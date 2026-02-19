@@ -73,7 +73,7 @@ export default function LandingPage() {
         </div>
 
         {/* Image Slider Section */}
-        <div className="lg:w-[48%] w-full relative group shadow-2xl shadow-black">
+        <div className="lg:w-[48%] w-full relative group shadow-[0_0_100px_black]">
           <div
             className="relative aspect-[16/10] w-full overflow-hidden rounded-xl"
             style={{
