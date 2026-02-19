@@ -44,10 +44,9 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
         <div className="text-left max-w-xl lg:w-1/2">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-display leading-[1.05] tracking-tighter mb-8 text-white">
-            Verifiable portfolios<br />
-            for Web3, creative,<br />
-            and on-chain careers.
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display leading-[1.1] tracking-tighter mb-8 text-white">
+            Verifiable portfolios for Web3,<br />
+            creative, and on-chain careers.
           </h1>
 
           {/* Subheading */}
