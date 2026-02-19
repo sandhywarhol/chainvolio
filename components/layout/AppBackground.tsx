@@ -1,6 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 export function AppBackground() {
+    const pathname = usePathname();
+    const isHomePage = pathname === "/";
+
     return (
         <>
             {/* Black background layer - behind everything */}
@@ -25,23 +30,37 @@ export function AppBackground() {
             {/* Bottom black fade - subtle depth at the footer area */}
             <div className="fixed inset-0 z-20 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
 
-            {/* Global Vignette - Ultra-Soft Seamless Mist (Offset from top for clear navigation) */}
-            <div
-                className="fixed top-24 bottom-0 left-0 w-[20%] z-50 pointer-events-none backdrop-blur-xl"
-                style={{
-                    maskImage: 'linear-gradient(to right, black, transparent)',
-                    WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
-                    background: 'linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0))'
-                }}
-            ></div>
-            <div
-                className="fixed top-24 bottom-0 right-0 w-[20%] z-50 pointer-events-none backdrop-blur-xl"
-                style={{
-                    maskImage: 'linear-gradient(to left, black, transparent)',
-                    WebkitMaskImage: 'linear-gradient(to left, black, transparent)',
-                    background: 'linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0))'
-                }}
-            ></div>
+            {isHomePage && (
+                <>
+                    {/* Global Vignette - Ultra-Soft Seamless Mist (Offset from top for clear navigation) */}
+                    <div
+                        className="fixed top-24 bottom-0 left-0 w-[20%] z-[70] pointer-events-none backdrop-blur-xl"
+                        style={{
+                            maskImage: 'linear-gradient(to right, black, transparent)',
+                            WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
+                            background: 'linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0))'
+                        }}
+                    ></div>
+                    <div
+                        className="fixed top-24 bottom-0 right-0 w-[20%] z-[70] pointer-events-none backdrop-blur-xl"
+                        style={{
+                            maskImage: 'linear-gradient(to left, black, transparent)',
+                            WebkitMaskImage: 'linear-gradient(to left, black, transparent)',
+                            background: 'linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0))'
+                        }}
+                    ></div>
+
+                    {/* Bottom Vignette - Blur for the footer area */}
+                    <div
+                        className="fixed bottom-0 left-0 right-0 h-32 z-[70] pointer-events-none backdrop-blur-xl"
+                        style={{
+                            maskImage: 'linear-gradient(to top, black, transparent)',
+                            WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
+                            background: 'linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0))'
+                        }}
+                    ></div>
+                </>
+            )}
 
             {/* Carbon fiber / mesh texture overlay moved to lower z-index */}
             <div className="fixed inset-0 z-15">

@@ -20,7 +20,6 @@ export default function LandingPage() {
             <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
             <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
             <Link href="/dashboard" className="text-white/40 hover:text-white/90 transition-colors">Dashboard</Link>
-            <Link href="/hiring/create" className="text-emerald-500/70 hover:text-emerald-400 transition-colors">Hire Talent</Link>
           </div>
         </div>
         <WalletMultiButton />
@@ -45,13 +44,19 @@ export default function LandingPage() {
             Share a trusted CV with anyone, no login required.
           </p>
 
-          {/* CTA Button */}
-          <div className="flex flex-col items-center gap-4">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/create-profile"
-              className="px-8 py-3.5 solana-glossy-button text-white font-semibold text-base"
+              className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap"
             >
-              Build your on-chain CV
+              Build your CV
+            </Link>
+            <Link
+              href="/hiring/create"
+              className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap"
+            >
+              Hire Talent
             </Link>
           </div>
         </div>
@@ -60,7 +65,7 @@ export default function LandingPage() {
       {/* Footer Area - Pinned to bottom */}
       <div className="w-full relative z-40 pb-12">
         {/* Logo Marquee Section */}
-        <div className="w-full py-10 overflow-hidden relative">
+        <div className="w-full py-10 overflow-hidden relative bg-black/5 backdrop-blur-sm">
           <div className="flex animate-marquee whitespace-nowrap items-center w-max">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
@@ -78,7 +83,7 @@ export default function LandingPage() {
         </div>
 
         {/* Bottom Info */}
-        <div className="w-full border-t border-white/5 pt-8 text-center bg-white/[0.01]">
+        <div className="w-full border-t border-white/5 pt-8 text-center bg-white/[0.02] backdrop-blur-md">
           <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
             Powered by Solana · Free to use · No tokens required
           </p>
