@@ -5,77 +5,96 @@ export interface SkillGroup {
 
 export const SKILL_BANK: SkillGroup[] = [
     {
-        category: "Engineering",
+        category: "Technology & Product",
         skills: [
             "Frontend Development",
             "Backend Development",
-            "Fullstack Development",
-            "Smart Contract (Solana)",
-            "Smart Contract (Ethereum)",
-            "Mobile Development",
+            "Full-Stack Development",
+            "Mobile App Development",
             "Game Development",
-            "DevOps",
-            "Data Science",
-            "Machine Learning",
-            "Rust",
-            "Solidity",
-            "TypeScript",
-            "React",
-            "Next.js",
-            "Python",
-            "Go",
-        ]
-    },
-    {
-        category: "Design & Creative",
-        skills: [
             "UI/UX Design",
             "Product Design",
-            "Graphic Design",
-            "Brand Identity",
-            "Photography",
-            "Videography",
-            "Motion Design",
-            "3D Modeling",
-            "Animation",
+            "Product Management",
+            "QA Testing",
         ]
     },
     {
-        category: "Web3 & Crypto",
+        category: "Creative & Media",
         skills: [
+            "Photography",
+            "Commercial Photography",
+            "Product Photography",
+            "Portrait Photography",
+            "Videography",
+            "Video Editing",
+            "Cinematography",
+            "Motion Design",
+            "Graphic Design",
+            "Brand Design",
+            "Visual Identity",
+            "Illustration",
+            "3D Design",
+            "Animation",
+            "Storyboarding",
+            "Creative Direction",
+        ]
+    },
+    {
+        category: "Web3 & Blockchain",
+        skills: [
+            "Smart Contract Development",
+            "Solana Development",
+            "Ethereum Development",
             "DeFi Research",
             "NFT Strategy",
             "DAO Governance",
-            "Tokenomics Design",
-            "Crypto Economics",
-            "On-chain Analysis",
-            "Security Auditing",
+            "Blockchain Analytics",
+            "On-Chain Data Analysis",
+            "Tokenomics",
         ]
     },
     {
-        category: "Tools & Platforms",
+        category: "Business & Marketing",
         skills: [
-            "GitHub",
+            "Digital Marketing",
+            "Social Media Management",
+            "Content Strategy",
+            "Copywriting",
+            "Branding Strategy",
+            "Growth Marketing",
+            "Community Management",
+            "Partnerships",
+            "Campaign Management",
+        ]
+    },
+    {
+        category: "Finance & Operations",
+        skills: [
+            "Financial Analysis",
+            "Accounting",
+            "Budget Planning",
+            "Treasury Management",
+            "Crypto Accounting",
+            "Risk Management",
+            "Operations Management",
+            "Business Development",
+        ]
+    },
+    {
+        category: "Tools & Software",
+        skills: [
             "Figma",
+            "Adobe Photoshop",
+            "Adobe Illustrator",
+            "Adobe Premiere Pro",
+            "After Effects",
+            "Blender",
             "Unity",
             "Unreal Engine",
-            "Docker",
-            "AWS",
-            "Vercel",
-            "Adobe Creative Cloud",
-        ]
-    },
-    {
-        category: "Marketing & Growth",
-        skills: [
-            "Content Strategy",
-            "Community Management",
-            "SEO",
-            "Social Media Marketing",
-            "Growth Hacking",
-            "Public Relations",
+            "GitHub",
+            "Notion",
         ]
     }
 ];
 
-export const ALL_SKILLS = SKILL_BANK.flatMap(group => group.skills).sort();
+export const ALL_SKILLS = Array.from(new Set(SKILL_BANK.flatMap(group => group.skills))).sort();
