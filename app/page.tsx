@@ -73,7 +73,7 @@ export default function LandingPage() {
         </div>
 
         {/* Image Slider Section */}
-        <div className="lg:w-1/2 w-full relative group">
+        <div className="lg:w-[42%] w-full relative group">
           <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl">
             {SLIDES.map((slide, index) => (
               <div
@@ -86,6 +86,8 @@ export default function LandingPage() {
                   alt={slide.label}
                   className="w-full h-full object-cover object-top"
                 />
+                {/* Black Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
               </div>
             ))}
 
