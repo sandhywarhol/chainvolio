@@ -73,9 +73,9 @@ export default function LandingPage() {
         </div>
 
         {/* Image Slider Section */}
-        <div className="lg:w-[48%] w-full relative group">
+        <div className="lg:w-[48%] w-full relative group shadow-2xl shadow-white/5">
           <div
-            className="relative aspect-[16/10] w-full overflow-hidden"
+            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl"
             style={{
               maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
