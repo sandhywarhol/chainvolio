@@ -6,6 +6,8 @@ import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { supabase } from "@/lib/supabase/client";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
+import { CountrySelector } from "@/components/ui/CountrySelector";
+import { SkillSelector } from "@/components/ui/SkillSelector";
 
 export default function CreateProfilePage() {
   const { publicKey, connected } = useWallet();
@@ -242,24 +244,19 @@ export default function CreateProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Skills (comma separated)</label>
-            <input
-              type="text"
+            <label className="block text-sm text-slate-400 mb-2">Primary Skills</label>
+            <SkillSelector
               value={form.skills}
-              onChange={(e) => setForm({ ...form, skills: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-              placeholder="Solidity, React, DeFi"
+              onChange={(val) => setForm({ ...form, skills: val })}
+              maxSkills={8}
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Country (optional)</label>
-            <input
-              type="text"
+            <label className="block text-sm text-slate-400 mb-2">Country (Select from list)</label>
+            <CountrySelector
               value={form.country}
-              onChange={(e) => setForm({ ...form, country: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-              placeholder="e.g., United States, Kenya, Singapore"
+              onChange={(val) => setForm({ ...form, country: val })}
             />
           </div>
 
