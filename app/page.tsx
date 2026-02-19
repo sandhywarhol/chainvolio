@@ -1,11 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 
 export default function LandingPage() {
   const [activeModal, setActiveModal] = useState<'features' | 'how' | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const SLIDES = [
+    { src: "/homepage/cv view.png", label: "Professional Profile" },
+    { src: "/homepage/dashboard.png", label: "Recruiter Dashboard" },
+    { src: "/homepage/edit profile.png", label: "Profile Customization" },
+    { src: "/homepage/link recruit.png", label: "Hiring Links" },
+    { src: "/homepage/proof of work.png", label: "Verifiable Work" },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -26,26 +42,21 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex-1 max-w-[1600px] w-full mx-auto px-8 relative z-40 flex flex-col items-center justify-center py-8">
-        <div className="text-center max-w-4xl">
-          {/* Logo above title */}
-          <div className="flex justify-center mb-2">
-            <img src="/chainvolio logo.png" alt="ChainVolio" className="w-32 h-32 md:w-36 md:h-36 object-contain animate-float" />
-          </div>
-
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold font-display leading-[1.05] tracking-tighter mb-8 text-white">
-            On-Chain portfolios<br />
-            for Web3 careers.
+      <section className="flex-1 max-w-[1600px] w-full mx-auto px-8 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-12">
+        <div className="text-left max-w-2xl lg:w-1/2">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-display leading-[1.05] tracking-tighter mb-8 text-white">
+            Radically better<br />
+            Web3 portfolios
           </h1>
 
           {/* Subheading */}
-          <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed mb-12 max-w-2xl mx-auto tracking-tight">
-            Build a work history that can't be faked. Timestamp achievements on-chain.
-            Share a trusted CV with anyone, no login required.
+          <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed mb-12 max-w-xl tracking-tight">
+            Build a work history that can't be faked. Verifiable achievements.
+            The most trusted way to grow your Web3 career.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
             <Link
               href="/create-profile"
               className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap"
@@ -58,6 +69,64 @@ export default function LandingPage() {
             >
               Hire Talent
             </Link>
+          </div>
+        </div>
+
+        {/* Image Slider Section */}
+        <div className="lg:w-1/2 w-full relative group">
+          <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl">
+            {SLIDES.map((slide, index) => (
+              <div
+                key={slide.src}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"
+                  }`}
+              >
+                <img
+                  src={slide.src}
+                  alt={slide.label}
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+            ))}
+
+            {/* Slide Indicators */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {SLIDES.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentSlide ? "bg-white w-4" : "bg-white/30"
+                    }`}
+                />
+              ))}
+            </div>
+
+            {/* Manual Controls */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
+                className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)}
+                className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Label Display */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-white/40 uppercase tracking-widest font-bold">
+              {SLIDES[currentSlide].label}
+            </p>
           </div>
         </div>
       </section>
