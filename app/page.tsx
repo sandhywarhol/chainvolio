@@ -75,9 +75,9 @@ export default function LandingPage() {
         {/* Image Slider Section */}
         <div className="lg:w-[48%] w-full relative group" style={{ perspective: '2000px' }}>
           <div
-            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-5deg] group-hover:rotate-x-[2deg]"
+            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]"
             style={{
-              transform: 'rotateY(-15deg) rotateX(5deg) scale(1.05)',
+              transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)',
               transformStyle: 'preserve-3d',
               maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
