@@ -5,22 +5,32 @@ export interface SkillGroup {
 
 export const SKILL_BANK: SkillGroup[] = [
     {
-        category: "Technology & Product",
+        category: "Technology & Engineering",
         skills: [
             "Frontend Development",
             "Backend Development",
             "Full-Stack Development",
             "Mobile App Development",
             "Game Development",
-            "UI/UX Design",
-            "Product Design",
-            "Product Management",
+            "DevOps",
+            "Data Science",
+            "Machine Learning",
             "QA Testing",
+            "Rust",
+            "Solidity",
+            "TypeScript",
+            "React",
+            "Next.js",
+            "Python",
+            "Go",
+            "Smart Contract Development",
         ]
     },
     {
         category: "Creative & Media",
         skills: [
+            "UI/UX Design",
+            "Product Design",
             "Photography",
             "Commercial Photography",
             "Product Photography",
@@ -42,7 +52,6 @@ export const SKILL_BANK: SkillGroup[] = [
     {
         category: "Web3 & Blockchain",
         skills: [
-            "Smart Contract Development",
             "Solana Development",
             "Ethereum Development",
             "DeFi Research",
@@ -51,6 +60,8 @@ export const SKILL_BANK: SkillGroup[] = [
             "Blockchain Analytics",
             "On-Chain Data Analysis",
             "Tokenomics",
+            "Crypto Economics",
+            "Security Auditing",
         ]
     },
     {
@@ -65,6 +76,8 @@ export const SKILL_BANK: SkillGroup[] = [
             "Community Management",
             "Partnerships",
             "Campaign Management",
+            "SEO",
+            "Public Relations",
         ]
     },
     {
@@ -78,6 +91,7 @@ export const SKILL_BANK: SkillGroup[] = [
             "Risk Management",
             "Operations Management",
             "Business Development",
+            "Project Management",
         ]
     },
     {
@@ -93,6 +107,9 @@ export const SKILL_BANK: SkillGroup[] = [
             "Unreal Engine",
             "GitHub",
             "Notion",
+            "Docker",
+            "AWS",
+            "Vercel",
         ]
     }
 ];
