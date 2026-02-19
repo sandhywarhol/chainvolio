@@ -34,20 +34,6 @@ export default function WhyPage() {
                     <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto italic font-light">
                         ChainVolio replaces traditional CVs, PDFs, and unverifiable claims with trusted, on-chain proof of work.
                     </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                        <Link
-                            href="/create-profile"
-                            className="w-full sm:w-auto px-8 py-4 solana-glossy-button text-white font-bold text-lg whitespace-nowrap"
-                        >
-                            Build Your On-Chain CV
-                        </Link>
-                        <Link
-                            href="/hiring/create"
-                            className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-lg whitespace-nowrap transition-all"
-                        >
-                            Hire with Proof
-                        </Link>
-                    </div>
                 </div>
             </section>
 
@@ -210,20 +196,6 @@ export default function WhyPage() {
                         </h2>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link
-                            href="/create-profile"
-                            className="w-full sm:w-auto px-10 py-4 solana-glossy-button text-white font-bold text-lg rounded-full"
-                        >
-                            Build Your On-Chain Portfolio
-                        </Link>
-                        <Link
-                            href="/hiring/create"
-                            className="w-full sm:w-auto px-10 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white font-bold text-lg rounded-full transition-all"
-                        >
-                            Start Hiring with Proof
-                        </Link>
-                    </div>
                 </div>
             </section>
 
