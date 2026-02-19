@@ -45,8 +45,9 @@ export default function LandingPage() {
       <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
         <div className="text-left max-w-xl lg:w-1/2">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-display leading-[1.05] tracking-tighter mb-8 text-white">
-            Radically better<br />
-            Web3 portfolios
+            Verifiable portfolios<br />
+            for Web3, creative,<br />
+            and on-chain careers.
           </h1>
 
           {/* Subheading */}
@@ -92,7 +93,7 @@ export default function LandingPage() {
                 <img
                   src={slide.src}
                   alt={slide.label}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top opacity-80"
                 />
               </div>
             ))}
@@ -130,12 +131,6 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* Label Display */}
-          <div className="mt-4 text-center">
-            <p className="text-xs text-white/40 uppercase tracking-widest font-bold">
-              {SLIDES[currentSlide].label}
-            </p>
-          </div>
         </div>
       </section>
 
