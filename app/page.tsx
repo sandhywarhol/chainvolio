@@ -73,14 +73,17 @@ export default function LandingPage() {
         </div>
 
         {/* Image Slider Section */}
-        <div className="lg:w-[48%] w-full relative group shadow-[0_0_100px_black]">
+        <div className="lg:w-[48%] w-full relative group" style={{ perspective: '2000px' }}>
           <div
-            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl"
+            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-5deg] group-hover:rotate-x-[2deg]"
             style={{
+              transform: 'rotateY(-15deg) rotateX(5deg) scale(1.05)',
+              transformStyle: 'preserve-3d',
               maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
               maskComposite: 'intersect',
-              WebkitMaskComposite: 'source-in'
+              WebkitMaskComposite: 'source-in',
+              boxShadow: '0 0 100px black'
             }}
           >
             {SLIDES.map((slide, index) => (
