@@ -101,7 +101,7 @@ export default function DashboardPage() {
               <span className="text-xl font-bold">chainvolio</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Why ChainVolio</Link>
+              <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why chainvolio</Link>
             </div>
           </div>
           <WalletMultiButton />
@@ -128,7 +128,7 @@ export default function DashboardPage() {
           <span className="text-xl font-bold">chainvolio</span>
         </Link>
         <div className="flex items-center gap-6">
-          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Why ChainVolio</Link>
+          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why chainvolio</Link>
           <Link href="/hiring/create" className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70 hover:text-emerald-400 transition-colors">Hire Talent</Link>
           <WalletMultiButton />
         </div>

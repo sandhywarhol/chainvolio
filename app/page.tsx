@@ -35,8 +35,8 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
             <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
             <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
-            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors">Why ChainVolio</Link>
-            <Link href="/dashboard" className="text-white/40 hover:text-white/90 transition-colors">Dashboard</Link>
+            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why chainvolio</Link>
+            <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
           </div>
         </div>
         <WalletMultiButton />

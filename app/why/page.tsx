@@ -14,9 +14,9 @@ export default function WhyPage() {
                         <span className="text-sm font-bold text-white/90">chainvolio</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
-                        <Link href="/" className="text-white/40 hover:text-white/90 transition-colors">Home</Link>
-                        <Link href="/why" className="text-white/90 transition-colors">Why ChainVolio</Link>
-                        <Link href="/dashboard" className="text-white/40 hover:text-white/90 transition-colors">Dashboard</Link>
+                        <Link href="/" className="text-white/40 hover:text-white/90 transition-colors normal-case">Home</Link>
+                        <Link href="/why" className="text-white/90 transition-colors normal-case">Why chainvolio</Link>
+                        <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
                     </div>
                 </div>
                 <WalletMultiButton />
