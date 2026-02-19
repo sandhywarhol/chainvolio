@@ -101,17 +101,6 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Slide Indicators */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-            {SLIDES.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentSlide ? "bg-white w-4" : "bg-white/30"
-                  }`}
-              />
-            ))}
-          </div>
 
           {/* Manual Controls */}
           <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -133,6 +122,16 @@ export default function LandingPage() {
             </button>
           </div>
 
+          <div className="flex justify-center gap-2 mt-12 relative z-50">
+            {SLIDES.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"
+                  }`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
