@@ -23,8 +23,8 @@ export default function WhyPage() {
             </nav>
 
             {/* 1. HERO SECTION */}
-            <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full text-center">
-                <div className="max-w-3xl mx-auto space-y-8">
+            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full text-center border-b border-white/5">
+                <div className="max-w-3xl mx-auto space-y-4">
                     <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tight text-white">
                         Why ChainVolio?
                     </h1>
@@ -38,10 +38,10 @@ export default function WhyPage() {
             </section>
 
             {/* 2. PROBLEM VS SOLUTION */}
-            <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
-                <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full">
+                <div className="grid lg:grid-cols-2 gap-8 items-stretch">
                     {/* Traditional Hiring (Problem) */}
-                    <div className="bg-black/20 backdrop-blur-sm border border-white/5 p-12 rounded-3xl space-y-8">
+                    <div className="bg-black/20 backdrop-blur-sm border border-white/5 p-8 rounded-2xl space-y-6">
                         <h2 className="text-2xl font-bold text-white/40 tracking-tight uppercase">Traditional Hiring</h2>
                         <ul className="space-y-6">
                             {[
@@ -60,9 +60,9 @@ export default function WhyPage() {
 
                     {/* ChainVolio (Solution) */}
                     <div className="relative group">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500/30 to-blue-500/30 rounded-3xl blur opacity-100 group-hover:opacity-100 transition duration-1000"></div>
-                        <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 p-12 rounded-3xl space-y-8 h-full shadow-2xl">
-                            <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent tracking-tight uppercase">ChainVolio</h2>
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500/30 to-blue-500/30 rounded-2xl blur opacity-100 group-hover:opacity-100 transition duration-1000"></div>
+                        <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 p-8 rounded-2xl space-y-6 h-full shadow-2xl">
+                            <h2 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent tracking-tight uppercase">ChainVolio</h2>
                             <ul className="space-y-6">
                                 {[
                                     "On-chain activity as proof",
@@ -82,9 +82,9 @@ export default function WhyPage() {
             </section>
 
             {/* 3. WHAT MAKES CHAINVOLIO DIFFERENT */}
-            <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
-                <h2 className="text-3xl md:text-5xl font-bold text-center mb-20 text-white tracking-tight">Different by Design</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full">
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-white tracking-tight">Different by Design</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                         {
                             title: "Verifiable by Design",
@@ -105,9 +105,9 @@ export default function WhyPage() {
                     ].map((card, i) => (
                         <div
                             key={i}
-                            className="bg-white/[0.03] backdrop-blur-sm border border-white/10 p-8 rounded-2xl hover:-translate-y-2 hover:shadow-2xl hover:bg-white/[0.05] transition-all duration-300 group"
+                            className="bg-white/[0.03] backdrop-blur-sm border border-white/10 p-6 rounded-xl hover:-translate-y-1 hover:shadow-xl hover:bg-white/[0.05] transition-all duration-300 group"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 tracking-tight group-hover:text-teal-400 transition-colors">{card.title}</h3>
+                            <h3 className="text-lg font-bold text-white mb-3 tracking-tight group-hover:text-teal-400 transition-colors">{card.title}</h3>
                             <p className="text-sm text-white/50 leading-relaxed font-light">{card.desc}</p>
                         </div>
                     ))}
@@ -118,8 +118,8 @@ export default function WhyPage() {
             <section className="relative z-40 border-y border-white/5 bg-white/[0.01]">
                 <div className="max-w-[1240px] mx-auto grid md:grid-cols-2 divide-x divide-white/5">
                     {/* For Talent */}
-                    <div className="p-16 space-y-8">
-                        <h2 className="text-3xl font-bold text-white tracking-tight">For Talent</h2>
+                    <div className="p-10 space-y-6">
+                        <h2 className="text-2xl font-bold text-white tracking-tight">For Talent</h2>
                         <ul className="space-y-4">
                             {[
                                 "Own your on-chain career",
@@ -136,8 +136,8 @@ export default function WhyPage() {
                     </div>
 
                     {/* For Recruiters */}
-                    <div className="p-16 space-y-8">
-                        <h2 className="text-3xl font-bold text-white tracking-tight">For Recruiters</h2>
+                    <div className="p-10 space-y-6">
+                        <h2 className="text-2xl font-bold text-white tracking-tight">For Recruiters</h2>
                         <ul className="space-y-4">
                             {[
                                 "Filter by real on-chain signal",
@@ -156,9 +156,9 @@ export default function WhyPage() {
             </section>
 
             {/* 5. MINI COMPARISON TABLE */}
-            <section className="relative z-40 py-24 px-8 max-w-[1000px] mx-auto w-full">
-                <h2 className="text-3xl font-bold text-center mb-12 text-white">The Comparison</h2>
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md">
+            <section className="relative z-40 py-16 px-8 max-w-[1000px] mx-auto w-full">
+                <h2 className="text-2xl font-bold text-center mb-8 text-white">The Comparison</h2>
+                <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20 backdrop-blur-md">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-white/5">
@@ -187,8 +187,8 @@ export default function WhyPage() {
             </section>
 
             {/* 6. CLOSING STATEMENT */}
-            <section className="relative z-40 py-32 px-8 text-center bg-gradient-to-b from-transparent to-teal-500/5">
-                <div className="max-w-2xl mx-auto space-y-12">
+            <section className="relative z-40 py-20 px-8 text-center bg-gradient-to-b from-transparent to-teal-500/5">
+                <div className="max-w-2xl mx-auto space-y-8">
                     <div className="space-y-4">
                         <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
                             In Web3, your work is public. <br />
