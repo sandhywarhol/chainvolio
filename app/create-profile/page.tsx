@@ -181,7 +181,10 @@ export default function CreateProfilePage() {
           <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
           <span className="text-xl font-bold">chainvolio</span>
         </Link>
-        <WalletMultiButton />
+        <div className="flex items-center gap-6">
+          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Why ChainVolio</Link>
+          <WalletMultiButton />
+        </div>
       </nav>
 
       <section className="max-w-xl mx-auto px-6 py-12">
