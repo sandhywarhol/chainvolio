@@ -42,8 +42,8 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex-1 max-w-[1600px] w-full mx-auto px-8 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-12">
-        <div className="text-left max-w-2xl lg:w-1/2">
+      <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
+        <div className="text-left max-w-xl lg:w-1/2">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-display leading-[1.05] tracking-tighter mb-8 text-white">
             Radically better<br />
             Web3 portfolios
@@ -73,8 +73,16 @@ export default function LandingPage() {
         </div>
 
         {/* Image Slider Section */}
-        <div className="lg:w-[42%] w-full relative group">
-          <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl">
+        <div className="lg:w-[48%] w-full relative group">
+          <div
+            className="relative aspect-[16/10] w-full overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+              maskComposite: 'intersect',
+              WebkitMaskComposite: 'source-in'
+            }}
+          >
             {SLIDES.map((slide, index) => (
               <div
                 key={slide.src}
@@ -86,42 +94,40 @@ export default function LandingPage() {
                   alt={slide.label}
                   className="w-full h-full object-cover object-top"
                 />
-                {/* Black Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
               </div>
             ))}
+          </div>
 
-            {/* Slide Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-              {SLIDES.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentSlide ? "bg-white w-4" : "bg-white/30"
-                    }`}
-                />
-              ))}
-            </div>
+          {/* Slide Indicators */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {SLIDES.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentSlide ? "bg-white w-4" : "bg-white/30"
+                  }`}
+              />
+            ))}
+          </div>
 
-            {/* Manual Controls */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
-                className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)}
-                className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+          {/* Manual Controls */}
+          <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
+              className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)}
+              className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
 
           {/* Label Display */}
@@ -243,9 +249,9 @@ export default function LandingPage() {
                     <div className="flex gap-6">
                       <div className="text-4xl font-light text-white/20">01</div>
                       <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Connect Your Wallet</h3>
-                        <p className="text-xs text-white/60 leading-relaxed mb-3">
-                          Use Phantom, Solflare, or any Solana wallet. Your wallet address becomes your identity—no email, no password, no personal data collection.
+                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Connect Wallet</h3>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Securely log in using your Solana wallet. This creates your unique cryptographic identifier on the platform.
                         </p>
                       </div>
                     </div>
@@ -253,9 +259,9 @@ export default function LandingPage() {
                     <div className="flex gap-6">
                       <div className="text-4xl font-light text-white/20">02</div>
                       <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Create Your Profile</h3>
-                        <p className="text-xs text-white/60 leading-relaxed mb-3">
-                          Add your name, bio, skills, and social links. Upload an avatar. This information is stored in our database and linked to your wallet.
+                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Build Profile</h3>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Enter your display name, bio, and professional links. Upload an avatar and define your work preferences.
                         </p>
                       </div>
                     </div>
@@ -263,9 +269,9 @@ export default function LandingPage() {
                     <div className="flex gap-6">
                       <div className="text-4xl font-light text-white/20">03</div>
                       <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Add Work History</h3>
-                        <p className="text-xs text-white/60 leading-relaxed mb-3">
-                          Record your roles, projects, and achievements. Each entry is timestamped on-chain. Add evidence links, portfolio images, and impact metrics.
+                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Add Work Proof</h3>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Submit your past projects or roles. Each entry is recorded on-chain with evidence and timestamps.
                         </p>
                       </div>
                     </div>
@@ -273,9 +279,9 @@ export default function LandingPage() {
                     <div className="flex gap-6">
                       <div className="text-4xl font-light text-white/20">04</div>
                       <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Get Attestations (Optional)</h3>
-                        <p className="text-xs text-white/60 leading-relaxed mb-3">
-                          Request colleagues or employers to verify your work by signing with their wallet. This creates cryptographic proof of authenticity.
+                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Get Attestations</h3>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Invite collaborators to verify your work. Their cryptographic signatures add a layer of peer-vetted trust to your profile.
                         </p>
                       </div>
                     </div>
