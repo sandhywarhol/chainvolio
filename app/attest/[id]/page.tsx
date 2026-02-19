@@ -135,8 +135,8 @@ export default function AttestPage() {
         <main className="min-h-screen text-white">
             <nav className="flex items-center justify-between px-6 py-4 max-w-2xl mx-auto relative z-[100]">
                 <Link href="/" className="flex items-center gap-1.5 group">
-                    <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-                    <span className="text-xl font-bold">chainvolio</span>
+                    <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+                    <span className="text-xl font-bold">Chainvolio</span>
                 </Link>
                 <WalletMultiButton />
             </nav>
@@ -154,7 +154,7 @@ export default function AttestPage() {
                     </div>
 
                     <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-left text-sm space-y-2">
-                        <p className="font-semibold text-white text-base">No ChainVolio account required.</p>
+                        <p className="font-semibold text-white text-base">No Chainvolio account required.</p>
                         <p className="text-slate-400 leading-relaxed">
                             Verifying this work helps the candidate build professional trust. Your name, role, and wallet signature will be cryptographically linked to this record.
                         </p>

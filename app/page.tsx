@@ -29,13 +29,13 @@ export default function LandingPage() {
       <nav className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto relative z-[100] border-b border-white/5">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-1.5 group">
-            <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-bold text-white/90">chainvolio</span>
+            <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-bold text-white/90">Chainvolio</span>
           </Link>
           <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
             <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
             <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
-            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why chainvolio</Link>
+            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why Chainvolio</Link>
             <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
           </div>
         </div>

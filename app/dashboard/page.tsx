@@ -97,11 +97,11 @@ export default function DashboardPage() {
         <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-1.5 group">
-              <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain" />
-              <span className="text-xl font-bold">chainvolio</span>
+              <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain" />
+              <span className="text-xl font-bold">Chainvolio</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why chainvolio</Link>
+              <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why Chainvolio</Link>
             </div>
           </div>
           <WalletMultiButton />
@@ -124,11 +124,11 @@ export default function DashboardPage() {
       {/* ... (Nav remains) */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto relative z-[100]">
         <Link href="/" className="flex items-center gap-1.5 group">
-          <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-          <span className="text-xl font-bold">chainvolio</span>
+          <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+          <span className="text-xl font-bold">Chainvolio</span>
         </Link>
         <div className="flex items-center gap-6">
-          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why chainvolio</Link>
+          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why Chainvolio</Link>
           <Link href="/hiring/create" className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70 hover:text-emerald-400 transition-colors">Hire Talent</Link>
           <WalletMultiButton />
         </div>

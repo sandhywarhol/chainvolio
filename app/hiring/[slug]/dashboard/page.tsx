@@ -331,8 +331,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link href="/" className="flex items-center gap-2 group">
-                            <img src="/chainvolio logo.png" alt="Logo" className="w-6 h-6 grayscale hover:grayscale-0 transition-all" />
-                            <span className="text-sm font-bold tracking-tight text-white/90">CHAINVOLIO <span className="text-indigo-500">HIRE</span></span>
+                            <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-6 h-6 grayscale hover:grayscale-0 transition-all" />
+                            <span className="text-sm font-bold tracking-tight text-white/90">Chainvolio <span className="text-indigo-500">HIRE</span></span>
                         </Link>
                         <div className="h-4 w-[1px] bg-white/10 mx-2" />
                         <h1 className="text-sm font-semibold text-white/70 line-clamp-1">{data?.collection.title}</h1>

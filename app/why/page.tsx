@@ -11,11 +11,10 @@ export default function WhyPage() {
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-1.5 group">
                         <img src="/chainvolio logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-bold text-white/90">chainvolio</span>
+                        <span className="text-sm font-bold text-white/90">Chainvolio</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
-                        <Link href="/" className="text-white/40 hover:text-white/90 transition-colors normal-case">Home</Link>
-                        <Link href="/why" className="text-white/90 transition-colors normal-case">Why chainvolio</Link>
+                        <Link href="/why" className="text-white/90 transition-colors normal-case">Why Chainvolio</Link>
                         <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
                     </div>
                 </div>
@@ -26,13 +25,13 @@ export default function WhyPage() {
             <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full text-center border-b border-white/5">
                 <div className="max-w-3xl mx-auto space-y-4">
                     <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tight text-white">
-                        Why ChainVolio?
+                        Why Chainvolio?
                     </h1>
                     <p className="text-xl md:text-2xl font-medium text-white/90 font-display">
                         Because Web3 careers deserve proof, not promises.
                     </p>
                     <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto italic font-light">
-                        ChainVolio replaces traditional CVs, PDFs, and unverifiable claims with trusted, on-chain proof of work.
+                        Chainvolio replaces traditional CVs, PDFs, and unverifiable claims with trusted, on-chain proof of work.
                     </p>
                 </div>
             </section>
@@ -62,7 +61,7 @@ export default function WhyPage() {
                     <div className="relative group">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500/30 to-blue-500/30 rounded-2xl blur opacity-100 group-hover:opacity-100 transition duration-1000"></div>
                         <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 p-8 rounded-2xl space-y-6 h-full shadow-2xl">
-                            <h2 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent tracking-tight uppercase">ChainVolio</h2>
+                            <h2 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent tracking-tight uppercase">Chainvolio</h2>
                             <ul className="space-y-6">
                                 {[
                                     "On-chain activity as proof",
@@ -164,7 +163,7 @@ export default function WhyPage() {
                             <tr className="bg-white/5">
                                 <th className="p-6 text-sm font-bold uppercase tracking-wider text-white/60">Feature</th>
                                 <th className="p-6 text-sm font-bold uppercase tracking-wider text-white/60">Traditional CV</th>
-                                <th className="p-6 text-sm font-bold uppercase tracking-wider text-teal-400">ChainVolio</th>
+                                <th className="p-6 text-sm font-bold uppercase tracking-wider text-teal-400">Chainvolio</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -202,7 +201,7 @@ export default function WhyPage() {
             {/* Footer Area */}
             <div className="w-full relative z-40 pb-12 border-t border-white/5 pt-12 text-center bg-black/20">
                 <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
-                    ChainVolio · Built for the Future of Work
+                    Chainvolio · Built for the Future of Work
                 </p>
             </div>
         </main>
