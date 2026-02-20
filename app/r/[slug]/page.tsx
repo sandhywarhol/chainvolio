@@ -97,8 +97,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
         <main className="min-h-screen text-white">
             <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
                 <Link href="/" className="flex items-center gap-1.5 group">
-                    <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                    <span className="text-xl font-bold">Chainvolio</span>
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                    <span className="text-xl font-bold">ChainVolio</span>
                 </Link>
                 <WalletMultiButton />
             </nav>

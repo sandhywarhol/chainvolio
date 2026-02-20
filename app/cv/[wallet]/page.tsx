@@ -205,8 +205,8 @@ export default function CVPage() {
     <main className="min-h-screen text-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-3xl mx-auto relative z-[100]">
         <Link href="/" className="flex items-center gap-1.5 group">
-          <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-          <span className="text-xl font-bold">Chainvolio</span>
+          <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+          <span className="text-xl font-bold">ChainVolio</span>
         </Link>
         <span className="text-sm text-slate-500 font-mono truncate max-w-[200px]">
           {wallet}
@@ -705,7 +705,7 @@ export default function CVPage() {
 
         <footer className="mt-16 text-center border-t border-slate-800 pt-8 pb-4">
           <p className="text-slate-600 text-xs max-w-md mx-auto">
-            Chainvolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by Chainvolio itself. Please verify critical claims independently.
+            ChainVolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by ChainVolio itself. Please verify critical claims independently.
           </p>
         </footer>
       </section>

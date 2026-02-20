@@ -9,11 +9,11 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const SLIDES = [
-    { src: "/homepage/cv view.png", label: "Professional Profile" },
+    { src: "/homepage/cv%20view.png", label: "Professional Profile" },
     { src: "/homepage/dashboard.png", label: "Recruiter Dashboard" },
-    { src: "/homepage/edit profile.png", label: "Profile Customization" },
-    { src: "/homepage/link recruit.png", label: "Hiring Links" },
-    { src: "/homepage/proof of work.png", label: "Verifiable Work" },
+    { src: "/homepage/edit%20profile.png", label: "Profile Customization" },
+    { src: "/homepage/link%20recruit.png", label: "Hiring Links" },
+    { src: "/homepage/proof%20of%20work.png", label: "Verifiable Work" },
   ];
 
   useEffect(() => {
@@ -29,13 +29,13 @@ export default function LandingPage() {
       <nav className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto relative z-[100] border-b border-white/5">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-1.5 group">
-            <img src="/chainvolio logo.png" alt="Chainvolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-bold text-white/90">Chainvolio</span>
+            <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-bold text-white/90">ChainVolio</span>
           </Link>
           <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
             <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
             <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
-            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why Chainvolio</Link>
+            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why ChainVolio</Link>
             <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function LandingPage() {
         {/* Bottom Info */}
         <div className="w-full border-t border-white/5 pt-8 text-center bg-white/[0.02] backdrop-blur-md">
           <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
-            Powered by Solana · Free to use · No tokens required
+            Powered by Solana · Free to use · No tokens required · ChainVolio
           </p>
         </div>
       </div>
@@ -182,7 +182,7 @@ export default function LandingPage() {
               playsInline
               className="absolute inset-0 w-full h-full object-cover opacity-70"
             >
-              <source src="/box navigation.mp4" type="video/mp4" />
+              <source src="/box%20navigation.mp4" type="video/mp4" />
             </video>
 
             {/* Content Container with Scroll */}

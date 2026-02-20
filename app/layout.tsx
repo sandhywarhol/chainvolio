@@ -9,10 +9,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
 
 export const metadata: Metadata = {
-  title: "Chainvolio — CV On-Chain",
+  title: "ChainVolio — CV On-Chain",
   description: "On-chain CV platform for Web3 talent",
   icons: {
-    icon: "/chainvolio logo.png",
+    icon: "/chainvolio%20logo.png",
   },
 };
 
