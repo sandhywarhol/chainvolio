@@ -18,10 +18,12 @@ import {
     Download,
     CheckCircle2,
     XCircle,
-    Trash2
+    Trash2,
+    AlertCircle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -29,6 +31,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
     const router = useRouter();
 
     // Filters & State
@@ -63,10 +67,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [slug]);
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this collection? This action cannot be undone.")) {
-            return;
-        }
-
         setIsDeleting(true);
         try {
             const res = await fetch(`/api/hiring/collections/${slug}`, {
@@ -84,6 +84,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             alert("An error occurred while deleting.");
         } finally {
             setIsDeleting(false);
+            setShowDeleteModal(false);
         }
     };
 
@@ -278,8 +279,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         return () => window.removeEventListener('click', closeDropdown);
     }, [activeDropdown]);
 
-    const handleDeleteCandidate = async (candidateId: string) => {
-        if (!confirm("Are you sure you want to delete this candidate? This action cannot be undone.")) return;
+    const handleDeleteCandidate = async () => {
+        if (!candidateToDelete) return;
+
+        const candidateId = candidateToDelete;
 
         // Optimistic update
         setData(prev => {
@@ -297,6 +300,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         } catch (err) {
             console.error("Failed to delete candidate", err);
             // Could revert here if needed
+        } finally {
+            setCandidateToDelete(null);
         }
     };
 
@@ -328,33 +333,40 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         <div className="min-h-screen text-slate-200 font-sans antialiased">
             {/* Top Header */}
             <header className="border-b border-white/5 bg-[#0f0f11]/60 backdrop-blur-md sticky top-0 z-[100]">
-                <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="flex items-center gap-2 group">
-                            <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-6 h-6 grayscale hover:grayscale-0 transition-all" />
-                            <span className="text-sm font-bold tracking-tight text-white/90">ChainVolio <span className="text-indigo-500">HIRE</span></span>
+                <div className="max-w-[1600px] mx-auto px-8 h-12 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-5 h-5 grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-300" />
+                            <span className="text-[11px] font-black tracking-[0.2em] text-white/50 uppercase group-hover:text-white/80 transition-colors">ChainVolio <span className="text-indigo-400">Secure</span></span>
                         </Link>
-                        <div className="h-4 w-[1px] bg-white/10 mx-2" />
-                        <h1 className="text-sm font-semibold text-white/70 line-clamp-1">{data?.collection.title}</h1>
+                        <div className="h-4 w-[1px] bg-white/[0.08]" />
+                        <div className="flex flex-col">
+                            <h1 className="text-[11px] font-bold text-white uppercase tracking-widest line-clamp-1">{data?.collection.title}</h1>
+                            <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{data?.collection.metadata?.roleType}</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
+                                <span className="text-[9px] font-bold text-emerald-500/80 uppercase tracking-wider">{data?.collection.metadata?.salary || "Competitive"}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         <button
-                            onClick={handleDelete}
+                            onClick={() => setShowDeleteModal(true)}
                             disabled={isDeleting}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold transition-colors border border-red-500/20 disabled:opacity-50"
+                            className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/5 text-red-400/50 hover:text-red-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-red-500/10 disabled:opacity-50"
                         >
-                            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                            Delete
+                            {isDeleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                            Terminate
                         </button>
                         <button
                             onClick={handleExportCSV}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-semibold transition-colors border border-white/5"
+                            className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/[0.03] text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-white/5"
                         >
-                            <Download className="w-3.5 h-3.5" /> Export CSV
+                            <Download className="w-3 h-3" /> Report
                         </button>
-                        <Link href={`/r/${slug}`} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold text-white transition-colors">
-                            <ExternalLink className="w-3.5 h-3.5" /> View Public Link
+                        <Link href={`/r/${slug}`} className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border border-indigo-500/20 hover:border-indigo-500/40">
+                            <ExternalLink className="w-3 h-3" /> Dashboard Access
                         </Link>
                     </div>
                 </div>
@@ -362,147 +374,176 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
             <main className="max-w-[1600px] mx-auto px-6 py-8 relative z-[60]">
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                     {[
-                        { label: "Total Candidates", value: data?.candidates.length, icon: Users, color: "text-blue-400" },
-                        { label: "Attested Portfolios", value: data?.candidates.filter(c => c.attestedCount > 0).length, icon: ShieldCheck, color: "text-emerald-400" },
-                        { label: "Avg. Proofs / User", value: (data?.candidates.reduce((acc, c) => acc + c.powCount, 0) / (data?.candidates.length || 1)).toFixed(1), icon: Briefcase, color: "text-purple-400" },
-                        { label: "Verified Organizations", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-orange-400" }
+                        { label: "Pipeline Depth", value: data?.candidates.length, icon: Users, color: "text-blue-400/80", desc: "Total applications" },
+                        { label: "Authority Rate", value: `${((data?.candidates.filter(c => c.attestedCount > 0).length || 0) / (data?.candidates.length || 1) * 100).toFixed(0)}%`, icon: ShieldCheck, color: "text-emerald-400/80", desc: "Attested portfolios" },
+                        { label: "Signal Density", value: (data?.candidates.reduce((acc, c) => acc + c.powCount, 0) / (data?.candidates.length || 1)).toFixed(1), icon: Briefcase, color: "text-purple-400/80", desc: "Avg. proof volume" },
+                        { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-orange-400/80", desc: "Verified partners" }
                     ].map((stat, i) => (
-                        <div key={i} className="bg-[#141417] border border-white/[0.03] rounded-2xl p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</span>
-                                <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                        <div key={i} className="bg-[#121215] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">
+                            {/* Suble glow */}
+                            <div className={`absolute -top-12 -right-12 w-24 h-24 blur-3xl opacity-5 transition-opacity group-hover:opacity-10 ${stat.color.split('-')[1] === 'blue' ? 'bg-blue-500' : stat.color.split('-')[1] === 'emerald' ? 'bg-emerald-500' : stat.color.split('-')[1] === 'purple' ? 'bg-purple-500' : 'bg-orange-500'}`}></div>
+
+                            <div className="flex items-center justify-between mb-4 relative z-10">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em]">{stat.label}</span>
+                                <div className={`p-2 rounded-lg bg-black/20 border border-white/[0.03] ${stat.color}`}>
+                                    <stat.icon className="w-3.5 h-3.5" />
+                                </div>
                             </div>
-                            <div className="text-2xl font-bold text-white tracking-tight">{stat.value}</div>
+                            <div className="flex items-baseline gap-2 relative z-10">
+                                <div className="text-3xl font-bold text-white tracking-tight">{stat.value}</div>
+                                <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">{stat.desc}</span>
+                            </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Filters Bar */}
-                <div className="bg-[#141417] border border-white/[0.03] rounded-2xl p-6 mb-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <div className="bg-[#121215]/80 backdrop-blur-sm border border-white/[0.04] rounded-2xl p-4 mb-10">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                        <div className="flex-1 relative group">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search candidates by name, wallet, or organization..."
+                                placeholder="Search by name, wallet address, or organization..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-black/40 border border-white/5 rounded-xl pl-10 pr-4 py-2.5 focus:border-indigo-500/50 outline-none transition-all text-sm"
+                                className="w-full bg-black/40 border border-white/[0.05] rounded-xl pl-11 pr-4 py-2 text-[13px] focus:border-indigo-400/30 transition-all text-slate-200 placeholder:text-slate-600 outline-none"
                             />
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <Filter className="w-4 h-4 text-slate-500" />
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Role</span>
                                 <select
                                     value={roleFilter}
                                     onChange={(e) => setRoleFilter(e.target.value)}
-                                    className="bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-sm focus:border-indigo-500/50 outline-none cursor-pointer"
+                                    className="bg-transparent text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
                                 >
-                                    <option value="all">Every Role</option>
-                                    {uniqueRoles.map((role: string) => <option key={role} value={role}>{role}</option>)}
+                                    <option value="all">ALL</option>
+                                    {uniqueRoles.map((role: string) => <option key={role} value={role}>{role.toUpperCase()}</option>)}
                                 </select>
                             </div>
 
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-sm focus:border-indigo-500/50 outline-none cursor-pointer"
-                            >
-                                <option value="recent">Sort by Recency</option>
-                                <option value="attestations">Most Attestations</option>
-                                <option value="total_proof">Most Proofs</option>
-                            </select>
+                            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sort</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-transparent text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
+                                >
+                                    <option value="recent">RECENCY</option>
+                                    <option value="attestations">AUTHORITY</option>
+                                    <option value="total_proof">VOLUME</option>
+                                </select>
+                            </div>
 
-                            <label className="flex items-center gap-2 cursor-pointer group">
+                            <div className="h-6 w-[1px] bg-white/[0.05] mx-1" />
+
+                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
+                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${attestedOnly ? 'bg-emerald-500 border-emerald-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                    {attestedOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                </div>
                                 <input
                                     type="checkbox"
                                     checked={attestedOnly}
                                     onChange={(e) => setAttestedOnly(e.target.checked)}
-                                    className="w-4 h-4 rounded border-white/10 bg-black/40 text-indigo-500 focus:ring-indigo-500/50"
+                                    className="hidden"
                                 />
-                                <span className="text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors">Attested Only</span>
+                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Verified Only</span>
                             </label>
 
-                            <label className="flex items-center gap-2 cursor-pointer group relative">
+                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1 relative">
+                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${spamFilter ? 'bg-red-500 border-red-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                    {spamFilter && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                </div>
                                 <input
                                     type="checkbox"
                                     checked={spamFilter}
                                     onChange={(e) => setSpamFilter(e.target.checked)}
-                                    className="w-4 h-4 rounded border-white/10 bg-black/40 text-red-500 focus:ring-red-500/50"
+                                    className="hidden"
                                 />
-                                <span className="text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors border-b border-dashed border-slate-600">Hide Low Signal</span>
-                                {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-[#18181b] border border-white/10 rounded-lg p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                    <p className="text-[10px] text-slate-300 leading-relaxed">
-                                        Filters out candidates with low on-chain activity, zero attestations, or inactive wallets.
-                                    </p>
-                                </div>
+                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">High Signal Only</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
                 {/* Candidates Table */}
-                <div className="bg-[#141417] border border-white/[0.03] rounded-2xl overflow-hidden min-h-[400px]">
-                    <table className="w-full text-left border-collapse">
+                <div className="bg-[#121215] border border-white/[0.04] rounded-2xl overflow-hidden min-h-[400px] shadow-2xl relative">
+                    <table className="w-full text-left border-separate border-spacing-0">
                         <thead>
-                            <tr className="border-b border-white/[0.03] bg-white/[0.01]">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Candidate</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-center">In-App Signal</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest hidden md:table-cell">Primary Role</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Portfolio</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest hidden lg:table-cell">Top Partners</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Recency</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="bg-white/[0.01]">
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Candidate Intelligence</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Signal Confidence</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden md:table-cell border-b border-white/[0.03]">Strategic Fit</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Portfolio Authority</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden lg:table-cell border-b border-white/[0.03]">Institutional Trust</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Last Activity</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-right border-b border-white/[0.03]">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/[0.02]">
                             {filteredCandidates.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-20 text-center">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Search className="w-8 h-8 text-slate-600 mb-2" />
-                                            <p className="text-slate-400 font-medium">No candidates match your filters.</p>
-                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); }} className="text-indigo-500 text-sm font-bold hover:underline">Clear all filters</button>
+                                    <td colSpan={7} className="px-8 py-32 text-center">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-2">
+                                                <Search className="w-6 h-6 text-slate-700" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">No Profiles Found</p>
+                                                <p className="text-slate-600 text-[11px]">Adjust your calibration to discover more candidates.</p>
+                                            </div>
+                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all mt-4">Clear All Filters</button>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
                                 filteredCandidates.map((candidate) => (
                                     <React.Fragment key={candidate.id}>
-                                        <tr className={`group hover:bg-white/[0.02] transition-colors cursor-pointer ${expandedId === candidate.id ? 'bg-white/[0.02]' : ''}`} onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
-                                                        {candidate.avatarUrl ? (
-                                                            <img src={candidate.avatarUrl} alt="" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <span className="text-xs font-bold text-slate-500">{candidate.wallet.slice(0, 2)}</span>
-                                                        )}
-                                                        {/* Status Indicator Dot */}
+                                        <tr
+                                            className={`group hover:bg-white/[0.03] transition-all cursor-pointer relative ${expandedId === candidate.id ? 'bg-white/[0.02] shadow-[inset_4px_0_0_0_#6366f1]' : ''}`}
+                                            onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
+                                        >
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative flex-shrink-0">
+                                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm shadow-indigo-500/5 group-hover:border-indigo-500/20 transition-all duration-300">
+                                                            {candidate.avatarUrl ? (
+                                                                <img src={candidate.avatarUrl} alt="" className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
+                                                            ) : (
+                                                                <span className="text-[10px] font-black text-indigo-400 font-mono italic opacity-60 uppercase">{candidate.wallet.slice(0, 2)}</span>
+                                                            )}
+                                                        </div>
                                                         {candidate.recruiterStatus === 'shortlisted' && (
-                                                            <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#141417]"></div>
+                                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#121215] shadow-lg shadow-emerald-500/20"></div>
                                                         )}
                                                         {candidate.recruiterStatus === 'rejected' && (
-                                                            <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#141417]"></div>
+                                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#121215] shadow-lg shadow-red-500/20"></div>
                                                         )}
                                                     </div>
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`font-bold transition-colors ${candidate.recruiterStatus === 'rejected' ? 'text-slate-500 line-through' : 'text-white'}`}>{candidate.displayName || "Anonymous User"}</span>
-                                                            {candidate.attestedCount > 0 && <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />}
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {candidate.primarySignal && (
-                                                                <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-400 whitespace-nowrap">
-                                                                    {candidate.primarySignal}
-                                                                </span>
+                                                    <div className="flex flex-col gap-1.5 overflow-hidden">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <span className={`text-[13px] font-bold tracking-tight transition-colors truncate max-w-[140px] md:max-w-[200px] ${candidate.recruiterStatus === 'rejected' ? 'text-slate-600' : 'text-white'}`}>
+                                                                {candidate.displayName || "Anonymous Professional"}
+                                                            </span>
+                                                            {candidate.attestedCount > 0 && (
+                                                                <div className="group/shield relative">
+                                                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
+                                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/shield:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                                                        Attested
+                                                                    </div>
+                                                                </div>
                                                             )}
-                                                            {candidate.snapshotTags?.map((tag: string) => (
-                                                                <span key={tag} className="px-1.5 py-0.5 rounded bg-slate-800 border border-white/5 text-[10px] font-medium text-slate-400 whitespace-nowrap">
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            <span className="text-[9px] font-mono text-slate-500 truncate max-w-[100px] hover:text-slate-300 transition-colors uppercase select-none">
+                                                                {candidate.wallet.slice(0, 6)}...{candidate.wallet.slice(-4)}
+                                                            </span>
+                                                            {candidate.snapshotTags?.slice(0, 2).map((tag: string) => (
+                                                                <span key={tag} className="px-1.5 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.04] text-[9px] font-black text-slate-500 uppercase tracking-wider">
                                                                     {tag}
                                                                 </span>
                                                             ))}
@@ -510,133 +551,200 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-center">
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : candidate.signalStrength === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-slate-800 text-slate-400 border-white/5'}`}>
-                                                        {candidate.signalStrength === 'Strong' && "🟢 Strong"}
-                                                        {candidate.signalStrength === 'Medium' && "🟡 Medium"}
-                                                        {candidate.signalStrength === 'Low' && "🔴 Low"}
+                                            <td className="px-8 py-6 text-center">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20 shadow-sm shadow-yellow-500/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                        {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
+                                                        {candidate.signalStrength === 'Medium' && "CALIBRATED"}
+                                                        {candidate.signalStrength === 'Low' && "LOW SIGNAL"}
                                                     </div>
-                                                    <span className="text-[9px] font-mono text-slate-500 font-medium">Score: {candidate.signalScore || 0}/100</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 hidden md:table-cell">
-                                                <span className="text-sm font-medium text-slate-300 line-clamp-1 max-w-[200px]">{candidate.role}</span>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <div className="flex flex-col items-center">
-                                                        <span className="text-sm font-bold text-white">{candidate.powCount}</span>
-                                                        <span className="text-[10px] font-bold text-slate-500 uppercase">Total</span>
-                                                    </div>
-                                                    <div className="w-[1px] h-6 bg-white/5" />
-                                                    <div className="flex flex-col items-center">
-                                                        <span className={`text-sm font-bold ${candidate.attestedCount > 0 ? 'text-emerald-400' : 'text-slate-500'}`}>{candidate.attestedCount}</span>
-                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Attested</span>
+                                                    <div className="w-16 h-1 bg-white/[0.02] rounded-full overflow-hidden">
+                                                        <div className={`h-full rounded-full transition-all duration-700 ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-yellow-500/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 hidden lg:table-cell">
-                                                <div className="flex flex-wrap gap-1.5 max-w-[240px]">
+                                            <td className="px-8 py-6 hidden md:table-cell">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-xs font-bold text-slate-200 capitalize truncate max-w-[180px]">{candidate.role}</span>
+                                                    <span className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">{candidate.primarySignal || "Standard Contribution"}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center justify-center gap-6">
+                                                    <div className="flex flex-col items-center gap-0.5">
+                                                        <span className="text-sm font-black text-white font-mono">{candidate.powCount}</span>
+                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">PROOFS</span>
+                                                    </div>
+                                                    <div className="w-[1px] h-6 bg-white/[0.04]" />
+                                                    <div className="flex flex-col items-center gap-0.5">
+                                                        <span className={`text-sm font-black font-mono transition-colors ${candidate.attestedCount > 0 ? 'text-emerald-400' : 'text-slate-700'}`}>{candidate.attestedCount}</span>
+                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">ATTESTED</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 hidden lg:table-cell">
+                                                <div className="flex flex-wrap gap-2 max-w-[280px]">
                                                     {candidate.attestedOrgs.slice(0, 2).map((org: string) => (
-                                                        <span key={org} className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-bold text-indigo-400 truncate max-w-[100px]">{org}</span>
+                                                        <div key={org} className="px-2.5 py-1 bg-white/[0.03] border border-white/[0.04] rounded-md flex items-center gap-1.5 shadow-sm">
+                                                            <div className="w-1 h-1 rounded-full bg-indigo-500"></div>
+                                                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest truncate max-w-[90px]">{org}</span>
+                                                        </div>
                                                     ))}
                                                     {candidate.attestedOrgs.length > 2 && (
-                                                        <span className="px-2 py-0.5 bg-slate-800 border border-white/5 rounded text-[10px] font-bold text-slate-400">+{candidate.attestedOrgs.length - 2} more</span>
+                                                        <div className="px-2 py-1 bg-white/[0.02] border border-white/[0.04] rounded-md">
+                                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">+{candidate.attestedOrgs.length - 2}</span>
+                                                        </div>
                                                     )}
                                                     {candidate.attestedOrgs.length === 0 && (
-                                                        <span className="px-2 py-0.5 bg-white/5 border border-white/5 rounded text-[10px] font-medium text-slate-500">
-                                                            {candidate.powCount > 0 ? "Independent Builder" : "Early-stage Contributor"}
-                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em] italic select-none">No Verified Anchors</span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-1.5 text-slate-400">
-                                                    <Clock className="w-3 h-3" />
-                                                    <span className="text-[11px] font-medium">{new Date(candidate.lastActive).toLocaleDateString()}</span>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-2 text-slate-500">
+                                                    <Clock className="w-3 h-3 opacity-50" />
+                                                    <span className="text-[11px] font-bold font-mono tracking-tight">{new Date(candidate.lastActive).toLocaleDateString()}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-right relative">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-8 py-6 text-right">
+                                                <div className="flex items-center justify-end gap-1">
                                                     <Link
                                                         href={`/cv/${candidate.wallet}`}
                                                         target="_blank"
-                                                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-indigo-400"
+                                                        className="p-2 hover:bg-indigo-500/5 rounded-lg transition-all text-slate-600 hover:text-indigo-400 group/btn"
                                                         onClick={(e) => e.stopPropagation()}
+                                                        title="Strategic Review"
                                                     >
-                                                        <ExternalLink className="w-4 h-4" />
+                                                        <ExternalLink className="w-3.5 h-3.5" />
                                                     </Link>
                                                     <button
-                                                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-red-400"
+                                                        className="p-2 hover:bg-red-500/5 rounded-lg transition-all text-slate-600 hover:text-red-400 group/btn"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleDeleteCandidate(candidate.id);
+                                                            setCandidateToDelete(candidate.id);
                                                         }}
-                                                        title="Delete Candidate"
+                                                        title="Archive Decision"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
 
-                                        {/* Feature 4: Quick Peek / Expanded Preview */}
                                         {expandedId === candidate.id && (
-                                            <tr className="bg-white/[0.01]">
-                                                <td colSpan={6} className="px-20 py-8 border-l-2 border-indigo-500">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                            <tr className="bg-[#0c0c0e]/50 backdrop-blur-sm">
+                                                <td colSpan={7} className="px-12 py-12 border-l-[3px] border-indigo-500/50 relative overflow-hidden">
+                                                    {/* Background Pattern */}
+                                                    <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-20 relative z-10">
+                                                        {/* Separator Line with soft glow */}
+                                                        <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[1px] bg-white/[0.04] -translate-x-1/2 shadow-[0_0_15px_rgba(255,255,255,0.02)]"></div>
+
+                                                        {/* Credentials Side */}
                                                         <div>
-                                                            <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                                <Briefcase className="w-3.5 h-3.5" /> Recent Verified Proofs
-                                                            </h4>
+                                                            <div className="flex items-center justify-between mb-10">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2.5">
+                                                                        <Briefcase className="w-3.5 h-3.5 opacity-80" /> Candidate Intelligence
+                                                                    </h4>
+                                                                    <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest pl-6">Deep Signal Correlation</span>
+                                                                </div>
+                                                                <div className="flex flex-col items-end gap-1">
+                                                                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Verification ID</span>
+                                                                    <span className="text-[9px] font-mono text-indigo-500/50 uppercase">CV-{candidate.wallet.slice(0, 8)}</span>
+                                                                </div>
+                                                            </div>
+
                                                             <div className="space-y-4">
                                                                 {candidate.attestedCount > 0 ? (
-                                                                    <div className="p-4 bg-black/40 border border-white/5 rounded-xl">
-                                                                        <p className="text-sm font-bold text-white mb-1">Top Attested Proofs available on full CV.</p>
-                                                                        <Link href={`/cv/${candidate.wallet}`} target="_blank" className="text-xs text-indigo-400 hover:underline flex items-center gap-1">Click to view deep evidence <ExternalLink className="w-3 h-3" /></Link>
+                                                                    <div className="p-8 bg-white/[0.01] border border-white/[0.04] rounded-2xl relative group/card overflow-hidden">
+                                                                        <div className="absolute -top-6 -right-6 p-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-700 group-hover/card:scale-110">
+                                                                            <ShieldCheck className="w-32 h-32 text-indigo-500" />
+                                                                        </div>
+                                                                        <div className="relative z-10">
+                                                                            <div className="flex items-center gap-2 mb-3">
+                                                                                <div className="h-[1px] w-4 bg-indigo-500/50"></div>
+                                                                                <p className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">Protocol Verified</p>
+                                                                            </div>
+                                                                            <p className="text-sm font-bold text-white mb-3 pr-12 leading-snug font-serif italic opacity-90">"Consolidated professional authority anchored by immutable on-chain evidence."</p>
+                                                                            <p className="text-[12px] text-slate-500 leading-relaxed max-w-sm mb-8 font-medium">This professional has successfully correlated multiple high-authority signals, providing a verified foundation for strategic evaluation.</p>
+                                                                            <Link href={`/cv/${candidate.wallet}`} target="_blank" className="inline-flex items-center gap-3 px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-all shadow-xl shadow-indigo-500/5 group/btn">
+                                                                                Review Full Dossier <ExternalLink className="w-3 h-3 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                                                            </Link>
+                                                                        </div>
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="p-4 bg-white/5 rounded-xl border border-dashed border-white/10 text-center">
-                                                                        <p className="text-xs text-slate-400 font-medium">Candidate has not yet anchored verified proof on-chain.</p>
-                                                                        <p className="text-[10px] text-slate-600 mt-1">Check their attached CV link for self-declared portfolio items.</p>
+                                                                    <div className="p-12 border border-dashed border-white/[0.05] rounded-3xl flex flex-col items-center text-center bg-black/10">
+                                                                        <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mb-5 text-slate-700 shadow-inner">
+                                                                            <AlertCircle className="w-6 h-6" />
+                                                                        </div>
+                                                                        <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Signal Attenuation</h5>
+                                                                        <p className="text-[11px] text-slate-600 leading-relaxed max-w-[280px] font-medium italic">No verified on-chain anchors detected for this quadrant. Manual verification of external professional history is recommended.</p>
                                                                     </div>
                                                                 )}
+
+                                                                <div className="flex items-center gap-4 px-6 py-4 bg-white/[0.01] border border-white/[0.03] rounded-xl">
+                                                                    <Users className="w-4 h-4 text-slate-700" />
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Network Consensus</span>
+                                                                        <span className="text-[11px] font-bold text-slate-400">{candidate.attestedOrgs.length > 0 ? `${candidate.attestedOrgs.length} Verified Institutional Relays` : "Organic Network Growth"}</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div className="border-l border-white/5 pl-12 flex flex-col h-full">
-                                                            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Recruiter Controls</h4>
-                                                            <div className="space-y-4 flex-1 flex flex-col">
-                                                                <div className="flex items-center gap-3">
+
+                                                        {/* Calibration Side */}
+                                                        <div className="flex flex-col h-full">
+                                                            <div className="flex items-center justify-between mb-10">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Pipeline Calibration</h4>
+                                                                    <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest">Strategic Placement</span>
+                                                                </div>
+                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${candidate.recruiterStatus === 'shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : candidate.recruiterStatus === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                                    {candidate.recruiterStatus ? candidate.recruiterStatus.toUpperCase() : 'UNDER REVIEW'}
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-8 flex-1 flex flex-col">
+                                                                <div className="flex gap-4">
                                                                     <button
                                                                         onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'shortlisted' ? 'pending' : 'shortlisted')}
-                                                                        className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all border ${candidate.recruiterStatus === 'shortlisted'
-                                                                            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                                                                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                                                                        className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'shortlisted'
+                                                                            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.3)]"
+                                                                            : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
                                                                             }`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'shortlisted' ? 'Shortlisted' : 'Shortlist'}
+                                                                        {candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'PROMOTE'}
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'rejected' ? 'pending' : 'rejected')}
-                                                                        className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all border ${candidate.recruiterStatus === 'rejected'
-                                                                            ? "bg-red-500 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                                                                            : "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20"
+                                                                        className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'rejected'
+                                                                            ? "bg-red-500 text-white border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.3)]"
+                                                                            : "bg-red-500/5 border-red-500/10 text-red-500/60 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10"
                                                                             }`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'rejected' ? 'Rejected' : 'Reject'}
+                                                                        {candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'ARCHIVE'}
                                                                     </button>
                                                                 </div>
-                                                                <div className="relative flex-1">
+
+                                                                <div className="relative flex-1 group/notes">
+                                                                    <div className="absolute top-4 left-5 text-[9px] font-black text-slate-700 uppercase tracking-[0.2em] pointer-events-none group-focus-within/notes:text-indigo-400/70 transition-colors flex items-center gap-2">
+                                                                        <div className="w-2 h-[1px] bg-current opacity-30"></div>
+                                                                        Evaluation Synthesis
+                                                                    </div>
                                                                     <textarea
                                                                         value={noteDraft}
                                                                         onChange={(e) => setNoteDraft(e.target.value)}
                                                                         onBlur={handleSaveNote}
-                                                                        placeholder="Add private note (stored locally)..."
-                                                                        className="w-full h-full min-h-[160px] bg-black/60 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-white/20 transition-all placeholder:text-slate-600 resize-none"
+                                                                        placeholder="Record strategic observations, verdict rationale, or next steps..."
+                                                                        className="w-full h-full min-h-[180px] bg-black/40 border border-white/[0.04] rounded-2xl p-6 pt-12 text-[14px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
                                                                     />
                                                                     {isSavingNote && (
-                                                                        <span className="absolute bottom-3 right-3 text-[10px] text-slate-400 bg-black/80 px-2 py-1 rounded animate-pulse border border-white/5">Saving...</span>
+                                                                        <div className="absolute bottom-6 right-6 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
+                                                                            <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />
+                                                                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Archiving</span>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -652,6 +760,29 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     </table>
                 </div>
             </main>
+
+            {/* Confirmation Modals */}
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDelete}
+                title="Terminate Recruitment?"
+                message={`Are you sure you want to delete "${data?.collection.title}"? This action cannot be undone and all candidate data will be lost.`}
+                confirmLabel={isDeleting ? "Terminating..." : "Terminate"}
+                confirmButtonColor="red"
+                iconColor="red"
+            />
+
+            <ConfirmationModal
+                isOpen={!!candidateToDelete}
+                onClose={() => setCandidateToDelete(null)}
+                onConfirm={handleDeleteCandidate}
+                title="Archive Candidate?"
+                message="Are you sure you want to remove this candidate from the pipeline? This action cannot be undone."
+                confirmLabel="Archive"
+                confirmButtonColor="red"
+                iconColor="red"
+            />
         </div>
     );
 }

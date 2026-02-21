@@ -22,7 +22,15 @@ import {
     Users,
     Code2,
     Palette,
-    Filter
+    Filter,
+    Twitter,
+    Building2,
+    MessageSquare,
+    ExternalLink,
+    ChevronDown,
+    ChevronUp,
+    LayoutGrid,
+    User
 } from "lucide-react";
 
 export default function CreateCollection() {
@@ -39,6 +47,17 @@ export default function CreateCollection() {
         timezone: "UTC",
         experienceLevel: "Senior",
         compensationType: "Crypto + Equity",
+        salary: "",
+        recruiterName: "",
+        recruiterRole: "",
+        companyName: "",
+        companyDescription: "",
+        websiteUrl: "",
+        twitterUrl: "",
+        discordUrl: "",
+        githubUrl: "",
+        projectStage: "Early",
+        contactChannel: "",
         deadline: "",
         visibility: "public",
         focusAreas: [] as string[],
@@ -140,6 +159,141 @@ export default function CreateCollection() {
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-emerald-500/50 outline-none transition-all h-32 resize-none placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-500/20 text-sm leading-relaxed"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Recruiter Identity Card */}
+                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 backdrop-blur-sm shadow-2xl space-y-8">
+                                <div className="flex items-center gap-3 pb-2 border-b border-white/5">
+                                    <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                                        <Building2 className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-white">Recruiter Identity</h3>
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Build trust with candidates</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Recruiter Name / Alias</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Satoshi (Founder)"
+                                                value={formData.recruiterName}
+                                                onChange={(e) => setFormData({ ...formData, recruiterName: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
+                                            />
+                                            <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Current Role</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. CTO, Head of Talent"
+                                            value={formData.recruiterRole}
+                                            onChange={(e) => setFormData({ ...formData, recruiterRole: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Company / Project Name</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. ChainVolio"
+                                            value={formData.companyName}
+                                            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Project Stage</label>
+                                        <select
+                                            value={formData.projectStage}
+                                            onChange={(e) => setFormData({ ...formData, projectStage: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all text-sm cursor-pointer appearance-none"
+                                        >
+                                            <option value="Stealth">Stealth</option>
+                                            <option value="Early">Early Stage</option>
+                                            <option value="Live">Mainnet / Live</option>
+                                            <option value="Scaling">Scaling / Growth</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">One-line Project Description</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Subtle, high-signal recruitment infrastructure for Web3."
+                                        value={formData.companyDescription}
+                                        onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
+                                    />
+                                </div>
+
+                                {/* Official Links */}
+                                <div className="pt-4 space-y-4">
+                                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                        <LayoutGrid className="w-3 h-3" /> Official Presence
+                                    </h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="relative">
+                                            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="Website URL"
+                                                value={formData.websiteUrl}
+                                                onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="X / Twitter handle"
+                                                value={formData.twitterUrl}
+                                                onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="Discord Link"
+                                                value={formData.discordUrl}
+                                                onChange={(e) => setFormData({ ...formData, discordUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="GitHub Organization"
+                                                value={formData.githubUrl}
+                                                onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Preferred Contact Method</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. DM on X, Discord Ticket, or Email"
+                                            value={formData.contactChannel}
+                                            onChange={(e) => setFormData({ ...formData, contactChannel: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
                                         />
                                     </div>
                                 </div>
@@ -261,7 +415,7 @@ export default function CreateCollection() {
                                     </div>
 
                                     <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
-                                        <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Comp. Model</label>
+                                        <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs text-nowrap">Comp. Model</label>
                                         <div className="relative">
                                             <select
                                                 value={formData.compensationType}
@@ -274,6 +428,20 @@ export default function CreateCollection() {
                                                 <option className="bg-[#121214] text-white">DAO Tokens</option>
                                             </select>
                                             <DollarSign className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                        <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Salary</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. $120k - $180k"
+                                                value={formData.salary}
+                                                onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                                                className="w-full bg-transparent border-none outline-none text-sm font-medium placeholder:text-slate-600"
+                                            />
+                                            <Plus className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none" />
                                         </div>
                                     </div>
                                 </div>

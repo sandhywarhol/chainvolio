@@ -9,11 +9,11 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const SLIDES = [
-    { src: "/homepage/cv%20view.png", label: "Professional Profile" },
-    { src: "/homepage/dashboard.png", label: "Recruiter Dashboard" },
-    { src: "/homepage/edit%20profile.png", label: "Profile Customization" },
-    { src: "/homepage/link%20recruit.png", label: "Hiring Links" },
-    { src: "/homepage/proof%20of%20work.png", label: "Verifiable Work" },
+    { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
+    { src: "/homepage/dashboard.png?v=3", label: "Recruiter Dashboard" },
+    { src: "/homepage/edit%20profile.png?v=3", label: "Profile Customization" },
+    { src: "/homepage/link%20recruit.png?v=3", label: "Hiring Links" },
+    { src: "/homepage/proof%20of%20work.png?v=3", label: "Verifiable Work" },
   ];
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function LandingPage() {
       setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [SLIDES.length]);
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -36,6 +36,7 @@ export default function LandingPage() {
             <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
             <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
             <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why ChainVolio</Link>
+            <Link href="/privacy-policy" className="text-white/40 hover:text-white/90 transition-colors normal-case">Privacy Policy</Link>
             <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
           </div>
         </div>

@@ -37,8 +37,9 @@ export async function POST(request: Request) {
 
         console.warn("⚠️ Full insert failed. Error code:", error.code, error.message);
 
-        // Attempt 2: Without eligibility_filters (Schema might be old)
-        if (error.code === '42703') { // Undefined column
+        // Attempt 2: Without metadata (Column might be missing)
+        if (error.code === '42703' && error.message.includes('metadata')) {
+            console.warn("⚠️ Metadata column missing. Retrying without it...");
             const { data: retryData, error: retryError } = await supabase
                 .from("hiring_collections")
                 .insert({
@@ -46,17 +47,33 @@ export async function POST(request: Request) {
                     description,
                     slug,
                     owner_wallet: ownerWallet || null,
-                    metadata: metadata
+                    eligibility_filters: filters || {}
                 })
                 .select()
                 .single();
 
             if (!retryError) return NextResponse.json(retryData);
-            console.error("⚠️ Retry failed:", retryError);
+
+            // If it fails again, check if eligibility_filters is also missing
+            if (retryError.code === '42703') {
+                console.warn("⚠️ Eligibility filters column also missing. Retrying with minimal fields + description...");
+                const { data: finalData, error: finalError } = await supabase
+                    .from("hiring_collections")
+                    .insert({
+                        title,
+                        description,
+                        slug,
+                        owner_wallet: ownerWallet || null
+                    })
+                    .select()
+                    .single();
+
+                if (!finalError) return NextResponse.json(finalData);
+            }
         }
 
-        // Attempt 3: Minimal Insert (Absolute fallback)
-        console.warn("⚠️ Falling back to minimal insert.");
+        // Attempt 3: Absolute minimal (If description also fails)
+        console.warn("⚠️ Falling back to absolute minimal insert.");
         const { data: minimalData, error: minimalError } = await supabase
             .from("hiring_collections")
             .insert({

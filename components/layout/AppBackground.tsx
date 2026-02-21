@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 export function AppBackground() {
     const pathname = usePathname();
     const isHomePage = pathname === "/";
+    const isWhyPage = pathname === "/why";
 
     return (
         <>
@@ -30,7 +31,7 @@ export function AppBackground() {
             {/* Bottom black fade - subtle depth at the footer area */}
             <div className="fixed inset-0 z-20 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
 
-            {isHomePage && (
+            {(isHomePage || isWhyPage) && (
                 <>
                     {/* Global Vignette - Ultra-Soft Seamless Mist (Offset from top for clear navigation) */}
                     <div

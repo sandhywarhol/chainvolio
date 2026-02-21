@@ -5,8 +5,11 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 
 export default function WhyPage() {
     return (
-        <main className="min-h-screen flex flex-col">
-            {/* Top Navigation */}
+        <main className="min-h-screen flex flex-col relative overflow-hidden selection:bg-teal-500/30 selection:text-white">
+            {/* Very subtle noise texture - more refined opacity */}
+            <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+            {/* Top Navigation - Consistent with Home */}
             <nav className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto relative z-[100] border-b border-white/5">
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-1.5 group">
@@ -14,170 +17,151 @@ export default function WhyPage() {
                         <span className="text-sm font-bold text-white/90">ChainVolio</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
-                        <Link href="/why" className="text-white/90 transition-colors normal-case">Why ChainVolio</Link>
-                        <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
+                        <Link href="/why" className="text-white hover:text-white transition-colors normal-case">Why ChainVolio</Link>
+                        <Link href="/privacy-policy" className="text-white/40 hover:text-white transition-colors normal-case">Privacy Policy</Link>
+                        <Link href="/dashboard" className="text-emerald-500/70 hover:text-emerald-400 transition-colors normal-case">Dashboard</Link>
                     </div>
                 </div>
                 <WalletMultiButton />
             </nav>
 
-            {/* 1. HERO SECTION */}
-            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full text-center border-b border-white/5">
-                <div className="max-w-3xl mx-auto space-y-4">
-                    <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tight text-white">
-                        Why ChainVolio?
-                    </h1>
-                    <p className="text-xl md:text-2xl font-medium text-white/90 font-display">
-                        Because Web3 careers deserve proof, not promises.
-                    </p>
-                    <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto italic font-light">
-                        ChainVolio replaces traditional CVs, PDFs, and unverifiable claims with trusted, on-chain proof of work.
-                    </p>
+            {/* 1. HERO SECTION - Statement-driven, Editorial spacing */}
+            <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
+                <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
+                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-teal-400/60">Introduction</span>
                 </div>
+
+                <h1 className="text-6xl md:text-[80px] font-bold font-display tracking-tighter text-white leading-[0.85] mb-8">
+                    The Statement of Proof.
+                </h1>
+
+                <p className="text-lg md:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto font-light tracking-tight px-8">
+                    Traditional credentials are based on trust. ChainVolio is based on truth. We replace promises with verifiable, on-chain evidence.
+                </p>
             </section>
 
-            {/* 2. PROBLEM VS SOLUTION */}
-            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full">
-                <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-                    {/* Traditional Hiring (Problem) */}
-                    <div className="bg-black/20 backdrop-blur-sm border border-white/5 p-8 rounded-2xl space-y-6">
-                        <h2 className="text-2xl font-bold text-white/40 tracking-tight uppercase">Traditional Hiring</h2>
+            <div className="max-w-[1240px] mx-auto border-t border-white/5 w-full px-8" />
+
+            {/* 2. THE THRESHOLD - Problem vs Solution (Quiet Comparison) */}
+            <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
+                <div className="grid lg:grid-cols-2 gap-20 items-start">
+                    {/* The Old Way */}
+                    <div className="space-y-8">
+                        <div className="space-y-4">
+                            <span className="text-[10px] uppercase tracking-[0.4em] text-red-500/40 font-bold">The Vulnerability</span>
+                            <h2 className="text-3xl font-bold text-white tracking-tight">Paper Credentials.</h2>
+                            <p className="text-white/40 font-light leading-relaxed max-w-sm">
+                                Standard CVs and PDFs are static artifacts. They are easily forged, lack context, and offer zero verifiable accountability.
+                            </p>
+                        </div>
                         <ul className="space-y-6">
                             {[
-                                "CVs can be faked or exaggerated",
-                                "GitHub links lack context",
-                                "No verifiable contribution history",
-                                "Recruiters waste time filtering noise"
+                                "Unverifiable professional claims",
+                                "Static links without proof of ownership",
+                                "Zero cryptographic accountability",
+                                "High noise-to-signal ratio for hiring"
                             ].map((item, i) => (
-                                <li key={i} className="flex items-start gap-4 text-white/40">
-                                    <span className="text-red-500/50 mt-1">✕</span>
-                                    <span className="text-lg">{item}</span>
+                                <li key={i} className="flex items-start gap-4 text-white/20 border-l border-white/5 pl-6 pb-1">
+                                    <span className="text-xs font-mono opacity-50">0{i + 1}</span>
+                                    <span className="text-base font-light tracking-tight">{item}</span>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* ChainVolio (Solution) */}
-                    <div className="relative group">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500/30 to-blue-500/30 rounded-2xl blur opacity-100 group-hover:opacity-100 transition duration-1000"></div>
-                        <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 p-8 rounded-2xl space-y-6 h-full shadow-2xl">
-                            <h2 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent tracking-tight uppercase">ChainVolio</h2>
-                            <ul className="space-y-6">
-                                {[
-                                    "On-chain activity as proof",
-                                    "Verifiable work history & receipts",
-                                    "Signal-based evaluation",
-                                    "Faster, trustless hiring"
-                                ].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-4 text-white">
-                                        <span className="text-teal-400 mt-1">✓</span>
-                                        <span className="text-lg font-medium">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                    {/* The ChainVolio Way - Calm Confidence */}
+                    <div className="space-y-8">
+                        <div className="space-y-4">
+                            <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">The Standard</span>
+                            <h2 className="text-3xl font-bold text-white tracking-tight">On-Chain Reality.</h2>
+                            <p className="text-white/60 font-light leading-relaxed max-w-sm">
+                                ChainVolio creates an immutable record of work. Every entry is a cryptographic receipt, anchored to your wallet and verified by the network.
+                            </p>
                         </div>
+                        <ul className="space-y-6">
+                            {[
+                                "Provenance of every contribution",
+                                "Cryptographic Proof of Work (PoW)",
+                                "Peer-vetted on-chain attestations",
+                                "High-density signal for recruiters"
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-start gap-4 text-white/90 border-l border-teal-500/20 pl-6 pb-1">
+                                    <span className="text-xs font-mono text-teal-400/50">0{i + 1}</span>
+                                    <span className="text-base font-medium tracking-tight">{item}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
             </section>
 
-            {/* 3. WHAT MAKES CHAINVOLIO DIFFERENT */}
-            <section className="relative z-40 py-16 px-8 max-w-[1240px] mx-auto w-full">
-                <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-white tracking-tight">Different by Design</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="max-w-[1240px] mx-auto border-t border-white/5 w-full px-8" />
+
+            {/* 3. CORE PRINCIPLES - Grid without Card Heavy Design */}
+            <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
+                <div className="max-w-xl mb-16">
+                    <h2 className="text-4xl font-bold text-white tracking-tighter mb-4">Designed for Substance.</h2>
+                    <p className="text-white/40 font-light leading-relaxed">
+                        We removed the fluff of traditional recruitment to focus on the only thing that matters: the work you actually shipped.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-x-16 gap-y-16">
                     {[
                         {
-                            title: "Verifiable by Design",
-                            desc: "Work history anchored on-chain. Immutable and timestamped."
+                            title: "Absolute Provenance",
+                            desc: "In ChainVolio, the chain is the judge. Every milestone is timestamped and anchored to Solana, creating a permanent, unalterable career ledger."
                         },
                         {
-                            title: "Signal > Credentials",
-                            desc: "Focus on what was built, contributed, and shipped — not age, gender, or degrees."
+                            title: "Signal Priority",
+                            desc: "We prioritize actual accomplishments over titles. Recruiters see your contributions first, allowing talent to speak louder than words."
                         },
                         {
-                            title: "Faster Hiring",
-                            desc: "Recruiters see real signals instantly, reducing low-quality applications."
+                            title: "Institutional Trust",
+                            desc: "Our attestation layer allows projects to verify your work cryptographically. This isn't a referral; it's a signed validation."
                         },
                         {
-                            title: "Built for Global Web3",
-                            desc: "Wallet-based identity. Remote-first. Permissionless."
+                            title: "Permissionless Identity",
+                            desc: "Your profile is yours. Built on open standards and wallet-based authentication, it functions globally without intermediaries."
                         }
                     ].map((card, i) => (
-                        <div
-                            key={i}
-                            className="bg-white/[0.03] backdrop-blur-sm border border-white/10 p-6 rounded-xl hover:-translate-y-1 hover:shadow-xl hover:bg-white/[0.05] transition-all duration-300 group"
-                        >
-                            <h3 className="text-lg font-bold text-white mb-3 tracking-tight group-hover:text-teal-400 transition-colors">{card.title}</h3>
-                            <p className="text-sm text-white/50 leading-relaxed font-light">{card.desc}</p>
+                        <div key={i} className="group">
+                            <div className="w-12 h-[1px] bg-white/10 mb-6 group-hover:w-24 group-hover:bg-teal-500/50 transition-all duration-700" />
+                            <h3 className="text-xl font-bold text-white mb-2 tracking-tight">{card.title}</h3>
+                            <p className="text-sm text-white/30 leading-relaxed font-light group-hover:text-white/50 transition-colors duration-500 max-w-sm">{card.desc}</p>
                         </div>
                     ))}
                 </div>
             </section>
 
-            {/* 4. FOR TALENT / FOR RECRUITERS */}
-            <section className="relative z-40 border-y border-white/5 bg-white/[0.01]">
-                <div className="max-w-[1240px] mx-auto grid md:grid-cols-2 divide-x divide-white/5">
-                    {/* For Talent */}
-                    <div className="p-10 space-y-6">
-                        <h2 className="text-2xl font-bold text-white tracking-tight">For Talent</h2>
-                        <ul className="space-y-4">
-                            {[
-                                "Own your on-chain career",
-                                "Share one trusted portfolio link",
-                                "Build reputation across projects",
-                                "No need to oversell yourself"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-white/70">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500"></div>
-                                    <span>{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            <div className="max-w-[1240px] mx-auto border-t border-white/5 w-full px-8" />
 
-                    {/* For Recruiters */}
-                    <div className="p-10 space-y-6">
-                        <h2 className="text-2xl font-bold text-white tracking-tight">For Recruiters</h2>
-                        <ul className="space-y-4">
-                            {[
-                                "Filter by real on-chain signal",
-                                "Reduce spam and noise",
-                                "Verify contributions before interviews",
-                                "Hire faster with confidence"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-white/70">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                    <span>{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            {/* 4. THE COMPARISON - Understated Table */}
+            <section className="relative z-40 py-24 px-8 max-w-[1000px] mx-auto w-full">
+                <div className="text-center mb-16 space-y-2">
+                    <h2 className="text-2xl font-bold text-white tracking-tight">The Calibration</h2>
+                    <p className="text-white/20 text-[10px] font-bold tracking-[0.4em] uppercase">Truth vs Fabrication</p>
                 </div>
-            </section>
 
-            {/* 5. MINI COMPARISON TABLE */}
-            <section className="relative z-40 py-16 px-8 max-w-[1000px] mx-auto w-full">
-                <h2 className="text-2xl font-bold text-center mb-8 text-white">The Comparison</h2>
-                <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20 backdrop-blur-md">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-white/5">
-                                <th className="p-6 text-sm font-bold uppercase tracking-wider text-white/60">Feature</th>
-                                <th className="p-6 text-sm font-bold uppercase tracking-wider text-white/60">Traditional CV</th>
-                                <th className="p-6 text-sm font-bold uppercase tracking-wider text-teal-400">ChainVolio</th>
-                            </tr>
-                        </thead>
+                <div className="border-t border-white/5">
+                    <table className="w-full text-left">
                         <tbody className="divide-y divide-white/5">
                             {[
-                                ["Verifiable history", "No", "Yes (On-chain)"],
-                                ["Editable past", "Yes", "No"],
-                                ["Proof of contribution", "Weak", "Strong"],
-                                ["Global & permissionless", "No", "Yes"],
-                                ["Built for Web3", "No", "Yes"]
+                                ["Data Layer", "Centralized / Paper", "Decentralized / On-chain"],
+                                ["Auditability", "Requires Reference Calls", "Instant & Peer-to-Peer"],
+                                ["Trust Model", "Implicit (Assumed)", "Explicit (Verified)"],
+                                ["Persistence", "Fragile / Perishable", "Immutable / Permanent"],
+                                ["Web3 Compatibility", "None", "Native Wallet Identity"]
                             ].map((row, i) => (
-                                <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-6 text-white/80 font-medium">{row[0]}</td>
-                                    <td className="p-6 text-white/40">{row[1]}</td>
-                                    <td className="p-6 text-white font-semibold">{row[2]}</td>
+                                <tr key={i} className="group">
+                                    <td className="py-6 text-[11px] font-bold uppercase tracking-widest text-white/20 group-hover:text-white/40 transition-colors">{row[0]}</td>
+                                    <td className="py-6 text-sm font-light text-white/20 text-center">{row[1]}</td>
+                                    <td className="py-6 text-sm font-medium text-white text-right">
+                                        <div className="flex items-center justify-end gap-3">
+                                            <span className="w-1 h-1 rounded-full bg-teal-500/30 group-hover:bg-teal-500 transition-colors" />
+                                            {row[2]}
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -185,25 +169,27 @@ export default function WhyPage() {
                 </div>
             </section>
 
-            {/* 6. CLOSING STATEMENT */}
-            <section className="relative z-40 py-20 px-8 text-center bg-gradient-to-b from-transparent to-teal-500/5">
-                <div className="max-w-2xl mx-auto space-y-8">
-                    <div className="space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                            In Web3, your work is public. <br />
-                            <span className="text-white/40">Your career should be too.</span>
-                        </h2>
-                    </div>
+            <div className="border-t border-white/5 w-full" />
 
+            {/* 5. CLOSING STATEMENT - Pure Typography */}
+            <section className="relative z-40 py-40 px-8 text-center bg-black/20">
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <h2 className="text-5xl md:text-[72px] font-bold tracking-tighter leading-[0.85] flex flex-col items-center">
+                        <span className="text-white">Evidence is the</span>
+                        <span className="text-white/30">New Authority.</span>
+                    </h2>
+                    <p className="text-white/30 text-lg md:text-xl font-light tracking-tight max-w-xl mx-auto">
+                        Join the professionals who no longer need to explain their work.
+                    </p>
                 </div>
             </section>
 
-            {/* Footer Area */}
-            <div className="w-full relative z-40 pb-12 border-t border-white/5 pt-12 text-center bg-black/20">
-                <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
-                    ChainVolio · Built for the Future of Work
+            {/* Footer Area - Minimalist */}
+            <footer className="w-full relative z-40 pb-16 pt-16 text-center border-t border-white/5">
+                <p className="text-[9px] text-white/10 uppercase tracking-[0.5em] font-medium">
+                    ChainVolio Protocol · MMXXVI · Solana Mainnet Native
                 </p>
-            </div>
+            </footer>
         </main>
     );
 }

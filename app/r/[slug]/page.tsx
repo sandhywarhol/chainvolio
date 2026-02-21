@@ -4,7 +4,25 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
-import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle } from "lucide-react";
+import {
+    Loader2,
+    Send,
+    CheckCircle,
+    ExternalLink,
+    AlertCircle,
+    ShieldCheck,
+    CalendarDays,
+    Twitter,
+    Github,
+    MessageSquare,
+    Building2,
+    User,
+    BadgeCheck,
+    Clock,
+    DollarSign,
+    Briefcase,
+    Globe
+} from "lucide-react";
 
 export default function CandidateSubmission({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -94,137 +112,291 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
 
     return (
-        <main className="min-h-screen text-white">
-            <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
-                <Link href="/" className="flex items-center gap-1.5 group">
-                    <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                    <span className="text-xl font-bold">ChainVolio</span>
+        <main className="min-h-screen text-white selection:bg-emerald-500/30">
+            <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
+                <Link href="/" className="flex items-center gap-2 group">
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
+                    <span className="text-xl font-bold tracking-tight text-white">ChainVolio</span>
                 </Link>
                 <WalletMultiButton />
             </nav>
 
-            <section className="max-w-2xl mx-auto px-6 py-16 text-center relative z-10">
+            <section className="max-w-3xl mx-auto px-6 py-12 relative z-10">
                 {!submitted ? (
-                    <div className="animate-in fade-in zoom-in-95 duration-500">
-                        <h1 className="text-4xl font-bold mb-4">{collection.title}</h1>
-                        <p className="text-slate-400 mb-12 text-lg">
-                            {collection.description || "Submit your on-chain CV for review by the hiring team."}
-                        </p>
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <header className="text-center mb-12">
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight leading-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
+                                {collection.title}
+                            </h1>
+                            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+                                <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-md text-emerald-500/80">
+                                    <ShieldCheck className="w-3.5 h-3.5" /> Verified Pool
+                                </span>
+                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
+                                <span className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5 text-blue-500" /> {collection.metadata?.roleType || "Active"}
+                                </span>
+                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
+                                <span className="flex items-center gap-1.5 text-emerald-400">
+                                    <DollarSign className="w-3.5 h-3.5" /> {collection.metadata?.salary || "Competitive"}
+                                </span>
+                            </div>
+                        </header>
 
-                        <div className="bg-slate-900/60 border border-white/10 rounded-3xl p-8 backdrop-blur-xl text-left">
-                            {!connected ? (
-                                <div className="space-y-6 text-center">
-                                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Send className="w-8 h-8 text-slate-400" />
+                        {/* Section 1: Role Overview & Details */}
+                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl space-y-10">
+                            <div className="flex flex-col md:flex-row gap-10">
+                                <div className="flex-1 space-y-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                                            <Briefcase className="w-5 h-5" />
+                                        </div>
+                                        <h2 className="text-xl font-bold">Role Overview</h2>
                                     </div>
-                                    <h2 className="text-xl font-bold">Ready to apply?</h2>
-                                    <p className="text-slate-400 mb-6">Connect your wallet to share your verified work history.</p>
-                                    <div className="flex justify-center">
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Type</p>
+                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.roleType || "Full-time"}</p>
+                                        </div>
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Work Mode</p>
+                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.workMode || "Remote"}</p>
+                                        </div>
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Timezone</p>
+                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.timezone || "Any"}</p>
+                                        </div>
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Comp. Model</p>
+                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.compensationType || "Crypto + Equity"}</p>
+                                        </div>
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4 border-emerald-500/10">
+                                            <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-1">Salary</p>
+                                            <p className="text-sm font-bold text-emerald-400">{collection.metadata?.salary || "Competitive"}</p>
+                                        </div>
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Experience</p>
+                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.experienceLevel || "Senior"}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-6">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1 h-1 rounded-full bg-slate-600"></div>
+                                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Job Description</h3>
+                                        </div>
+                                        <div className="prose prose-invert max-w-none">
+                                            <p className="text-slate-400 text-lg leading-relaxed whitespace-pre-wrap">
+                                                {collection.description ? collection.description : "Apply to join the team and showcase your verified on-chain history as part of your application."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section 2: Recruiter Identity */}
+                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-20">
+                                <BadgeCheck className="w-8 h-8 text-slate-400" />
+                            </div>
+
+                            <div className="flex items-center gap-3 pb-8 border-b border-white/5 mb-8">
+                                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                                    <Building2 className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-white tracking-tight">Hiring Context</h3>
+                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Verified Recruiter Details</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row gap-10">
+                                <div className="flex-1 space-y-6">
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white mb-1">
+                                            {collection.metadata?.recruiterName || "Collection Owner"}
+                                        </h3>
+                                        <p className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
+                                            {collection.metadata?.recruiterRole || "Lead Recruiter"}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl">
+                                            <p className="text-xs font-bold text-white uppercase tracking-wide mb-2 flex items-center gap-2">
+                                                <Building2 className="w-3.5 h-3.5 text-slate-500" /> {collection.metadata?.companyName || "Project Team"}
+                                            </p>
+                                            {collection.metadata?.companyDescription && (
+                                                <p className="text-sm text-slate-400 leading-relaxed italic">{collection.metadata.companyDescription}</p>
+                                            )}
+                                        </div>
+
+                                        {(collection.metadata?.websiteUrl || collection.metadata?.twitterUrl || collection.metadata?.githubUrl) && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {collection.metadata.websiteUrl && (
+                                                    <a href={collection.metadata.websiteUrl} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 transition-all">
+                                                        <Globe className="w-4 h-4" />
+                                                    </a>
+                                                )}
+                                                {collection.metadata.twitterUrl && (
+                                                    <a href={`https://twitter.com/${collection.metadata.twitterUrl.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-blue-400/50 hover:bg-blue-400/10 text-slate-400 hover:text-blue-400 transition-all">
+                                                        <Twitter className="w-4 h-4" />
+                                                    </a>
+                                                )}
+                                                {collection.metadata.githubUrl && (
+                                                    <a href={`https://github.com/${collection.metadata.githubUrl}`} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/50 hover:bg-white/10 text-slate-400 hover:text-white transition-all">
+                                                        <Github className="w-4 h-4" />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="md:w-72 space-y-4">
+                                    <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
+                                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Project Stage</p>
+                                        <p className="text-sm font-bold text-slate-300">{collection.metadata?.projectStage || "Early Stage"}</p>
+                                    </div>
+                                    <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
+                                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Contact Channel</p>
+                                        <p className="text-xs font-medium text-indigo-400">{collection.metadata?.contactChannel || "DM on X"}</p>
+                                    </div>
+                                    {collection.metadata?.focusAreas && collection.metadata.focusAreas.length > 0 && (
+                                        <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                                            <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-2">Target Signals</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {collection.metadata.focusAreas.slice(0, 3).map((area: string) => (
+                                                    <span key={area} className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">
+                                                        {area.replace('_', ' ')}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Submission Form */}
+                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-50"></div>
+
+                            {!connected ? (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+                                        <User className="w-8 h-8 text-slate-500" />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-4">Ready to Apply?</h3>
+                                    <p className="text-slate-400 mb-8 max-w-sm mx-auto text-sm leading-relaxed">Connect your wallet to share your verified work history and professional signals.</p>
+                                    <div className="flex justify-center scale-110">
                                         <WalletMultiButton />
                                     </div>
                                 </div>
                             ) : (
-                                <div className="space-y-8">
-                                    <div className="flex items-center gap-4 mb-4 pb-4 border-b border-white/5">
-                                        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden">
-                                            <span className="text-lg font-mono text-emerald-400 font-bold">CV</span>
+                                <div className="space-y-10">
+                                    <div className="flex items-center justify-between gap-4 p-5 bg-black/40 border border-white/5 rounded-2xl">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                                                <User className="w-6 h-6 text-emerald-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Applicant Wallet</p>
+                                                <p className="text-sm font-mono font-bold text-white">
+                                                    {publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Submitting as</p>
-                                            <p className="text-emerald-400 font-mono text-sm">{publicKey?.toBase58()}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Feature 1: Primary Evaluation Signal */}
-                                    <div className="space-y-3">
-                                        <label className="block text-sm font-bold text-slate-300 uppercase tracking-wider">
-                                            Strongest Proof of Work <span className="text-red-400">*</span>
-                                        </label>
-                                        <p className="text-xs text-slate-500 font-medium mb-3 mt-1">
-                                            Select the single strongest, verifiable signal recruiters should evaluate first.
-                                        </p>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            {["GitHub / Code", "On-chain activity", "Hackathon wins", "DAO governance", "NFT / Creative"].map((sig) => (
-                                                <button
-                                                    key={sig}
-                                                    onClick={() => setPrimarySignal(sig)}
-                                                    className={`px-4 py-3 rounded-xl text-sm font-medium text-left transition-all border ${primarySignal === sig
-                                                        ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-                                                        : "bg-black/20 border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-200"
-                                                        }`}
-                                                >
-                                                    {sig}
-                                                </button>
-                                            ))}
+                                        <div className="px-3 py-1.5 bg-emerald-500/10 rounded-lg text-[10px] font-bold text-emerald-400 uppercase tracking-widest border border-emerald-500/10">
+                                            Connected
                                         </div>
                                     </div>
 
-                                    {/* Feature 5: Self-Declared Role Strength */}
-                                    <div className="space-y-3">
-                                        <label className="block text-sm font-bold text-slate-300 uppercase tracking-wider">
-                                            Primary Role <span className="text-red-400">*</span>
-                                        </label>
-                                        <p className="text-xs text-slate-500 font-medium mb-3 mt-1">
-                                            Select the role closest to how you actually contribute in Web3.
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {["Builder / Engineer", "Game Developer", "Researcher", "Designer / Creative", "Operator / Growth", "Hybrid"].map((role) => (
-                                                <button
-                                                    key={role}
-                                                    onClick={() => setRoleStrength(role)}
-                                                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border ${roleStrength === role
-                                                        ? "bg-blue-500/20 border-blue-500/50 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
-                                                        : "bg-black/20 border-white/5 text-slate-500 hover:bg-white/5 hover:text-slate-300"
-                                                        }`}
-                                                >
-                                                    {role}
-                                                </button>
-                                            ))}
+                                    <div className="space-y-10">
+                                        <div className="space-y-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                                <label className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Strongest Proof of Work</label>
+                                            </div>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                {["GitHub / Code", "On-chain activity", "Hackathon wins", "DAO governance", "NFT / Creative", "DeFi / Trading"].map((signal) => (
+                                                    <button
+                                                        key={signal}
+                                                        onClick={() => setPrimarySignal(signal)}
+                                                        className={`p-4 rounded-xl border text-xs font-bold transition-all ${primarySignal === signal
+                                                            ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                            : 'bg-black/40 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
+                                                            }`}
+                                                    >
+                                                        {signal}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {error && <p className="text-red-400 text-sm py-2 px-4 bg-red-500/10 border border-red-500/20 rounded-lg mb-4 text-center">{error}</p>}
+                                        <div className="space-y-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                                                <label className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Primary Role Focus</label>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {["Frontend Engineer", "Smart Contract Dev", "Fullstack", "Backend / Core", "Design / UI / UX", "Creative / Media", "Marketing / Growth", "Finance / Operations", "Product / Management", "Community / DAO"].map((role) => (
+                                                    <button
+                                                        key={role}
+                                                        onClick={() => setRoleStrength(role)}
+                                                        className={`p-4 rounded-xl border text-xs font-bold transition-all ${roleStrength === role
+                                                            ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                            : 'bg-black/40 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
+                                                            }`}
+                                                    >
+                                                        {role}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
 
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={submitting || !primarySignal || !roleStrength}
-                                        className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 group mt-4"
-                                    >
-                                        {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Submit On-Chain CV <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>}
-                                    </button>
+                                        {error && <p className="text-red-400 text-sm py-4 px-6 bg-red-500/10 border border-red-500/20 rounded-xl">{error}</p>}
 
-                                    <div className="text-center space-y-2 pt-2">
-                                        <p className="text-xs text-slate-500">
-                                            Recruiters only see a summarized on-chain profile. Your full wallet history remains private.
-                                        </p>
-                                        <p className="text-[10px] text-slate-600">
-                                            Most applications are reviewed within 2–5 days.
-                                        </p>
+                                        <div className="pt-4 space-y-4">
+                                            <button
+                                                onClick={handleSubmit}
+                                                disabled={submitting || !primarySignal || !roleStrength}
+                                                className="w-full py-5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-2xl shadow-emerald-500/40"
+                                            >
+                                                {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Submit Verified Credentials <Send className="w-5 h-5" /></>}
+                                            </button>
+
+                                            <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
+                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500/50" />
+                                                Professional signals only • Keys never shared
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
                         </div>
                     </div>
                 ) : (
-                    <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                        <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle className="w-10 h-10 text-emerald-400" />
+                    <div className="max-w-xl mx-auto text-center animate-in fade-in slide-in-from-bottom-6 duration-700 py-12">
+                        <div className="w-24 h-24 bg-emerald-500/20 border-2 border-emerald-500/40 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <CheckCircle className="w-12 h-12 text-emerald-400" />
                         </div>
-                        <h1 className="text-4xl font-bold mb-4">Submission Successful!</h1>
-                        <p className="text-slate-400 mb-10 text-lg">
-                            The hiring team at <span className="text-white font-bold">{collection.title}</span> has received your CV.
+                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight bg-gradient-to-br from-white to-emerald-400 bg-clip-text text-transparent">Submission Successful</h1>
+                        <p className="text-slate-400 mb-12 text-lg">
+                            The hiring team at <span className="text-white font-bold">{collection.title}</span> has received your verified credentials.
                         </p>
 
-                        <div className="flex flex-col md:flex-row gap-4 justify-center">
+                        <div className="flex flex-col gap-4 max-w-sm mx-auto">
                             <Link
                                 href={`/cv/${publicKey?.toBase58()}`}
-                                className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
+                                className="px-8 py-5 bg-white text-black rounded-2xl font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-3 shadow-xl"
                             >
                                 View My Live CV <ExternalLink className="w-5 h-5" />
                             </Link>
                             <Link
                                 href="/"
-                                className="px-8 py-4 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition-all"
+                                className="px-8 py-5 bg-[#121214] border border-white/5 text-slate-300 rounded-2xl font-bold hover:bg-[#1a1a1c] hover:text-white transition-all shadow-xl"
                             >
                                 Back to Home
                             </Link>

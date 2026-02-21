@@ -183,6 +183,7 @@ export default function CreateProfilePage() {
         </Link>
         <div className="flex items-center gap-6">
           <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why ChainVolio</Link>
+          <Link href="/privacy-policy" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Privacy Policy</Link>
           <WalletMultiButton />
         </div>
       </nav>
