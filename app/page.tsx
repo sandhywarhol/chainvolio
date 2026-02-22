@@ -28,6 +28,7 @@ function LandingPageContent() {
   }, [searchParams]);
 
   const SLIDES = [
+    { src: "/homepage/card.png?v=3", label: "Portable Identity" },
     { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
     { src: "/homepage/dashboard.png?v=3", label: "Recruiter Dashboard" },
     { src: "/homepage/edit%20profile.png?v=3", label: "Profile Customization" },
