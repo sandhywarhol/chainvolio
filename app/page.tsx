@@ -1,12 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 export default function LandingPage() {
-  const [activeModal, setActiveModal] = useState<'features' | 'how' | null>(null);
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <LandingPageContent />
+    </Suspense>
+  );
+}
+
+function LandingPageContent() {
+  const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const modal = searchParams.get('modal');
+    if (modal === 'how' || modal === 'recruiters' || modal === 'talent' || modal === 'ask' || modal === 'screening' || modal === 'attestation') {
+      setActiveModal(modal as any);
+    }
+  }, [searchParams]);
 
   const SLIDES = [
     { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
@@ -24,24 +43,18 @@ export default function LandingPage() {
   }, [SLIDES.length]);
 
   return (
-    <main className="min-h-screen flex flex-col">
-      {/* Top Navigation */}
-      <nav className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto relative z-[100] border-b border-white/5">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-1.5 group">
-            <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-bold text-white/90">ChainVolio</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
-            <button onClick={() => setActiveModal('features')} className="text-white/40 hover:text-white/90 transition-colors">Features</button>
-            <button onClick={() => setActiveModal('how')} className="text-white/40 hover:text-white/90 transition-colors">How it Works</button>
-            <Link href="/why" className="text-white/40 hover:text-white/90 transition-colors normal-case">Why ChainVolio</Link>
-            <Link href="/privacy-policy" className="text-white/40 hover:text-white/90 transition-colors normal-case">Privacy Policy</Link>
-            <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors normal-case">Dashboard</Link>
-          </div>
-        </div>
-        <WalletMultiButton />
-      </nav>
+    <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+      {/* Very subtle noise texture */}
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+      <Navbar
+        onHowItWorksClick={() => setActiveModal('how')}
+        onRecruitersClick={() => setActiveModal('recruiters')}
+        onTalentClick={() => setActiveModal('talent')}
+        onAskClick={() => setActiveModal('ask')}
+        onScreeningClick={() => setActiveModal('screening')}
+        onAttestationClick={() => setActiveModal('attestation')}
+      />
 
       {/* Hero Section */}
       <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
@@ -53,7 +66,7 @@ export default function LandingPage() {
 
           {/* Subheading */}
           <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed mb-12 max-w-xl tracking-tight">
-            Build a work history that can't be faked. Verifiable achievements.
+            Your work. Your proof. Your reputation.<br />
             The most trusted way to grow your Web3 career.
           </p>
 
@@ -137,38 +150,35 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer Area - Pinned to bottom */}
-      <div className="w-full relative z-40 pb-12">
-        {/* Logo Marquee Section */}
-        <div className="w-full py-10 overflow-hidden relative bg-black/5 backdrop-blur-sm">
-          <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
-                {PARTNERS.map((partner) => (
-                  <CryptoLogo
-                    key={`${i}-${partner.name}`}
-                    src={partner.src}
-                    name={partner.name}
-                    scale={partner.scale}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Footer Area */}
+      {/* Logo Marquee Section */}
+      <div className="w-full py-10 overflow-hidden relative group/marquee">
+        {/* Edge Blur Masks */}
+        <div className="absolute left-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
+        <div className="absolute right-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
 
-        {/* Bottom Info */}
-        <div className="w-full border-t border-white/5 pt-8 text-center bg-white/[0.02] backdrop-blur-md">
-          <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
-            Powered by Solana · Free to use · No tokens required · ChainVolio
-          </p>
+        <div className="flex animate-marquee whitespace-nowrap items-center w-max">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
+              {PARTNERS.map((partner) => (
+                <CryptoLogo
+                  key={`${i}-${partner.name}`}
+                  src={partner.src}
+                  name={partner.name}
+                  scale={partner.scale}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
+
+      <Footer />
 
       {/* Modal Overlay */}
       {activeModal && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-8"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-8"
           onClick={() => setActiveModal(null)}
         >
           <div
@@ -196,103 +206,363 @@ export default function LandingPage() {
                 ×
               </button>
 
-              {activeModal === 'features' && (
-                <div className="space-y-8">
-                  <h2 className="text-2xl font-light tracking-tight border-b border-white/10 pb-4">Features</h2>
+              {activeModal === 'how' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">How It Works</h2>
+                    <p className="text-white/40 text-sm max-w-xl leading-relaxed">ChainVolio is a Web3-native CV and reputation platform designed to turn professional experience into verifiable proof, not just claims.</p>
+                  </div>
 
-                  <div className="space-y-6">
-                    <div className="border-l-2 border-white/20 pl-6">
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Blockchain Verification</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">
-                        Every work entry is timestamped on the Solana blockchain, creating an immutable record that cannot be altered or faked.
-                      </p>
+                  <div className="grid md:grid-cols-2 gap-12 pt-8">
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Workflow</h3>
+                      <div className="space-y-6">
+                        <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                          <span className="text-lg font-light text-white/20">01</span>
+                          <div>
+                            <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Identity</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Connect your wallet to establish a secure, cryptographically-backed professional identity.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                          <span className="text-lg font-light text-white/20">02</span>
+                          <div>
+                            <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Build</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Curate your CV, work history, portfolio, and key milestones in a streamlined interface.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                          <span className="text-lg font-light text-white/20">03</span>
+                          <div>
+                            <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Verify</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Anchor your achievements with direct evidence via projects, attestations, and on-chain activity.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                          <span className="text-lg font-light text-white/20">04</span>
+                          <div>
+                            <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Share</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Share your public profile with a single link. Your reputation is portable and transparent.</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="border-l-2 border-white/20 pl-6">
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Cryptographic Signatures</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">
-                        Work history can be attested by employers or colleagues using wallet signatures, providing cryptographic proof of authenticity.
-                      </p>
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Core Features</h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Solana Verification</h4>
+                          <p className="text-[11px] text-white/40 leading-relaxed">Entries are timestamped on-chain, creating an immutable record.</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Public Hub</h4>
+                          <p className="text-[11px] text-white/40 leading-relaxed">One destination for your CV, proof-of-work, and portfolio. No gatekeepers.</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Zero Cost</h4>
+                          <p className="text-[11px] text-white/40 leading-relaxed">Completely free to use. Built for the ecosystem.</p>
+                        </div>
+                      </div>
                     </div>
+                  </div>
 
-                    <div className="border-l-2 border-white/20 pl-6">
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Public Sharing</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">
-                        Share your CV with anyone via a simple link. No login required for viewers. Fully transparent and verifiable.
-                      </p>
-                    </div>
-
-                    <div className="border-l-2 border-white/20 pl-6">
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Portfolio Integration</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">
-                        Attach images, links, and evidence to each work entry. Showcase your actual work alongside your credentials.
-                      </p>
-                    </div>
-
-                    <div className="border-l-2 border-white/20 pl-6">
-                      <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Zero Cost</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">
-                        Completely free to use. No tokens, no NFTs, no hidden fees. Just pure infrastructure for career verification.
-                      </p>
-                    </div>
+                  <div className="pt-12 border-t border-white/5">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest leading-loose max-w-2xl">
+                      All data remains user-owned. ChainVolio does not sell personal data. Your professional history is your sovereign property.
+                    </p>
                   </div>
                 </div>
               )}
 
-              {activeModal === 'how' && (
-                <div className="space-y-8">
-                  <h2 className="text-2xl font-light tracking-tight border-b border-white/10 pb-4">How it Works</h2>
+              {activeModal === 'recruiters' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Recruiters</h2>
+                    <p className="text-white/40 text-sm max-w-xl leading-relaxed">ChainVolio helps recruiters hire faster, smarter, and with lower risk by providing access to transparent and verifiable professional profiles.</p>
+                  </div>
 
-                  <div className="space-y-6">
-                    <div className="flex gap-6">
-                      <div className="text-4xl font-light text-white/20">01</div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Connect Wallet</h3>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Securely log in using your Solana wallet. This creates your unique cryptographic identifier on the platform.
-                        </p>
+                  <div className="grid md:grid-cols-2 gap-12 pt-8">
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-teal-400/60 uppercase tracking-[0.3em]">Strategic Value</h3>
+                      <div className="space-y-6">
+                        <div className="flex gap-4 items-start">
+                          <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Web3 Talent</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Discover candidates with real work history and proven output in the ecosystem.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Instant Review</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Review portfolios and verified milestones in a single, standardized view.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Automated Integrity</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Reduce check times with cryptographic proof of work and peer attestations.</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex gap-6">
-                      <div className="text-4xl font-light text-white/20">02</div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Build Profile</h3>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Enter your display name, bio, and professional links. Upload an avatar and define your work preferences.
-                        </p>
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Key Benefits</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Faster decisions</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Reduced risk</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">High signal</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Global reach</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-12 border-t border-white/5">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest leading-loose">
+                      ChainVolio enables recruiters to make decisions based on evidence, not assumptions.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'talent' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Talent</h2>
+                    <p className="text-white/40 text-sm max-w-xl leading-relaxed">Build a professional identity that grows over time and is not tied to a single employer or platform.</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-12 pt-8">
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">Advantage</h3>
+                      <div className="space-y-6">
+                        <div className="flex gap-4 items-start">
+                          <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Sovereign Identity</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Own your professional identity through your wallet. No platform lock-in.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Showcase Output</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">Focus on actual contributions rather than just company titles.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                          <div className="space-y-1">
+                            <h4 className="text-[10px] font-bold uppercase text-white/90">Reputation Hub</h4>
+                            <p className="text-[11px] text-white/50 leading-relaxed">One professional destination for jobs, grants, and collaborations.</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex gap-6">
-                      <div className="text-4xl font-light text-white/20">03</div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Add Work Proof</h3>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Submit your past projects or roles. Each entry is recorded on-chain with evidence and timestamps.
-                        </p>
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Why it matters</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Web3-Native</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Proof Over Hype</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Data Sovereignty</p>
+                        </div>
+                        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Global Reach</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-12 border-t border-white/5">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest leading-loose">
+                      ChainVolio is not just a resume. It is your professional reputation in the new internet.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'ask' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">Sourcing</h2>
+                    <p className="text-white/40 text-sm max-w-md">Eliminate the friction of static files. Request live, verified links to capture higher signal talent.</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-12 pt-8">
+                    <div className="space-y-6">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Shift</h3>
+                      <div className="space-y-4">
+                        <div className="p-6 bg-white/[0.02] border border-white/5 rounded-sm">
+                          <p className="text-[10px] text-white/20 uppercase mb-3 text-[8px] tracking-[0.2em]">Traditional Query</p>
+                          <p className="text-sm text-white/40 font-light">"Please attach your CV as a PDF."</p>
+                        </div>
+                        <div className="p-6 bg-emerald-400/[0.03] border border-emerald-400/10 rounded-sm">
+                          <p className="text-[10px] text-emerald-400/40 uppercase mb-3 text-[8px] tracking-[0.2em]">Native Query</p>
+                          <p className="text-sm text-emerald-400/90 font-medium">"Drop your ChainVolio link."</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex gap-6">
-                      <div className="text-4xl font-light text-white/20">04</div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Get Attestations</h3>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Invite collaborators to verify your work. Their cryptographic signatures add a layer of peer-vetted trust to your profile.
-                        </p>
+                    <div className="space-y-6">
+                      <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Operational Value</h3>
+                      <div className="space-y-5 text-xs text-white/60">
+                        <div className="flex gap-4">
+                          <span className="text-emerald-400/40 font-bold">/</span>
+                          <p className="font-light leading-relaxed">Direct access to verified work history without logins.</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <span className="text-emerald-400/40 font-bold">/</span>
+                          <p className="font-light leading-relaxed">Unified view of portfolio, code, and peer proof.</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <span className="text-emerald-400/40 font-bold">/</span>
+                          <p className="font-light leading-relaxed">Signal-rich screening for global, remote pipelines.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-12 border-t border-white/5">
+                    <div className="max-w-md">
+                      <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] mb-6">Template</h3>
+                      <p className="text-sm text-white/40 italic leading-relaxed font-light">
+                        "We prioritize verified proof of work. Please include your ChainVolio link with your application."
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 text-center">
+                    <p className="text-[9px] text-white/20 uppercase tracking-[0.5em]">Native sourcing for a decentralized workforce</p>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'screening' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">Screening Protocol</h2>
+                    <p className="text-white/40 text-sm max-w-md">Efficient evaluation of Web3 talent requires a shift from credentials to contributions.</p>
+                  </div>
+
+                  <div className="grid gap-12">
+                    <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.2em] pt-1">01 Authority</h3>
+                      <div className="space-y-3">
+                        <p className="text-sm text-white/90 font-medium">Prioritize attested history.</p>
+                        <p className="text-xs text-white/40 leading-relaxed font-light">Focus on records verified by founders or collaborators. These represent social capital anchored in real output.</p>
+                      </div>
+                    </section>
+
+                    <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start border-t border-white/5 pt-12">
+                      <h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.2em] pt-1">02 Substance</h3>
+                      <div className="space-y-3">
+                        <p className="text-sm text-white/90 font-medium">Evaluate work, not titles.</p>
+                        <p className="text-xs text-white/40 leading-relaxed font-light">Web3 roles are fluid. Look for high-frequency contributions and consistency across multiple milestones.</p>
+                      </div>
+                    </section>
+
+                    <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start border-t border-white/5 pt-12">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.2em] pt-1">03 Evidence</h3>
+                      <div className="space-y-3">
+                        <p className="text-sm text-white/90 font-medium">Navigate proof directly.</p>
+                        <p className="text-xs text-white/40 leading-relaxed font-light">Links are integrated. View code, designs, and on-chain activity without leaving the profile hub.</p>
+                      </div>
+                    </section>
+
+                    <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start border-t border-white/5 pt-12">
+                      <h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.2em] pt-1">04 Filter</h3>
+                      <div className="space-y-3">
+                        <p className="text-sm text-white/90 font-medium">Comparison over intuition.</p>
+                        <p className="text-xs text-white/40 leading-relaxed font-light">Standardized profiles allow for objective comparison of skills, availability, and documented reputation.</p>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div className="pt-8 text-center border-t border-white/5">
+                    <p className="text-[9px] text-white/20 uppercase tracking-[0.5em]">Evidence-based hiring at scale</p>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'attestation' && (
+                <div className="space-y-16 py-4">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase">Proof Standards</h2>
+                    <p className="text-white/40 text-sm max-w-md">Cryptographic validation of professional experience in a decentralized market.</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-16">
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Attestation Primitive</h3>
+                      <p className="text-sm text-white/70 leading-relaxed font-light">An attestation is a work record confirmed by a secondary party. It proves that a contribution occurred, who verified it, and when the verification was anchored.</p>
+
+                      <div className="space-y-4 pt-4">
+                        <div className="flex gap-4 items-center">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/40" />
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Founder / Manager verification</p>
+                        </div>
+                        <div className="flex gap-4 items-center">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/40" />
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">Collaborator confirmation</p>
+                        </div>
+                        <div className="flex gap-4 items-center">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/40" />
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest">On-chain timestamping</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex gap-6">
-                      <div className="text-4xl font-light text-white/20">05</div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-white/90 mb-2">Share Your CV</h3>
-                        <p className="text-xs text-white/60 leading-relaxed mb-3">
-                          Get a public link to your CV. Anyone can view it without logging in. All work history is verifiable on the blockchain.
+                    <div className="space-y-8">
+                      <h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.3em]">Recruiter Insights</h3>
+                      <div className="p-8 bg-white/[0.02] border border-white/5 rounded-sm space-y-8">
+                        <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                          <div className="space-y-1">
+                            <span className="text-[8px] text-white/20 uppercase tracking-widest">Signal Type</span>
+                            <p className="text-xs text-white/90">Attested Work</p>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <span className="text-[8px] text-emerald-400/30 uppercase tracking-widest">Trust level</span>
+                            <p className="text-xs text-emerald-400/80 font-bold tracking-widest uppercase">High</p>
+                          </div>
+                        </div>
+                        <p className="text-xs text-white/40 leading-relaxed italic font-light">
+                          "Verification reduces screening noise before a single interview is conducted."
                         </p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-16 pt-12 border-t border-white/5">
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Web3 Context</h3>
+                      <p className="text-[11px] text-white/40 leading-relaxed font-light">In a market without centralized HR databases, attestations create a portable reputation layer that follows the builder across DAOs and projects.</p>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Exclusions</h3>
+                      <p className="text-[11px] text-white/20 leading-relaxed font-light italic">Attestations prove historical occurrence, not future performance. They are a signal of credibility, not a promise of quality.</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 text-center border-t border-white/5">
+                    <p className="text-[9px] text-white/20 uppercase tracking-[0.5em]">Cryptographic credibility for the global talent stack</p>
                   </div>
                 </div>
               )}

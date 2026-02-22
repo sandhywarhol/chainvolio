@@ -256,7 +256,7 @@ export function ReceiptForm({ walletAddress, onSuccess }: Props) {
           onChange={(e) => setForm({ ...form, compensationType: e.target.value })}
           className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
         >
-          <option value="">—</option>
+          <option value="">None</option>
           {COMP_TYPES.map((t) => (
             <option key={t} value={t}>
               {t}

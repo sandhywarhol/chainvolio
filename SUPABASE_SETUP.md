@@ -1,4 +1,4 @@
-# ChainVolio — Supabase Implementation
+# ChainVolio: Supabase Implementation
 
 ## Prerequisites
 - Supabase project created

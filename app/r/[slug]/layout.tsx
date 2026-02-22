@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Apply with ChainVolio — Verified Professional Proof",
+    title: "Apply with ChainVolio | Verified Professional Proof",
     description: "Submit your verifiable on-chain CV to a recruitment collection.",
 };
 

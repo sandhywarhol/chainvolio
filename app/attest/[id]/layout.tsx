@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Verify Proof of Work — ChainVolio Attestation",
+    title: "Verify Proof of Work: ChainVolio Attestation",
     description: "Sign a cryptographic attestation to verify a colleague's professional work history on-chain.",
 };
 

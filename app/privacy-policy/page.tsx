@@ -1,29 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 export default function PrivacyPolicyPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-hidden selection:bg-teal-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
             {/* Very subtle noise texture */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
-            {/* Top Navigation */}
-            <nav className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto relative z-[100] border-b border-white/5">
-                <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-1.5 group">
-                        <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-bold text-white/90">ChainVolio</span>
-                    </Link>
-                    <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase">
-                        <Link href="/why" className="text-white/40 hover:text-white transition-colors normal-case">Why ChainVolio</Link>
-                        <Link href="/privacy-policy" className="text-white hover:text-white transition-colors normal-case">Privacy Policy</Link>
-                        <Link href="/dashboard" className="text-emerald-500/70 hover:text-emerald-400 transition-colors normal-case">Dashboard</Link>
-                    </div>
-                </div>
-                <WalletMultiButton />
-            </nav>
+            <Navbar />
 
             {/* Hero Section */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
@@ -120,7 +106,6 @@ export default function PrivacyPolicyPage() {
                 </div>
             </section>
 
-            <div className="max-w-[1240px] mx-auto border-t border-white/5 w-full px-8" />
 
             {/* Updates & Third Party */}
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
@@ -140,12 +125,7 @@ export default function PrivacyPolicyPage() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="w-full relative z-40 pb-16 pt-16 text-center border-t border-white/5">
-                <p className="text-[9px] text-white/10 uppercase tracking-[0.5em] font-medium">
-                    ChainVolio Utility · Identity Protocol · Solana Network
-                </p>
-            </footer>
+            <Footer />
         </main>
     );
 }

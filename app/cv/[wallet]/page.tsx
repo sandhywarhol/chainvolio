@@ -7,6 +7,7 @@ import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Pla
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
 import { Toast } from "@/components/ui/Toast";
+import { Footer } from "@/components/layout/Footer";
 
 type Profile = {
   displayName: string;
@@ -202,7 +203,9 @@ export default function CVPage() {
   }
 
   return (
-    <main className="min-h-screen text-white">
+    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+      {/* Very subtle noise texture */}
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <nav className="flex items-center justify-between px-6 py-4 max-w-3xl mx-auto relative z-[100]">
         <Link href="/" className="flex items-center gap-1.5 group">
           <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
@@ -709,6 +712,7 @@ export default function CVPage() {
           </p>
         </footer>
       </section>
+      <Footer />
     </main >
   );
 }

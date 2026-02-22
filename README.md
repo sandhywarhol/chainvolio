@@ -1,6 +1,6 @@
 # ChainVolio
 
-On-chain CV platform for Web3 talent — Proof of Work Receipt with on-chain timestamp (Solana).
+On-chain CV platform for Web3 talent | Proof of Work Receipt with on-chain timestamp (Solana).
 
 ## Getting started
 
@@ -13,10 +13,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Pages
 
-- `/` — Landing page
-- `/create-profile` — Create profile (requires wallet connection)
-- `/dashboard` — Talent dashboard, add receipts
-- `/cv/[wallet]` — Public CV (for recruiters, no login)
+- `/`: Landing page
+- `/create-profile`: Create profile (requires wallet connection)
+- `/dashboard`: Talent dashboard, add receipts
+- `/cv/[wallet]`: Public CV (for recruiters, no login)
 
 ## MVP features
 

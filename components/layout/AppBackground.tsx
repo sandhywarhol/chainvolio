@@ -28,14 +28,14 @@ export function AppBackground() {
             {/* Black gradient overlay - video only visible at bottom */}
             <div className="fixed inset-0 z-20 bg-gradient-to-b from-black via-black/80 to-transparent"></div>
 
-            {/* Bottom black fade - subtle depth at the footer area */}
-            <div className="fixed inset-0 z-20 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+            {/* Bottom black fade - stronger depth at the footer area */}
+            <div className="fixed inset-0 z-20 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
 
             {(isHomePage || isWhyPage) && (
                 <>
-                    {/* Global Vignette - Ultra-Soft Seamless Mist (Offset from top for clear navigation) */}
+                    {/* Global Vignette - Stronger Side Mist */}
                     <div
-                        className="fixed top-24 bottom-0 left-0 w-[20%] z-[70] pointer-events-none backdrop-blur-xl"
+                        className="fixed top-24 bottom-0 left-0 w-[25%] z-[70] pointer-events-none backdrop-blur-2xl"
                         style={{
                             maskImage: 'linear-gradient(to right, black, transparent)',
                             WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
@@ -43,7 +43,7 @@ export function AppBackground() {
                         }}
                     ></div>
                     <div
-                        className="fixed top-24 bottom-0 right-0 w-[20%] z-[70] pointer-events-none backdrop-blur-xl"
+                        className="fixed top-24 bottom-0 right-0 w-[25%] z-[70] pointer-events-none backdrop-blur-2xl"
                         style={{
                             maskImage: 'linear-gradient(to left, black, transparent)',
                             WebkitMaskImage: 'linear-gradient(to left, black, transparent)',
@@ -51,13 +51,13 @@ export function AppBackground() {
                         }}
                     ></div>
 
-                    {/* Bottom Vignette - Blur for the footer area */}
+                    {/* Bottom Vignette - Deeper and taller for the footer area */}
                     <div
-                        className="fixed bottom-0 left-0 right-0 h-32 z-[70] pointer-events-none backdrop-blur-xl"
+                        className="fixed bottom-0 left-0 right-0 h-48 z-[70] pointer-events-none"
                         style={{
-                            maskImage: 'linear-gradient(to top, black, transparent)',
-                            WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
-                            background: 'linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0))'
+                            maskImage: 'linear-gradient(to top, black 20%, transparent)',
+                            WebkitMaskImage: 'linear-gradient(to top, black 20%, transparent)',
+                            background: 'linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0))'
                         }}
                     ></div>
                 </>
