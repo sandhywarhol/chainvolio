@@ -102,9 +102,9 @@ export default function AboutPage() {
                                 <span className="text-white/60 text-base font-light font-display tracking-tight">sandhywarhol@gmail.com</span>
                             </a>
                             <div className="grid grid-cols-2 gap-4">
-                                <a href="https://x.com/sandhywarhol" target="_blank" rel="noopener noreferrer" className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                                <a href="https://x.com/chainvolio" target="_blank" rel="noopener noreferrer" className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
                                     <span className="block text-[10px] uppercase tracking-widest text-white/20 mb-2">X / Twitter</span>
-                                    <span className="text-white/60 text-base font-light font-display tracking-tight">@sandhywarhol</span>
+                                    <span className="text-white/60 text-base font-light font-display tracking-tight">@chainvolio</span>
                                 </a>
                                 <div className="p-6 border border-white/5 bg-white/[0.01] cursor-not-allowed opacity-50">
                                     <span className="block text-[10px] uppercase tracking-widest text-white/20 mb-2">GitHub</span>
