@@ -28,7 +28,6 @@ function LandingPageContent() {
   }, [searchParams]);
 
   const SLIDES = [
-    { src: "/homepage/card.png?v=3", label: "Portable Identity" },
     { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
     { src: "/homepage/dashboard.png?v=3", label: "Recruiter Dashboard" },
     { src: "/homepage/edit%20profile.png?v=3", label: "Profile Customization" },
@@ -67,7 +66,7 @@ function LandingPageContent() {
 
           {/* Subheading */}
           <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed mb-12 max-w-xl tracking-tight">
-            Your work. Your proof. Your reputation.<br />
+            Build a work history that can’t be faked. Verifiable achievements, secured on-chain.<br />
             The most trusted way to grow your Web3 career.
           </p>
 
