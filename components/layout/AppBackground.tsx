@@ -33,24 +33,6 @@ export function AppBackground() {
 
             {(isHomePage || isWhyPage) && (
                 <>
-                    {/* Global Vignette - Stronger Side Mist */}
-                    <div
-                        className="fixed top-24 bottom-0 left-0 w-[25%] z-[70] pointer-events-none backdrop-blur-2xl"
-                        style={{
-                            maskImage: 'linear-gradient(to right, black, transparent)',
-                            WebkitMaskImage: 'linear-gradient(to right, black, transparent)',
-                            background: 'linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0))'
-                        }}
-                    ></div>
-                    <div
-                        className="fixed top-24 bottom-0 right-0 w-[25%] z-[70] pointer-events-none backdrop-blur-2xl"
-                        style={{
-                            maskImage: 'linear-gradient(to left, black, transparent)',
-                            WebkitMaskImage: 'linear-gradient(to left, black, transparent)',
-                            background: 'linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0))'
-                        }}
-                    ></div>
-
                     {/* Bottom Vignette - Deeper and taller for the footer area */}
                     <div
                         className="fixed bottom-0 left-0 right-0 h-48 z-[70] pointer-events-none"
