@@ -21,9 +21,10 @@ type Receipt = {
 
 type Props = {
   walletAddress: string;
+  onEdit?: (receipt: Receipt) => void;
 };
 
-export function ReceiptList({ walletAddress }: Props) {
+export function ReceiptList({ walletAddress, onEdit }: Props) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -93,17 +94,34 @@ export function ReceiptList({ walletAddress }: Props) {
               )}
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-end">
-            <button
-              onClick={() => {
-                const url = `${window.location.origin}/attest/${r.id}`;
-                navigator.clipboard.writeText(url);
-                setToastMessage("Verification link copied!");
-              }}
-              className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
-            >
-              📋 Copy Verification Link
-            </button>
+          <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/attest/${r.id}`;
+                  navigator.clipboard.writeText(url);
+                  setToastMessage("Verification link copied!");
+                }}
+                className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+              >
+                📋 Copy Verification Link
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {r.status === "Attested" || r.status === "Locked" || r.status === "Submitted" ? (
+                <span className="text-[10px] text-slate-500 flex items-center gap-1 italic">
+                  <span className="text-emerald-500/50">🔒</span> This record is locked for editing after submission/attestation
+                </span>
+              ) : (
+                <button
+                  onClick={() => onEdit?.(r)}
+                  className="text-xs text-emerald-400 hover:text-emerald-300 font-medium px-2 py-1 rounded hover:bg-emerald-400/5 transition-colors"
+                >
+                  Edit Record
+                </button>
+              )}
+            </div>
           </div>
         </div>
       ))}

@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   if (!supabase) {
-    return NextResponse.json(
-      { error: "Supabase not configured" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
   }
 
   try {
@@ -24,14 +21,36 @@ export async function POST(request: Request) {
       evidenceLinks,
       impact,
       portfolioImages,
+      signature,
+      nonce,
+      timestamp
     } = body;
+
+    // --- Signature Verification ---
+    const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+    if (!skipVerify && (!signature || !nonce || !timestamp)) {
+      return NextResponse.json({ error: "Signature required for this action." }, { status: 401 });
+    }
+
+    const { verifySignature } = await import("@/lib/crypto");
+    const { isValid, error: sigError } = await verifySignature(
+      walletAddress,
+      "submit_work",
+      nonce || "",
+      timestamp || 0,
+      signature || ""
+    );
+
+    if (!isValid) {
+      return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+    }
+
+    // Set transaction context for RLS
+    await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
 
     // 1. Ensure wallet exists
     await supabase.from("wallets").upsert(
-      {
-        wallet_address: walletAddress,
-        last_connected_at: new Date().toISOString(),
-      },
+      { wallet_address: walletAddress, last_connected_at: new Date().toISOString() },
       { onConflict: "wallet_address" }
     );
 
@@ -49,7 +68,7 @@ export async function POST(request: Request) {
       evidence_links: evidenceLinks || [],
       impact: impact || [],
       portfolio_images: portfolioImages || [],
-      status: "Self-Declared",
+      status: "Submitted",
     });
 
     if (error) {
@@ -64,13 +83,129 @@ export async function POST(request: Request) {
   }
 }
 
+const errorResponse = (code: string, message: string, status: number = 400) => {
+  return NextResponse.json({
+    ok: false,
+    error: { code, message }
+  }, { status });
+};
+
+export async function PATCH(request: Request) {
+  if (!supabase) {
+    return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);
+  }
+
+  try {
+    const body = await request.json();
+    const { id, walletAddress, signature, nonce, timestamp } = body;
+
+    if (!id) {
+      return errorResponse("ERR_INVALID_REQUEST", "Receipt ID is required", 400);
+    }
+
+    if (!walletAddress) {
+      return errorResponse("ERR_INVALID_REQUEST", "Wallet address is required", 400);
+    }
+
+    // --- Signature Verification ---
+    const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+    if (!skipVerify && (!signature || !nonce || !timestamp)) {
+      return errorResponse("ERR_SIGNATURE_REQUIRED", "Cryptographic signature is required for updates", 401);
+    }
+
+    const { verifySignature } = await import("@/lib/crypto");
+    const { isValid, error: sigError } = await verifySignature(
+      walletAddress,
+      "update_work",
+      nonce || "",
+      timestamp || 0,
+      signature || ""
+    );
+
+    if (!isValid) {
+      return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed", 401);
+    }
+
+    // 1. Ownership & State Check
+    const { data: existing, error: fetchError } = await supabase
+      .from("receipts")
+      .select("wallet_address, status")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !existing) {
+      return errorResponse("ERR_RECORD_NOT_FOUND", "The specified work record could not be found", 404);
+    }
+
+    // Authorization: Must be the owner
+    if (existing.wallet_address !== walletAddress) {
+      return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized: You do not own this record", 403);
+    }
+
+    // Semantic Check: Block if already Attested/Locked/Submitted (Frontend UX optimization)
+    if (["Attested", "Locked", "Submitted"].includes(existing.status)) {
+      return errorResponse("ERR_IMMUTABLE_RECORD", `Cannot edit a record that is already ${existing.status.toLowerCase()}`, 403);
+    }
+
+    // 2. Prepare Partial Update
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+
+    const allowedFields: Record<string, string> = {
+      role: 'role',
+      org: 'org',
+      description: 'description',
+      startDate: 'start_date',
+      endDate: 'end_date',
+      workType: 'work_type',
+      compensationType: 'compensation_type',
+      evidenceLinks: 'evidence_links',
+      impact: 'impact',
+      portfolioImages: 'portfolio_images',
+      status: 'status'
+    };
+
+    Object.entries(allowedFields).forEach(([bodyKey, dbKey]) => {
+      if (body[bodyKey] !== undefined) {
+        updateData[dbKey] = body[bodyKey];
+      }
+    });
+
+    // 3. Execute Update
+    await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
+
+    const { error: updateError } = await supabase
+      .from("receipts")
+      .update(updateData)
+      .eq("id", id);
+
+    if (updateError) {
+      // Map Postgres trigger violations (P0001) to semantic codes
+      if (updateError.code === 'P0001') {
+        const msg = updateError.message.toLowerCase();
+        if (msg.includes("attested") || msg.includes("locked")) {
+          return errorResponse("ERR_IMMUTABLE_RECORD", updateError.message, 403);
+        }
+        if (msg.includes("revert") || msg.includes("state")) {
+          return errorResponse("ERR_INVALID_STATE_TRANSITION", updateError.message, 403);
+        }
+        return errorResponse("ERR_DATABASE_RULE_VIOLATION", updateError.message, 403);
+      }
+      return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    console.error("PATCH Receipts Error:", err);
+    return errorResponse("ERR_SERVER_ERROR", err.message || "An unexpected error occurred", 500);
+  }
+}
+
 export async function GET(request: Request) {
   try {
     if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase not configured" },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -80,7 +215,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "wallet required" }, { status: 400 });
     }
 
-    // 1. Fetch Receipts
+    // 1. Fetch Receipts (Historical data is preserved as we use SELECT *)
     const { data: receiptsData, error: receiptsError } = await supabase
       .from("receipts")
       .select("*")
@@ -97,7 +232,7 @@ export async function GET(request: Request) {
 
     const receiptIds = receiptsList.map((r: any) => r.id);
 
-    // 2. Fetch Attestations separately to be robust against schema differences
+    // 2. Fetch Attestations
     let finalAttestations: any[] = [];
     try {
       const { data: attestationsData, error: attestationsError } = await supabase
@@ -117,20 +252,17 @@ export async function GET(request: Request) {
         .in("receipt_id", receiptIds);
 
       if (attestationsError) {
-        console.warn("Full attestation fetch failed, falling back to basic info:", attestationsError.message);
         const { data: basicAttestations } = await supabase
           .from("attestations")
           .select("receipt_id, attester_wallet, created_at, signature, comment")
           .in("receipt_id", receiptIds);
 
-        if (basicAttestations) {
-          finalAttestations = basicAttestations;
-        }
+        if (basicAttestations) finalAttestations = basicAttestations;
       } else {
         finalAttestations = attestationsData || [];
       }
     } catch (e) {
-      console.warn("Attestations table might be missing or broken:", e);
+      console.warn("Attestations fetch failed:", e);
     }
 
     const attestationsMap = finalAttestations.reduce((acc: any, a: any) => {

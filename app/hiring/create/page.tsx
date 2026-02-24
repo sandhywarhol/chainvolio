@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 export default function CreateCollection() {
-    const { publicKey } = useWallet();
+    const { publicKey, signMessage } = useWallet();
     const [loading, setLoading] = useState(false);
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -84,17 +84,31 @@ export default function CreateCollection() {
         { id: "nft", label: "NFT Portfolio", icon: Palette, desc: "Created assets" },
     ];
 
+    // ...
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!publicKey || !signMessage) {
+            alert("Please connect your wallet to sign this action.");
+            return;
+        }
         setLoading(true);
 
         try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile"); // Reusing high-level action or add create_collection
+
+            if (!signedAction) {
+                setLoading(false);
+                return;
+            }
+
             const res = await fetch("/api/hiring/collections", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
                     ownerWallet: publicKey?.toBase58(),
+                    ...signedAction
                 }),
             });
 

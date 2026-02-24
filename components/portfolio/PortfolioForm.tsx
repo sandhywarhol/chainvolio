@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
 import imageCompression from "browser-image-compression";
-import { supabase } from "@/lib/supabase/client";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface PortfolioItem {
     id: string;
@@ -19,6 +19,7 @@ interface PortfolioFormProps {
 }
 
 export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
+    const { publicKey, signMessage } = useWallet();
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -48,8 +49,6 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
     };
 
     const compressAndUploadImage = async (file: File) => {
-        if (!supabase) throw new Error("Supabase not configured");
-
         // Compress full-size image (max 1200px)
         const fullOptions = {
             maxSizeMB: 1,
@@ -74,39 +73,36 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
         const fullFileName = `${walletAddress}/${timestamp}_full.webp`;
         const thumbFileName = `${walletAddress}/${timestamp}_thumb.webp`;
 
-        // Upload to Supabase storage
-        const { error: fullError } = await supabase.storage
-            .from("portfolio")
-            .upload(fullFileName, fullImage, {
-                contentType: "image/webp",
-                upsert: false,
+        // Helper for uploading via API
+        const uploadFile = async (blob: Blob, path: string) => {
+            const formData = new FormData();
+            formData.append("file", blob, path);
+            formData.append("bucket", "portfolio");
+            formData.append("path", path);
+
+            const res = await fetch("/api/storage/upload", {
+                method: "POST",
+                body: formData,
             });
 
-        if (fullError) throw fullError;
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || "Upload failed");
+            }
+            return await res.json();
+        };
 
-        const { error: thumbError } = await supabase.storage
-            .from("portfolio")
-            .upload(thumbFileName, thumbnail, {
-                contentType: "image/webp",
-                upsert: false,
-            });
-
-        if (thumbError) throw thumbError;
-
-        // Get public URLs
-        const { data: fullData } = supabase.storage
-            .from("portfolio")
-            .getPublicUrl(fullFileName);
-
-        const { data: thumbData } = supabase.storage
-            .from("portfolio")
-            .getPublicUrl(thumbFileName);
+        const [fullRes, thumbRes] = await Promise.all([
+            uploadFile(fullImage, fullFileName),
+            uploadFile(thumbnail, thumbFileName),
+        ]);
 
         return {
-            imageUrl: fullData.publicUrl,
-            thumbnailUrl: thumbData.publicUrl,
+            imageUrl: fullRes.url,
+            thumbnailUrl: thumbRes.url,
         };
     };
+
 
     const handleFileSelect = async (file: File) => {
         setSelectedFile(file);
@@ -114,6 +110,11 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!publicKey || !signMessage) {
+            alert("Please connect your wallet to sign this action.");
+            return;
+        }
 
         if (!form.title.trim()) {
             alert("Please enter a title");
@@ -133,6 +134,14 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
         setLoading(true);
 
         try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+
+            if (!signedAction) {
+                setLoading(false);
+                return;
+            }
+
             // Compress and upload images
             const { imageUrl, thumbnailUrl } = await compressAndUploadImage(selectedFile);
 
@@ -146,6 +155,7 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
                     description: form.description.trim() || undefined,
                     imageUrl,
                     thumbnailUrl,
+                    ...signedAction
                 }),
             });
 
@@ -169,21 +179,35 @@ export function PortfolioForm({ walletAddress }: PortfolioFormProps) {
     };
 
     const handleDelete = async (id: string) => {
+        if (!publicKey || !signMessage) return;
         if (!confirm("Delete this portfolio item?")) return;
 
         try {
-            const res = await fetch(`/api/portfolio/${id}`, {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+
+            if (!signedAction) return;
+
+            const searchParams = new URLSearchParams({
+                wallet: publicKey.toBase58(),
+                signature: signedAction.signature,
+                nonce: signedAction.nonce,
+                timestamp: signedAction.timestamp.toString()
+            });
+
+            const res = await fetch(`/api/portfolio/${id}?${searchParams.toString()}`, {
                 method: "DELETE",
             });
 
             if (!res.ok) {
-                throw new Error("Failed to delete");
+                const error = await res.json();
+                throw new Error(error.error || "Failed to delete");
             }
 
             await fetchItems();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error deleting:", err);
-            alert("Failed to delete portfolio item");
+            alert(err.message || "Failed to delete portfolio item");
         }
     };
 

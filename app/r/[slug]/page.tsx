@@ -26,7 +26,7 @@ import {
 
 export default function CandidateSubmission({ params }: { params: { slug: string } }) {
     const { slug } = params;
-    const { publicKey, connected } = useWallet();
+    const { publicKey, connected, signMessage } = useWallet();
     const [collection, setCollection] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -38,7 +38,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     useEffect(() => {
         async function fetchCollection() {
             try {
-                const res = await fetch(`/api/hiring/collections/${slug}/candidates`); // Reusing dashboard API for collection info
+                const res = await fetch(`/api/hiring/collections/${slug}/candidates`);
                 const data = await res.json();
                 if (data.collection) {
                     setCollection(data.collection);
@@ -55,11 +55,19 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     }, [slug]);
 
     const handleSubmit = async () => {
-        if (!publicKey) return;
+        if (!publicKey || !signMessage) return;
         setSubmitting(true);
         setError(null);
 
         try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "apply_job", slug);
+
+            if (!signedAction) {
+                setSubmitting(false);
+                return;
+            }
+
             const res = await fetch("/api/hiring/submissions", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -68,6 +76,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                     walletAddress: publicKey.toBase58(),
                     primarySignal,
                     roleStrength,
+                    ...signedAction
                 }),
             });
 
@@ -109,8 +118,6 @@ export default function CandidateSubmission({ params }: { params: { slug: string
         );
     }
 
-
-
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30">
             <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
@@ -133,17 +140,16 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                     <ShieldCheck className="w-3.5 h-3.5" /> Verified Pool
                                 </span>
                                 <span className="w-1 h-1 rounded-full bg-slate-800"></span>
-                                <span className="flex items-center gap-1.5">
+                                <span className="flex items-center gap-1.5 font-sans">
                                     <Clock className="w-3.5 h-3.5 text-blue-500" /> {collection.metadata?.roleType || "Active"}
                                 </span>
                                 <span className="w-1 h-1 rounded-full bg-slate-800"></span>
-                                <span className="flex items-center gap-1.5 text-emerald-400">
+                                <span className="flex items-center gap-1.5 text-emerald-400 font-sans">
                                     <DollarSign className="w-3.5 h-3.5" /> {collection.metadata?.salary || "Competitive"}
                                 </span>
                             </div>
                         </header>
 
-                        {/* Section 1: Role Overview & Details */}
                         <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl space-y-10">
                             <div className="flex flex-col md:flex-row gap-10">
                                 <div className="flex-1 space-y-6">
@@ -195,91 +201,6 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                             </div>
                         </div>
 
-                        {/* Section 2: Recruiter Identity */}
-                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-20">
-                                <BadgeCheck className="w-8 h-8 text-slate-400" />
-                            </div>
-
-                            <div className="flex items-center gap-3 pb-8 border-b border-white/5 mb-8">
-                                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-                                    <Building2 className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-bold text-white tracking-tight">Hiring Context</h3>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Verified Recruiter Details</p>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row gap-10">
-                                <div className="flex-1 space-y-6">
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-white mb-1">
-                                            {collection.metadata?.recruiterName || "Collection Owner"}
-                                        </h3>
-                                        <p className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
-                                            {collection.metadata?.recruiterRole || "Lead Recruiter"}
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl">
-                                            <p className="text-xs font-bold text-white uppercase tracking-wide mb-2 flex items-center gap-2">
-                                                <Building2 className="w-3.5 h-3.5 text-slate-500" /> {collection.metadata?.companyName || "Project Team"}
-                                            </p>
-                                            {collection.metadata?.companyDescription && (
-                                                <p className="text-sm text-slate-400 leading-relaxed italic">{collection.metadata.companyDescription}</p>
-                                            )}
-                                        </div>
-
-                                        {(collection.metadata?.websiteUrl || collection.metadata?.twitterUrl || collection.metadata?.githubUrl) && (
-                                            <div className="flex flex-wrap gap-2">
-                                                {collection.metadata.websiteUrl && (
-                                                    <a href={collection.metadata.websiteUrl} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 transition-all">
-                                                        <Globe className="w-4 h-4" />
-                                                    </a>
-                                                )}
-                                                {collection.metadata.twitterUrl && (
-                                                    <a href={`https://twitter.com/${collection.metadata.twitterUrl.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-blue-400/50 hover:bg-blue-400/10 text-slate-400 hover:text-blue-400 transition-all">
-                                                        <Twitter className="w-4 h-4" />
-                                                    </a>
-                                                )}
-                                                {collection.metadata.githubUrl && (
-                                                    <a href={`https://github.com/${collection.metadata.githubUrl}`} target="_blank" rel="noopener noreferrer" className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/50 hover:bg-white/10 text-slate-400 hover:text-white transition-all">
-                                                        <Github className="w-4 h-4" />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="md:w-72 space-y-4">
-                                    <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Project Stage</p>
-                                        <p className="text-sm font-bold text-slate-300">{collection.metadata?.projectStage || "Early Stage"}</p>
-                                    </div>
-                                    <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Contact Channel</p>
-                                        <p className="text-xs font-medium text-indigo-400">{collection.metadata?.contactChannel || "DM on X"}</p>
-                                    </div>
-                                    {collection.metadata?.focusAreas && collection.metadata.focusAreas.length > 0 && (
-                                        <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                                            <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-2">Target Signals</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {collection.metadata.focusAreas.slice(0, 3).map((area: string) => (
-                                                    <span key={area} className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">
-                                                        {area.replace('_', ' ')}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Submission Form */}
                         <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-50"></div>
 
@@ -366,11 +287,6 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                             >
                                                 {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Submit Verified Credentials <Send className="w-5 h-5" /></>}
                                             </button>
-
-                                            <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
-                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500/50" />
-                                                Professional signals only • Keys never shared
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -386,21 +302,6 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         <p className="text-slate-400 mb-12 text-lg">
                             The hiring team at <span className="text-white font-bold">{collection.title}</span> has received your verified credentials.
                         </p>
-
-                        <div className="flex flex-col gap-4 max-w-sm mx-auto">
-                            <Link
-                                href={`/cv/${publicKey?.toBase58()}`}
-                                className="px-8 py-5 bg-white text-black rounded-2xl font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-3 shadow-xl"
-                            >
-                                View My Live CV <ExternalLink className="w-5 h-5" />
-                            </Link>
-                            <Link
-                                href="/"
-                                className="px-8 py-5 bg-[#121214] border border-white/5 text-slate-300 rounded-2xl font-bold hover:bg-[#1a1a1c] hover:text-white transition-all shadow-xl"
-                            >
-                                Back to Home
-                            </Link>
-                        </div>
                     </div>
                 )}
             </section>

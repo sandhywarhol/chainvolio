@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
     if (!supabase) {
@@ -18,14 +18,61 @@ export async function POST(request: Request) {
             attesterOrg,
             attesterEmail,
             attestationType,
-            confidenceLevel
+            confidenceLevel,
+            nonce,
+            timestamp
         } = body;
+
+        // --- Signature Verification ---
+        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+        if (!skipVerify && (!signature || !nonce || !timestamp)) {
+            return NextResponse.json({ error: "Signature required to attest work." }, { status: 401 });
+        }
+
+
+        const { verifySignature } = await import("@/lib/crypto");
+        const { isValid, error: sigError } = await verifySignature(
+
+            attesterWallet,
+            "attest",
+            nonce || "",
+            timestamp || 0,
+            signature || ""
+        );
+
+
+        if (!isValid) {
+            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+        }
+        // ----------------------------
+
+        // Set transaction context for RLS parity
+        await supabase.rpc('set_app_wallet', { wallet_addr: attesterWallet });
 
         if (!receiptId || !attesterWallet || !signature || !attesterName || !attesterRole) {
             return NextResponse.json(
                 { error: "Missing required fields: name and role are required." },
                 { status: 400 }
             );
+        }
+
+        // 0. Verify Receipt state
+        const { data: receipt, error: fetchError } = await supabase
+            .from("receipts")
+            .select("status, wallet_address")
+            .eq("id", receiptId)
+            .single();
+
+        if (fetchError || !receipt) {
+            return NextResponse.json({ error: "Work record not found." }, { status: 404 });
+        }
+
+        if (receipt.status === "Locked") {
+            return NextResponse.json({ error: "Work record is archived and immutable." }, { status: 403 });
+        }
+
+        if (receipt.wallet_address === attesterWallet) {
+            return NextResponse.json({ error: "You cannot attest your own work." }, { status: 403 });
         }
 
         // Insert attestation

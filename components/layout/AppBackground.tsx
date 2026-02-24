@@ -6,6 +6,7 @@ export function AppBackground() {
     const pathname = usePathname();
     const isHomePage = pathname === "/";
     const isWhyPage = pathname === "/why";
+    const isSecurityPage = pathname === "/security";
 
     return (
         <>
@@ -31,7 +32,7 @@ export function AppBackground() {
             {/* Bottom black fade - stronger depth at the footer area */}
             <div className="fixed inset-0 z-20 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
 
-            {(isHomePage || isWhyPage) && (
+            {(isHomePage || isWhyPage || isSecurityPage) && (
                 <>
                     {/* Bottom Vignette - Deeper and taller for the footer area */}
                     <div

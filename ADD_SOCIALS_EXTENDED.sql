@@ -1,0 +1,8 @@
+-- Add LinkedIn and Instagram columns to profiles table
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS linkedin TEXT,
+ADD COLUMN IF NOT EXISTS instagram TEXT,
+ADD COLUMN IF NOT EXISTS github TEXT,
+ADD COLUMN IF NOT EXISTS discord TEXT,
+ADD COLUMN IF NOT EXISTS website TEXT,
+ADD COLUMN IF NOT EXISTS telegram TEXT;

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,6 +11,12 @@ export async function GET(
     if (!supabase) {
         return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
     }
+
+    const { searchParams } = new URL(request.url);
+    const wallet = searchParams.get("wallet");
+    const signature = searchParams.get("signature");
+    const nonce = searchParams.get("nonce");
+    const timestamp = searchParams.get("timestamp");
 
     // Explicit headers to prevent caching
     const headers = {
@@ -32,6 +38,30 @@ export async function GET(
         if (colError || !collection) {
             return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
+
+        // --- Signature Verification ---
+        if (!wallet || !signature || !nonce || !timestamp) {
+            return NextResponse.json({ error: "Signature required to view dashboard." }, { status: 401 });
+        }
+
+        const { verifySignature } = await import("@/lib/crypto");
+        const { isValid, error: sigError } = await verifySignature(
+            wallet,
+            "update_profile", // Reusing the same action to keep it simple, or we could add 'view_dashboard'
+            nonce,
+            parseInt(timestamp),
+            signature
+        );
+
+        if (!isValid) {
+            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+        }
+
+        // Check ownership
+        if (collection.owner_wallet !== wallet) {
+            return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403 });
+        }
+        // ----------------------------
 
         // 2. Get submissions (Ordered in code to avoid RLS/Index issues)
         const { data: submissions, error: subError } = await supabase
@@ -121,7 +151,8 @@ export async function GET(
                 recruiterNotes: sub.recruiter_notes,
                 submittedAt: sub.submitted_at,
                 signalScore: score,
-                signalStrength: signalStrength
+                signalStrength: signalStrength,
+                cardNumber: profile?.card_number || null,
             };
         });
 

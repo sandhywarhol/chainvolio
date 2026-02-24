@@ -22,6 +22,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     const whyItems = [
         { label: "Why Chainvolio", href: "/why" },
+        { label: "Trust Model", href: "/trust" },
+        { label: "System Status", href: "/status" },
         { label: "About Us", href: "/about" },
         { label: "Terms of Service", href: "/terms" },
         { label: "Privacy Policy", href: "/privacy-policy" },
@@ -68,6 +70,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             href="/guides"
                             items={guidesItems}
                         />
+
+                        <Link href="/security" className="text-white/40 hover:text-white/90 transition-colors py-2">Security</Link>
 
 
                         <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors py-2">Dashboard</Link>
@@ -120,6 +124,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         onToggle={() => setIsMobileGuidesOpen(!isMobileGuidesOpen)}
                         onCloseMenu={() => setIsMobileMenuOpen(false)}
                     />
+
+                    <Link href="/security" className="block text-white/40 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Security</Link>
 
 
                     <Link href="/dashboard" className="block text-emerald-400 hover:text-emerald-300 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
 import {
     Loader2,
     Search,
@@ -43,11 +44,27 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [sortBy, setSortBy] = useState("recent");
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
 
+    const { publicKey, connected, signMessage } = useWallet();
+
     useEffect(() => {
+        if (!connected || !publicKey || !signMessage) return;
+
         async function fetchDashboard() {
             try {
-                // Add timestamp to bust cache
-                const res = await fetch(`/api/hiring/collections/${slug}/candidates?t=${Date.now()}`, {
+                const { signChainVolioAction } = await import("@/lib/wallet-utils");
+                const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile"); // Reusing high-level action or could add a 'view_dashboard' one
+
+                if (!signedAction) return;
+
+                const searchParams = new URLSearchParams({
+                    t: Date.now().toString(),
+                    wallet: publicKey?.toBase58() || "",
+                    signature: signedAction.signature,
+                    nonce: signedAction.nonce,
+                    timestamp: signedAction.timestamp.toString()
+                });
+
+                const res = await fetch(`/api/hiring/collections/${slug}/candidates?${searchParams.toString()}`, {
                     cache: 'no-store',
                     headers: { 'Cache-Control': 'no-cache' }
                 });
@@ -64,12 +81,28 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             }
         }
         fetchDashboard();
-    }, [slug]);
+    }, [slug, connected, publicKey, signMessage]);
 
     const handleDelete = async () => {
+        if (!publicKey || !signMessage) return;
         setIsDeleting(true);
         try {
-            const res = await fetch(`/api/hiring/collections/${slug}`, {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+
+            if (!signedAction) {
+                setIsDeleting(false);
+                return;
+            }
+
+            const searchParams = new URLSearchParams({
+                wallet: publicKey.toBase58(),
+                signature: signedAction.signature,
+                nonce: signedAction.nonce,
+                timestamp: signedAction.timestamp.toString()
+            });
+
+            const res = await fetch(`/api/hiring/collections/${slug}?${searchParams.toString()}`, {
                 method: "DELETE",
             });
 
@@ -101,6 +134,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [expandedId, data]);
 
     const handleUpdateStatus = async (candidateId: string, newStatus: string) => {
+        if (!publicKey || !signMessage) return;
         const oldStatus = data?.candidates.find(c => c.id === candidateId)?.recruiterStatus;
 
         // Optimistic update
@@ -115,10 +149,31 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+
+            if (!signedAction) {
+                // Revert and exit
+                setData(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        candidates: prev.candidates.map(c =>
+                            c.id === candidateId ? { ...c, recruiterStatus: oldStatus } : c
+                        )
+                    };
+                });
+                return;
+            }
+
             const res = await fetch(`/api/hiring/submissions/${candidateId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({
+                    status: newStatus,
+                    wallet: publicKey.toBase58(),
+                    ...signedAction
+                }),
             });
 
             if (!res.ok) {
@@ -142,9 +197,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     const handleSaveNote = async () => {
-        if (!expandedId) return;
+        if (!expandedId || !publicKey || !signMessage) return;
 
         const oldNote = data?.candidates.find(c => c.id === expandedId)?.recruiterNotes;
+        if (oldNote === noteDraft) return; // No change
+
         setIsSavingNote(true);
 
         // Optimistic update
@@ -159,10 +216,33 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+
+            if (!signedAction) {
+                // Revert
+                setData(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        candidates: prev.candidates.map(c =>
+                            c.id === expandedId ? { ...c, recruiterNotes: oldNote } : c
+                        )
+                    };
+                });
+                setNoteDraft(oldNote || "");
+                setIsSavingNote(false);
+                return;
+            }
+
             const res = await fetch(`/api/hiring/submissions/${expandedId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ notes: noteDraft }),
+                body: JSON.stringify({
+                    notes: noteDraft,
+                    wallet: publicKey.toBase58(),
+                    ...signedAction
+                }),
             });
 
             if (!res.ok) {
@@ -182,6 +262,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     )
                 };
             });
+            setNoteDraft(oldNote || "");
         } finally {
             setIsSavingNote(false);
         }
@@ -280,9 +361,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [activeDropdown]);
 
     const handleDeleteCandidate = async () => {
-        if (!candidateToDelete) return;
+        if (!candidateToDelete || !publicKey || !signMessage) return;
 
         const candidateId = candidateToDelete;
+        const oldCandidates = [...(data?.candidates || [])];
 
         // Optimistic update
         setData(prev => {
@@ -294,12 +376,47 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            await fetch(`/api/hiring/submissions/${candidateId}`, {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+
+            if (!signedAction) {
+                // Revert
+                setData(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        candidates: oldCandidates
+                    };
+                });
+                return;
+            }
+
+            const searchParams = new URLSearchParams({
+                wallet: publicKey.toBase58(),
+                signature: signedAction.signature,
+                nonce: signedAction.nonce,
+                timestamp: signedAction.timestamp.toString()
+            });
+
+            const res = await fetch(`/api/hiring/submissions/${candidateId}?${searchParams.toString()}`, {
                 method: "DELETE"
             });
-        } catch (err) {
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Failed to delete candidate");
+            }
+        } catch (err: any) {
             console.error("Failed to delete candidate", err);
-            // Could revert here if needed
+            alert(`Delete failed: ${err.message}`);
+            // Revert
+            setData(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    candidates: oldCandidates
+                };
+            });
         } finally {
             setCandidateToDelete(null);
         }
@@ -366,7 +483,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             <Download className="w-3 h-3" /> Report
                         </button>
                         <Link href={`/r/${slug}`} className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border border-indigo-500/20 hover:border-indigo-500/40">
-                            <ExternalLink className="w-3 h-3" /> Dashboard Access
+                            <ExternalLink className="w-3 h-3" /> View Public Link
                         </Link>
                     </div>
                 </div>
@@ -525,10 +642,15 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                         )}
                                                     </div>
                                                     <div className="flex flex-col gap-1.5 overflow-hidden">
-                                                        <div className="flex items-center gap-2.5">
+                                                        <div className="flex items-center gap-2">
                                                             <span className={`text-[13px] font-bold tracking-tight transition-colors truncate max-w-[140px] md:max-w-[200px] ${candidate.recruiterStatus === 'rejected' ? 'text-slate-600' : 'text-white'}`}>
                                                                 {candidate.displayName || "Anonymous Professional"}
                                                             </span>
+                                                            {candidate.cardNumber && (
+                                                                <span className="text-[9px] font-mono text-slate-500 font-bold bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                                                                    #{String(candidate.cardNumber).padStart(5, '0')}
+                                                                </span>
+                                                            )}
                                                             {candidate.attestedCount > 0 && (
                                                                 <div className="group/shield relative">
                                                                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
@@ -651,8 +773,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                     <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest pl-6">Deep Signal Correlation</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-end gap-1">
-                                                                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Verification ID</span>
-                                                                    <span className="text-[9px] font-mono text-indigo-500/50 uppercase">CV-{candidate.wallet.slice(0, 8)}</span>
+                                                                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Member ID</span>
+                                                                    <span className="text-[9px] font-mono text-indigo-500/50 uppercase">
+                                                                        {candidate.cardNumber ? `#${String(candidate.cardNumber).padStart(5, '0')}` : `CV-${candidate.wallet.slice(0, 8)}`}
+                                                                    </span>
                                                                 </div>
                                                             </div>
 

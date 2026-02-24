@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
 export async function DELETE(
     request: Request,
@@ -10,30 +10,56 @@ export async function DELETE(
     }
 
     const { slug } = params;
+    const { searchParams } = new URL(request.url);
+    const wallet = searchParams.get("wallet");
+    const signature = searchParams.get("signature");
+    const nonce = searchParams.get("nonce");
+    const timestamp = searchParams.get("timestamp");
 
     if (!slug) {
         return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
 
     try {
-        // First, check if the collection exists to verify ownership if needed (skipping strict ownership check for now as per MVP requirements, just like updates)
-        // In a real app, we should check if the requester is the owner.
-
-        // Delete the collection. 
-        // Note: If you have foreign key constraints (like submissions referencing collections), 
-        // you might need to delete them first OR have ON DELETE CASCADE set up in your DB.
-        // Assuming ON DELETE CASCADE is NOT set up by default unless specified, let's try to delete submissions first to be safe.
-
-        // 1. Get Collection ID
+        // 1. Get Collection ID & Owner
         const { data: collection, error: fetchError } = await supabase
             .from("hiring_collections")
-            .select("id")
+            .select("id, owner_wallet")
             .eq("slug", slug)
             .single();
 
         if (fetchError || !collection) {
             return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
+
+        // --- Signature Verification ---
+        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+        if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
+            return NextResponse.json({ error: "Signature required to delete collection." }, { status: 401 });
+        }
+
+
+        const { verifySignature } = await import("@/lib/crypto");
+        const { isValid, error: sigError } = await verifySignature(
+            wallet || "",
+            "update_profile",
+            nonce || "",
+            timestamp ? parseInt(timestamp) : 0,
+            signature || ""
+        );
+
+
+        if (!isValid) {
+            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+        }
+
+        if (collection.owner_wallet !== wallet) {
+            return NextResponse.json({ error: "Unauthorized. You do not own this collection." }, { status: 403 });
+        }
+        // ----------------------------
+
+        // Set transaction context for RLS parity
+        await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
 
         // 2. Delete submissions (if any)
         const { error: subError } = await supabase

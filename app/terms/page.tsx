@@ -151,13 +151,14 @@ export default function TermsPage() {
                         <p className="text-white/40 font-light mb-4">
                             If you have questions about these Terms, please reach out.
                         </p>
-                        <div className="grid grid-cols-1 gap-4">
-                            <a href="mailto:support@chainvolio.xyz" className="p-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="mailto:sandhywarhol@gmail.com" className="p-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
                                 <span className="block text-[10px] uppercase tracking-widest text-white/20 mb-1">Email Support</span>
-                                <span className="text-white/60 text-sm">support@chainvolio.xyz</span>
+                                <span className="text-white/60 text-sm">sandhywarhol@gmail.com</span>
                             </a>
-                            <a href="https://chainvolio.xyz" className="p-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors text-white/60 text-sm">
-                                chainvolio.xyz
+                            <a href="https://twitter.com/chainvolio" target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                                <span className="block text-[10px] uppercase tracking-widest text-white/20 mb-1">X / Twitter</span>
+                                <span className="text-white/60 text-sm">@chainvolio</span>
                             </a>
                         </div>
                     </div>

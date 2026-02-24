@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
     if (!supabase) {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { walletAddress, title, description, imageUrl, thumbnailUrl } = body;
+        const { walletAddress, title, description, imageUrl, thumbnailUrl, signature, nonce, timestamp } = body;
 
         if (!walletAddress || !title || !imageUrl || !thumbnailUrl) {
             return NextResponse.json(
@@ -58,6 +58,28 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
+
+        // --- Signature Verification ---
+        if (!signature || !nonce || !timestamp) {
+            return NextResponse.json({ error: "Signature required to save portfolio." }, { status: 401 });
+        }
+
+        const { verifySignature } = await import("@/lib/crypto");
+        const { isValid, error: sigError } = await verifySignature(
+            walletAddress,
+            "update_profile", // Reusing action
+            nonce,
+            timestamp,
+            signature
+        );
+
+        if (!isValid) {
+            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+        }
+        // ----------------------------
+
+        // Set transaction context for RLS parity
+        await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
 
         // Validate description length
         if (description && description.length > 150) {

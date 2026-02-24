@@ -31,6 +31,7 @@ type Profile = {
   farcaster?: string;
   tags?: string[];
   telegram?: string;
+  cardNumber?: number;
 };
 
 type HiringCollection = {
@@ -46,6 +47,7 @@ export default function DashboardPage() {
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingReceipt, setEditingReceipt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const handleShare = async () => {
@@ -143,6 +145,14 @@ export default function DashboardPage() {
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-slate-500 text-4xl font-bold shadow-xl">
                     {profile.displayName?.[0] || '?'}
+                  </div>
+                )}
+
+                {profile.cardNumber && (
+                  <div className="mt-2 text-center md:text-left">
+                    <span className="font-mono text-[10px] tracking-widest text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded border border-slate-700/50">
+                      ID #{String(profile.cardNumber).padStart(5, '0')}
+                    </span>
                   </div>
                 )}
 
@@ -284,14 +294,29 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {showForm && (
+        {showForm || editingReceipt ? (
           <ReceiptForm
             walletAddress={walletAddress}
-            onSuccess={() => setShowForm(false)}
+            initialData={editingReceipt}
+            onSuccess={() => {
+              setShowForm(false);
+              setEditingReceipt(null);
+            }}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingReceipt(null);
+            }}
           />
-        )}
+        ) : null}
 
-        <ReceiptList walletAddress={walletAddress} />
+        <ReceiptList
+          walletAddress={walletAddress}
+          onEdit={(r) => {
+            setEditingReceipt(r);
+            setShowForm(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
       </section>
 
       {toastMessage && (

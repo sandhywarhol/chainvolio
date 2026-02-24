@@ -52,13 +52,13 @@ export default function AttestPage() {
         setAttesting(true);
 
         try {
-            // 1. Create message to sign
-            const message = `I verify that I have worked with this person and this work history is accurate.\n\nReceipt ID: ${receipt.id}\nAttester: ${publicKey.toBase58()}\nDate: ${new Date().toISOString()}`;
-            const encodedMessage = new TextEncoder().encode(message);
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "attest");
 
-            // 2. Sign message
-            const signatureBytes = await signMessage(encodedMessage);
-            const signature = bs58.encode(signatureBytes);
+            if (!signedAction) {
+                setAttesting(false);
+                return;
+            }
 
             // 3. Submit to API
             const res = await fetch("/api/attest", {
@@ -67,14 +67,14 @@ export default function AttestPage() {
                 body: JSON.stringify({
                     receiptId: receipt.id,
                     attesterWallet: publicKey.toBase58(),
-                    signature,
                     comment,
                     attesterName,
                     attesterRole,
                     attesterOrg,
                     attesterEmail,
                     attestationType,
-                    confidenceLevel
+                    confidenceLevel,
+                    ...signedAction
                 }),
             });
 

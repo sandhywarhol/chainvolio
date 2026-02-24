@@ -1,97 +1,74 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer as supabase } from "@/lib/supabase/server";
 
-// Create a new collection
+const errorResponse = (code: string, message: string, status: number = 400) => {
+    return NextResponse.json({
+        ok: false,
+        error: { code, message }
+    }, { status });
+};
+
 export async function POST(request: Request) {
     if (!supabase) {
-        return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+        return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);
     }
 
     try {
-        const { title, description, ownerWallet, filters, ...metadata } = await request.json();
+        const body = await request.json();
+        const { title, description, ownerWallet, filters, signature, nonce, timestamp, ...metadata } = body;
 
-        if (!title) {
-            return NextResponse.json({ error: "Title is required" }, { status: 400 });
+        if (!title || !ownerWallet) {
+            return errorResponse("ERR_INVALID_REQUEST", "Title and ownerWallet are required", 400);
         }
 
-        // Generate a simple slug from title
+        // --- Signature Verification ---
+        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+        if (!skipVerify && (!signature || !nonce || !timestamp)) {
+            return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to create a collection.", 401);
+        }
+
+        const { verifySignature } = await import("@/lib/crypto");
+        const { isValid, error: sigError } = await verifySignature(
+            ownerWallet,
+            "create_collection",
+            nonce || "",
+            timestamp || 0,
+            signature || ""
+        );
+
+        if (!isValid) {
+            return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+        }
+
+        // Set transaction context for RLS
+        await supabase.rpc('set_app_wallet', { wallet_addr: ownerWallet });
+
+        // Generate a clean slug
         const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
         const randomHash = Math.random().toString(36).substring(2, 7);
         const slug = `${baseSlug}-${randomHash}`;
 
-        // Attempt 1: Full Features
         const { data, error } = await supabase
             .from("hiring_collections")
             .insert({
                 title,
                 description,
                 slug,
-                owner_wallet: ownerWallet || null,
+                owner_wallet: ownerWallet,
                 metadata: metadata,
                 eligibility_filters: filters || {}
             })
             .select()
             .single();
 
-        if (!error) return NextResponse.json(data);
-
-        console.warn("⚠️ Full insert failed. Error code:", error.code, error.message);
-
-        // Attempt 2: Without metadata (Column might be missing)
-        if (error.code === '42703' && error.message.includes('metadata')) {
-            console.warn("⚠️ Metadata column missing. Retrying without it...");
-            const { data: retryData, error: retryError } = await supabase
-                .from("hiring_collections")
-                .insert({
-                    title,
-                    description,
-                    slug,
-                    owner_wallet: ownerWallet || null,
-                    eligibility_filters: filters || {}
-                })
-                .select()
-                .single();
-
-            if (!retryError) return NextResponse.json(retryData);
-
-            // If it fails again, check if eligibility_filters is also missing
-            if (retryError.code === '42703') {
-                console.warn("⚠️ Eligibility filters column also missing. Retrying with minimal fields + description...");
-                const { data: finalData, error: finalError } = await supabase
-                    .from("hiring_collections")
-                    .insert({
-                        title,
-                        description,
-                        slug,
-                        owner_wallet: ownerWallet || null
-                    })
-                    .select()
-                    .single();
-
-                if (!finalError) return NextResponse.json(finalData);
-            }
+        if (error) {
+            console.error("Collection Creation Error:", error);
+            return errorResponse("ERR_DATABASE_ERROR", error.message, 500);
         }
 
-        // Attempt 3: Absolute minimal (If description also fails)
-        console.warn("⚠️ Falling back to absolute minimal insert.");
-        const { data: minimalData, error: minimalError } = await supabase
-            .from("hiring_collections")
-            .insert({
-                title,
-                slug,
-                owner_wallet: ownerWallet || null
-            })
-            .select()
-            .single();
-
-        if (minimalError) {
-            console.error("❌ CRITICAL: Minimal insert failed:", minimalError);
-            return NextResponse.json({ error: "Database rejected all attempts: " + minimalError.message }, { status: 500 });
-        }
-
-        return NextResponse.json(minimalData);
+        return NextResponse.json({ ok: true, data });
     } catch (err: any) {
         console.error("Critical API Error:", err);
-        return NextResponse.json({ error: err.message || "Server Error" }, { status: 500 });
+        return errorResponse("ERR_SERVER_ERROR", err.message || "Server Error", 500);
     }
 }
