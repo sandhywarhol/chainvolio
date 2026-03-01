@@ -215,10 +215,56 @@ export function LandingPageClient() {
                             )}
                             {activeModal === 'recruiters' && (
                                 <div className="space-y-16 py-4">
-                                    <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Recruiters</h2><p className="text-white/40 text-sm max-w-xl leading-relaxed">ChainVolio helps recruiters hire faster, smarter, and with lower risk by providing access to transparent and verifiable professional profiles.</p></div>
+                                    <div className="space-y-4">
+                                        <h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Recruiters</h2>
+                                        <p className="text-white/40 text-sm max-w-xl leading-relaxed">
+                                            ChainVolio provides verifiable hiring infrastructure that reduces information asymmetry and enables transparent candidate evaluation through an accountable, on-chain recruitment trail.
+                                        </p>
+                                    </div>
                                     <div className="grid md:grid-cols-2 gap-12 pt-8">
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-teal-400/60 uppercase tracking-[0.3em]">Strategic Value</h3><div className="space-y-6"><div className="flex gap-4 items-start"><span className="text-teal-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Web3 Talent</h4><p className="text-[11px] text-white/50 leading-relaxed">Discover candidates with real work history and proven output in the ecosystem.</p></div></div><div className="flex gap-4 items-start"><span className="text-teal-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Instant Review</h4><p className="text-[11px] text-white/50 leading-relaxed">Review portfolios and verified milestones in a single, standardized view.</p></div></div><div className="flex gap-4 items-start"><span className="text-teal-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Automated Integrity</h4><p className="text-[11px] text-white/50 leading-relaxed">Reduce check times with cryptographic proof of work and peer attestations.</p></div></div></div></div>
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Key Benefits</h3><div className="grid grid-cols-2 gap-4"><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Faster decisions</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Reduced risk</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">High signal</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Global reach</p></div></div></div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-teal-400/60 uppercase tracking-[0.3em]">Strategic Value</h3>
+                                            <div className="space-y-6">
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Web3 Talent</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Access wallet-native professional records and review on-chain work history with proven output.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Instant Review</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Evaluate high-signal professional ledgers in a standardized, verifiable format to reduce due-diligence friction.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-teal-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Automated Integrity</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Leverage gas-backed peer attestations to maintain a permanent, cryptographic hiring audit trail.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Key Benefits</h3>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Verifiable decisions</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Transparent accountability</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Signal-dense data</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Institutional trust</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
