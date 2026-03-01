@@ -270,10 +270,56 @@ export function LandingPageClient() {
                             )}
                             {activeModal === 'talent' && (
                                 <div className="space-y-16 py-4">
-                                    <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Talent</h2><p className="text-white/40 text-sm max-w-xl leading-relaxed">Build a professional identity that grows over time and is not tied to a single employer or platform.</p></div>
+                                    <div className="space-y-4">
+                                        <h2 className="text-3xl font-bold tracking-tight text-white uppercase">For Talent</h2>
+                                        <p className="text-white/40 text-sm max-w-xl leading-relaxed">
+                                            Establish a wallet-bound professional record and participate in a public trust infrastructure that ensures long-term career persistence outside of centralized platforms.
+                                        </p>
+                                    </div>
                                     <div className="grid md:grid-cols-2 gap-12 pt-8">
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">Advantage</h3><div className="space-y-6"><div className="flex gap-4 items-start"><span className="text-emerald-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Sovereign Identity</h4><p className="text-[11px] text-white/50 leading-relaxed">Own your professional identity through your wallet. No platform lock-in.</p></div></div><div className="flex gap-4 items-start"><span className="text-emerald-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Showcase Output</h4><p className="text-[11px] text-white/50 leading-relaxed">Focus on actual contributions rather than just company titles.</p></div></div><div className="flex gap-4 items-start"><span className="text-emerald-400/40 font-bold mt-0.5">/</span><div className="space-y-1"><h4 className="text-[10px] font-bold uppercase text-white/90">Reputation Hub</h4><p className="text-[11px] text-white/50 leading-relaxed">One professional destination for jobs, grants, and collaborations.</p></div></div></div></div>
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Why it matters</h3><div className="grid grid-cols-2 gap-4"><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Web3-Native</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Proof Over Hype</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Data Sovereignty</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/40 uppercase tracking-widest">Global Reach</p></div></div></div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">Advantage</h3>
+                                            <div className="space-y-6">
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Sovereign Identity</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Self-custodied wallet authentication with no centralized account dependency. Interoperable and permissionless.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Showcase Output</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Anchor contributions as verifiable records and prioritize provable output over narrative claims via timestamped proof.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 items-start">
+                                                    <span className="text-emerald-400/40 font-bold mt-0.5">/</span>
+                                                    <div className="space-y-1">
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90">Reputation Hub</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Unified professional ledger providing a verifiable identity surface compatible with Web3 grants and DAOs.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Why it matters</h3>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Wallet-Native Identity</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Cryptographic Proof</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Self-Sovereign Data</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Borderless Verifiability</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
