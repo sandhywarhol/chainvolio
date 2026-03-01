@@ -9,8 +9,9 @@ import { Footer } from "@/components/layout/Footer";
 import { ReceiptForm } from "@/components/receipt/ReceiptForm";
 import { ReceiptList } from "@/components/receipt/ReceiptList";
 import { Toast } from "@/components/ui/Toast";
+import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck } from "lucide-react";
 
 type Profile = {
   displayName: string;
@@ -31,7 +32,12 @@ type Profile = {
   farcaster?: string;
   tags?: string[];
   telegram?: string;
+  linkedin?: string;
+  instagram?: string;
   cardNumber?: number;
+  isVerified?: boolean;
+  verifierTier?: number;
+  role?: string;
 };
 
 type HiringCollection = {
@@ -91,7 +97,21 @@ export default function DashboardPage() {
     }
     fetchCollections();
 
+    // 3. Fetch Attestation Count (if verified)
+    async function fetchAttestationCount() {
+      if (!supabase) return;
+      const { count } = await supabase
+        .from("attestations")
+        .select("*", { count: 'exact', head: true })
+        .eq("attester_wallet", wallet);
+
+      setAttestationCount(count || 0);
+    }
+    fetchAttestationCount();
+
   }, [publicKey, connected]);
+
+  const [attestationCount, setAttestationCount] = useState(0);
 
   // ... (Login screen remains)
 
@@ -116,8 +136,7 @@ export default function DashboardPage() {
     <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-      {/* ... (Nav remains) */}
-      <Navbar />
+      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
 
       <section className="max-w-3xl mx-auto px-6 py-8">
         {loading ? (
@@ -151,7 +170,7 @@ export default function DashboardPage() {
                 {profile.cardNumber && (
                   <div className="mt-2 text-center md:text-left">
                     <span className="font-mono text-[10px] tracking-widest text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded border border-slate-700/50">
-                      ID #{String(profile.cardNumber).padStart(5, '0')}
+                      CV ID #{String(profile.cardNumber).padStart(5, '0')}
                     </span>
                   </div>
                 )}
@@ -176,7 +195,21 @@ export default function DashboardPage() {
 
               <div className="flex-1 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-between mb-4">
-                  <h1 className="text-3xl font-bold">{profile.displayName}</h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-bold">{profile.displayName}</h1>
+                    {profile?.isVerified && (
+                      <div
+                        className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${profile.verifierTier === 3
+                          ? "bg-teal-500/10 border-teal-500/20 text-teal-400"
+                          : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                          }`}
+                        title={profile.verifierTier === 3 ? "Verified Organization" : "Verified Figure"}
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>{profile.verifierTier === 3 ? "Org" : "Figure"}</span>
+                      </div>
+                    )}
+                  </div>
                   <Link
                     href="/create-profile"
                     className="hidden md:block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
@@ -194,7 +227,13 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {profile.bio && <p className="text-slate-400 mb-6 leading-relaxed">{profile.bio}</p>}
+                {profile.bio && (
+                  <ExpandableText
+                    text={profile.bio}
+                    maxLength={300}
+                    className="text-slate-400 mb-6 leading-relaxed"
+                  />
+                )}
 
                 {profile.skills && (
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
@@ -209,6 +248,10 @@ export default function DashboardPage() {
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                   {profile.twitter && <Twitter className="w-4 h-4 text-slate-500" />}
                   {profile.github && <Github className="w-4 h-4 text-slate-500" />}
+                  {profile.linkedin && <Linkedin className="w-4 h-4 text-slate-500" />}
+                  {profile.instagram && <Instagram className="w-4 h-4 text-slate-500" />}
+                  {profile.lens && <span className="text-sm grayscale opacity-70" title="Lens">🌿</span>}
+                  {profile.farcaster && <span className="text-sm grayscale opacity-70" title="Farcaster">🟣</span>}
                   {profile.website && <Globe className="w-4 h-4 text-slate-500" />}
                   {profile.email && <Mail className="w-4 h-4 text-slate-500" />}
                   {profile.discord && (
@@ -229,6 +272,37 @@ export default function DashboardPage() {
                 >
                   Edit Profile
                 </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Organization Impact - For Verified Orgs */}
+        {profile?.isVerified && (
+          <div className="mb-12">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <ShieldCheck className={`w-5 h-5 ${profile.verifierTier === 3 ? "text-teal-400" : "text-emerald-400"}`} />
+              {profile.verifierTier === 3 ? "Organization Impact" : "Professional Impact"}
+            </h2>
+            <div className={`p-4 rounded-xl border mb-4 ${profile.verifierTier === 3
+              ? "bg-teal-500/5 border-teal-500/10"
+              : "bg-emerald-500/5 border-emerald-500/10"
+              }`}>
+              <p className={`text-xs font-medium ${profile.verifierTier === 3 ? "text-teal-400" : "text-emerald-400"}`}>
+                Verified {profile.verifierTier === 3 ? "Organization" : "Figure"} Status: Active
+              </p>
+              <p className="text-[10px] text-emerald-400/50 mt-1">Your attestations now carry the "Verified" shield 🛡️ across the network.</p>
+            </div>
+
+            {/* Summary Stat */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Attestations Issued</span>
+                <span className="text-2xl font-bold text-white">{attestationCount}</span>
+              </div>
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact Tier</span>
+                <span className="text-2xl font-bold text-emerald-400">II</span>
               </div>
             </div>
           </div>

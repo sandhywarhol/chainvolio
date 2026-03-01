@@ -247,7 +247,9 @@ export async function GET(request: Request) {
           attester_role,
           attester_org,
           attestation_type,
-          confidence_level
+          confidence_level,
+          tx_signature,
+          id
         `)
         .in("receipt_id", receiptIds);
 
@@ -291,6 +293,24 @@ export async function GET(request: Request) {
       }
     }
 
+    // 4. Fetch Organization Verification Status & Tiers
+    let verifiedOrgWallets = new Set<string>();
+    let verifierTiers: Record<string, number> = {};
+    if (attesterWallets.length > 0) {
+      const { data: orgData } = await supabase
+        .from("organization_verifications")
+        .select("wallet_address, verifier_tier")
+        .in("wallet_address", attesterWallets)
+        .eq("status", "verified");
+
+      if (orgData) {
+        orgData.forEach(o => {
+          verifiedOrgWallets.add(o.wallet_address);
+          verifierTiers[o.wallet_address] = o.verifier_tier || 1;
+        });
+      }
+    }
+
     const result = receiptsList.map((r: any) => {
       const attestation = attestationsMap[r.id]?.[0];
       const profile = attestation ? profileMap[attestation.attester_wallet] : null;
@@ -317,7 +337,12 @@ export async function GET(request: Request) {
         confidence: attestation?.confidence_level || null,
         attesterAvatar: profile?.avatar_url || null,
         attesterAt: attestation?.created_at || null,
+        isAttesterVerified: attestation ? verifiedOrgWallets.has(attestation.attester_wallet) : false,
+        attesterTier: attestation ? (verifierTiers[attestation.attester_wallet] || 1) : 1,
         attesterSignature: attestation?.signature || null,
+        txSignature: attestation?.tx_signature || null,
+        attestationId: attestation?.id || null,
+        attesterComment: attestation?.comment || null,
         createdAt: r.created_at,
       };
     });

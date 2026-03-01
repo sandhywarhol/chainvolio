@@ -214,7 +214,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       </div>
       <div>
         <label className="block text-sm text-slate-400 mb-1">Job description *</label>
-        <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-20 disabled:opacity-50" placeholder="Summary of tasks and contributions" />
+        <textarea required value={form.description} maxLength={500} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-20 disabled:opacity-50" placeholder="Summary of tasks and contributions" />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -241,11 +241,11 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       </div>
 
       <div>
-        <label className="block text-sm text-slate-400 mb-2">Impact / Outcomes (optional, max 2)</label>
+        <label className="block text-sm text-slate-400 mb-2">Impact / Outcomes (optional, max 5)</label>
         <div className="space-y-2">
           {form.impact.map((item: string, index: number) => (
             <div key={index} className="flex gap-2">
-              <input type="text" value={item} maxLength={80} onChange={(e) => {
+              <input type="text" value={item} maxLength={180} onChange={(e) => {
                 const newImpact = [...form.impact];
                 newImpact[index] = e.target.value;
                 setForm({ ...form, impact: newImpact });
@@ -258,7 +258,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
               )}
             </div>
           ))}
-          {!isLocked && form.impact.length < 2 && (
+          {!isLocked && form.impact.length < 5 && (
             <button type="button" onClick={() => setForm({ ...form, impact: [...form.impact, ""] })} className="text-sm text-emerald-400 hover:text-emerald-300 font-medium">+ Add Impact</button>
           )}
         </div>

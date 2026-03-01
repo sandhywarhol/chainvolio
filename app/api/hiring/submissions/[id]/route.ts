@@ -17,7 +17,10 @@ export async function PATCH(
     try {
         const { id } = params;
         const body = await request.json();
-        const { status, notes, wallet, signature, nonce, timestamp } = body;
+        const { status, notes, wallet, signature, txSignature, nonce, timestamp } = body;
+
+        const cleanTxSignature = txSignature?.replace(/\s/g, '');
+        const cleanSignature = signature?.replace(/\s/g, '');
 
         if (!id) return errorResponse("ERR_INVALID_REQUEST", "Submission ID required", 400);
 
@@ -34,22 +37,24 @@ export async function PATCH(
 
         const ownerWallet = (submission as any).hiring_collections?.owner_wallet;
 
-        // --- Signature Verification ---
+        // --- Signature / Proof Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to review submission.", 401);
+        if (!skipVerify && !cleanTxSignature && (!wallet || !cleanSignature || !nonce || !timestamp)) {
+            return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required to review submission.", 401);
         }
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            wallet || "",
-            "review_submission",
-            nonce || "",
-            Number(timestamp) || 0,
-            signature || ""
-        );
+        if (!skipVerify && cleanSignature && !cleanTxSignature) {
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                wallet || "",
+                "review_submission",
+                nonce || "",
+                Number(timestamp) || 0,
+                cleanSignature || ""
+            );
 
-        if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+            if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+        }
 
         // Verify that the signer is the collection owner
         if (wallet !== ownerWallet) {
@@ -62,6 +67,7 @@ export async function PATCH(
         const updates: any = {};
         if (status) updates.recruiter_status = status;
         if (typeof notes === 'string') updates.recruiter_notes = notes;
+        if (cleanTxSignature) updates.tx_signature = cleanTxSignature;
 
         const { error: updateError } = await supabase
             .from("collection_submissions")
@@ -90,6 +96,10 @@ export async function DELETE(
         const signature = searchParams.get("signature");
         const nonce = searchParams.get("nonce");
         const timestamp = searchParams.get("timestamp");
+        const txSignatureRaw = searchParams.get("txSignature");
+
+        const cleanTxSignature = txSignatureRaw?.replace(/\s/g, '');
+        const cleanSignature = signature?.replace(/\s/g, '');
 
         if (!id) return errorResponse("ERR_INVALID_REQUEST", "ID required", 400);
 
@@ -104,22 +114,24 @@ export async function DELETE(
 
         const ownerWallet = (submission as any).hiring_collections?.owner_wallet;
 
-        // --- Signature Verification ---
+        // --- Signature / Proof Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to delete submission.", 401);
+        if (!skipVerify && !cleanTxSignature && (!wallet || !cleanSignature || !nonce || !timestamp)) {
+            return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required to delete submission.", 401);
         }
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            wallet || "",
-            "review_submission",
-            nonce || "",
-            Number(timestamp) || 0,
-            signature || ""
-        );
+        if (!skipVerify && cleanSignature && !cleanTxSignature) {
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                wallet || "",
+                "review_submission",
+                nonce || "",
+                Number(timestamp) || 0,
+                cleanSignature || ""
+            );
 
-        if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+            if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+        }
 
         if (wallet !== ownerWallet) return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized. You do not own the parent collection.", 403);
 

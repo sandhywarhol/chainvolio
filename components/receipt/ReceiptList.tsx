@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Toast } from "@/components/ui/Toast";
+import { ExpandableText } from "@/components/ui/ExpandableText";
 
 type Receipt = {
   id: string;
@@ -72,7 +73,11 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                 </p>
               )}
 
-              <p className="text-slate-300 mt-2 text-sm">{r.description}</p>
+              <ExpandableText
+                text={r.description}
+                maxLength={240}
+                className="text-slate-300 mt-2 text-sm leading-relaxed"
+              />
               <p className="text-slate-500 text-xs mt-2">
                 {r.startDate} – {r.endDate} · {r.workType}
                 {r.compensationType && ` · ${r.compensationType}`}

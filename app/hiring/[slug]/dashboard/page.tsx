@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { Connection, Transaction, TransactionInstruction, PublicKey } from "@solana/web3.js";
 import {
     Loader2,
     Search,
@@ -44,7 +45,16 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [sortBy, setSortBy] = useState("recent");
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
 
-    const { publicKey, connected, signMessage } = useWallet();
+    const { publicKey, connected, signMessage, sendTransaction } = useWallet();
+
+    const generateReviewHash = async (data: any) => {
+        const encoder = new TextEncoder();
+        const jsonData = JSON.stringify(data);
+        const dataBytes = encoder.encode(jsonData);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", dataBytes);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
 
     useEffect(() => {
         if (!connected || !publicKey || !signMessage) return;
@@ -149,30 +159,73 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+            // 1. Prepare data and generate hash
+            const reviewData = {
+                submissionId: candidateId,
+                recruiterWallet: publicKey.toBase58(),
+                status: newStatus,
+                timestamp: Date.now()
+            };
+            const dataHash = await generateReviewHash(reviewData);
 
-            if (!signedAction) {
-                // Revert and exit
-                setData(prev => {
-                    if (!prev) return null;
-                    return {
-                        ...prev,
-                        candidates: prev.candidates.map(c =>
-                            c.id === candidateId ? { ...c, recruiterStatus: oldStatus } : c
-                        )
-                    };
-                });
-                return;
+            // 2. Create and Send On-Chain Transaction
+            const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
+            const transaction = new Transaction();
+            const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+
+            transaction.add(
+                new TransactionInstruction({
+                    keys: [], // Memo V3/V2 doesn't require signer keys in the instruction unless for specific logic
+                    programId: MEMO_PROGRAM_ID,
+                    data: Buffer.from(JSON.stringify({
+                        app: "ChainVolio",
+                        type: "recruiter_review",
+                        target: "status_update",
+                        hash: dataHash,
+                        timestamp: reviewData.timestamp
+                    })) as any,
+                })
+            );
+
+            const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
+            const txSignature = txSig.replace(/\s/g, ''); // Clean any accidental whitespace
+            console.log("On-chain status record created:", txSignature);
+
+            // Wait for confirmation with resilience
+            try {
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+                await connection.confirmTransaction({
+                    signature: txSignature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
+            } catch (confErr: any) {
+                console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
+                let confirmed = false;
+                for (let i = 0; i < 30; i++) {
+                    const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                    if (status.value && (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized')) {
+                        confirmed = true;
+                        break;
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+                if (!confirmed) {
+                    const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                    if (!finalStatus.value) {
+                        throw new Error("Transaction expired or was dropped. Please try again.");
+                    }
+                }
             }
 
+            // 3. Submit to API with TX Signature
             const res = await fetch(`/api/hiring/submissions/${candidateId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     status: newStatus,
                     wallet: publicKey.toBase58(),
-                    ...signedAction
+                    txSignature
                 }),
             });
 
@@ -216,32 +269,82 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+            // 1. Prepare data and generate hash
+            const reviewData = {
+                submissionId: expandedId,
+                recruiterWallet: publicKey.toBase58(),
+                notes: noteDraft,
+                timestamp: Date.now()
+            };
+            const dataHash = await generateReviewHash(reviewData);
 
-            if (!signedAction) {
-                // Revert
-                setData(prev => {
-                    if (!prev) return null;
-                    return {
-                        ...prev,
-                        candidates: prev.candidates.map(c =>
-                            c.id === expandedId ? { ...c, recruiterNotes: oldNote } : c
-                        )
-                    };
-                });
-                setNoteDraft(oldNote || "");
-                setIsSavingNote(false);
-                return;
+            // 2. Create and Send On-Chain Transaction
+            const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
+            const transaction = new Transaction();
+            const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+
+            transaction.add(
+                new TransactionInstruction({
+                    keys: [], // Memo V3/V2 doesn't require signer keys in the instruction unless for specific logic
+                    programId: MEMO_PROGRAM_ID,
+                    data: Buffer.from(JSON.stringify({
+                        app: "ChainVolio",
+                        type: "recruiter_review",
+                        target: "notes_update",
+                        hash: dataHash,
+                        timestamp: reviewData.timestamp
+                    })) as any,
+                })
+            );
+
+            const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
+            const txSignature = txSig.replace(/\s/g, ''); // Clean any accidental whitespace
+            console.log("On-chain notes record created:", txSignature);
+
+            // Wait for confirmation with resilience
+            try {
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+                await connection.confirmTransaction({
+                    signature: txSignature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
+            } catch (confErr: any) {
+                console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
+                let confirmed = false;
+                for (let i = 0; i < 30; i++) {
+                    const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+
+                    if (status.value) {
+                        if (status.value.err) {
+                            throw new Error(`Transaction failed during execution: ${JSON.stringify(status.value.err)}`);
+                        }
+                        if (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized') {
+                            confirmed = true;
+                            break;
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+                if (!confirmed) {
+                    const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                    if (finalStatus.value?.err) {
+                        throw new Error(`Transaction landed but FAILED: ${JSON.stringify(finalStatus.value.err)}`);
+                    }
+                    if (!finalStatus.value || (finalStatus.value.confirmationStatus !== 'confirmed' && finalStatus.value.confirmationStatus !== 'finalized')) {
+                        throw new Error("Transaction failed to confirm in time. (Network Timeout)");
+                    }
+                }
             }
 
+            // 3. Submit to API with TX Signature
             const res = await fetch(`/api/hiring/submissions/${expandedId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     notes: noteDraft,
                     wallet: publicKey.toBase58(),
-                    ...signedAction
+                    txSignature
                 }),
             });
 
@@ -376,26 +479,77 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_submission");
+            // 1. Prepare data and generate hash
+            const reviewData = {
+                submissionId: candidateId,
+                recruiterWallet: publicKey.toBase58(),
+                action: "delete_candidate",
+                timestamp: Date.now()
+            };
+            const dataHash = await generateReviewHash(reviewData);
 
-            if (!signedAction) {
-                // Revert
-                setData(prev => {
-                    if (!prev) return null;
-                    return {
-                        ...prev,
-                        candidates: oldCandidates
-                    };
-                });
-                return;
+            // 2. Create and Send On-Chain Transaction
+            const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
+            const transaction = new Transaction();
+            const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+
+            transaction.add(
+                new TransactionInstruction({
+                    keys: [], // Memo V3/V2 doesn't require signer keys in the instruction unless for specific logic
+                    programId: MEMO_PROGRAM_ID,
+                    data: Buffer.from(JSON.stringify({
+                        app: "ChainVolio",
+                        type: "recruiter_review",
+                        target: "delete_candidate",
+                        hash: dataHash,
+                        timestamp: reviewData.timestamp
+                    })) as any,
+                })
+            );
+
+            const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
+            const txSignature = txSig.replace(/\s/g, ''); // Clean any accidental whitespace
+            console.log("On-chain delete record created:", txSignature);
+
+            // Wait for confirmation with resilience
+            try {
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+                await connection.confirmTransaction({
+                    signature: txSignature,
+                    blockhash,
+                    lastValidBlockHeight
+                }, 'confirmed');
+            } catch (confErr: any) {
+                console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
+                let confirmed = false;
+                for (let i = 0; i < 30; i++) {
+                    const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+
+                    if (status.value) {
+                        if (status.value.err) {
+                            throw new Error(`Transaction failed during execution: ${JSON.stringify(status.value.err)}`);
+                        }
+                        if (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized') {
+                            confirmed = true;
+                            break;
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+                if (!confirmed) {
+                    const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                    if (finalStatus.value?.err) {
+                        throw new Error(`Transaction landed but FAILED: ${JSON.stringify(finalStatus.value.err)}`);
+                    }
+                    if (!finalStatus.value || (finalStatus.value.confirmationStatus !== 'confirmed' && finalStatus.value.confirmationStatus !== 'finalized')) {
+                        throw new Error("Transaction failed to confirm in time. (Network Timeout)");
+                    }
+                }
             }
 
             const searchParams = new URLSearchParams({
                 wallet: publicKey.toBase58(),
-                signature: signedAction.signature,
-                nonce: signedAction.nonce,
-                timestamp: signedAction.timestamp.toString()
+                txSignature
             });
 
             const res = await fetch(`/api/hiring/submissions/${candidateId}?${searchParams.toString()}`, {
@@ -864,6 +1018,18 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                         placeholder="Record strategic observations, verdict rationale, or next steps..."
                                                                         className="w-full h-full min-h-[180px] bg-black/40 border border-white/[0.04] rounded-2xl p-6 pt-12 text-[14px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
                                                                     />
+                                                                    {candidate.recruiterTxSignature && (
+                                                                        <a
+                                                                            href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="absolute bottom-4 left-6 flex items-center gap-2 text-[10px] font-black text-indigo-400/60 hover:text-indigo-400 transition-colors uppercase tracking-widest"
+                                                                        >
+                                                                            <ShieldCheck className="w-3.5 h-3.5" />
+                                                                            Verify Recruiter Proof
+                                                                            <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                                                                        </a>
+                                                                    )}
                                                                     {isSavingNote && (
                                                                         <div className="absolute bottom-6 right-6 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
                                                                             <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />

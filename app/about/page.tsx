@@ -37,10 +37,16 @@ export default function AboutPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">01. Definition</span>
                         <h2 className="text-3xl font-bold text-white tracking-tight">What Is ChainVolio?</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is a Web3-native CV and portfolio platform. It allows professionals to bind their work history, evidence of output, and peer attestations to a wallet address through an on-chain timestamp.
+                            ChainVolio is a Web3-native professional trust infrastructure. It enables professionals, peers, and recruiters to record verifiable career milestones as permanent on-chain transactions.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Traditional CVs are static PDFs. Links can be edited, records can be lost, and verification in a remote ecosystem is often slow and manual. ChainVolio solves this by creating a permanent, public, and shareable record of professional milestones that remains verified by the blockchain.
+                            Traditional CVs are static PDFs. Links can be edited, records can be lost, and verification in a remote ecosystem is slow and manual. ChainVolio replaces this fragile model with cryptographic proof.
+                        </p>
+                        <p className="text-white/40 font-light leading-relaxed">
+                            Instead of relying on editable claims, work history, attestations, and hiring decisions are anchored to the blockchain through verifiable transactions. Only privacy-preserving hashes are stored on-chain, ensuring that no personal data is exposed while maintaining public verifiability.
+                        </p>
+                        <p className="text-white/40 font-light leading-relaxed">
+                            This transforms a CV from a document into a living, tamper-resistant professional ledger.
                         </p>
                     </div>
 
@@ -49,10 +55,10 @@ export default function AboutPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">02. Purpose</span>
                         <h2 className="text-3xl font-bold text-white tracking-tight">Why We Exist.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Web3 hiring is uniquely challenging. Teams are global, often remote, and builders frequently operate under pseudonymous identities. In this environment, trust cannot rely on institutional credentials alone.
+                            Web3 hiring is uniquely challenging. Teams are global, remote, and often pseudonymous. In this environment, trust cannot rely on institutional credentials alone.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We believe trust should be built on signals over time. ChainVolio provides the neutral infrastructure to capture these signals, serving as the standard CV format for a decentralized workforce that values proof of work above all else.
+                            We believe trust should be built on verifiable signals accumulated over time. ChainVolio provides the neutral infrastructure to capture these signals through on-chain attestations and recruiter-verified hiring actions, forming a transparent and tamper-resistant hiring history.
                         </p>
                     </div>
 
@@ -61,10 +67,10 @@ export default function AboutPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">03. Framework</span>
                         <h2 className="text-3xl font-bold text-white tracking-tight">Scope and Limitations.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            It is important to understand what ChainVolio is and is not. ChainVolio records professional claims made by users. We do not act as a recruiter, employer, or judge of professional performance.
+                            It is important to understand what ChainVolio is and is not. ChainVolio provides infrastructure for recording professional claims and attestations as blockchain transactions.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            The platform provides objective on-chain data proving when a claim was made. While peer attestations provide additional signals of trust, they are pointers of verification, not absolute guarantees of truth. The responsibility for final evaluation always remains with the hiring party.
+                            We do not act as a recruiter, employer, arbitrator, or authority of truth. On-chain records prove that an event was recorded at a specific time by a specific wallet. Peer attestations and recruiter actions are verifiable signals, not absolute guarantees of performance or character. Final evaluation remains the responsibility of the hiring party.
                         </p>
                     </div>
 
@@ -73,10 +79,10 @@ export default function AboutPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">04. The Core</span>
                         <h2 className="text-3xl font-bold text-white tracking-tight">Behind the Project.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is an independent, builder-led project. I come from a background in the creative industry and the Web3 ecosystem, with a deep interest in decentralized identity and the future of work.
+                            ChainVolio is an independent, builder-led initiative focused on decentralized identity and the future of work. The project is grounded in real-world industry experience and long-term infrastructure thinking rather than short-term trends.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            This is a long-term vision. We are committed to a community-driven direction and are always open to collaboration with other builders who share the goal of creating a better way to hire and be hired in Web3.
+                            We are committed to building open, verifiable systems that strengthen professional trust in Web3 and beyond.
                         </p>
                     </div>
 
@@ -85,10 +91,10 @@ export default function AboutPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">05. The Goal</span>
                         <h2 className="text-3xl font-bold text-white tracking-tight">Long-Term Vision.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Our goal is for a ChainVolio profile to become the default professional link in Web3. When someone says "drop your CV," we want that to mean sharing your verified on-chain history.
+                            Our goal is for a ChainVolio profile to become the default professional link in Web3. When someone says “drop your CV,” it should mean sharing a verifiable on-chain history.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We are building toward open standards, interoperability, and a future where every professional owns their career data permanently. No tokens, no NFTs: just pure infrastructure for professional identity.
+                            We are building toward open standards, interoperability, and permanent ownership of career data. No tokens, no NFTs—just durable infrastructure for professional identity.
                         </p>
                     </div>
 

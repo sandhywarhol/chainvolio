@@ -1,6 +1,7 @@
 "use client";
 
-import { X, ShieldCheck, UserCheck, Calendar, Globe, MapPin, ExternalLink, Link as LinkIcon, Briefcase } from "lucide-react";
+import { X, ShieldCheck, UserCheck, Calendar, Globe, MapPin, ExternalLink, Link as LinkIcon, Briefcase, FileText } from "lucide-react";
+import Link from "next/link";
 import { format } from "date-fns";
 
 interface ReceiptDetailModalProps {
@@ -88,13 +89,28 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                         <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm">👤</div>
                                     )}
                                     <div className="flex-1">
-                                        <p className="text-sm font-bold text-white">{receipt.attesterName}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-bold text-white">{receipt.attesterName}</p>
+                                            {receipt.isAttesterVerified && (
+                                                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-tight">
+                                                    <ShieldCheck className="w-3 h-3" />
+                                                    Verified Org
+                                                </div>
+                                            )}
+                                        </div>
                                         <p className="text-xs text-slate-400">
                                             {receipt.attesterRole}
                                             {receipt.attesterOrg && ` at ${receipt.attesterOrg}`}
                                         </p>
                                     </div>
                                 </div>
+                                {receipt.attesterComment && (
+                                    <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 italic text-slate-300 text-sm relative">
+                                        <span className="absolute -top-2 -left-1 text-2xl text-emerald-500/30 font-serif">"</span>
+                                        {receipt.attesterComment}
+                                        <span className="absolute -bottom-4 -right-1 text-2xl text-emerald-500/30 font-serif">"</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 text-[10px]">
@@ -123,20 +139,36 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Technical Proof</p>
-                                    <p className="text-slate-300 font-mono truncate" title={receipt.attesterSignature}>ED25519: {receipt.attesterSignature?.slice(0, 10)}...</p>
+                                    <p className="text-slate-300 font-mono truncate" title={receipt.txSignature || receipt.attesterSignature}>
+                                        {receipt.txSignature ? `TX: ${receipt.txSignature.slice(0, 10)}...` : `SIG: ${receipt.attesterSignature?.slice(0, 10)}...`}
+                                    </p>
                                 </div>
                             </div>
 
-                            <a
-                                href={`https://solscan.io/account/${receipt.attesterWallet}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-white transition-all border border-slate-700"
-                            >
-                                <Globe className="w-4 h-4" />
-                                View on-chain proof
-                                <ExternalLink className="w-3 h-3 opacity-50" />
-                            </a>
+                            <div className="grid grid-cols-2 gap-3 pt-2">
+                                {receipt.txSignature && (
+                                    <a
+                                        href={`https://solscan.io/tx/${receipt.txSignature}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all border border-slate-700"
+                                    >
+                                        <Globe className="w-3.5 h-3.5" />
+                                        View on Chain
+                                        <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                                    </a>
+                                )}
+
+                                {receipt.attestationId && (
+                                    <Link
+                                        href={`/memo/${receipt.attestationId}`}
+                                        className={`${receipt.txSignature ? "" : "col-span-2"} flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all shadow-lg shadow-emerald-900/20`}
+                                    >
+                                        <FileText className="w-3.5 h-3.5" />
+                                        View Memo
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     )}
 

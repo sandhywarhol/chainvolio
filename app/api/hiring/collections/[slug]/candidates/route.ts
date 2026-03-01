@@ -149,6 +149,7 @@ export async function GET(
                 status: attestedReceipts.length > 0 ? "Attested" : "Self-Declared",
                 recruiterStatus: sub.recruiter_status,
                 recruiterNotes: sub.recruiter_notes,
+                recruiterTxSignature: sub.tx_signature,
                 submittedAt: sub.submitted_at,
                 signalScore: score,
                 signalStrength: signalStrength,

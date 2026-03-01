@@ -218,7 +218,7 @@ export async function GET(request: Request) {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("*") // We get all but map safely in response
+    .select("*")
     .eq("wallet_address", wallet)
     .single();
 
@@ -227,6 +227,13 @@ export async function GET(request: Request) {
   }
 
   if (!data) return NextResponse.json(null);
+
+  // 2. Fetch verification status
+  const { data: orgData } = await supabase
+    .from("organization_verifications")
+    .select("status, verifier_tier")
+    .eq("wallet_address", wallet)
+    .single();
 
   return NextResponse.json({
     displayName: data.display_name,
@@ -251,6 +258,9 @@ export async function GET(request: Request) {
     instagram: data.instagram,
     cardNumber: data.card_number,
     walletAddress: data.wallet_address,
-    createdAt: data.created_at
+    createdAt: data.created_at,
+    role: data.role,
+    isVerified: orgData?.status === 'verified',
+    verifierTier: orgData?.verifier_tier || 1
   });
 }

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 
 interface NavbarProps {
@@ -12,9 +13,12 @@ interface NavbarProps {
     onAskClick?: () => void;
     onScreeningClick?: () => void;
     onAttestationClick?: () => void;
+    isVerified?: boolean;
+    verifierTier?: number;
 }
 
-export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick }: NavbarProps) {
+export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier }: NavbarProps) {
+    const { publicKey } = useWallet();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileWhyOpen, setIsMobileWhyOpen] = useState(false);
     const [isMobileHowOpen, setIsMobileHowOpen] = useState(false);
@@ -75,10 +79,34 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
 
                         <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors py-2">Dashboard</Link>
+
+                        {publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" && (
+                            <Link href="/admin/organization-verification" className="text-purple-400 hover:text-purple-300 transition-colors py-2">Admin</Link>
+                        )}
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <Link
+                        href="/verified-organization"
+                        className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${isVerified
+                                ? verifierTier === 3
+                                    ? "bg-teal-500/10 border-teal-400/20 text-teal-400"
+                                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                            }`}
+                    >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span>
+                            {isVerified
+                                ? verifierTier === 3 ? "Verified Organization" : "Verified Figure"
+                                : "Verified Organization"
+                            }
+                        </span>
+                    </Link>
+
                     <div className="hidden md:block">
                         <WalletMultiButton />
                     </div>
@@ -129,6 +157,17 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
 
                     <Link href="/dashboard" className="block text-emerald-400 hover:text-emerald-300 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+
+                    <Link
+                        href="/verified-organization"
+                        className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span>Verified Organization</span>
+                    </Link>
 
                     <div className="pt-4 border-t border-white/5">
                         <WalletMultiButton />

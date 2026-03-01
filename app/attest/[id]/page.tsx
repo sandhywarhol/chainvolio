@@ -3,64 +3,166 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
+import {
+    Connection, Transaction, TransactionInstruction,
+    PublicKey, ComputeBudgetProgram,
+} from "@solana/web3.js";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
-import bs58 from "bs58"; // We need to install this: npm install bs58
 
+// ─── Types ────────────────────────────────────────────────────────────────────
 type ReceiptDetails = {
-    id: string;
-    role: string;
-    org: string;
-    description: string;
-    startDate: string;
-    endDate: string;
-    ownerWallet: string;
-    attestationCount: number;
+    id: string; role: string; org: string;
+    description: string; startDate: string; endDate: string;
+    ownerWallet: string; attestationCount: number;
 };
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+async function sha256hex(text: string): Promise<string> {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+const MEMO_PID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function AttestPage() {
     const { id } = useParams();
-    const { publicKey, signMessage } = useWallet();
+    const { publicKey, sendTransaction } = useWallet();
+
     const [receipt, setReceipt] = useState<ReceiptDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [attesting, setAttesting] = useState(false);
-    const [comment, setComment] = useState("");
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState("");
+    const [txHash, setTxHash] = useState("");
+    const [memoId, setMemoId] = useState("");
+
+    // Form fields (same as original)
     const [attesterName, setAttesterName] = useState("");
     const [attesterRole, setAttesterRole] = useState("");
     const [attesterOrg, setAttesterOrg] = useState("");
     const [attesterEmail, setAttesterEmail] = useState("");
+    const [entityType, setEntityType] = useState("Individual");
     const [attestationType, setAttestationType] = useState("Employment verification");
     const [confidenceLevel, setConfidenceLevel] = useState("Confirm");
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState("");
+    const [comment, setComment] = useState("");
+    const [performance, setPerformance] = useState({
+        reliability: 0,
+        technical_skill: 0,
+        communication: 0,
+        leadership: 0,
+        integrity: 0,
+    });
 
     useEffect(() => {
         if (!id) return;
         fetch(`/api/attest/${id}`)
-            .then((res) => {
-                if (!res.ok) throw new Error("Receipt not found");
-                return res.json();
-            })
+            .then(r => { if (!r.ok) throw new Error("Receipt not found"); return r.json(); })
             .then(setReceipt)
-            .catch((err) => setError(err.message))
+            .catch(e => setError(e.message))
             .finally(() => setLoading(false));
     }, [id]);
 
+    // ─── Submit ───────────────────────────────────────────────────────────────
     const handleAttest = async () => {
-        if (!publicKey || !signMessage || !receipt) return;
-        setError("");
-        setAttesting(true);
+        if (!publicKey || !receipt) return;
+        setError(""); setAttesting(true);
 
         try {
-            const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "attest");
+            // 1. Server-authoritative timestamp
+            const tsRes = await fetch("/api/attest/timestamp");
+            if (!tsRes.ok) throw new Error("Failed to obtain server timestamp.");
+            const { issued_at } = await tsRes.json();
 
-            if (!signedAction) {
-                setAttesting(false);
-                return;
+            // 2. Build Memo V2 payload (stored in DB)
+            const attestationId = crypto.randomUUID();
+            setMemoId(attestationId);
+
+            const memoV2 = {
+                version: "2.0",
+                classification: attestationType,
+                header: {
+                    network: "Solana Mainnet",
+                    issuer_wallet: publicKey.toBase58(),
+                    issuer_org: attesterOrg || "—",
+                    issuer_tier: "Public",
+                    issued_at,
+                },
+                recipient: {
+                    wallet: receipt.ownerWallet,
+                    cv_id: receipt.id,
+                    role: receipt.role,
+                    engagement_start: receipt.startDate,
+                    engagement_end: receipt.endDate,
+                },
+                content: {
+                    executive_summary: comment,
+                    scope_of_work: [],
+                    performance: performance,
+                    key_achievements: [],
+                    final_statement: "",
+                },
+                signature: {
+                    signatory_name: attesterName,
+                    signatory_position: attesterRole,
+                    signatory_org: attesterOrg,
+                },
+            };
+
+            // 3. SHA-256 content hash (anchored on-chain)
+            const memoJSON = JSON.stringify(memoV2);
+            const contentHash = await sha256hex(memoJSON);
+
+            // 4. Compact on-chain memo (under 566 bytes)
+            const onChainMemo = JSON.stringify({
+                protocol: "chainvolio",
+                type: "attestation",
+                description: "ChainVolio CV Verification",
+                cv_id: receipt.id,
+                memo_id: attestationId,
+                issuer: publicKey.toBase58(),
+                issued_at,
+                content_hash: contentHash,
+            });
+
+            const memoBytes = new TextEncoder().encode(onChainMemo);
+            if (memoBytes.length > 566) throw new Error(`Memo too large: ${memoBytes.length} bytes`);
+
+            // 5. Build & send Solana transaction
+            const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+            const conn = new Connection(rpcUrl, "confirmed");
+            const tx = new Transaction();
+            const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
+
+            tx.recentBlockhash = blockhash;
+            tx.feePayer = publicKey;
+            tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 5000 }));
+            tx.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }));
+            tx.add(new TransactionInstruction({
+                keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
+                programId: MEMO_PID,
+                data: Buffer.from(new TextEncoder().encode(onChainMemo)),
+            }));
+
+            const txSig = await sendTransaction(tx, conn, { skipPreflight: true, preflightCommitment: "confirmed", maxRetries: 5 });
+            const signature = txSig.replace(/\s/g, "");
+
+            // 6. Confirm
+            try {
+                await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
+            } catch {
+                let confirmed = false;
+                for (let i = 0; i < 30; i++) {
+                    const st = await conn.getSignatureStatus(signature, { searchTransactionHistory: true });
+                    if (st.value?.err) throw new Error(`Transaction failed: ${JSON.stringify(st.value.err)}`);
+                    if (st.value?.confirmationStatus === "confirmed" || st.value?.confirmationStatus === "finalized") { confirmed = true; break; }
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+                if (!confirmed) throw new Error("Transaction failed to confirm. Please try again.");
             }
 
-            // 3. Submit to API
+            // 7. Record in database
             const res = await fetch("/api/attest", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -74,245 +176,294 @@ export default function AttestPage() {
                     attesterEmail,
                     attestationType,
                     confidenceLevel,
-                    ...signedAction
+                    entityType,
+                    attestationId,
+                    txSignature: signature,
+                    issuedAt: issued_at,
+                    memoV2,
+                    contentHash,
+                    classification: attestationType,
                 }),
             });
 
             if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to attest");
+                const d = await res.json();
+                throw new Error(d.error || "Failed to record attestation");
             }
 
+            setTxHash(signature);
             setSuccess(true);
-        } catch (err: any) {
-            console.error(err);
-            setError(err.message || "Error signing message");
+        } catch (e: any) {
+            console.error(e);
+            setError(e.message || "Execution failed");
         } finally {
             setAttesting(false);
         }
     };
 
-    if (loading) {
-        return (
-            <main className="min-h-screen text-white flex items-center justify-center">
-                <p className="text-slate-400">Loading receipt details...</p>
-            </main>
-        );
-    }
+    // ─── Loading ──────────────────────────────────────────────────────────────
+    if (loading) return (
+        <main className="min-h-screen flex items-center justify-center text-white">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-slate-400 text-sm">Loading…</p>
+            </div>
+        </main>
+    );
 
-    if (error || !receipt) {
-        return (
-            <main className="min-h-screen text-white flex flex-col items-center justify-center gap-4">
-                <p className="text-red-400">{error || "Receipt not found"}</p>
-                <Link href="/" className="text-slate-400 hover:text-white">
-                    Return Home
+    if (error && !receipt) return (
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">
+            <p className="text-red-400">{error}</p>
+            <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
+        </main>
+    );
+
+    // ─── Success ──────────────────────────────────────────────────────────────
+    if (success) return (
+        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6">
+            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-4xl">✓</div>
+            <div className="text-center space-y-2">
+                <h1 className="text-2xl font-bold">Attestation Recorded On-Chain</h1>
+                <p className="text-slate-400 max-w-sm text-sm">Your verification has been permanently anchored to the Solana blockchain.</p>
+            </div>
+            <div className="flex flex-col gap-3 w-full max-w-xs">
+                <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                    className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-medium text-center text-sm">
+                    🔗 View on Solscan
+                </a>
+                <Link href={`/memo/${memoId}`}
+                    className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-medium text-center text-sm">
+                    📄 View Verification Memo
                 </Link>
-            </main>
-        );
-    }
+                {receipt && (
+                    <Link href={`/cv/${receipt.ownerWallet}`}
+                        className="px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 font-medium text-center text-sm">
+                        View Updated Profile
+                    </Link>
+                )}
+            </div>
+        </main>
+    );
 
-    if (success) {
-        return (
-            <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl">
-                    ✓
-                </div>
-                <h1 className="text-2xl font-bold text-center">Attestation Verified!</h1>
-                <p className="text-slate-400 text-center max-w-sm">
-                    Thank you for verifying this work history. Your cryptographic signature has been recorded.
-                </p>
-                <Link
-                    href={`/cv/${receipt.ownerWallet}`}
-                    className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 font-medium"
-                >
-                    View Updated Profile
-                </Link>
-            </main>
-        );
-    }
-
+    // ─── Main Form ────────────────────────────────────────────────────────────
     return (
         <main className="min-h-screen text-white">
             <nav className="flex items-center justify-between px-6 py-4 max-w-2xl mx-auto relative z-[100]">
                 <Link href="/" className="flex items-center gap-1.5 group">
-                    <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
                     <span className="text-xl font-bold">ChainVolio</span>
                 </Link>
                 <WalletMultiButton />
             </nav>
 
-            <section className="max-w-xl mx-auto px-6 py-12">
+            <section className="max-w-xl mx-auto px-6 pb-20 space-y-6">
+                {/* Header */}
                 <div className="mb-8 text-center space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-                        🛡 Identity-Linked Verification
+                        🔗 Identity-Linked Verification
                     </div>
-                    <div>
-                        <h1 className="text-3xl font-bold mb-2">Verify Proof of Work</h1>
-                        <p className="text-slate-400">
-                            Confirm a candidate's professional contributions on-chain.
-                        </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-left text-sm space-y-2">
-                        <p className="font-semibold text-white text-base">No ChainVolio account required.</p>
-                        <p className="text-slate-400 leading-relaxed">
-                            Verifying this work helps the candidate build professional trust. Your name, role, and wallet signature will be cryptographically linked to this record.
-                        </p>
-                    </div>
+                    <h1 className="text-3xl font-bold mb-2">Verify Proof of Work</h1>
+                    <p className="text-slate-400">Confirm a candidate's professional contributions on-chain.</p>
                 </div>
 
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 mb-8">
-                    <div className="space-y-4">
-                        <div>
-                            <label className="text-xs text-slate-500 uppercase tracking-wider">Candidate Wallet</label>
-                            <p className="font-mono text-emerald-400 text-sm truncate">{receipt.ownerWallet}</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-xs text-slate-500 uppercase tracking-wider">Role</label>
-                                <p className="font-semibold text-lg">{receipt.role}</p>
-                            </div>
-                            <div>
-                                <label className="text-xs text-slate-500 uppercase tracking-wider">Organization</label>
-                                <p className="font-semibold text-lg">{receipt.org}</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="text-xs text-slate-500 uppercase tracking-wider">Description</label>
-                            <p className="text-slate-300 mt-1">{receipt.description}</p>
-                        </div>
-
-                        <div className="pt-4 border-t border-slate-700 flex justify-between items-center text-sm">
-                            <span className="text-slate-400">
-                                {receipt.startDate} – {receipt.endDate}
-                            </span>
-                            {receipt.attestationCount > 0 && (
-                                <span className="text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">
-                                    {receipt.attestationCount} existing verification(s)
-                                </span>
-                            )}
-                        </div>
-                    </div>
+                {/* No account required notice */}
+                <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-left text-sm space-y-2">
+                    <p className="font-semibold text-white text-base">No ChainVolio account required.</p>
+                    <p className="text-slate-400 leading-relaxed">
+                        Verifying this work helps the candidate build professional trust. Your name, role, and wallet signature will be cryptographically linked to this record.
+                    </p>
                 </div>
 
+                {/* Work record */}
+                {receipt && (
+                    <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 mb-8">
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-xs text-slate-500 uppercase tracking-wider">Candidate Wallet</label>
+                                <p className="font-mono text-emerald-400 text-sm truncate">{receipt.ownerWallet}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider">Role</label>
+                                    <p className="font-semibold text-lg">{receipt.role}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider">Organization</label>
+                                    <p className="font-semibold text-lg">{receipt.org}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider">Start Date</label>
+                                    <p className="font-semibold">{receipt.startDate || "—"}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wider">End Date</label>
+                                    <p className="font-semibold">{receipt.endDate || "—"}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Wallet gate */}
                 {!publicKey ? (
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-4">
-                        <p className="text-slate-400">Connect your wallet to sign this verification.</p>
-                        <div className="flex justify-center">
-                            <WalletMultiButton />
-                        </div>
+                        <p className="text-slate-400 text-sm">Connect your wallet to submit this attestation.</p>
+                        <div className="flex justify-center"><WalletMultiButton /></div>
                     </div>
                 ) : (
-                    <div className="space-y-8 bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
-                        <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-white border-b border-slate-800 pb-2">Your Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Full Name *</label>
-                                    <input
-                                        type="text"
-                                        value={attesterName}
-                                        onChange={(e) => setAttesterName(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm"
-                                        placeholder="Andi Wijaya"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Relationship *</label>
-                                    <input
-                                        type="text"
-                                        value={attesterRole}
-                                        onChange={(e) => setAttesterRole(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm"
-                                        placeholder="e.g. Project Lead, Manager"
-                                    />
-                                </div>
-                            </div>
+                    <div className="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-6 space-y-5">
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Organization (Optional)</label>
-                                    <input
-                                        type="text"
-                                        value={attesterOrg}
-                                        onChange={(e) => setAttesterOrg(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm"
-                                        placeholder="Company or Group"
-                                    />
+                        {/* Verifier identity */}
+                        <div>
+                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Your Information</h2>
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Full Name *</label>
+                                        <input value={attesterName} onChange={e => setAttesterName(e.target.value)}
+                                            placeholder="Your full name"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Relationship *</label>
+                                        <input value={attesterRole} onChange={e => setAttesterRole(e.target.value)}
+                                            placeholder="e.g. Direct Manager"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Work Email (Optional)</label>
-                                    <input
-                                        type="email"
-                                        value={attesterEmail}
-                                        onChange={(e) => setAttesterEmail(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm"
-                                        placeholder="name@company.com"
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Organization (Optional)</label>
+                                        <input value={attesterOrg} onChange={e => setAttesterOrg(e.target.value)}
+                                            placeholder="Company or DAO"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Work Email (Optional)</label>
+                                        <input type="email" value={attesterEmail} onChange={e => setAttesterEmail(e.target.value)}
+                                            placeholder="name@company.com"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Entity Type</label>
+                                    <select value={entityType} onChange={e => setEntityType(e.target.value)}
+                                        className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
+                                        <option>Individual</option>
+                                        <option>Company</option>
+                                        <option>Organization / DAO</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-6">
-                            <h3 className="text-lg font-bold text-white border-b border-slate-800 pb-2">Verification Scope</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Attestation Type</label>
-                                    <select
-                                        value={attestationType}
-                                        onChange={(e) => setAttestationType(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm appearance-none"
-                                    >
-                                        <option value="Employment verification">Employment verification</option>
-                                        <option value="Freelance / Contract work">Freelance / Contract work</option>
-                                        <option value="Project collaboration">Project collaboration</option>
-                                        <option value="Reference / Recommendation">Reference / Recommendation</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Confidence Level</label>
-                                    <select
-                                        value={confidenceLevel}
-                                        onChange={(e) => setConfidenceLevel(e.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all text-sm appearance-none"
-                                    >
-                                        <option value="Strongly confirm">Strongly confirm</option>
-                                        <option value="Confirm">Confirm</option>
-                                        <option value="Partial / limited confirmation">Partial confirmation</option>
-                                    </select>
-                                </div>
-                            </div>
+                        {/* Divider */}
+                        <div className="border-t border-slate-800" />
 
-                            <div className="space-y-2">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Comment (Optional)</label>
-                                <textarea
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-24 text-sm"
-                                    placeholder="Add specific context about their performance..."
-                                />
+                        {/* Verification scope */}
+                        <div>
+                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Verification Scope</h2>
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Attestation Type</label>
+                                        <select value={attestationType} onChange={e => setAttestationType(e.target.value)}
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
+                                            <option>Employment verification</option>
+                                            <option>Professional Attestation</option>
+                                            <option>Project Completion</option>
+                                            <option>Recommendation Letter</option>
+                                            <option>Performance Evaluation</option>
+                                            <option>Partnership Confirmation</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Confidence Level</label>
+                                        <select value={confidenceLevel} onChange={e => setConfidenceLevel(e.target.value)}
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
+                                            <option>Strongly confirm</option>
+                                            <option>Confirm</option>
+                                            <option>Partial / limited confirmation</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Performance Ratings */}
+                                <div className="pt-2 space-y-4">
+                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Performance Ratings</label>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {[
+                                            { key: "reliability", label: "Reliability" },
+                                            { key: "technical_skill", label: "Technical Proficiency" },
+                                            { key: "communication", label: "Communication" },
+                                            { key: "leadership", label: "Leadership" },
+                                            { key: "integrity", label: "Professional Integrity" },
+                                        ].map(({ key, label }) => (
+                                            <div key={key} className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                                                <span className="text-sm font-medium text-slate-300">{label}</span>
+                                                <div className="flex gap-1">
+                                                    {[0, 1, 2, 3, 4, 5].map((num) => (
+                                                        <button
+                                                            key={num}
+                                                            type="button"
+                                                            onClick={() => setPerformance(prev => ({ ...prev, [key]: num }))}
+                                                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${performance[key as keyof typeof performance] === num
+                                                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                                                : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                                                                }`}
+                                                        >
+                                                            {num}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Comment (Optional)</label>
+                                    <textarea value={comment} onChange={e => setComment(e.target.value)}
+                                        className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm resize-none h-24 transition-colors"
+                                        placeholder="Add specific context about their performance..." />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="pt-2">
-                            <button
-                                onClick={handleAttest}
-                                disabled={attesting}
-                                className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 font-bold text-lg shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2"
-                            >
-                                {attesting ? "Processing..." : (
-                                    <>
-                                        <span>Confirm & Sign Verification</span>
-                                    </>
-                                )}
-                            </button>
+                        {/* Divider */}
+                        <div className="border-t border-slate-800" />
 
-                            <p className="text-[10px] text-slate-500 text-center mt-4 uppercase tracking-widest font-bold">
-                                🔒 Secure Wallet signature required
+                        {/* On-chain notice */}
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <h2 className="text-sm font-bold text-white">Record Verification On-Chain</h2>
+                            </div>
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                                By confirming this attestation, you will record a cryptographic proof of this verification on the blockchain.
+                                This creates a permanent, tamper-resistant record that strengthens the credibility of this CV.
                             </p>
+                            <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                                <p className="text-xs font-bold text-amber-500 mb-0.5">⚠ Fee Notice</p>
+                                <p className="text-xs text-slate-400">A small network fee is required to submit this record. The fee is paid to the blockchain network — not to ChainVolio.</p>
+                            </div>
                         </div>
+
+                        {/* Error */}
+                        {error && (
+                            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                <p className="text-red-400 text-sm">⚠ {error}</p>
+                            </div>
+                        )}
+
+                        {/* Submit */}
+                        <button onClick={handleAttest}
+                            disabled={attesting || !attesterName.trim() || !attesterRole.trim()}
+                            className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2">
+                            {attesting ? (
+                                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing…</>
+                            ) : "Confirm Attestation On-Chain"}
+                        </button>
                     </div>
                 )}
             </section>

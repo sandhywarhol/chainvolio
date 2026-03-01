@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { Connection } from "@solana/web3.js";
 
 export async function POST(request: Request) {
     if (!supabase) {
@@ -12,6 +13,7 @@ export async function POST(request: Request) {
             receiptId,
             attesterWallet,
             signature,
+            txSignature,
             comment,
             attesterName,
             attesterRole,
@@ -19,39 +21,90 @@ export async function POST(request: Request) {
             attesterEmail,
             attestationType,
             confidenceLevel,
+            entityType,
+            attestationId,
             nonce,
-            timestamp
+            timestamp,
+            issuedAt,
+            memoV2,
+            contentHash,
+            classification,
         } = body;
 
-        // --- Signature Verification ---
+        // Server-side ISO 8601 timestamp — use client-provided value if valid,
+        // otherwise fall back to server time (safety net)
+        const memoIssuedAt = issuedAt && /^\d{4}-\d{2}-\d{2}T/.test(issuedAt)
+            ? issuedAt
+            : new Date().toISOString();
+
+        const cleanTxSignature = txSignature?.replace(/\s/g, '');
+        const cleanSignature = signature?.replace(/\s/g, '');
+
+        // --- Signature / Proof Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!signature || !nonce || !timestamp)) {
-            return NextResponse.json({ error: "Signature required to attest work." }, { status: 401 });
+
+        // If we have an on-chain TX signature, that is our proof. 
+        // Otherwise, we fall back to the message signature.
+        if (!skipVerify && !cleanTxSignature && (!cleanSignature || !nonce || !timestamp)) {
+            return NextResponse.json({ error: "On-chain transaction or signature required to attest work." }, { status: 401 });
         }
 
+        if (!skipVerify && cleanSignature && !cleanTxSignature) {
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                attesterWallet,
+                "attest",
+                nonce || "",
+                timestamp || 0,
+                cleanSignature || ""
+            );
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
+            if (!isValid) {
+                return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+            }
+        }
 
-            attesterWallet,
-            "attest",
-            nonce || "",
-            timestamp || 0,
-            signature || ""
-        );
+        // Verify the txSignature on-chain if provided
+        if (!skipVerify && cleanTxSignature) {
+            try {
+                const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+                const connection = new Connection(rpcUrl, "confirmed");
 
+                // Wait/Poll briefly for the transaction to be visible to the RPC
+                let status = await connection.getSignatureStatus(cleanTxSignature, { searchTransactionHistory: true });
 
-        if (!isValid) {
-            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+                // If not found immediately, wait a few seconds and try one more time 
+                // (Backend needs to be relatively quick, but RPCs can have a lag)
+                if (!status.value) {
+                    await new Promise(r => setTimeout(r, 3000));
+                    status = await connection.getSignatureStatus(cleanTxSignature, { searchTransactionHistory: true });
+                }
+
+                if (!status.value || (status.value.confirmationStatus !== 'confirmed' && status.value.confirmationStatus !== 'finalized')) {
+                    return NextResponse.json({
+                        error: "On-chain proof not found or not yet confirmed. Please wait a moment and try again."
+                    }, { status: 400 });
+                }
+
+                // CRITICAL: Check if the transaction actually SUCCEEDED
+                if (status.value.err) {
+                    return NextResponse.json({
+                        error: `Blockchain transaction reached consensus but FAILED during execution: ${JSON.stringify(status.value.err)}. Please try again.`
+                    }, { status: 400 });
+                }
+            } catch (err: any) {
+                console.error("On-chain verification failed:", err);
+                return NextResponse.json({ error: "Failed to verify transaction on-chain." }, { status: 500 });
+            }
         }
         // ----------------------------
 
         // Set transaction context for RLS parity
         await supabase.rpc('set_app_wallet', { wallet_addr: attesterWallet });
 
-        if (!receiptId || !attesterWallet || !signature || !attesterName || !attesterRole) {
+        if (!receiptId || !attesterWallet || (!cleanSignature && !cleanTxSignature) || !attesterName || !attesterRole) {
             return NextResponse.json(
-                { error: "Missing required fields: name and role are required." },
+                { error: "Missing required fields: proof, name, and role are required." },
                 { status: 400 }
             );
         }
@@ -77,9 +130,12 @@ export async function POST(request: Request) {
 
         // Insert attestation
         const { error } = await supabase.from("attestations").insert({
+            id: attestationId, // Use the ID generated for the on-chain memo
             receipt_id: receiptId,
             attester_wallet: attesterWallet,
-            signature,
+            signature: cleanSignature || cleanTxSignature, // Store the proof
+            tx_signature: cleanTxSignature,
+            memo_issued_at: memoIssuedAt,
             comment,
             attester_name: attesterName,
             attester_role: attesterRole,
@@ -87,6 +143,9 @@ export async function POST(request: Request) {
             attester_email: attesterEmail,
             attestation_type: attestationType,
             confidence_level: confidenceLevel,
+            memo_v2: memoV2 || null,
+            content_hash: contentHash || null,
+            classification: classification || null,
         });
 
         if (error) {

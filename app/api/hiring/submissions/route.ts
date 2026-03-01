@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { collectionSlug, walletAddress, primarySignal, roleStrength, signature, nonce, timestamp } = body;
+        const cleanSignature = signature?.replace(/\s/g, '');
 
         if (!collectionSlug || !walletAddress) {
             return errorResponse("ERR_INVALID_REQUEST", "slug and wallet required", 400);
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
 
         // --- 3. Signature Verification (with Context) ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!signature || !nonce || !timestamp)) {
+        if (!skipVerify && (!cleanSignature || !nonce || !timestamp)) {
             return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to apply.", 401);
         }
 
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
             "apply_job",
             nonce || "",
             timestamp || 0,
-            signature || "",
+            cleanSignature || "",
             collectionSlug // Hardening: Signature is now bound to THIS collection
         );
 
