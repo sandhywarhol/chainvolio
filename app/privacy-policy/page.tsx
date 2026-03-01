@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">01. Introduction</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">The Vision.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is a Web3-native CV and portfolio platform built to empower talent through verifiable proof of work. Our privacy approach is anchored in the principles of decentralization and user sovereignty.
+                            ChainVolio is a Web3-native professional record infrastructure. Our privacy architecture is designed for a wallet-bound identity layer anchoring professional output directly to public blockchain networks. Privacy in this decentralized context operates through transparency and cryptographic ownership.
                         </p>
                     </div>
 
@@ -44,11 +44,14 @@ export default function PrivacyPolicyPage() {
                     <div className="space-y-4">
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">02. Data Processing</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Information we collect.</h2>
+                        <p className="text-white/40 font-light leading-relaxed mb-2 text-xs">
+                            We process two distinct categories of data:
+                        </p>
                         <ul className="space-y-3 text-white/40 font-light text-sm">
-                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> Public wallet addresses linked to your profile</li>
-                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> Professional information you explicitly provide (CV, Work, Bio)</li>
-                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> On-chain attestations and verified milestones</li>
-                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> Basic diagnostic metadata to improve platform stability</li>
+                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> <strong>Off-chain Data:</strong> Profile metadata (Bio, Skills) stored in our secure database.</li>
+                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> <strong>On-chain Data:</strong> Public wallet addresses and cryptographic hashes anchored to the ledger.</li>
+                            <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-teal-500/30" /> <strong>Attestations:</strong> Public, immutable work history records confirmed on the blockchain.</li>
+                            <li className="flex items-center gap-2 font-bold italic text-white/20 underline decoration-teal-500/20">On-chain records cannot be altered or deleted once confirmed by the network.</li>
                         </ul>
                     </div>
 
@@ -57,15 +60,16 @@ export default function PrivacyPolicyPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-red-500/40 font-bold">03. The Threshold</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">What we never see.</h2>
                         <p className="text-white/40 font-light leading-relaxed mb-4">
-                            As a non-custodial platform, we prioritize your security by never interacting with sensitive credentials.
+                            ChainVolio is architected as a non-custodial infrastructure. We have zero access to your private credentials or financial assets.
                         </p>
                         <ul className="grid grid-cols-2 gap-4">
-                            {["Private Keys", "Seed Phrases", "Wallet Balances", "Asset Values"].map((item) => (
+                            {["Private Keys", "Seed Phrases", "Wallet Signing", "Asset Assets"].map((item) => (
                                 <li key={item} className="p-3 border border-white/5 bg-white/[0.01] text-[10px] uppercase tracking-widest font-bold text-white/20 text-center">
-                                    {item}
+                                    {item} NO ACCESS
                                 </li>
                             ))}
                         </ul>
+                        <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest mt-2">Users are solely responsible for wallet security and key management.</p>
                     </div>
 
                     {/* Usage */}
@@ -74,9 +78,9 @@ export default function PrivacyPolicyPage() {
                         <h2 className="text-2xl font-bold text-white tracking-tight">How we use data.</h2>
                         <ul className="space-y-4">
                             {[
-                                { title: "Visibility", desc: "Displaying your verified profile to recruiters and potential collaborators." },
-                                { title: "Verification", desc: "Showcasing attested proof of work linked to your unique wallet identity." },
-                                { title: "Evolution", desc: "Analyzing usage patterns to refine the hiring dashboard and peer review systems." }
+                                { title: "Public Ledger Display", desc: "Projecting your professional profile as part of a transparent, auditable professional ledger." },
+                                { title: "Verification Protocol", desc: "Facilitating user-initiated blockchain transactions for attestations and milestones." },
+                                { title: "Infrastructure Optimization", desc: "Analyzing anonymized diagnostic data to ensure the reliability of the trust layer. We do not sell personal data." }
                             ].map((item, i) => (
                                 <li key={i} className="group">
                                     <h4 className="text-sm font-bold text-white/60 mb-1">{item.title}</h4>
@@ -91,7 +95,7 @@ export default function PrivacyPolicyPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">05. Sovereignty</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Your Control.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            You are the sole owner of your professional identity. You can update, modify, or remove your profile information at any time through your authenticated wallet.
+                            You govern your professional identity via wallet-based authentication. While you may modify or remove off-chain profile data at any time, on-chain transactions and hashes remain a permanent part of the public infrastructure.
                         </p>
                     </div>
 
@@ -100,7 +104,7 @@ export default function PrivacyPolicyPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">06. Safeguards</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Security & Storage.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We utilize industry-standard cryptographic practices and secure database environments. No sensitive wallet credentials or production secrets are ever stored on our servers.
+                            We implement industry-standard safeguards for off-chain storage. Data anchored to the blockchain is secured by the underlying public network architecture. ChainVolio does not control or manage independent third-party wallet providers.
                         </p>
                     </div>
                 </div>
@@ -111,15 +115,15 @@ export default function PrivacyPolicyPage() {
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="grid md:grid-cols-2 gap-16">
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">Third-Party Verification</h3>
+                        <h3 className="text-lg font-bold text-white">Non-Custodial Third Parties</h3>
                         <p className="text-sm text-white/30 font-light leading-relaxed">
-                            We interact with wallet providers (like Phantom or Solflare) and blockchain nodes to facilitate secure authentication and data retrieval. These services operate under their own independent privacy standards.
+                            We interact with sovereign wallet providers and public blockchain nodes to facilitate secure authentication. These third-party services operate independently of the ChainVolio infrastructure.
                         </p>
                     </div>
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">Policy Updates</h3>
+                        <h3 className="text-lg font-bold text-white">Prospective Updates</h3>
                         <p className="text-sm text-white/30 font-light leading-relaxed">
-                            As the ChainVolio protocol evolves, this policy may be updated to reflect new features or security standards. The latest version will always be anchored to this permanent URL.
+                            Updates to this policy apply prospectively as the infrastructure evolves. Continued interaction with the system constitutes acceptance of the current privacy standards.
                         </p>
                     </div>
                 </div>
