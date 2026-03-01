@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   applicationName: "ChainVolio",
   icons: {
     icon: [
-      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "32x32", type: "image/png" },
-      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "16x16", type: "image/png" },
-      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "192x192", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/logo.png", sizes: "32x32", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/logo.png", sizes: "16x16", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/logo.png", sizes: "192x192", type: "image/png" },
     ],
-    shortcut: "https://www.chainvolio.xyz/chainvolio%20logo.png",
+    shortcut: "https://www.chainvolio.xyz/logo.png",
     apple: [
-      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "180x180", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/logo.png", sizes: "180x180", type: "image/png" },
     ],
   },
   manifest: "https://www.chainvolio.xyz/manifest.json",

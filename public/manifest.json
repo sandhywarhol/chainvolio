@@ -8,17 +8,17 @@
     "theme_color": "#000000",
     "icons": [
         {
-            "src": "https://www.chainvolio.xyz/chainvolio%20logo.png",
+            "src": "https://www.chainvolio.xyz/logo.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "https://www.chainvolio.xyz/chainvolio%20logo.png",
+            "src": "https://www.chainvolio.xyz/logo.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "https://www.chainvolio.xyz/chainvolio%20logo.png",
+            "src": "https://www.chainvolio.xyz/logo.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

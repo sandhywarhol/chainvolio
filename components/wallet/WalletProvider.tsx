@@ -46,7 +46,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         },
       }}
       appName="ChainVolio"
-      appIcon="https://chainvolio.xyz/chainvolio%20logo.png"
+      appIcon="https://chainvolio.xyz/logo.png"
     >
       <ConnProv endpoint={endpoint}>
         <SolWallProv wallets={wallets} autoConnect>
