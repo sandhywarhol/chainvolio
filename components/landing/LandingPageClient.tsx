@@ -88,8 +88,8 @@ export function LandingPageClient() {
             />
 
             <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
-                <div className="text-left max-w-xl lg:w-1/2">
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold font-display leading-[1.2] tracking-tight mb-10 text-white">
+                <div className="text-left max-w-3xl lg:w-[65%]">
+                    <h1 className="text-2xl md:text-3xl lg:text-[40px] font-extrabold font-display leading-[1.2] tracking-tight mb-10 text-white">
                         Verifiable professional identity<br />
                         for Web3 careers.
                     </h1>

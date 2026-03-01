@@ -192,13 +192,26 @@ export default function CVPage() {
 
   const isProfileComplete = useMemo(() => {
     if (!profile) return false;
-    const hasSocial = !!(profile.twitter || profile.github || profile.discord || profile.telegram || profile.whatsapp || profile.email || profile.lens || profile.farcaster);
+    const hasSocial = !!(
+      profile.twitter ||
+      profile.github ||
+      profile.discord ||
+      profile.telegram ||
+      profile.whatsapp ||
+      profile.email ||
+      profile.website ||
+      profile.linkedin ||
+      profile.instagram ||
+      profile.lens ||
+      profile.farcaster
+    );
     const hasExperience = receipts && receipts.length > 0;
+
     return !!(
       profile.bio &&
       profile.skills &&
-      profile.avatarUrl &&
-      hasExperience
+      hasExperience &&
+      hasSocial
     );
   }, [profile, receipts]);
 
@@ -331,7 +344,7 @@ export default function CVPage() {
               <div className="absolute top-6 right-6 z-30 flex flex-col gap-4 items-center">
                 <ProfileCompleteBadge
                   isComplete={isProfileComplete}
-                  onClick={() => setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, and work evidence.")}
+                  onClick={() => setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, work evidence, and contact information.")}
                 />
 
                 {totalYearsExperience > 0 && (
