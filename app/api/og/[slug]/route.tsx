@@ -13,6 +13,9 @@ export async function GET(
         const { slug } = params;
         const cleanSlug = slug.replace(/\.png$/, '');
 
+        // Log wallet param to confirm it's received
+        console.log(`[OG_IMAGE_API] Received wallet: ${cleanSlug}`);
+
         let profile = null;
         let verifierTier = 1;
         let receipts: any[] = [];
@@ -25,23 +28,65 @@ export async function GET(
                 .maybeSingle();
             profile = prof;
 
-            const { data: orgData } = await supabase
-                .from("organization_verifications")
-                .select("verifier_tier, status")
-                .eq("wallet_address", cleanSlug)
-                .maybeSingle();
+            if (profile) {
+                const { data: orgData } = await supabase
+                    .from("organization_verifications")
+                    .select("verifier_tier, status")
+                    .eq("wallet_address", cleanSlug)
+                    .maybeSingle();
 
-            if (orgData?.status === 'verified') {
-                verifierTier = orgData.verifier_tier || 3;
-            } else {
-                verifierTier = profile?.verifier_tier || 1;
+                if (orgData?.status === 'verified') {
+                    verifierTier = orgData.verifier_tier || 3;
+                } else {
+                    verifierTier = profile?.verifier_tier || 1;
+                }
+
+                const { data: recs } = await supabase
+                    .from("receipts")
+                    .select("start_date, end_date")
+                    .eq("wallet_address", cleanSlug);
+                receipts = recs || [];
             }
+        }
 
-            const { data: recs } = await supabase
-                .from("receipts")
-                .select("start_date, end_date")
-                .eq("wallet_address", cleanSlug);
-            receipts = recs || [];
+        // Return specific handling if no profile found
+        if (!profile) {
+            const { origin } = new URL(request.url);
+            const bgUrl = `${origin}/homepage/og%20image%20for%20all.jpg`;
+            return new ImageResponse(
+                (
+                    <div style={{
+                        height: '100%',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: '#07070B',
+                        position: 'relative',
+                        fontFamily: 'sans-serif',
+                        color: 'white',
+                    }}>
+                        <img src={bgUrl} style={{ position: 'absolute', top: 0, left: 0, width: '1200px', height: '630px', objectFit: 'cover' }} />
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            borderRadius: '32px',
+                            padding: '40px',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            zIndex: 1,
+                        }}>
+                            <h1 style={{ fontSize: '48px', fontWeight: 900, margin: 0 }}>Unregistered Wallet</h1>
+                            <p style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)', marginTop: '10px' }}>{cleanSlug.slice(0, 16)}...</p>
+                        </div>
+                    </div>
+                ),
+                {
+                    width: 1200,
+                    height: 630,
+                    headers: { 'Cache-Control': 'no-store, max-age=0' }
+                }
+            );
         }
 
         // Calculate Experience
@@ -93,7 +138,7 @@ export async function GET(
         const tierColor = verifierTier === 3 ? '#2dd4bf' : (verifierTier === 2 ? '#10b981' : '#94a3b8');
 
         const { origin } = new URL(request.url);
-        const bgUrl = `${origin}/og%20image/background.png`;
+        const bgUrl = `${origin}/homepage/og%20image%20for%20all.jpg`;
 
         return new ImageResponse(
             (
@@ -348,7 +393,11 @@ export async function GET(
                     </div>
                 </div>
             ),
-            { width: 1200, height: 630 }
+            {
+                width: 1200,
+                height: 630,
+                headers: { 'Cache-Control': 'no-store, max-age=0' }
+            }
         );
     } catch (e: any) {
         return new Response(`Error: ${e.message}`, { status: 500 });

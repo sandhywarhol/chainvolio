@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "ChainVolio",
     images: [
       {
-        url: "/og.png?v=10",
+        url: "/homepage/og%20image%20for%20all.jpg?v=1",
         width: 1200,
         height: 630,
         alt: "ChainVolio: Professional Trust Infrastructure",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ChainVolio: Professional Trust Primitive",
     description: "The on-chain standard for professional identity and verifiable career milestones.",
-    images: ["/og.png?v=10"],
+    images: ["/homepage/og%20image%20for%20all.jpg?v=1"],
   },
 };
 
