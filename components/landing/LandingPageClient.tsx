@@ -153,10 +153,63 @@ export function LandingPageClient() {
                             <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">×</button>
                             {activeModal === 'how' && (
                                 <div className="space-y-16 py-4">
-                                    <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">How It Works</h2><p className="text-white/40 text-sm max-w-xl leading-relaxed">ChainVolio is a Web3-native CV and reputation platform designed to turn professional experience into verifiable proof, not just claims.</p></div>
+                                    <div className="space-y-4">
+                                        <h2 className="text-3xl font-bold tracking-tight text-white uppercase">How It Works</h2>
+                                        <p className="text-white/40 text-sm max-w-xl leading-relaxed">
+                                            ChainVolio is Web3-native professional trust infrastructure architected to anchor career milestones directly to a public, verifiable professional ledger.
+                                        </p>
+                                    </div>
                                     <div className="grid md:grid-cols-2 gap-12 pt-8">
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Workflow</h3><div className="space-y-6"><div className="flex gap-6 border-l border-white/10 pl-6 py-1"><span className="text-lg font-light text-white/20">01</span><div><h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Identity</h4><p className="text-[11px] text-white/50 leading-relaxed">Connect your wallet to establish a secure, cryptographically-backed professional identity.</p></div></div><div className="flex gap-6 border-l border-white/10 pl-6 py-1"><span className="text-lg font-light text-white/20">02</span><div><h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Build</h4><p className="text-[11px] text-white/50 leading-relaxed">Curate your CV, work history, portfolio, and key milestones in a streamlined interface.</p></div></div><div className="flex gap-6 border-l border-white/10 pl-6 py-1"><span className="text-lg font-light text-white/20">03</span><div><h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Verify</h4><p className="text-[11px] text-white/50 leading-relaxed">Anchor your achievements with direct evidence via projects, attestations, and on-chain activity.</p></div></div><div className="flex gap-6 border-l border-white/10 pl-6 py-1"><span className="text-lg font-light text-white/20">04</span><div><h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Share</h4><p className="text-[11px] text-white/50 leading-relaxed">Share your public profile with a single link. Your reputation is portable and transparent.</p></div></div></div></div>
-                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Core Features</h3><div className="grid grid-cols-1 gap-4"><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Solana Verification</h4><p className="text-[11px] text-white/40 leading-relaxed">Entries are timestamped on-chain, creating an immutable record.</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Public Hub</h4><p className="text-[11px] text-white/40 leading-relaxed">One destination for your CV, proof-of-work, and portfolio. No gatekeepers.</p></div><div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm"><h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Zero Cost</h4><p className="text-[11px] text-white/40 leading-relaxed">Completely free to use. Built for the ecosystem.</p></div></div></div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Workflow</h3>
+                                            <div className="space-y-6">
+                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                                                    <span className="text-lg font-light text-white/20">01</span>
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Identity</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Establish a non-custodial professional identity via self-sovereign wallet authentication.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                                                    <span className="text-lg font-light text-white/20">02</span>
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Build</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Structure your professional claims and document milestones for cryptographic anchoring.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                                                    <span className="text-lg font-light text-white/20">03</span>
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Verify</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Anchor achievements through gas-backed peer attestations and on-chain professional proof.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
+                                                    <span className="text-lg font-light text-white/20">04</span>
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Share</h4>
+                                                        <p className="text-[11px] text-white/50 leading-relaxed">Deploy your portable, auditable record to a publicly verifiable professional trust layer.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-8">
+                                            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Core Features</h3>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Solana Verification</h4>
+                                                    <p className="text-[11px] text-white/40 leading-relaxed">Professional entries are anchored as immutable, network-secured blockchain transactions.</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Public Hub</h4>
+                                                    <p className="text-[11px] text-white/40 leading-relaxed">A unified, wallet-bound professional ledger with public auditability.</p>
+                                                </div>
+                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Infrastructure Model</h4>
+                                                    <p className="text-[11px] text-white/40 leading-relaxed">Neutral infrastructure with no subscription fees. Built for ecosystem integrity.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
