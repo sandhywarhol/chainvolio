@@ -22,7 +22,7 @@ export default function WhyPage() {
                 </h1>
 
                 <p className="text-lg md:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto font-light tracking-tight px-8">
-                    Traditional credentials are based on trust. ChainVolio is based on truth. We replace promises with verifiable, on-chain evidence.
+                    Legacy professional credentials rely on social trust. ChainVolio operates on cryptographic truth. We transition from arbitrary promises to a foundational trust layer of verifiable, on-chain architecture.
                 </p>
             </section>
 
@@ -37,15 +37,15 @@ export default function WhyPage() {
                             <span className="text-[10px] uppercase tracking-[0.4em] text-red-500/40 font-bold">The Vulnerability</span>
                             <h2 className="text-3xl font-bold text-white tracking-tight">Paper Credentials.</h2>
                             <p className="text-white/40 font-light leading-relaxed max-w-sm">
-                                Standard CVs and PDFs are static artifacts. They are easily forged, lack context, and offer zero verifiable accountability.
+                                Legacy professional records are static, unanchored artifacts. They lack cryptographic guarantees, are prone to manipulation, and offer no structural accountability.
                             </p>
                         </div>
                         <ul className="space-y-6">
                             {[
-                                "Unverifiable professional claims",
-                                "Static links without proof of ownership",
-                                "Zero cryptographic accountability",
-                                "High noise-to-signal ratio for hiring"
+                                "Unverifiable professional assertions",
+                                "Static records lacking cryptographic ownership",
+                                "Zero structural accountability",
+                                "High entropy in professional validation"
                             ].map((item, i) => (
                                 <li key={i} className="flex items-start gap-4 text-white/20 border-l border-white/5 pl-6 pb-1">
                                     <span className="text-xs font-mono opacity-50">0{i + 1}</span>
@@ -61,15 +61,15 @@ export default function WhyPage() {
                             <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">The Standard</span>
                             <h2 className="text-3xl font-bold text-white tracking-tight">On-Chain Reality.</h2>
                             <p className="text-white/60 font-light leading-relaxed max-w-sm">
-                                ChainVolio creates an immutable record of work. Every entry is a cryptographic receipt, anchored to your wallet and verified by the network.
+                                ChainVolio establishes a permanent trust infrastructure for work history. Every milestone is a gas-backed cryptographic receipt, anchored to public ledger finality.
                             </p>
                         </div>
                         <ul className="space-y-6">
                             {[
-                                "Provenance of every contribution",
-                                "Cryptographic Proof of Work (PoW)",
-                                "Peer-vetted on-chain attestations",
-                                "High-density signal for recruiters"
+                                "Cryptographic provenance of all professional output",
+                                "On-chain anchoring of proof-of-work (PoW)",
+                                "Consensus-backed professional attestations",
+                                "Auditable integrity for institutional actors"
                             ].map((item, i) => (
                                 <li key={i} className="flex items-start gap-4 text-white/90 border-l border-teal-500/20 pl-6 pb-1">
                                     <span className="text-xs font-mono text-teal-400/50">0{i + 1}</span>
@@ -88,7 +88,7 @@ export default function WhyPage() {
                 <div className="max-w-xl mb-16">
                     <h2 className="text-4xl font-bold text-white tracking-tighter mb-4">Designed for Substance.</h2>
                     <p className="text-white/40 font-light leading-relaxed">
-                        We removed the fluff of traditional recruitment to focus on the only thing that matters: the work you actually shipped.
+                        ChainVolio is architected for transparency. We eliminate the noise of legacy recruitment systems to focus exclusively on public auditability and verified professional output.
                     </p>
                 </div>
 
@@ -96,19 +96,19 @@ export default function WhyPage() {
                     {[
                         {
                             title: "Absolute Provenance",
-                            desc: "In ChainVolio, the chain is the judge. Every milestone is timestamped and anchored to Solana, creating a permanent, unalterable career ledger."
+                            desc: "Solana coordinates the professional ledger. Every milestone is timestamped and anchored with economic finality, creating an immutable career registry."
                         },
                         {
                             title: "Signal Priority",
-                            desc: "We prioritize actual accomplishments over titles. Recruiters see your contributions first, allowing talent to speak louder than words."
+                            desc: "We prioritize verifiable accomplishments over titles. Institutional records and network-backed proofs allow talent to be audited with crystalline clarity."
                         },
                         {
                             title: "Institutional Trust",
-                            desc: "Our attestation layer allows projects to verify your work cryptographically. This isn't a referral; it's a signed validation."
+                            desc: "Our attestation protocol enables projects to endorse performance cryptographically. This is not a social referral; it is an on-chain verification anchored by gas-backed finality."
                         },
                         {
                             title: "Permissionless Identity",
-                            desc: "Your profile is yours. Built on open standards and wallet-based authentication, it functions globally without intermediaries."
+                            desc: "Your professional identity is wallet-native and sovereign. Built on open cryptographic standards, it functions as a global trust layer without institutional intermediaries."
                         }
                     ].map((card, i) => (
                         <div key={i} className="group">
@@ -133,11 +133,11 @@ export default function WhyPage() {
                     <table className="w-full text-left">
                         <tbody className="divide-y divide-white/5">
                             {[
-                                ["Data Layer", "Centralized / Paper", "Decentralized / On-chain"],
-                                ["Auditability", "Requires Reference Calls", "Instant & Peer-to-Peer"],
-                                ["Trust Model", "Implicit (Assumed)", "Explicit (Verified)"],
-                                ["Persistence", "Fragile / Perishable", "Immutable / Permanent"],
-                                ["Web3 Compatibility", "None", "Native Wallet Identity"]
+                                ["Data Layer", "Legacy Data Architecture", "Public Ledger Infrastructure"],
+                                ["Verification Protocol", "Manual Outreach & Social Trust", "Cryptographically Verifiable in Real Time"],
+                                ["Validation Logic", "Subjective / Unverified", "Algorithmic / Secure"],
+                                ["Data Integrity", "Temporary / Volatile", "Permanent / Immutable"],
+                                ["Interoperability", "Systemic Isolation", "Universal Wallet-Native ID"]
                             ].map((row, i) => (
                                 <tr key={i} className="group">
                                     <td className="py-6 text-[11px] font-bold uppercase tracking-widest text-white/20 group-hover:text-white/40 transition-colors">{row[0]}</td>
@@ -165,7 +165,7 @@ export default function WhyPage() {
                         <span className="text-white/30">New Authority.</span>
                     </h2>
                     <p className="text-white/30 text-lg md:text-xl font-light tracking-tight max-w-xl mx-auto">
-                        Join the professionals who no longer need to explain their work.
+                        Integrate with the foundational layer where professional reputation requires no external explanation.
                     </p>
                 </div>
             </section>
