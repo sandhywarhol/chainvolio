@@ -90,13 +90,18 @@ export function LandingPageClient() {
             <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
                 <div className="text-left max-w-xl lg:w-1/2">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display leading-[1.1] tracking-tighter mb-8 text-white">
-                        Verifiable portfolios<br />
+                        Verifiable professional identity<br />
                         for Web3 careers.
                     </h1>
-                    <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed mb-12 max-w-xl tracking-tight">
-                        Build a work history that can’t be faked. Verifiable achievements, secured on-chain.<br />
-                        The most trusted way to grow your Web3 career.
-                    </p>
+                    <div className="mb-12 space-y-4">
+                        <p className="text-white/60 text-lg md:text-xl font-display leading-relaxed max-w-xl tracking-tight">
+                            Build a work history that can't be faked.<br />
+                            Verifiable achievements & attestations secured on-chain.
+                        </p>
+                        <p className="text-white/40 text-sm font-display tracking-widest uppercase font-bold">
+                            The trust layer for Web3 careers.
+                        </p>
+                    </div>
                     <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
                         <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Build your CV</Link>
                         <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Hire Talent</Link>
