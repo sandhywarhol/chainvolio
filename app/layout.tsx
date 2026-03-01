@@ -12,18 +12,19 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.chainvolio.xyz/"),
   title: "ChainVolio: On-Chain Professional Trust Infrastructure",
   description: "The Web3 standard for professional identity. Your work. Verified. Permanent.",
+  applicationName: "ChainVolio",
   icons: {
     icon: [
-      { url: "/chainvolio logo.png", sizes: "32x32", type: "image/png" },
-      { url: "/chainvolio logo.png", sizes: "16x16", type: "image/png" },
-      { url: "/chainvolio logo.png", sizes: "192x192", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "32x32", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "16x16", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "192x192", type: "image/png" },
     ],
-    shortcut: "/chainvolio logo.png",
+    shortcut: "https://www.chainvolio.xyz/chainvolio%20logo.png",
     apple: [
-      { url: "/chainvolio logo.png", sizes: "180x180", type: "image/png" },
+      { url: "https://www.chainvolio.xyz/chainvolio%20logo.png", sizes: "180x180", type: "image/png" },
     ],
   },
-  manifest: "/manifest.json",
+  manifest: "https://www.chainvolio.xyz/manifest.json",
   openGraph: {
     title: "ChainVolio: Professional Trust Primitive",
     description: "Web3-native professional infrastructure for verifiable careers and on-chain milestones.",
