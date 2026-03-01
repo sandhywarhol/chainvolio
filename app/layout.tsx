@@ -13,8 +13,13 @@ export const metadata: Metadata = {
   title: "ChainVolio: On-Chain Professional Trust Infrastructure",
   description: "The Web3 standard for professional identity. Your work. Verified. Permanent.",
   icons: {
-    icon: "/logo%20black.png",
+    icon: [
+      { url: "/chainvolio logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/chainvolio logo.png", sizes: "16x16", type: "image/png" }
+    ],
+    apple: "/chainvolio logo.png",
   },
+  manifest: "/manifest.json",
   openGraph: {
     title: "ChainVolio: Professional Trust Primitive",
     description: "Web3-native professional infrastructure for verifiable careers and on-chain milestones.",
