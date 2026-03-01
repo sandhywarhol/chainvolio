@@ -41,10 +41,10 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">01. Purpose</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">About ChainVolio.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is a Web3-native CV and professional profile platform that allows users to create public profiles linked to a wallet address, record self-declared work history, and anchor claims with on-chain timestamps.
+                            ChainVolio is a Web3-native professional record infrastructure. It functions as a non-custodial credential layer, enabling users to anchor professional claims and social proofs to a public blockchain via wallet-bound identity.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is not an employer, recruiter, hiring agency, or verification authority.
+                            ChainVolio provides the technical infrastructure but does not act as a centralized employer, verifier of individual facts, or hiring intermediary.
                         </p>
                     </div>
 
@@ -53,7 +53,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">02. Access</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Eligibility.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            You may use ChainVolio if you are at least 18 years old, have the legal capacity to enter into this agreement, and comply with all applicable laws in your jurisdiction. You are responsible for ensuring that your use of the platform is lawful.
+                            You may interact with this infrastructure if you are at least 18 years old and possess the legal capacity to enter into binding agreements. You are solely responsible for ensuring that your interaction with the blockchain is compliant with your local jurisdiction.
                         </p>
                     </div>
 
@@ -62,10 +62,10 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">03. Authentication</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Wallet & Identity.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio uses wallet-based authentication. By connecting a wallet, you confirm you control the address, understand that your address may be publicly visible, and acknowledge that blockchain data is public and immutable.
+                            ChainVolio utilizes self-sovereign, wallet-based authentication. By connecting your wallet, you acknowledge that you retain exclusive control over your private keys and that all authenticated actions represent irreversible on-chain transactions.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed text-xs italic">
-                            ChainVolio does not custody wallets, private keys, or assets.
+                            ChainVolio cannot modify, reverse, or delete records anchored to the public ledger.
                         </p>
                     </div>
 
@@ -74,10 +74,10 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">04. Submissions</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">User Content.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            You are fully responsible for all information you submit. All professional claims on ChainVolio are self-declared unless explicitly marked as attested.
+                            You bear full accountability for all information submitted. Professional claims recorded via this infrastructure are self-declared, with the exception of cryptographically signed attestations.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We do not guarantee the accuracy of content, verify employment by default, or endorse any claims made by users.
+                            We do not arbitrate the accuracy of content or function as a centralized authority for employment verification.
                         </p>
                     </div>
 
@@ -86,7 +86,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">05. Validation</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Attestations.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Attestations represent opinions or acknowledgments by the attesting party, not factual guarantees. ChainVolio does not validate the truthfulness of attestations and is not responsible for disputes between users and attestors.
+                            Attestations are independent, user-initiated cryptographic actions. A gas-backed transaction represents an economic and reputational commitment by the attesting party. ChainVolio does not arbitrate factual disputes between users and third-party attestors.
                         </p>
                     </div>
 
@@ -95,7 +95,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">06. Visibility</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Data Exposure.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Public profiles can be viewed by anyone with the link. You understand that on-chain data (timestamps, hashes, wallet addresses) is permanent. You should not upload sensitive or confidential information.
+                            Professional identities are publicly verifiable on the ledger. You acknowledge that on-chain data—including timestamps, hashes, and wallet addresses—is permanent and subject to public auditability. Deletion of on-chain data is not technically possible.
                         </p>
                     </div>
 
@@ -104,7 +104,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-red-500/40 font-bold">07. Restrictions</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Prohibited Use.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            You agree not to submit false information, impersonate others, upload harmful content, or use the platform for deceptive activities. We reserve the right to restrict content that violates these terms.
+                            You agree not to utilize this infrastructure for deceptive practices, impersonation, or the submission of maliciously false data. We reserve the right to restrict interface-level access for entries that violate these principles.
                         </p>
                     </div>
 
@@ -113,7 +113,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">08. Expectations</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Employment.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio does not guarantee job placement or responses from recruiters. All hiring decisions are made independently by third parties.
+                            ChainVolio provides a trust-minimized tool for professional records. It does not guarantee employment outcomes. Hiring decisions remain the independent responsibility of external actors.
                         </p>
                     </div>
 
@@ -122,7 +122,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">09. Reliability</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Platform Status.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            ChainVolio is provided "as is" and "as available." We do not guarantee continuous availability or error-free operation. Features may change or be discontinued at any time.
+                            Infrastructure access is provided "as is." Reliability is subject to the underlying performance of public blockchain networks and decentralized dependencies. Systemic interruptions may occur due to external network conditions.
                         </p>
                     </div>
 
@@ -131,7 +131,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">10. Indemnity</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Limited Liability.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            To the maximum extent permitted by law, ChainVolio is not liable for any loss, damage, or dispute arising from platform use. Users assume full responsibility for how their information is used by others.
+                            Given the decentralized and user-controlled nature of this infrastructure, ChainVolio disclaims all liability for losses or disputes arising from user-initiated ledger entries or third-party attestations.
                         </p>
                     </div>
 
@@ -140,7 +140,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">11. Evolution</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Updates.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We may update these terms from time to time. Changes are effective once published. Continued use of the platform means you accept the updated terms.
+                            These governance rules may be updated to reflect infrastructure evolution. Continued interaction with the system following such updates constitutes acceptance of the revised rules.
                         </p>
                     </div>
 
