@@ -88,7 +88,7 @@ export function LandingPageClient() {
             />
 
             <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
-                <div className="text-left max-w-xl lg:w-[55%]">
+                <div className="text-left max-w-3xl lg:w-[60%]">
                     <h1 className="text-4xl md:text-5xl lg:text-[64px] font-extrabold font-display leading-[1.1] tracking-tight mb-10 text-white">
                         Verifiable<br />
                         professional identity<br />
@@ -109,7 +109,7 @@ export function LandingPageClient() {
                     </div>
                 </div>
 
-                <div className="lg:w-[48%] w-full relative group" style={{ perspective: '2000px' }}>
+                <div className="lg:w-[38%] w-full relative group" style={{ perspective: '2000px' }}>
                     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
                         {SLIDES.map((slide, index) => (
                             <div key={slide.src} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"}`}>

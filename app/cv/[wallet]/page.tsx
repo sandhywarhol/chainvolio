@@ -100,7 +100,7 @@ function formatDateRange(startDate: string, endDate: string): string {
     durationText = `${totalMonths} ${totalMonths === 1 ? "month" : "months"}`;
   }
 
-  return `${startMonth} ${startYear} – ${endMonth} ${endYear} · ${durationText}`;
+  return `${startMonth} ${startYear} - ${endMonth} ${endYear} · ${durationText}`;
 }
 
 // Tooltip text for evidence links

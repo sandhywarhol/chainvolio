@@ -95,7 +95,7 @@ export default function TermsPage() {
                         <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">06. Visibility</span>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Data Exposure.</h2>
                         <p className="text-white/40 font-light leading-relaxed">
-                            Professional identities are publicly verifiable on the ledger. You acknowledge that on-chain data—including timestamps, hashes, and wallet addresses—is permanent and subject to public auditability. Deletion of on-chain data is not technically possible.
+                            Professional identities are publicly verifiable on the ledger. You acknowledge that on-chain data, including timestamps, hashes, and wallet addresses, is permanent and subject to public auditability. Deletion of on-chain data is not technically possible.
                         </p>
                     </div>
 

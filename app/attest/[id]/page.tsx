@@ -85,7 +85,7 @@ export default function AttestPage() {
                 header: {
                     network: "Solana Mainnet",
                     issuer_wallet: publicKey.toBase58(),
-                    issuer_org: attesterOrg || "—",
+                    issuer_org: attesterOrg || "-",
                     issuer_tier: "Public",
                     issued_at,
                 },
@@ -293,11 +293,11 @@ export default function AttestPage() {
                                 </div>
                                 <div>
                                     <label className="text-xs text-slate-500 uppercase tracking-wider">Start Date</label>
-                                    <p className="font-semibold">{receipt.startDate || "—"}</p>
+                                    <p className="font-semibold">{receipt.startDate || "-"}</p>
                                 </div>
                                 <div>
                                     <label className="text-xs text-slate-500 uppercase tracking-wider">End Date</label>
-                                    <p className="font-semibold">{receipt.endDate || "—"}</p>
+                                    <p className="font-semibold">{receipt.endDate || "-"}</p>
                                 </div>
                             </div>
                         </div>
@@ -445,7 +445,7 @@ export default function AttestPage() {
                             </p>
                             <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
                                 <p className="text-xs font-bold text-amber-500 mb-0.5">⚠ Fee Notice</p>
-                                <p className="text-xs text-slate-400">A small network fee is required to submit this record. The fee is paid to the blockchain network — not to ChainVolio.</p>
+                                <p className="text-xs text-slate-400">A small network fee is required to submit this record. The fee is paid to the blockchain network, not to ChainVolio.</p>
                             </div>
                         </div>
 

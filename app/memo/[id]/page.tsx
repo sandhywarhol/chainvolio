@@ -172,7 +172,7 @@ export default function MemoPage() {
                         </div>
 
                         <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 pt-4 w-full">
-                            <MetaItem label="Issue Date" value={issuedDate ? format(new Date(issuedDate), "dd MMMM yyyy") : "—"} t={t} />
+                            <MetaItem label="Issue Date" value={issuedDate ? format(new Date(issuedDate), "dd MMMM yyyy") : "-"} t={t} />
                             <MetaItem label="Memo ID" value={String(id).slice(0, 12).toUpperCase()} t={t} isMono />
                             <MetaItem label="Protocol Status" value="Verified & Active" t={t} isAccent />
                             <MetaItem label="Classification" value={classification} t={t} />
@@ -369,7 +369,7 @@ export default function MemoPage() {
                                             </div>
                                         </div>
                                         <p className="text-sm font-medium opacity-60 italic">
-                                            {attestation.attester_role} — {issuerOrg}
+                                            {attestation.attester_role} - {issuerOrg}
                                         </p>
                                         {/* Verification Details */}
                                         {tier > 1 && (
@@ -423,7 +423,7 @@ function MetaItem({ label, value, t, isMono, isAccent }: { label: string, value?
         <div className="space-y-1.5">
             <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">{label}</p>
             <p className={`text-sm font-bold tracking-tight ${isMono ? "font-mono" : ""} ${isAccent ? "text-emerald-500" : t.heading}`}>
-                {value || "—"}
+                {value || "-"}
             </p>
         </div>
     );
@@ -433,7 +433,7 @@ function InfoItem({ label, value, t }: { label: string, value?: string, t: any }
     return (
         <div className="space-y-1.5">
             <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1 opacity-50">{label}</p>
-            <p className={`text-base font-bold ${t.heading}`}>{value || "—"}</p>
+            <p className={`text-base font-bold ${t.heading}`}>{value || "-"}</p>
         </div>
     );
 }

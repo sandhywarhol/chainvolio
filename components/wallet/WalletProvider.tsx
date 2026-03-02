@@ -12,7 +12,7 @@ import { AddressType } from "@phantom/browser-sdk";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-// Your Phantom Portal App ID — registers ChainVolio as a recognized app
+// Your Phantom Portal App ID - registers ChainVolio as a recognized app
 // so users see "ChainVolio" instead of "Unknown App" in their Phantom wallet.
 const PHANTOM_APP_ID = "50fbe4ae-fe6e-4d4e-beb8-1a798d2f6632";
 

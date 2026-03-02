@@ -94,7 +94,7 @@ export default function AboutPage() {
                             Our goal is for a ChainVolio profile to become the default professional link in Web3. When someone says “drop your CV,” it should mean sharing a verifiable on-chain history.
                         </p>
                         <p className="text-white/40 font-light leading-relaxed">
-                            We are building toward open standards, interoperability, and permanent ownership of career data. No tokens, no NFTs—just durable infrastructure for professional identity.
+                            We are building toward open standards, interoperability, and permanent ownership of career data. No tokens, no NFTs, just durable infrastructure for professional identity.
                         </p>
                     </div>
 

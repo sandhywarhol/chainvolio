@@ -31,7 +31,7 @@ export async function POST(request: Request) {
             classification,
         } = body;
 
-        // Server-side ISO 8601 timestamp — use client-provided value if valid,
+        // Server-side ISO 8601 timestamp - use client-provided value if valid,
         // otherwise fall back to server time (safety net)
         const memoIssuedAt = issuedAt && /^\d{4}-\d{2}-\d{2}T/.test(issuedAt)
             ? issuedAt
