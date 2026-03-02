@@ -29,8 +29,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         { label: "Trust Model", href: "/trust" },
         { label: "System Status", href: "/status" },
         { label: "About Us", href: "/about" },
-        { label: "Terms of Service", href: "/terms" },
-        { label: "Privacy Policy", href: "/privacy-policy" },
     ];
 
     const howItems = [
@@ -90,10 +88,10 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     <Link
                         href="/verified-organization"
                         className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${isVerified
-                                ? verifierTier === 3
-                                    ? "bg-teal-500/10 border-teal-400/20 text-teal-400"
-                                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                            ? verifierTier === 3
+                                ? "bg-teal-500/10 border-teal-400/20 text-teal-400"
+                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

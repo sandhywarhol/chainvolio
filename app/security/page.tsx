@@ -28,17 +28,17 @@ export default function SecurityPage() {
                 <div className="max-w-4xl mx-auto space-y-6">
                     <div className="space-y-4">
                         <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            ChainVolio is built as a trust-minimized, non-custodial hiring infrastructure.
+                            ChainVolio operates as trust-minimized, non-custodial hiring infrastructure.
                         </p>
                         <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            Every state-changing action is cryptographically verified.
+                            State-changing actions require strict cryptographic verification.
                         </p>
                         <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            Professional history is protected through architectural immutability, not promises.
+                            Professional records are secured by architectural immutability, eliminating reliance on centralized authorities.
                         </p>
                     </div>
                     <p className="text-sm text-white/40 max-w-2xl mx-auto leading-relaxed pt-8 font-light">
-                        This page consolidates ChainVolio’s public security posture, trust assumptions, enforced invariants, and operational readiness into a single source of truth.
+                        This document details ChainVolio’s public security posture, explicit trust assumptions, and the rigorously enforced invariants underlying the platform's operational readiness.
                     </p>
                 </div>
             </section>
@@ -55,16 +55,16 @@ export default function SecurityPage() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-16">
                     {[
                         {
-                            title: "Signature Verification",
-                            desc: "All critical actions: profile updates, CV snapshots, attestations, and job submissions, require wallet-based cryptographic signatures. Signatures are context-bound, meaning a signature generated for one action or hiring context is invalid for any other, preventing replay and signature harvesting attacks."
+                            title: "Cryptographic Verification",
+                            desc: "State mutations—including profile generation, snapshot anchoring, and peer attestation—require valid cryptographic signatures. Signatures are strictly context-bound to prevent replay attacks and signature harvesting across divergent execution paths."
                         },
                         {
-                            title: "Immutability (Ledger of Truth)",
-                            desc: "Once a work record is attested or a CV snapshot is submitted, it becomes immutable. Database-level constraints and triggers prevent modification, deletion, or historical rewriting, even with elevated privileges."
+                            title: "Database-Enforced Immutability",
+                            desc: "Attested records and submitted snapshots are locked at the database layer. Hardened table triggers and access policies unconditionally reject modifications, deletions, or historical overwrites, irrespective of system privilege levels."
                         },
                         {
-                            title: "Non-Custodial Data Model",
-                            desc: "ChainVolio never stores private keys or wallet credentials. Users retain full control of their identity via their chosen wallet provider. The platform verifies proofs and does not custody secrets."
+                            title: "Non-Custodial Architecture",
+                            desc: "ChainVolio does not custody private keys or wallet credentials. Identity authority remains entirely with the user via self-sovereign wallets. The platform's sole function is the verification of cryptographic proofs."
                         }
                     ].map((item, i) => (
                         <div key={i} className="group">
@@ -88,16 +88,16 @@ export default function SecurityPage() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-16">
                     {[
                         {
-                            title: "Isolated Environments",
-                            desc: "All recruiter and hiring data is logically and cryptographically isolated. Row-Level Security (RLS) ensures recruiters cannot access, infer, or enumerate data outside their own collections."
+                            title: "Data Isolation",
+                            desc: "Hiring data is segmented through strict Row-Level Security (RLS) enforcement. Database policies guarantee that recruiting entities cannot access, infer, or enumerate records beyond their cryptographically authorized collections."
                         },
                         {
-                            title: "Abuse Prevention",
-                            desc: "Public hiring links are protected by layered defenses: Context-aware signatures, wallet-based cooldowns, privacy-preserving IP throttling, and server-enforced eligibility checks. These mechanisms increase the economic cost of spam while preserving legitimate access."
+                            title: "Asymmetric Cost Enforcement",
+                            desc: "Public infrastructure surfaces defend against abuse by amplifying the economic cost of adversarial behavior. Rate limitation, wallet-based cooldowns, and stringent eligibility invariants degrade the viability of automated spam without restricting legitimate throughput."
                         },
                         {
-                            title: "Open Disclosure",
-                            desc: "ChainVolio favors transparent architecture over obscurity. Security guarantees are enforced by code, database constraints, and verifiable invariants, not trust assumptions."
+                            title: "Architectural Transparency",
+                            desc: "ChainVolio rejects security through obscurity in favor of verifiable architecture. Platform guarantees are derived deterministically from code, database constraints, and immutable logic flows, rather than aspirational trust models."
                         }
                     ].map((item, i) => (
                         <div key={i} className="group">
@@ -117,7 +117,7 @@ export default function SecurityPage() {
                     </span>
                     <h2 className="text-2xl font-bold text-white tracking-tight mb-6">Security Scope & Disclosure</h2>
                     <div className="space-y-6 text-white/40 font-light leading-relaxed text-sm italic border-l border-white/10 pl-8">
-                        <p>“This page describes the security principles and architectural guarantees enforced by the ChainVolio platform. It does not constitute a formal third-party security audit, bug bounty program, or a guarantee of absolute risk elimination. While the system is designed to be resilient against abuse, tampering, and replay attacks, no software system can guarantee perfect security. ChainVolio prioritizes verifiable invariants, transparent design, and safe failure modes over unverifiable claims.”</p>
+                        <p>“This document outlines the operational security posture and structural guarantees implemented within the ChainVolio platform. It is not an assertion of absolute security, nor does it replace formal third-party cryptanalysis or audit reports. While the architecture is hardened against common vectors—including replay, mutation, and enumeration—software systems carry inherent risk. ChainVolio’s operational baseline relies on deterministic enforcement, transparent invariant design, and predictable degradation under failure.”</p>
                     </div>
                 </div>
             </section>
@@ -131,14 +131,14 @@ export default function SecurityPage() {
                                 Status
                             </span>
                             <h3 className="text-3xl font-bold text-white tracking-tight">Operational Readiness</h3>
-                            <p className="text-sm text-white/40 max-w-md font-light">The platform is considered production-ready under the following enforced conditions:</p>
+                            <p className="text-sm text-white/40 max-w-md font-light">The platform asserts production readiness based on the following deterministic constraints:</p>
                         </div>
                         <ul className="space-y-6">
                             {[
-                                "Trust invariants enforced at the database level",
-                                "Historical professional records remain immutable once attested",
-                                "Recruiter data is cryptographically and logically isolated",
-                                "Abuse mitigation and eligibility checks are active by default"
+                                "Trust invariants are strictly asserted at the database layer",
+                                "Professional records achieve irrevocable immutability upon attestation",
+                                "Data isolation is enforced via Row-Level Security policies",
+                                "Asymmetric cost enforcement correctly throttles anomalous traffic patterns"
                             ].map((item, i) => (
                                 <li key={i} className="flex items-start gap-4 text-white/90 border-l border-emerald-500/20 pl-6 pb-1">
                                     <span className="text-xs font-mono text-emerald-400/50">0{i + 1}</span>
@@ -157,7 +157,7 @@ export default function SecurityPage() {
                         </div>
                         <div className="space-y-4">
                             <p className="text-sm text-white/30 font-light leading-relaxed">
-                                For partners, investors, and institutional reviewers, a concise Security Overview PDF is available. It summarizes ChainVolio’s architecture, trust assumptions, enforced invariants, and failure modes.
+                                Intended for institutional due diligence, the Security Overview outlines ChainVolio’s threat model, cryptographic architecture, database-enforced invariants, and degraded state recovery mechanisms.
                             </p>
                         </div>
                         <button
