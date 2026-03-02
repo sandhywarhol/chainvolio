@@ -15,6 +15,9 @@ export function Footer() {
                 <Link href="/privacy-policy" className="text-[11px] text-white/30 hover:text-white/60 transition-colors uppercase tracking-[0.2em]">
                     Privacy Policy
                 </Link>
+                <Link href="/whitepaper" className="text-[11px] text-white/30 hover:text-white/60 transition-colors uppercase tracking-[0.2em]">
+                    Whitepaper
+                </Link>
             </div>
         </div>
     );
