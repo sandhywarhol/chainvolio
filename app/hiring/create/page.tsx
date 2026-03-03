@@ -112,12 +112,18 @@ export default function CreateCollection() {
                 }),
             });
 
-            const data = await res.json();
-            if (data.slug) {
-                setCreatedSlug(data.slug);
+            const responseData = await res.json();
+            const slug = responseData?.data?.slug || responseData?.slug;
+
+            if (slug) {
+                setCreatedSlug(slug);
+            } else {
+                console.error("API returned success but no slug:", responseData);
+                alert("Creation failed: API did not return a valid collection link.");
             }
         } catch (err) {
             console.error(err);
+            alert("An error occurred while creating the collection.");
         } finally {
             setLoading(false);
         }
