@@ -1,6 +1,31 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 
+export async function GET(
+    request: Request,
+    { params }: { params: { slug: string } }
+) {
+    if (!supabase) {
+        return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+    }
+
+    try {
+        const { data: collection, error: fetchError } = await supabase
+            .from("hiring_collections")
+            .select("*")
+            .eq("slug", params.slug)
+            .single();
+
+        if (fetchError || !collection) {
+            return NextResponse.json({ error: "Collection not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({ collection });
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message || "Server Error" }, { status: 500 });
+    }
+}
+
 export async function DELETE(
     request: Request,
     { params }: { params: { slug: string } }

@@ -38,7 +38,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     useEffect(() => {
         async function fetchCollection() {
             try {
-                const res = await fetch(`/api/hiring/collections/${slug}/candidates`);
+                const res = await fetch(`/api/hiring/collections/${slug}`);
                 const data = await res.json();
                 if (data.collection) {
                     setCollection(data.collection);
