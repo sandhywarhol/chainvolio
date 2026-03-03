@@ -56,7 +56,7 @@ export default function SecurityPage() {
                     {[
                         {
                             title: "Cryptographic Verification",
-                            desc: "State mutations—including profile generation, snapshot anchoring, and peer attestation—require valid cryptographic signatures. Signatures are strictly context-bound to prevent replay attacks and signature harvesting across divergent execution paths."
+                            desc: "State mutations, including profile generation, snapshot anchoring, and peer attestation, require valid cryptographic signatures. Signatures are strictly context-bound to prevent replay attacks and signature harvesting across divergent execution paths."
                         },
                         {
                             title: "Database-Enforced Immutability",
@@ -117,7 +117,7 @@ export default function SecurityPage() {
                     </span>
                     <h2 className="text-2xl font-bold text-white tracking-tight mb-6">Security Scope & Disclosure</h2>
                     <div className="space-y-6 text-white/40 font-light leading-relaxed text-sm italic border-l border-white/10 pl-8">
-                        <p>“This document outlines the operational security posture and structural guarantees implemented within the ChainVolio platform. It is not an assertion of absolute security, nor does it replace formal third-party cryptanalysis or audit reports. While the architecture is hardened against common vectors—including replay, mutation, and enumeration—software systems carry inherent risk. ChainVolio’s operational baseline relies on deterministic enforcement, transparent invariant design, and predictable degradation under failure.”</p>
+                        <p>“This document outlines the operational security posture and structural guarantees implemented within the ChainVolio platform. It is not an assertion of absolute security, nor does it replace formal third-party cryptanalysis or audit reports. While the architecture is hardened against common vectors, including replay, mutation, and enumeration, software systems carry inherent risk. ChainVolio’s operational baseline relies on deterministic enforcement, transparent invariant design, and predictable degradation under failure.”</p>
                     </div>
                 </div>
             </section>

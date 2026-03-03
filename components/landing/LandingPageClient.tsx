@@ -104,8 +104,8 @@ export function LandingPageClient() {
                         </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
-                        <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Build your CV</Link>
-                        <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Hire Talent</Link>
+                        <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Start Your On-Chain Career</Link>
+                        <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Discover Talent</Link>
                     </div>
                 </div>
 
