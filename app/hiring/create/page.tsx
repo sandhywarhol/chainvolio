@@ -95,7 +95,7 @@ export default function CreateCollection() {
 
         try {
             const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile"); // Reusing high-level action or add create_collection
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "create_collection");
 
             if (!signedAction) {
                 setLoading(false);

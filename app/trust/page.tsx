@@ -85,13 +85,14 @@ export default function TrustPage() {
             </section>
 
             {/* Closing Line */}
-            <section className="relative z-40 py-32 px-8 text-center border-t border-white/5">
-                <p className="text-xl md:text-3xl font-display font-medium text-white/80 tracking-tight">
-                    “Security is not a feature. It is a system property.”
-                </p>
-                <div className="mt-8">
-                    <p className="text-[10px] text-white/20 uppercase tracking-[0.6em] font-bold">
-                        Engineered for Verifiable Careers
+            <section className="relative z-40 py-40 px-8 text-center border-t border-white/5">
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <h2 className="text-5xl md:text-[72px] font-bold tracking-tighter leading-[0.85] flex flex-col items-center">
+                        <span className="text-white">Security is not a feature.</span>
+                        <span className="text-white/30">It is a system property.</span>
+                    </h2>
+                    <p className="text-white/30 text-lg md:text-xl font-light tracking-tight max-w-xl mx-auto">
+                        Engineered for Verifiable Careers.
                     </p>
                 </div>
             </section>

@@ -115,13 +115,13 @@ export default function PrivacyPolicyPage() {
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="grid md:grid-cols-2 gap-16">
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">Non-Custodial Third Parties</h3>
+                        <h3 className="text-lg font-bold text-white">07. Non-Custodial Third Parties</h3>
                         <p className="text-sm text-white/30 font-light leading-relaxed">
                             We interact with sovereign wallet providers and public blockchain nodes to facilitate secure authentication. These third-party services operate independently of the ChainVolio infrastructure.
                         </p>
                     </div>
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">Prospective Updates</h3>
+                        <h3 className="text-lg font-bold text-white">08. Prospective Updates</h3>
                         <p className="text-sm text-white/30 font-light leading-relaxed">
                             Updates to this policy apply prospectively as the infrastructure evolves. Continued interaction with the system constitutes acceptance of the current privacy standards.
                         </p>
