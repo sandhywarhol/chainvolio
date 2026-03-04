@@ -25,19 +25,12 @@ export default function SecurityPage() {
                     Trust by Design.
                 </h1>
 
-                <div className="max-w-4xl mx-auto space-y-6">
-                    <div className="space-y-4">
-                        <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            ChainVolio operates as trust-minimized, non-custodial hiring infrastructure.
-                        </p>
-                        <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            State-changing actions require strict cryptographic verification.
-                        </p>
-                        <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light tracking-tight">
-                            Professional records are secured by architectural immutability, eliminating reliance on centralized authorities.
-                        </p>
-                    </div>
-                    <p className="text-sm text-white/40 max-w-2xl mx-auto leading-relaxed pt-8 font-light">
+                <div className="max-w-3xl mx-auto space-y-8">
+                    <p className="text-lg md:text-xl text-white/70 leading-relaxed font-light tracking-tight">
+                        Trust-minimized, non-custodial hiring infrastructure. Cryptographically verified actions and architecturally immutable records eliminate reliance on centralized authorities.
+                    </p>
+
+                    <p className="text-sm text-white/40 max-w-2xl mx-auto leading-relaxed font-light">
                         This document details ChainVolio’s public security posture, explicit trust assumptions, and the rigorously enforced invariants underlying the platform's operational readiness.
                     </p>
                 </div>
