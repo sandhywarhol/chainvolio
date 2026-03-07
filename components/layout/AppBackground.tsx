@@ -36,7 +36,7 @@ export function AppBackground() {
                 <>
                     {/* Bottom Vignette - Deeper and taller for the footer area */}
                     <div
-                        className="fixed bottom-0 left-0 right-0 h-48 z-[70] pointer-events-none"
+                        className="fixed bottom-0 left-0 right-0 h-48 z-[50] pointer-events-none"
                         style={{
                             maskImage: 'linear-gradient(to top, black 20%, transparent)',
                             WebkitMaskImage: 'linear-gradient(to top, black 20%, transparent)',
