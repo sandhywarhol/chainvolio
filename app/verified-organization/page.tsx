@@ -6,47 +6,10 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, CheckCircle, TrendingUp, Lock, Award, Building, Users, Globe, Briefcase } from "lucide-react";
+import Link from "next/link";
 
 export default function VerifiedOrganizationPage() {
-    const { publicKey, connected } = useWallet();
-    const [isApplying, setIsApplying] = useState(false);
-    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-    const [errorMessage, setErrorMessage] = useState("");
-
-    const [formData, setFormData] = useState({
-        name: "",
-        type: "Company",
-        website: "",
-        socialLink: "",
-        proof: ""
-    });
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!publicKey) return;
-
-        setFormStatus('submitting');
-        try {
-            const res = await fetch("/api/organizations/verify", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    walletAddress: publicKey.toBase58()
-                }),
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to submit application");
-            }
-
-            setFormStatus('success');
-        } catch (err: any) {
-            setFormStatus('error');
-            setErrorMessage(err.message);
-        }
-    };
+    const { connected } = useWallet();
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative overflow-x-hidden">
@@ -186,121 +149,16 @@ export default function VerifiedOrganizationPage() {
 
             {/* REGISTRATION FORM SECTION / FOOTER CTA */}
             <section id="apply" className="relative z-10 py-32 px-8 max-w-[800px] mx-auto w-full text-center">
-                {!isApplying ? (
-                    <div className="space-y-8">
-                        <h2 className="text-5xl font-bold tracking-tighter">Ready to join the network?</h2>
-                        <p className="text-xl text-white/40 font-light">Join the leading organizations securing the future of work.</p>
-                        <button
-                            onClick={() => {
-                                if (!connected) {
-                                    alert("Please connect your wallet first.");
-                                    return;
-                                }
-                                setIsApplying(true);
-                            }}
-                            className="px-12 py-5 rounded-2xl bg-emerald-500 text-black font-extrabold text-xl hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20"
-                        >
-                            Apply for Verification
-                        </button>
-                    </div>
-                ) : (
-                    <div className="p-8 md:p-12 rounded-[40px] bg-white/[0.03] border border-white/10 text-left">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-3xl font-bold">Apply for Verification</h2>
-                            <button onClick={() => setIsApplying(false)} className="text-white/40 hover:text-white transition-colors">Cancel</button>
-                        </div>
-
-                        {formStatus === 'success' ? (
-                            <div className="py-12 text-center space-y-4">
-                                <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
-                                    <CheckCircle className="w-10 h-10 text-emerald-500" />
-                                </div>
-                                <h3 className="text-2xl font-bold">Application Submitted</h3>
-                                <p className="text-white/50">We have received your request. Applications are typically reviewed within 48-72 hours. Your current status is <span className="text-emerald-400 font-bold">Pending</span>.</p>
-                                <button
-                                    onClick={() => setIsApplying(false)}
-                                    className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all mt-8"
-                                >
-                                    Done
-                                </button>
-                            </div>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">Connected Wallet</label>
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-white/30 truncate text-sm">
-                                        {publicKey?.toBase58()}
-                                    </div>
-                                </div>
-
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">Organization Name *</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            placeholder="e.g. Acme Corp"
-                                            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-emerald-500/50 outline-none transition-all"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">Org Type *</label>
-                                        <select
-                                            className="w-full p-4 rounded-xl bg-[#111111] border border-white/10 focus:border-emerald-500/50 outline-none transition-all text-white appearance-none cursor-pointer"
-                                            style={{ colorScheme: 'dark' }}
-                                            value={formData.type}
-                                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                        >
-                                            <option value="Company" className="bg-[#111111] text-white">Company</option>
-                                            <option value="DAO" className="bg-[#111111] text-white">DAO</option>
-                                            <option value="Community" className="bg-[#111111] text-white">Community</option>
-                                            <option value="Agency" className="bg-[#111111] text-white">Agency</option>
-                                            <option value="Figure" className="bg-[#111111] text-white">Figure</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">Website / Social Link *</label>
-                                    <input
-                                        required
-                                        type="url"
-                                        placeholder="https://..."
-                                        className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-emerald-500/50 outline-none transition-all"
-                                        value={formData.website}
-                                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">Verification Proof (Optional)</label>
-                                    <textarea
-                                        placeholder="Link to a tweet, GitHub org, or any evidence that you own this brand/entity."
-                                        rows={4}
-                                        className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-emerald-500/50 outline-none transition-all resize-none"
-                                        value={formData.proof}
-                                        onChange={(e) => setFormData({ ...formData, proof: e.target.value })}
-                                    />
-                                </div>
-
-                                {formStatus === 'error' && (
-                                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                                        {errorMessage}
-                                    </div>
-                                )}
-
-                                <button
-                                    disabled={formStatus === 'submitting'}
-                                    className="w-full py-5 rounded-2xl bg-emerald-500 text-black font-bold text-xl hover:bg-emerald-400 transition-all disabled:opacity-50"
-                                >
-                                    {formStatus === 'submitting' ? 'Submitting...' : 'Submit Application'}
-                                </button>
-                            </form>
-                        )}
-                    </div>
-                )}
+                <div className="space-y-8">
+                    <h2 className="text-5xl font-bold tracking-tighter">Ready to join the network?</h2>
+                    <p className="text-xl text-white/40 font-light">Join the leading organizations securing the future of work. You can verify your identity directly from your Dashboard.</p>
+                    <Link
+                        href="/dashboard"
+                        className="inline-block px-12 py-5 rounded-2xl bg-emerald-500 text-black font-extrabold text-xl hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20 mt-4"
+                    >
+                        Go to Dashboard
+                    </Link>
+                </div>
             </section>
 
             <div className="relative z-10">

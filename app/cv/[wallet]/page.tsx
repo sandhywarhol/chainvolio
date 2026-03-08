@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check } from "lucide-react";
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
+import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
+import { WorkTimeline } from "@/components/profile/WorkTimeline";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Footer } from "@/components/layout/Footer";
@@ -34,6 +36,7 @@ type Profile = {
   cardNumber?: number;
   isVerified?: boolean;
   verifierTier?: number;
+  verificationType?: string;
 };
 
 type Receipt = {
@@ -136,16 +139,18 @@ const TIER_DATA: Record<number, { label: string; icon: boolean; color: string; b
   3: { label: "Verified Organization", icon: true, color: "text-teal-400 bg-teal-400/10 border-teal-400/20", bars: 3, weight: 6 },
 };
 
-function TrustBadge({ tier, isVerified, className = "" }: { tier: number; isVerified: boolean; className?: string }) {
+function TrustBadge({ tier, isVerified, verificationType, className = "" }: { tier: number; isVerified: boolean; verificationType?: string; className?: string }) {
   const data = TIER_DATA[tier as keyof typeof TIER_DATA] || TIER_DATA[1];
   // Tier 2 & 3 visuals only active if isVerified is true
   const isActive = tier > 1 ? isVerified : true;
   const showShield = tier > 1 && isVerified && data.icon;
 
+  const displayLabel = (isActive && verificationType) ? `Verified ${verificationType}` : data.label;
+
   return (
     <div className={`flex flex-col items-start gap-1 ${className}`}>
       <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${isActive ? data.color : 'text-slate-500 bg-slate-500/10 border-slate-500/20'}`}>
-        {showShield && <ShieldCheck size={10} strokeWidth={3} />} {data.label}
+        {showShield && <ShieldCheck size={10} strokeWidth={3} />} {displayLabel}
       </span>
       {isActive && (
         <div className={`text-[8px] leading-none tracking-[-0.1em] transition-opacity duration-300 ${data.color} opacity-60 ml-0.5`}>
@@ -179,9 +184,9 @@ function ProfileCompleteBadge({ isComplete, onClick, className = "" }: { isCompl
   );
 }
 
-export default function CVPage() {
+export default function CVPage(props: any) {
   const params = useParams();
-  const wallet = params.wallet as string;
+  const wallet = props?.walletAddressOverride || (params?.wallet as string);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
@@ -453,6 +458,7 @@ export default function CVPage() {
                     <TrustBadge
                       tier={profile.verifierTier || 1}
                       isVerified={!!profile.isVerified}
+                      verificationType={profile.verificationType}
                     />
                   </div>
 
@@ -650,6 +656,13 @@ export default function CVPage() {
               </div>
             </div>
 
+            {receipts.length > 0 && (
+              <WorkTimeline
+                receipts={receipts}
+                onSelectReceipt={setSelectedReceipt}
+              />
+            )}
+
             <h2 className="text-xl font-semibold mt-12 mb-4">Proof of Work</h2>
             {receipts.length === 0 ? (
               <p className="text-slate-500">No receipts yet.</p>
@@ -788,6 +801,8 @@ export default function CVPage() {
                         {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
                       </span>
                     </div>
+
+                    <ReceiptUpdates receipt={r} isOwner={false} />
                   </div>
                 ))}
               </div>

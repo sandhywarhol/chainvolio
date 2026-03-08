@@ -232,6 +232,25 @@ export async function GET(request: Request) {
 
     const receiptIds = receiptsList.map((r: any) => r.id);
 
+    // Fetch Updates
+    let updatesMap: Record<string, any[]> = {};
+    try {
+      const { data: updatesData, error: updatesError } = await supabase
+        .from("receipt_updates")
+        .select("*")
+        .in("receipt_id", receiptIds)
+        .order("created_at", { ascending: false });
+
+      if (!updatesError && updatesData) {
+        updatesData.forEach((u: any) => {
+          if (!updatesMap[u.receipt_id]) updatesMap[u.receipt_id] = [];
+          updatesMap[u.receipt_id].push(u);
+        });
+      }
+    } catch (e) {
+      console.warn("Updates fetch failed:", e);
+    }
+
     // 2. Fetch Attestations
     let finalAttestations: any[] = [];
     try {
@@ -314,6 +333,7 @@ export async function GET(request: Request) {
     const result = receiptsList.map((r: any) => {
       const attestation = attestationsMap[r.id]?.[0];
       const profile = attestation ? profileMap[attestation.attester_wallet] : null;
+      const updates = updatesMap[r.id] || [];
 
       return {
         id: r.id,
@@ -344,6 +364,11 @@ export async function GET(request: Request) {
         attestationId: attestation?.id || null,
         attesterComment: attestation?.comment || null,
         createdAt: r.created_at,
+        updates: updates.map((u: any) => ({
+          id: u.id,
+          message: u.message,
+          createdAt: u.created_at
+        })),
       };
     });
 

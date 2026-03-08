@@ -231,7 +231,7 @@ export async function GET(request: Request) {
   // 2. Fetch verification status
   const { data: orgData } = await supabase
     .from("organization_verifications")
-    .select("status, verifier_tier")
+    .select("status, verifier_tier, type")
     .eq("wallet_address", wallet)
     .single();
 
@@ -261,6 +261,8 @@ export async function GET(request: Request) {
     createdAt: data.created_at,
     role: data.role,
     isVerified: orgData?.status === 'verified',
-    verifierTier: orgData?.verifier_tier || 1
+    verifierTier: orgData?.verifier_tier || 1,
+    verificationStatus: orgData?.status || null,
+    verificationType: orgData?.type || null
   });
 }

@@ -128,6 +128,28 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "You cannot attest your own work." }, { status: 403 });
         }
 
+        // 1. Check for Anti-Reciprocity (prevent A -> B if B -> A exists)
+        // Find all receipts owned by attesterWallet
+        const { data: attesterReceipts, error: arError } = await supabase
+            .from("receipts")
+            .select("id")
+            .eq("wallet_address", attesterWallet);
+
+        if (!arError && attesterReceipts && attesterReceipts.length > 0) {
+            const attesterReceiptIds = attesterReceipts.map(r => r.id);
+            // Check if receipt.wallet_address (the candidate) has attested any of attesterWallet's receipts
+            const { data: reciprocalAttestations, error: raError } = await supabase
+                .from("attestations")
+                .select("id")
+                .eq("attester_wallet", receipt.wallet_address)
+                .in("receipt_id", attesterReceiptIds)
+                .limit(1);
+
+            if (!raError && reciprocalAttestations && reciprocalAttestations.length > 0) {
+                return NextResponse.json({ error: "Reciprocal attestation is not allowed to preserve trust integrity." }, { status: 403 });
+            }
+        }
+
         // Insert attestation
         const { error } = await supabase.from("attestations").insert({
             id: attestationId, // Use the ID generated for the on-chain memo

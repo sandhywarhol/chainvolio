@@ -310,6 +310,16 @@ export default function AttestPage() {
                         <p className="text-slate-400 text-sm">Connect your wallet to submit this attestation.</p>
                         <div className="flex justify-center"><WalletMultiButton /></div>
                     </div>
+                ) : publicKey.toBase58() === receipt?.ownerWallet ? (
+                    <div className="bg-slate-900 border border-red-500/30 rounded-2xl p-8 text-center space-y-4">
+                        <div className="flex justify-center mb-2">
+                            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
+                                <span className="text-2xl">🛑</span>
+                            </div>
+                        </div>
+                        <h2 className="text-lg font-bold text-red-500">Action Not Allowed</h2>
+                        <p className="text-slate-400 text-sm">You cannot attest to your own work.</p>
+                    </div>
                 ) : (
                     <div className="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-6 space-y-5">
 

@@ -11,7 +11,8 @@ import { ReceiptList } from "@/components/receipt/ReceiptList";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck } from "lucide-react";
+import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy } from "lucide-react";
 
 type Profile = {
   displayName: string;
@@ -38,6 +39,8 @@ type Profile = {
   isVerified?: boolean;
   verifierTier?: number;
   role?: string;
+  verificationStatus?: string;
+  verificationType?: string;
 };
 
 type HiringCollection = {
@@ -53,17 +56,25 @@ export default function DashboardPage() {
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [editingReceipt, setEditingReceipt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
   const handleShare = async () => {
     if (!profile || !publicKey) return;
-    const url = `${window.location.origin}/cv/${publicKey.toBase58()}`;
+
+    let url = `${window.location.origin}/cv/${publicKey.toBase58()}`;
+
+    if (profile.displayName && profile.cardNumber) {
+      const slug = profile.displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      url = `${window.location.origin}/${slug}/${profile.cardNumber}`;
+    }
+
     try {
       await navigator.clipboard.writeText(url);
       setToastMessage("CV link copied to clipboard!");
     } catch (err) {
       console.error("Failed to copy:", err);
+      setToastMessage("Failed to copy link.");
     }
   };
 
@@ -210,12 +221,22 @@ export default function DashboardPage() {
                       </div>
                     )}
                   </div>
-                  <Link
-                    href="/create-profile"
-                    className="hidden md:block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
-                  >
-                    Edit Profile
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {!profile?.isVerified && (
+                      <button
+                        onClick={() => setShowVerificationModal(true)}
+                        className="hidden md:flex px-4 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 items-center gap-2"
+                      >
+                        <ShieldCheck className="w-4 h-4" /> Verify Identity
+                      </button>
+                    )}
+                    <Link
+                      href="/create-profile"
+                      className="hidden md:block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
+                    >
+                      Edit Profile
+                    </Link>
+                  </div>
                 </div>
 
                 {profile.lookingFor && (
@@ -266,14 +287,25 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <Link
-                  href="/create-profile"
-                  className="mt-6 md:hidden block w-full py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
-                >
-                  Edit Profile
-                </Link>
+                <div className="mt-6 md:hidden flex flex-col gap-3">
+                  {!profile?.isVerified && (
+                    <button
+                      onClick={() => setShowVerificationModal(true)}
+                      className="w-full py-3 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 flex items-center justify-center gap-2"
+                    >
+                      <ShieldCheck className="w-4 h-4" /> Verify Identity
+                    </button>
+                  )}
+                  <Link
+                    href="/create-profile"
+                    className="w-full py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600 block text-center"
+                  >
+                    Edit Profile
+                  </Link>
+                </div>
               </div>
             </div>
+
           </div>
         )}
 
@@ -392,6 +424,22 @@ export default function DashboardPage() {
           }}
         />
       </section>
+
+      {showVerificationModal && profile && (
+        <VerificationRequestModal
+          walletAddress={walletAddress}
+          profileName={profile.displayName}
+          website={profile.website}
+          socials={`${profile.twitter || ''} ${profile.linkedin || ''}`.trim()}
+          currentStatus={profile.verificationStatus || null}
+          onClose={() => setShowVerificationModal(false)}
+          onSuccess={() => {
+            setShowVerificationModal(false);
+            setToastMessage("Verification request submitted successfully.");
+            setProfile({ ...profile, verificationStatus: 'pending' });
+          }}
+        />
+      )}
 
       {toastMessage && (
         <Toast
