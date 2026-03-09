@@ -64,7 +64,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             label="How It Works"
                             href="/?modal=how"
                             items={howItems}
-                            onClick={onHowItWorksClick}
                         />
 
                         <NavDropdown
@@ -139,7 +138,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         isOpen={isMobileHowOpen}
                         onToggle={() => setIsMobileHowOpen(!isMobileHowOpen)}
                         onCloseMenu={() => setIsMobileMenuOpen(false)}
-                        onClick={onHowItWorksClick}
                     />
 
                     <MobileAccordion
@@ -183,19 +181,7 @@ function NavDropdown({ label, href, items, onClick }: {
     onClick?: () => void
 }) {
     const [isOpen, setIsOpen] = useState(false);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
-    const handleMouseEnter = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setIsOpen(true);
-    };
-
-    const handleMouseLeave = () => {
-        timeoutRef.current = setTimeout(() => {
-            setIsOpen(false);
-        }, 150); // 150ms grace period
-    };
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -209,31 +195,20 @@ function NavDropdown({ label, href, items, onClick }: {
 
     return (
         <div
-            className="relative flex items-center gap-0.5"
+            className="relative flex items-center"
             ref={dropdownRef}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
         >
-            {onClick ? (
-                <button
-                    onClick={onClick}
-                    className="text-white/40 hover:text-white/90 transition-colors py-2"
-                >
-                    {label}
-                </button>
-            ) : (
-                <Link
-                    href={href}
-                    className="text-white/40 hover:text-white/90 transition-colors py-2"
-                >
-                    {label}
-                </Link>
-            )}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-white/40 hover:text-white/90 transition-colors py-2 px-1"
-                aria-label={`Toggle ${label} menu`}
+                onClick={(e) => {
+                    e.preventDefault();
+                    if (onClick) onClick();
+                    setIsOpen(!isOpen);
+                }}
+                className="flex items-center gap-1 text-white/40 hover:text-white/90 transition-colors py-2"
+                type="button"
+                aria-expanded={isOpen}
             >
+                {label}
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 

@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { receiptId, walletAddress, message, signature, nonce, timestamp } = body;
+        const { receiptId, walletAddress, message, evidenceLink, evidencePicture, signature, nonce, timestamp } = body;
 
         if (!receiptId || !walletAddress || !message) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
@@ -52,7 +52,9 @@ export async function POST(request: Request) {
         const { error: insertError } = await supabase.from("receipt_updates").insert({
             receipt_id: receiptId,
             wallet_address: walletAddress,
-            message,
+            message: message.trim(),
+            evidence_link: evidenceLink || null,
+            evidence_picture: evidencePicture || null,
             signature: signature || "skipped",
             nonce: nonce || "skipped"
         });

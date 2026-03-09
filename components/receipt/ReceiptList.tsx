@@ -72,7 +72,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                   </span>
                 </div>
 
-                <p className="text-slate-400 text-sm">{r.org}</p>
+                <p className="text-emerald-400 text-base font-bold">{r.org}</p>
 
                 {r.status === "Attested" && r.attesterWallet && (
                   <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">

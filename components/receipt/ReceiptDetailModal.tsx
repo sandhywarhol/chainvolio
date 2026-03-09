@@ -55,7 +55,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                     <div className="space-y-4">
                         <div>
                             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Position</h4>
-                            <p className="text-xl font-bold text-white">{receipt.role} at {receipt.org}</p>
+                            <p className="text-2xl font-bold text-white leading-tight">{receipt.role} <span className="text-slate-500 font-medium text-lg">at</span> <span className="text-emerald-400">{receipt.org}</span></p>
                             <p className="text-sm text-slate-400 mt-1">{receipt.description}</p>
                         </div>
 

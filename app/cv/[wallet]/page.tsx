@@ -679,7 +679,7 @@ export default function CVPage(props: any) {
                         {/* Primary: Role + Organization */}
                         <div className="space-y-1">
                           <h3 className="text-base font-semibold text-white">{r.role}</h3>
-                          <p className="text-sm text-slate-400">{r.org}</p>
+                          <p className="text-base text-emerald-400 font-bold">{r.org}</p>
                         </div>
 
                         {/* Secondary: Date, Duration, Work Type */}

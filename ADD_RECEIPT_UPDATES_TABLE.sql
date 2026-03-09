@@ -4,10 +4,16 @@ CREATE TABLE IF NOT EXISTS receipt_updates (
   receipt_id UUID NOT NULL REFERENCES receipts(id) ON DELETE CASCADE,
   wallet_address TEXT NOT NULL,
   message TEXT NOT NULL,
+  evidence_link TEXT,
+  evidence_picture TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   signature TEXT NOT NULL,
   nonce TEXT NOT NULL
 );
+
+-- If the table is already created, run these:
+-- ALTER TABLE receipt_updates ADD COLUMN IF NOT EXISTS evidence_link TEXT;
+-- ALTER TABLE receipt_updates ADD COLUMN IF NOT EXISTS evidence_picture TEXT;
 
 -- Note: In this system, wallet verify is done in API routes, so wallet_address acts as owner
 

@@ -367,6 +367,8 @@ export async function GET(request: Request) {
         updates: updates.map((u: any) => ({
           id: u.id,
           message: u.message,
+          evidence_link: u.evidence_link,
+          evidence_picture: u.evidence_picture,
           createdAt: u.created_at
         })),
       };

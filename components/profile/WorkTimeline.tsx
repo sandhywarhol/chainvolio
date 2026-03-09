@@ -23,7 +23,7 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                 <TrendingUp className="w-5 h-5 text-emerald-500" /> Career Timeline
             </h2>
 
-            <div className="relative w-full px-1 py-8 cursor-pointer mt-4">
+            <div className="relative w-full px-1 py-12 cursor-pointer mt-4">
                 <div className="flex items-center w-full">
                     {sortedReceipts.map((r, i) => {
                         const isTop = i % 2 !== 0;
@@ -44,15 +44,14 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                 {isTop && (
                                     <div className="absolute bottom-[calc(100%+2px)] w-full flex flex-col items-center">
                                         <div className="flex flex-col items-center text-center px-1 mb-1">
-                                            <h4 className="text-[7px] md:text-[8px] font-medium text-white group-hover:text-emerald-400 line-clamp-2 leading-tight">{r.org}</h4>
+                                            <h4 className="text-[9px] md:text-[10px] font-bold text-emerald-400 line-clamp-1 leading-tight">{r.org}</h4>
+                                            <p className="text-[6px] md:text-[7px] text-slate-500 group-hover:text-emerald-400/70 line-clamp-1 leading-tight">{r.role}</p>
                                         </div>
 
-                                        <div className="w-5 h-5 rounded-full border border-slate-700 bg-slate-900 flex shrink-0 items-center justify-center group-hover:border-emerald-500 group-hover:bg-emerald-500/10 transition-colors z-10 shadow-lg">
-                                            <Briefcase className="w-2.5 h-2.5 text-emerald-400" />
-                                        </div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 z-10 shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover:scale-125 transition-transform duration-300" />
 
                                         {/* Connector line */}
-                                        <div className="w-px h-3 bg-slate-700 group-hover:bg-emerald-500 transition-colors -mt-0.5" />
+                                        <div className="w-px h-8 bg-slate-800 group-hover:bg-emerald-500/50 transition-colors" />
                                     </div>
                                 )}
 
@@ -70,14 +69,13 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                 {!isTop && (
                                     <div className="absolute top-[calc(100%+2px)] w-full flex flex-col items-center">
                                         {/* Connector line */}
-                                        <div className="w-px h-3 bg-slate-700 group-hover:bg-emerald-500 transition-colors -mb-0.5" />
+                                        <div className="w-px h-8 bg-slate-800 group-hover:bg-emerald-500/50 transition-colors" />
 
-                                        <div className="w-5 h-5 rounded-full border border-slate-700 bg-slate-900 flex shrink-0 items-center justify-center group-hover:border-emerald-500 group-hover:bg-emerald-500/10 transition-colors z-10 shadow-lg">
-                                            <Briefcase className="w-2.5 h-2.5 text-emerald-400" />
-                                        </div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 z-10 shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover:scale-125 transition-transform duration-300" />
 
                                         <div className="flex flex-col items-center text-center px-1 mt-1">
-                                            <h4 className="text-[7px] md:text-[8px] font-medium text-white group-hover:text-emerald-400 line-clamp-2 leading-tight">{r.org}</h4>
+                                            <h4 className="text-[7px] md:text-[8px] font-bold text-emerald-400 line-clamp-1 leading-tight">{r.org}</h4>
+                                            <p className="text-[6px] md:text-[7px] text-slate-500 group-hover:text-emerald-400/70 line-clamp-1 leading-tight">{r.role}</p>
                                         </div>
                                     </div>
                                 )}
