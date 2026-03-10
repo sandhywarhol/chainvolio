@@ -29,6 +29,7 @@ export async function POST(request: Request) {
             memoV2,
             contentHash,
             classification,
+            isExternal,
         } = body;
 
         // Server-side ISO 8601 timestamp - use client-provided value if valid,
@@ -109,6 +110,26 @@ export async function POST(request: Request) {
             );
         }
 
+        // --- Identity Integrity Enforcement ---
+        let finalAttesterName = attesterName;
+        let finalAttesterRole = attesterRole;
+        let finalAttesterOrg = attesterOrg;
+
+        if (isExternal === false) {
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("display_name, headline, role, organization")
+                .eq("wallet_address", attesterWallet)
+                .single();
+
+            if (profile) {
+                finalAttesterName = profile.display_name;
+                finalAttesterRole = profile.headline || profile.role || "ChainVolio Builder";
+                finalAttesterOrg = profile.organization || null;
+            }
+        }
+        // ----------------------------------------
+
         // 0. Verify Receipt state
         const { data: receipt, error: fetchError } = await supabase
             .from("receipts")
@@ -159,15 +180,16 @@ export async function POST(request: Request) {
             tx_signature: cleanTxSignature,
             memo_issued_at: memoIssuedAt,
             comment,
-            attester_name: attesterName,
-            attester_role: attesterRole,
-            attester_org: attesterOrg,
+            attester_name: finalAttesterName,
+            attester_role: finalAttesterRole,
+            attester_org: finalAttesterOrg,
             attester_email: attesterEmail,
             attestation_type: attestationType,
             confidence_level: confidenceLevel,
             memo_v2: memoV2 || null,
             content_hash: contentHash || null,
             classification: classification || null,
+            is_external: isExternal !== undefined ? isExternal : true,
         });
 
         if (error) {

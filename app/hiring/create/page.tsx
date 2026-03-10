@@ -32,12 +32,14 @@ import {
     LayoutGrid,
     User
 } from "lucide-react";
+import { Toast } from "@/components/ui/Toast";
 
 export default function CreateCollection() {
     const { publicKey, signMessage } = useWallet();
     const [loading, setLoading] = useState(false);
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -88,7 +90,7 @@ export default function CreateCollection() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!publicKey || !signMessage) {
-            alert("Please connect your wallet to sign this action.");
+            setToast({ message: "Please connect your wallet to sign this action.", type: "warning" });
             return;
         }
         setLoading(true);
@@ -119,11 +121,11 @@ export default function CreateCollection() {
                 setCreatedSlug(slug);
             } else {
                 console.error("API returned success but no slug:", responseData);
-                alert("Creation failed: API did not return a valid collection link.");
+                setToast({ message: "Creation failed: API did not return a valid collection link.", type: "error" });
             }
         } catch (err) {
             console.error(err);
-            alert("An error occurred while creating the collection.");
+            setToast({ message: "An error occurred while creating the collection.", type: "error" });
         } finally {
             setLoading(false);
         }
@@ -626,6 +628,14 @@ export default function CreateCollection() {
                     </div>
                 )}
             </section>
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </main>
     );
 }

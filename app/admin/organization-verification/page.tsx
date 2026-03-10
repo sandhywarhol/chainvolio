@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ShieldCheck, XCircle, CheckCircle, Globe, Mail, MapPin, Clock, ExternalLink, ShieldAlert, FileText, LayoutDashboard, Search, Filter } from "lucide-react";
 import { format } from "date-fns";
 import bs58 from "bs58";
+import { Toast } from "@/components/ui/Toast";
 
 const ADMIN_WALLET = "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv";
 
@@ -31,6 +32,7 @@ export default function AdminVerificationPage() {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [showConfirm, setShowConfirm] = useState<{ id: string, action: 'approve' | 'reject', name: string } | null>(null);
     const [rejectionReason, setRejectionReason] = useState("");
+    const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
 
     const isAdmin = publicKey?.toBase58() === ADMIN_WALLET;
 
@@ -113,8 +115,9 @@ export default function AdminVerificationPage() {
             setRequests(requests.filter(r => r.id !== id));
             setShowConfirm(null);
             setRejectionReason("");
+            setToast({ message: `Successfully ${action}d organization.`, type: "success" });
         } catch (err: any) {
-            alert(err.message);
+            setToast({ message: err.message || "Action failed.", type: "error" });
         } finally {
             setActionLoading(null);
         }
@@ -341,6 +344,14 @@ export default function AdminVerificationPage() {
             )}
 
             <Footer />
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </main>
     );
 }

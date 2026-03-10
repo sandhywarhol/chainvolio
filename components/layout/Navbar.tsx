@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { usePathname } from "next/navigation";
 
 interface NavbarProps {
     onHowItWorksClick?: () => void;
@@ -19,10 +20,22 @@ interface NavbarProps {
 
 export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier }: NavbarProps) {
     const { publicKey } = useWallet();
+    const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileWhyOpen, setIsMobileWhyOpen] = useState(false);
     const [isMobileHowOpen, setIsMobileHowOpen] = useState(false);
     const [isMobileGuidesOpen, setIsMobileGuidesOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const isActive = (path: string) => pathname === path;
 
     const whyItems = [
         { label: "Why Chainvolio", href: "/why" },
@@ -44,7 +57,10 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     ];
 
     return (
-        <nav className="relative z-[100] border-b border-white/5 bg-black/20 backdrop-blur-md">
+        <nav className={`fixed top-0 left-0 right-0 z-[99999] transition-all duration-500 border-b ${scrolled
+                ? "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+                : "border-white/0 bg-transparent py-5"
+            }`}>
             <div className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto">
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-1.5 group">
@@ -72,13 +88,27 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={guidesItems}
                         />
 
-                        <Link href="/security" className="text-white/40 hover:text-white/90 transition-colors py-2">Security</Link>
+                        <Link
+                            href="/security"
+                            className={`transition-colors py-2 ${isActive('/security') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
+                        >
+                            Security
+                        </Link>
 
-
-                        <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300 transition-colors py-2">Dashboard</Link>
+                        <Link
+                            href="/dashboard"
+                            className={`transition-colors py-2 ${isActive('/dashboard') ? 'text-emerald-400 font-extrabold' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+                        >
+                            Dashboard
+                        </Link>
 
                         {publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" && (
-                            <Link href="/admin/organization-verification" className="text-purple-400 hover:text-purple-300 transition-colors py-2">Admin</Link>
+                            <Link
+                                href="/admin/organization-verification"
+                                className={`transition-colors py-2 ${isActive('/admin/organization-verification') ? 'text-purple-400 font-extrabold' : 'text-purple-400/60 hover:text-purple-300'}`}
+                            >
+                                Admin
+                            </Link>
                         )}
                     </div>
                 </div>

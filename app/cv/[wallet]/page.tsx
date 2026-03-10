@@ -11,6 +11,7 @@ import { WorkTimeline } from "@/components/profile/WorkTimeline";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 
 type Profile = {
   displayName: string;
@@ -37,6 +38,9 @@ type Profile = {
   isVerified?: boolean;
   verifierTier?: number;
   verificationType?: string;
+  headline?: string;
+  role?: string;
+  organization?: string;
 };
 
 type Receipt = {
@@ -65,6 +69,7 @@ type Receipt = {
   isAttesterVerified?: boolean;
   attesterTier?: number;
   attestationId?: string;
+  isExternal?: boolean;
   createdAt: string;
 };
 
@@ -292,17 +297,15 @@ export default function CVPage(props: any) {
     <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-      <nav className="flex items-center justify-between px-6 py-4 max-w-3xl mx-auto relative z-[100]">
-        <Link href="/" className="flex items-center gap-1.5 group">
-          <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-          <span className="text-xl font-bold">ChainVolio</span>
-        </Link>
-        <span className="text-sm text-slate-500 font-mono truncate max-w-[200px]">
-          {wallet}
-        </span>
-      </nav>
+      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
 
-      <section className="max-w-3xl mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto px-6 pt-24 pb-2 flex justify-end">
+        <span className="text-[10px] font-mono text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">
+          Source: {wallet}
+        </span>
+      </div>
+
+      <section className="max-w-3xl mx-auto px-6 pt-4 pb-12">
         {!profile ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
@@ -452,6 +455,18 @@ export default function CVPage(props: any) {
                       <Copy className="w-2.5 h-2.5 text-slate-500 group-hover:text-purple-400 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   </div>
+
+                  {/* Profile Identity (Headline / Role) */}
+                  {profile.headline ? (
+                    <p className="text-lg md:text-xl font-medium text-emerald-400 mt-1">
+                      {profile.headline}
+                    </p>
+                  ) : profile.role ? (
+                    <p className="text-lg md:text-xl font-medium text-emerald-400 mt-1">
+                      {profile.role}
+                      {profile.organization && <span className="text-slate-500 font-normal"> at {profile.organization}</span>}
+                    </p>
+                  ) : null}
 
                   {/* Badges & Trust Hierarchy */}
                   <div className="flex flex-col items-center md:items-start gap-3 mt-4">
@@ -678,8 +693,8 @@ export default function CVPage(props: any) {
                       <div className="flex-1">
                         {/* Primary: Role + Organization */}
                         <div className="space-y-1">
-                          <h3 className="text-base font-semibold text-white">{r.role}</h3>
-                          <p className="text-base text-emerald-400 font-bold">{r.org}</p>
+                          {r.role && <h3 className="text-base font-semibold text-white">{r.role}</h3>}
+                          {r.org && <p className={`text-base text-emerald-400 font-bold ${!r.role ? "text-white" : ""}`}>{r.org}</p>}
                         </div>
 
                         {/* Secondary: Date, Duration, Work Type */}
@@ -691,7 +706,14 @@ export default function CVPage(props: any) {
                         {/* Attester info (if attested) */}
                         {r.status === "Attested" && r.attesterWallet && (
                           <div className="mt-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2">
-                            <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">Verification Signature</p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">Verification Signature</p>
+                              {r.isExternal && (
+                                <span className="text-[8px] font-black bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded border border-slate-700 tracking-tighter uppercase">
+                                  External Attestation
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                                 {r.attesterAvatar ? (
@@ -709,7 +731,10 @@ export default function CVPage(props: any) {
                                     tier={r.attesterTier || 1}
                                     isVerified={!!r.isAttesterVerified}
                                   />
-                                  {r.attesterOrg && <span className="text-slate-500 font-normal text-xs whitespace-nowrap"> at {r.attesterOrg}</span>}
+                                  <div className="flex items-center gap-1 text-[10px] text-slate-500 font-normal truncate">
+                                    {r.attesterRole && <span>{r.attesterRole}</span>}
+                                    {r.attesterOrg && <span>at {r.attesterOrg}</span>}
+                                  </div>
                                 </div>
                                 <p className="text-[10px] font-mono text-slate-500">
                                   {r.attesterWallet.slice(0, 8)}...{r.attesterWallet.slice(-6)}

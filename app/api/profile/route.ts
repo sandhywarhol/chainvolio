@@ -29,7 +29,10 @@ const COSMETIC_FIELDS: Record<string, string> = {
   tags: 'tags',
   telegram: 'telegram',
   linkedin: 'linkedin',
-  instagram: 'instagram'
+  instagram: 'instagram',
+  headline: 'headline',
+  role: 'role',
+  organization: 'organization'
 };
 
 const IDENTITY_FIELDS = ['wallet_address', 'card_number', 'created_at'];
@@ -259,7 +262,9 @@ export async function GET(request: Request) {
     cardNumber: data.card_number,
     walletAddress: data.wallet_address,
     createdAt: data.created_at,
+    headline: data.headline,
     role: data.role,
+    organization: data.organization,
     isVerified: orgData?.status === 'verified',
     verifierTier: orgData?.verifier_tier || 1,
     verificationStatus: orgData?.status || null,

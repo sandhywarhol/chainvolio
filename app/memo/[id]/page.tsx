@@ -162,6 +162,13 @@ export default function MemoPage() {
                             <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border mb-6 ${t.badge}`}>
                                 <ShieldCheck size={12} /> PROTOCOL ISSUED ENTRY
                             </span>
+                            {attestation?.is_external && (
+                                <div className="mb-4">
+                                    <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-slate-800 text-slate-500 border border-slate-700">
+                                        External Attestation
+                                    </span>
+                                </div>
+                            )}
                             <h1 className={`text-3xl md:text-5xl font-black tracking-tighter mb-4 ${t.heading}`}>
                                 VERIFICATION MEMO
                             </h1>

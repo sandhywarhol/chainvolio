@@ -30,6 +30,7 @@ export async function GET(
             content_hash,
             classification,
             memo_v2,
+            is_external,
             created_at
         `)
         .eq("id", id)

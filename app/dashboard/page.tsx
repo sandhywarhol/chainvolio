@@ -41,6 +41,8 @@ type Profile = {
   role?: string;
   verificationStatus?: string;
   verificationType?: string;
+  headline?: string;
+  organization?: string;
 };
 
 type HiringCollection = {
@@ -149,7 +151,7 @@ export default function DashboardPage() {
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
 
-      <section className="max-w-3xl mx-auto px-6 py-8">
+      <section className="max-w-3xl mx-auto px-6 pt-32 pb-8">
         {loading ? (
           <p className="text-slate-400">Loading...</p>
         ) : !profile ? (
@@ -238,6 +240,22 @@ export default function DashboardPage() {
                     </Link>
                   </div>
                 </div>
+
+                {/* Profile Identity (Headline / Role) */}
+                {profile.headline ? (
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                    <span className="text-lg font-medium text-emerald-400">
+                      {profile.headline}
+                    </span>
+                  </div>
+                ) : profile.role ? (
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                    <span className="text-lg font-medium text-emerald-400">
+                      {profile.role}
+                      {profile.organization && <span className="text-slate-500 font-normal"> at {profile.organization}</span>}
+                    </span>
+                  </div>
+                ) : null}
 
                 {profile.lookingFor && (
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-4">

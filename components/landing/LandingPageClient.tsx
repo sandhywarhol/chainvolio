@@ -87,7 +87,7 @@ export function LandingPageClient() {
                 onAttestationClick={() => setActiveModal('attestation')}
             />
 
-            <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between py-12 gap-16">
+            <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
                 <div className="text-left max-w-3xl lg:w-[52%]">
                     <h1 className="text-4xl md:text-5xl lg:text-[56px] font-extrabold font-display leading-[1.1] tracking-tight mb-8 text-white">
                         Verifiable professional<br />

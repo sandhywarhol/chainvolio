@@ -39,8 +39,12 @@ export async function PATCH(
 
         // --- Signature / Proof Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && !cleanTxSignature && (!wallet || !cleanSignature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required to review submission.", 401);
+
+        // Internal workflow actions like notes or shortlisted/rejected are off-chain and don't require signatures
+        const isWorkflowAction = ["shortlisted", "rejected", "pending"].includes(status) || (typeof notes === 'string' && !status);
+
+        if (!skipVerify && !cleanTxSignature && !isWorkflowAction && (!wallet || !cleanSignature || !nonce || !timestamp)) {
+            return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required for this action.", 401);
         }
 
         if (!skipVerify && cleanSignature && !cleanTxSignature) {

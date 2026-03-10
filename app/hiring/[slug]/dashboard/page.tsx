@@ -26,6 +26,7 @@ import {
 import { useRouter } from "next/navigation";
 import React from "react";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { Toast } from "@/components/ui/Toast";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -35,6 +36,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
+    const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const router = useRouter();
 
     // Filters & State
@@ -117,14 +119,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             });
 
             if (res.ok) {
-                router.push("/hiring/create"); // Redirect to create page after deletion
+                router.push("/hiring/create");
             } else {
                 const result = await res.json();
-                alert(`Failed to delete: ${result.error}`);
+                setToast({ message: `Failed to delete: ${result.error}`, type: "error" });
             }
         } catch (err) {
             console.error("Delete error:", err);
-            alert("An error occurred while deleting.");
+            setToast({ message: "An error occurred while deleting.", type: "error" });
         } finally {
             setIsDeleting(false);
             setShowDeleteModal(false);
@@ -144,7 +146,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [expandedId, data]);
 
     const handleUpdateStatus = async (candidateId: string, newStatus: string) => {
-        if (!publicKey || !signMessage) return;
+        if (!publicKey) return;
         const oldStatus = data?.candidates.find(c => c.id === candidateId)?.recruiterStatus;
 
         // Optimistic update
@@ -159,66 +161,73 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            // 1. Prepare data and generate hash
-            const reviewData = {
-                submissionId: candidateId,
-                recruiterWallet: publicKey.toBase58(),
-                status: newStatus,
-                timestamp: Date.now()
-            };
-            const dataHash = await generateReviewHash(reviewData);
+            let txSignature = null;
 
-            // 2. Create and Send On-Chain Transaction
-            const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
-            const transaction = new Transaction();
-            const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+            // Only trigger on-chain transaction for 'hired' status
+            if (newStatus === 'hired') {
+                if (!sendTransaction) throw new Error("Wallet not connected");
 
-            transaction.add(
-                new TransactionInstruction({
-                    keys: [], // Memo V3/V2 doesn't require signer keys in the instruction unless for specific logic
-                    programId: MEMO_PROGRAM_ID,
-                    data: Buffer.from(JSON.stringify({
-                        app: "ChainVolio",
-                        type: "recruiter_review",
-                        target: "status_update",
-                        hash: dataHash,
-                        timestamp: reviewData.timestamp
-                    })) as any,
-                })
-            );
+                // 1. Prepare data and generate hash
+                const reviewData = {
+                    submissionId: candidateId,
+                    recruiterWallet: publicKey.toBase58(),
+                    status: "HIRED",
+                    timestamp: Date.now()
+                };
+                const dataHash = await generateReviewHash(reviewData);
 
-            const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
-            const txSignature = txSig.replace(/\s/g, ''); // Clean any accidental whitespace
-            console.log("On-chain status record created:", txSignature);
+                // 2. Create and Send On-Chain Transaction
+                const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
+                const transaction = new Transaction();
+                const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
-            // Wait for confirmation with resilience
-            try {
-                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
-                await connection.confirmTransaction({
-                    signature: txSignature,
-                    blockhash,
-                    lastValidBlockHeight
-                }, 'confirmed');
-            } catch (confErr: any) {
-                console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
-                let confirmed = false;
-                for (let i = 0; i < 30; i++) {
-                    const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
-                    if (status.value && (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized')) {
-                        confirmed = true;
-                        break;
+                transaction.add(
+                    new TransactionInstruction({
+                        keys: [],
+                        programId: MEMO_PROGRAM_ID,
+                        data: Buffer.from(JSON.stringify({
+                            app: "ChainVolio",
+                            type: "recruiter_review",
+                            target: "hiring_decision",
+                            hash: dataHash,
+                            timestamp: reviewData.timestamp
+                        })) as any,
+                    })
+                );
+
+                const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
+                txSignature = txSig.replace(/\s/g, '');
+                console.log("On-chain hiring proof created:", txSignature);
+
+                // Wait for confirmation with resilience
+                try {
+                    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+                    await connection.confirmTransaction({
+                        signature: txSignature,
+                        blockhash,
+                        lastValidBlockHeight
+                    }, 'confirmed');
+                } catch (confErr: any) {
+                    console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
+                    let confirmed = false;
+                    for (let i = 0; i < 30; i++) {
+                        const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                        if (status.value && (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized')) {
+                            confirmed = true;
+                            break;
+                        }
+                        await new Promise(r => setTimeout(r, 2000));
                     }
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                if (!confirmed) {
-                    const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
-                    if (!finalStatus.value) {
-                        throw new Error("Transaction expired or was dropped. Please try again.");
+                    if (!confirmed) {
+                        const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                        if (!finalStatus.value) {
+                            throw new Error("Transaction expired or was dropped. Please try again.");
+                        }
                     }
                 }
             }
 
-            // 3. Submit to API with TX Signature
+            // 3. Submit to API with TX Signature (if any)
             const res = await fetch(`/api/hiring/submissions/${candidateId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -231,11 +240,16 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
             if (!res.ok) {
                 const errData = await res.json();
-                throw new Error(errData.error || "Status update failed");
+                throw new Error(errData.error?.message || errData.message || "Status update failed");
+            }
+
+            // Show success toast for hired
+            if (newStatus === 'hired') {
+                setToast({ message: "Candidate Hired Successfully. On-chain proof anchored.", type: "success" });
             }
         } catch (err: any) {
             console.error("Failed to update status", err);
-            alert(`Status update failed: ${err.message}`);
+            setToast({ message: `Status update failed: ${err.message}`, type: "error" });
             // Revert on error
             setData(prev => {
                 if (!prev) return null;
@@ -250,7 +264,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     const handleSaveNote = async () => {
-        if (!expandedId || !publicKey || !signMessage) return;
+        if (!expandedId || !publicKey) return;
 
         const oldNote = data?.candidates.find(c => c.id === expandedId)?.recruiterNotes;
         if (oldNote === noteDraft) return; // No change
@@ -269,92 +283,24 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         try {
-            // 1. Prepare data and generate hash
-            const reviewData = {
-                submissionId: expandedId,
-                recruiterWallet: publicKey.toBase58(),
-                notes: noteDraft,
-                timestamp: Date.now()
-            };
-            const dataHash = await generateReviewHash(reviewData);
-
-            // 2. Create and Send On-Chain Transaction
-            const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
-            const transaction = new Transaction();
-            const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
-
-            transaction.add(
-                new TransactionInstruction({
-                    keys: [], // Memo V3/V2 doesn't require signer keys in the instruction unless for specific logic
-                    programId: MEMO_PROGRAM_ID,
-                    data: Buffer.from(JSON.stringify({
-                        app: "ChainVolio",
-                        type: "recruiter_review",
-                        target: "notes_update",
-                        hash: dataHash,
-                        timestamp: reviewData.timestamp
-                    })) as any,
-                })
-            );
-
-            const txSig = await sendTransaction(transaction, connection, { maxRetries: 5 });
-            const txSignature = txSig.replace(/\s/g, ''); // Clean any accidental whitespace
-            console.log("On-chain notes record created:", txSignature);
-
-            // Wait for confirmation with resilience
-            try {
-                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
-                await connection.confirmTransaction({
-                    signature: txSignature,
-                    blockhash,
-                    lastValidBlockHeight
-                }, 'confirmed');
-            } catch (confErr: any) {
-                console.warn("Standard confirmation failed or timed out. Checking network manually...", confErr);
-                let confirmed = false;
-                for (let i = 0; i < 30; i++) {
-                    const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
-
-                    if (status.value) {
-                        if (status.value.err) {
-                            throw new Error(`Transaction failed during execution: ${JSON.stringify(status.value.err)}`);
-                        }
-                        if (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized') {
-                            confirmed = true;
-                            break;
-                        }
-                    }
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                if (!confirmed) {
-                    const finalStatus = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
-                    if (finalStatus.value?.err) {
-                        throw new Error(`Transaction landed but FAILED: ${JSON.stringify(finalStatus.value.err)}`);
-                    }
-                    if (!finalStatus.value || (finalStatus.value.confirmationStatus !== 'confirmed' && finalStatus.value.confirmationStatus !== 'finalized')) {
-                        throw new Error("Transaction failed to confirm in time. (Network Timeout)");
-                    }
-                }
-            }
-
-            // 3. Submit to API with TX Signature
+            // Internal Review Notes are now off-chain for smoother workflow
             const res = await fetch(`/api/hiring/submissions/${expandedId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     notes: noteDraft,
                     wallet: publicKey.toBase58(),
-                    txSignature
+                    // No txSignature for notes updates
                 }),
             });
 
             if (!res.ok) {
                 const errData = await res.json();
-                throw new Error(errData.error || "Failed to save note");
+                throw new Error(errData.error?.message || errData.message || "Failed to save note");
             }
         } catch (err: any) {
             console.error("Failed to save note", err);
-            alert(`Note save failed: ${err.message}`);
+            setToast({ message: `Note save failed: ${err.message}`, type: "error" });
             // Revert
             setData(prev => {
                 if (!prev) return null;
@@ -560,9 +506,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 const errData = await res.json();
                 throw new Error(errData.error || "Failed to delete candidate");
             }
+
+            setToast({ message: "Candidate archived successfully.", type: "success" });
         } catch (err: any) {
             console.error("Failed to delete candidate", err);
-            alert(`Delete failed: ${err.message}`);
+            setToast({ message: `Delete failed: ${err.message}`, type: "error" });
             // Revert
             setData(prev => {
                 if (!prev) return null;
@@ -979,7 +927,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                     <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Pipeline Calibration</h4>
                                                                     <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest">Strategic Placement</span>
                                                                 </div>
-                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${candidate.recruiterStatus === 'shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : candidate.recruiterStatus === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${candidate.recruiterStatus === 'hired' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                                                                    candidate.recruiterStatus === 'shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                                        candidate.recruiterStatus === 'rejected' ? 'bg-slate-800 text-slate-500 border-white/5' :
+                                                                            'bg-slate-900 text-slate-600 border-white/[0.03]'
+                                                                    }`}>
                                                                     {candidate.recruiterStatus ? candidate.recruiterStatus.toUpperCase() : 'UNDER REVIEW'}
                                                                 </div>
                                                             </div>
@@ -993,17 +945,32 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                             : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
                                                                             }`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'PROMOTE'}
+                                                                        {candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST'}
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'rejected' ? 'pending' : 'rejected')}
                                                                         className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'rejected'
-                                                                            ? "bg-red-500 text-white border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.3)]"
-                                                                            : "bg-red-500/5 border-red-500/10 text-red-500/60 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10"
+                                                                            ? "bg-slate-700 text-white border-slate-600 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+                                                                            : "bg-slate-800/5 border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10 hover:bg-white/5"
                                                                             }`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'ARCHIVE'}
+                                                                        {candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'REJECT'}
                                                                     </button>
+                                                                </div>
+
+                                                                <div className="relative group/hired">
+                                                                    <button
+                                                                        onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'hired' ? 'pending' : 'hired')}
+                                                                        className={`w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'hired'
+                                                                            ? "bg-indigo-600 text-white border-indigo-500 shadow-[0_10px_40px_rgba(79,70,229,0.4)]"
+                                                                            : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-xl shadow-indigo-500/5"
+                                                                            }`}
+                                                                    >
+                                                                        {candidate.recruiterStatus === 'hired' ? 'HIRED ON-CHAIN' : 'MARK AS HIRED'}
+                                                                    </button>
+                                                                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 px-3 py-2 bg-black border border-white/10 rounded-lg text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/hired:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                                                                        Marking a candidate as Hired will create a verifiable on-chain recruiter proof.
+                                                                    </div>
                                                                 </div>
 
                                                                 <div className="relative flex-1 group/notes">
@@ -1073,6 +1040,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 confirmButtonColor="red"
                 iconColor="red"
             />
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 }

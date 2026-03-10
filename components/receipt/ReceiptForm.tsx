@@ -205,12 +205,12 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       )}
 
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Role / Title *</label>
-        <input type="text" required value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="Smart Contract Developer" />
+        <label className="block text-sm text-slate-400 mb-1">Role / Job Title (optional)</label>
+        <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="e.g. Smart Contract Developer, Independent Builder" />
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Organization / Project *</label>
-        <input type="text" required value={form.org} onChange={(e) => setForm({ ...form, org: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="Project or company name" />
+        <label className="block text-sm text-slate-400 mb-1">Organization / Project (optional)</label>
+        <input type="text" value={form.org} onChange={(e) => setForm({ ...form, org: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="e.g. Project or company name" />
       </div>
       <div>
         <label className="block text-sm text-slate-400 mb-1">Job description *</label>

@@ -37,6 +37,8 @@ export default function AttestPage() {
     const [error, setError] = useState("");
     const [txHash, setTxHash] = useState("");
     const [memoId, setMemoId] = useState("");
+    const [attesterProfile, setAttesterProfile] = useState<any>(null);
+    const [isExternal, setIsExternal] = useState(true);
 
     // Form fields (same as original)
     const [attesterName, setAttesterName] = useState("");
@@ -63,6 +65,34 @@ export default function AttestPage() {
             .catch(e => setError(e.message))
             .finally(() => setLoading(false));
     }, [id]);
+
+    useEffect(() => {
+        if (!publicKey) {
+            setAttesterProfile(null);
+            setIsExternal(true);
+            return;
+        }
+
+        // Sync profile data if logged in
+        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data && data.displayName) {
+                    setAttesterProfile(data);
+                    setAttesterName(data.displayName || "");
+                    setAttesterRole(data.headline || data.role || "");
+                    setAttesterOrg(data.organization || "");
+                    setIsExternal(false);
+                } else {
+                    setAttesterProfile(null);
+                    setIsExternal(true);
+                }
+            })
+            .catch(() => {
+                setAttesterProfile(null);
+                setIsExternal(true);
+            });
+    }, [publicKey]);
 
     // ─── Submit ───────────────────────────────────────────────────────────────
     const handleAttest = async () => {
@@ -183,6 +213,7 @@ export default function AttestPage() {
                     memoV2,
                     contentHash,
                     classification: attestationType,
+                    isExternal,
                 }),
             });
 
@@ -266,12 +297,19 @@ export default function AttestPage() {
                     <p className="text-slate-400">Confirm a candidate's professional contributions on-chain.</p>
                 </div>
 
-                {/* No account required notice */}
-                <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-left text-sm space-y-2">
-                    <p className="font-semibold text-white text-base">No ChainVolio account required.</p>
-                    <p className="text-slate-400 leading-relaxed">
-                        Verifying this work helps the candidate build professional trust. Your name, role, and wallet signature will be cryptographically linked to this record.
-                    </p>
+                {/* Trust Signal Hint */}
+                <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
+                    <div className="space-y-2">
+                        <p className="font-semibold text-white">No ChainVolio account required.</p>
+                        <p className="text-slate-400 leading-relaxed text-sm">
+                            However, registered users and verified organizations provide stronger trust signals and help the candidate build a more credible professional reputation.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3 pt-1">
+                        <Link href="/verified-organization" className="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500/30 text-[11px] font-bold text-slate-300 hover:text-white transition-all duration-300">
+                            Register your organization
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Work record */}
@@ -325,46 +363,87 @@ export default function AttestPage() {
 
                         {/* Verifier identity */}
                         <div>
-                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Your Information</h2>
-                            <div className="space-y-3">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-xs text-slate-500 mb-1">Full Name *</label>
-                                        <input value={attesterName} onChange={e => setAttesterName(e.target.value)}
-                                            placeholder="Your full name"
-                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-slate-500 mb-1">Relationship *</label>
-                                        <input value={attesterRole} onChange={e => setAttesterRole(e.target.value)}
-                                            placeholder="e.g. Direct Manager"
-                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-xs text-slate-500 mb-1">Organization (Optional)</label>
-                                        <input value={attesterOrg} onChange={e => setAttesterOrg(e.target.value)}
-                                            placeholder="Company or DAO"
-                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-slate-500 mb-1">Work Email (Optional)</label>
-                                        <input type="email" value={attesterEmail} onChange={e => setAttesterEmail(e.target.value)}
-                                            placeholder="name@company.com"
-                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Entity Type</label>
-                                    <select value={entityType} onChange={e => setEntityType(e.target.value)}
-                                        className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
-                                        <option>Individual</option>
-                                        <option>Company</option>
-                                        <option>Organization / DAO</option>
-                                    </select>
-                                </div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                    {isExternal ? "Attester Identity (External)" : "Attesting as"}
+                                </h2>
+                                {!isExternal && (
+                                    <Link href="/create-profile" className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 uppercase tracking-wider">
+                                        Edit Profile
+                                    </Link>
+                                )}
                             </div>
+
+                            {attesterProfile && !isExternal ? (
+                                <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
+                                            {attesterProfile.avatarUrl ? (
+                                                <img src={attesterProfile.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                                            ) : (
+                                                attesterProfile.displayName?.[0]
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-white">{attesterProfile.displayName}</p>
+                                            <p className="text-xs text-slate-400">{attesterProfile.headline || attesterProfile.role || "ChainVolio Builder"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="pt-2 border-t border-slate-700/50 flex flex-col gap-1">
+                                        {attesterProfile.organization && (
+                                            <p className="text-[10px] text-slate-500">
+                                                <span className="font-bold uppercase tracking-tighter">Organization:</span> {attesterProfile.organization}
+                                            </p>
+                                        )}
+                                        <p className="text-[10px] text-slate-500">
+                                            <span className="font-bold uppercase tracking-tighter">Wallet:</span> <span className="font-mono text-[9px]">{publicKey?.toBase58()}</span>
+                                        </p>
+                                    </div>
+                                    <p className="text-[9px] text-emerald-500 font-medium bg-emerald-500/5 px-2 py-1 rounded inline-block">
+                                        ✓ Profile Verified Identity
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs text-slate-500 mb-1">Full Name *</label>
+                                            <input value={attesterName} onChange={e => setAttesterName(e.target.value)}
+                                                placeholder="Your full name"
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-slate-500 mb-1">Role / Headline *</label>
+                                            <input value={attesterRole} onChange={e => setAttesterRole(e.target.value)}
+                                                placeholder="e.g. Smart Contract Dev"
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs text-slate-500 mb-1">Organization (Optional)</label>
+                                            <input value={attesterOrg} onChange={e => setAttesterOrg(e.target.value)}
+                                                placeholder="Company or DAO"
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-slate-500 mb-1">Work Email (Optional)</label>
+                                            <input type="email" value={attesterEmail} onChange={e => setAttesterEmail(e.target.value)}
+                                                placeholder="name@company.com"
+                                                className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm transition-colors" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">Entity Type</label>
+                                        <select value={entityType} onChange={e => setEntityType(e.target.value)}
+                                            className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none cursor-pointer transition-colors">
+                                            <option>Individual</option>
+                                            <option>Company</option>
+                                            <option>Organization / DAO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Divider */}

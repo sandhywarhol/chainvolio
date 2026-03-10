@@ -268,14 +268,15 @@ export async function GET(request: Request) {
           attestation_type,
           confidence_level,
           tx_signature,
-          id
+          id,
+          is_external
         `)
         .in("receipt_id", receiptIds);
 
       if (attestationsError) {
         const { data: basicAttestations } = await supabase
           .from("attestations")
-          .select("receipt_id, attester_wallet, created_at, signature, comment")
+          .select("receipt_id, attester_wallet, created_at, signature, comment, is_external")
           .in("receipt_id", receiptIds);
 
         if (basicAttestations) finalAttestations = basicAttestations;
@@ -301,7 +302,7 @@ export async function GET(request: Request) {
     if (attesterWallets.length > 0) {
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("wallet_address, display_name, bio, avatar_url")
+        .select("wallet_address, display_name, bio, avatar_url, headline, role, organization")
         .in("wallet_address", attesterWallets);
 
       if (profileData) {
@@ -350,9 +351,10 @@ export async function GET(request: Request) {
         portfolioImages: r.portfolio_images || [],
         status: attestation ? "Attested" : r.status,
         attesterWallet: attestation?.attester_wallet || null,
-        attesterName: attestation?.attester_name || profile?.display_name || "Anonymous Verifier",
-        attesterRole: attestation?.attester_role || profile?.bio || "Community Member",
-        attesterOrg: attestation?.attester_org || null,
+        attesterName: attestation?.attester_name || profile?.display_name || "Anonymous",
+        attesterRole: attestation?.attester_role || profile?.headline || null,
+        attesterOrg: attestation?.attester_org || profile?.organization || null,
+        isExternal: r.is_external,
         attestationType: attestation?.attestation_type || "Direct Verification",
         confidence: attestation?.confidence_level || null,
         attesterAvatar: profile?.avatar_url || null,

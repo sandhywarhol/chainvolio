@@ -1,15 +1,37 @@
 "use client";
 
-import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Navbar } from "@/components/layout/Navbar";
+import { useEffect, useState } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, CheckCircle, TrendingUp, Lock, Award, Building, Users, Globe, Briefcase } from "lucide-react";
 import Link from "next/link";
 
 export default function VerifiedOrganizationPage() {
-    const { connected } = useWallet();
+    const { connected, publicKey } = useWallet();
+    const { setVisible } = useWalletModal();
+    const [isVerified, setIsVerified] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        if (!publicKey) {
+            setIsVerified(false);
+            return;
+        }
+
+        // Check if the current wallet is already a verified organization
+        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                // We check if the verification status exists and is verified
+                setIsVerified(data?.verificationStatus === 'verified');
+            })
+            .catch(() => setIsVerified(false));
+    }, [publicKey]);
+
+    // Only show the "Verify your organization" button to "new" (unverified) users
+    const showVerifyCTA = !isVerified;
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative overflow-x-hidden">
@@ -47,8 +69,28 @@ export default function VerifiedOrganizationPage() {
                     </p>
 
                     <div className="pt-4">
-                        {!connected && (
-                            <WalletMultiButton />
+                        {showVerifyCTA && (
+                            !connected ? (
+                                <button
+                                    onClick={() => setVisible(true)}
+                                    className="px-8 py-3.5 rounded-2xl bg-emerald-500 text-white font-extrabold text-lg hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20"
+                                >
+                                    Verify your organization
+                                </button>
+                            ) : (
+                                <Link
+                                    href="/dashboard?tab=organization"
+                                    className="px-8 py-3.5 rounded-2xl bg-emerald-500 text-white font-extrabold text-lg hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20 inline-block"
+                                >
+                                    Verify your organization
+                                </Link>
+                            )
+                        )}
+                        {connected && !showVerifyCTA && (
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold">
+                                <CheckCircle className="w-4 h-4" />
+                                Your organization is verified
+                            </div>
                         )}
                     </div>
                 </div>
@@ -151,13 +193,9 @@ export default function VerifiedOrganizationPage() {
             <section id="apply" className="relative z-10 py-32 px-8 max-w-[800px] mx-auto w-full text-center">
                 <div className="space-y-8">
                     <h2 className="text-5xl font-bold tracking-tighter">Ready to join the network?</h2>
-                    <p className="text-xl text-white/40 font-light">Join the leading organizations securing the future of work. You can verify your identity directly from your Dashboard.</p>
-                    <Link
-                        href="/dashboard"
-                        className="inline-block px-12 py-5 rounded-2xl bg-emerald-500 text-black font-extrabold text-xl hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20 mt-4"
-                    >
-                        Go to Dashboard
-                    </Link>
+                    <p className="text-xl text-white/40 font-light italic">
+                        Secure the future of professional trust <br /> by verifying your identity directly on-chain.
+                    </p>
                 </div>
             </section>
 

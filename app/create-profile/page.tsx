@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { Navbar } from "@/components/layout/Navbar";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
 import { Instagram, Linkedin, Twitter, Github, Globe, MessageSquare, Send, Phone, Mail } from "lucide-react";
+import { Toast } from "@/components/ui/Toast";
 
 export default function CreateProfilePage() {
   const { publicKey, connected, signMessage } = useWallet();
@@ -34,6 +36,9 @@ export default function CreateProfilePage() {
     telegram: "",
     linkedin: "",
     instagram: "",
+    headline: "",
+    role: "",
+    organization: "",
   });
 
   const [profileExists, setProfileExists] = useState(false);
@@ -41,6 +46,7 @@ export default function CreateProfilePage() {
     isOpen: false,
     image: null,
   });
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
 
   // Fetch existing profile if editing
   useEffect(() => {
@@ -72,6 +78,9 @@ export default function CreateProfilePage() {
             telegram: data.telegram || "",
             linkedin: data.linkedin || "",
             instagram: data.instagram || "",
+            headline: data.headline || "",
+            role: data.role || "",
+            organization: data.organization || "",
           });
         }
       })
@@ -124,7 +133,7 @@ export default function CreateProfilePage() {
       const { url } = await res.json();
       setForm((prev) => ({ ...prev, avatarUrl: url }));
     } catch (error: any) {
-      alert("Error uploading avatar: " + error.message);
+      setToast({ message: "Error uploading avatar: " + error.message, type: "error" });
     } finally {
       setUploading(false);
     }
@@ -161,11 +170,14 @@ export default function CreateProfilePage() {
         window.location.href = "/dashboard";
       } else {
         const data = await res.json();
-        alert(data.error?.message || data.error || "Failed to save profile.");
+        if (data.error) {
+          setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
+        } else {
+          setToast({ message: "Profile saved successfully!", type: "success" });
+        }
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error saving profile");
+    } catch (error) {
+      setToast({ message: "Error saving profile", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -187,20 +199,12 @@ export default function CreateProfilePage() {
   }
 
   return (
-    <main className="min-h-screen text-white">
-      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto relative z-[100]">
-        <Link href="/" className="flex items-center gap-1.5 group">
-          <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-          <span className="text-xl font-bold">ChainVolio</span>
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link href="/why" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Why ChainVolio</Link>
-          <Link href="/privacy-policy" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors normal-case">Privacy Policy</Link>
-          <WalletMultiButton />
-        </div>
-      </nav>
+    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+      {/* Very subtle noise texture */}
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+      <Navbar />
 
-      <section className="max-w-xl mx-auto px-6 py-12">
+      <section className="max-w-xl mx-auto px-6 pt-32 pb-12">
         <h1 className="text-2xl font-bold mb-8">{form.displayName ? "Edit Profile" : "Create Profile"}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -228,7 +232,7 @@ export default function CreateProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Display name</label>
+            <label className="block text-sm text-slate-400 mb-2">Display name *</label>
             <input
               type="text"
               required
@@ -237,6 +241,42 @@ export default function CreateProfilePage() {
               className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
               placeholder="Name or pseudonym"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">Headline (optional, max 120 chars)</label>
+            <input
+              type="text"
+              value={form.headline}
+              maxLength={120}
+              onChange={(e) => setForm({ ...form, headline: e.target.value })}
+              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              placeholder="Solana Developer | Web3 Researcher | Builder"
+            />
+            <p className="text-right text-[10px] text-slate-500 mt-1">{form.headline.length}/120</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">Current Role (optional)</label>
+              <input
+                type="text"
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                placeholder="CEO, Lead Developer, etc."
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">Current Organization (optional)</label>
+              <input
+                type="text"
+                value={form.organization}
+                onChange={(e) => setForm({ ...form, organization: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                placeholder="Google, Solana Foundation, DAO, etc."
+              />
+            </div>
           </div>
 
           <div>
@@ -358,7 +398,7 @@ export default function CreateProfilePage() {
             </div>
             <div>
               <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 2.122 1.381.762.297 1.634.501 2.911.558 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.277-.057 2.149-.261 2.911-.558.788-.306 1.457-.715 2.122-1.381.666-.665 1.075-1.334 1.381-2.122.297-.762.501-1.634.558-2.911.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 2.122 1.381.762.297 1.634.501 2.911.558 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.277-.057 2.149-.261 2.911-.558.788-.306 1.457-.715 2.122-1.381.666-.665 1.334-1.075 2.122-1.381.297-.762.501-1.634.558-2.911.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
                 Instagram (optional)
               </label>
               <input
@@ -497,6 +537,14 @@ export default function CreateProfilePage() {
 
       {cropModal.isOpen && cropModal.image && (
         <ImageCropModal image={cropModal.image} onCropComplete={handleCroppedImage} onClose={() => setCropModal({ isOpen: false, image: null })} />
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </main>
   );
