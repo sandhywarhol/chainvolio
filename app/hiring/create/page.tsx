@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { supabase } from "@/lib/supabase/client";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
 import {
@@ -40,6 +41,7 @@ export default function CreateCollection() {
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
+    const [isAutoFilled, setIsAutoFilled] = useState(false);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -68,6 +70,37 @@ export default function CreateCollection() {
             verifiedOnly: false
         }
     });
+
+    // Auto-populate profile data
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!publicKey || !supabase) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from("profiles")
+                    .select("display_name, headline, organization, website_url, twitter_handle")
+                    .eq("wallet_address", publicKey.toBase58())
+                    .single();
+
+                if (data && !error) {
+                    setFormData(prev => ({
+                        ...prev,
+                        recruiterName: prev.recruiterName || data.display_name || "",
+                        recruiterRole: prev.recruiterRole || data.headline || "",
+                        companyName: prev.companyName || data.organization || "",
+                        websiteUrl: prev.websiteUrl || data.website_url || "",
+                        twitterUrl: prev.twitterUrl || data.twitter_handle || ""
+                    }));
+                    setIsAutoFilled(true);
+                }
+            } catch (err) {
+                console.error("Error fetching recruiter profile:", err);
+            }
+        };
+
+        fetchProfile();
+    }, [publicKey]);
 
     const toggleFocus = (area: string) => {
         setFormData(prev => ({
@@ -194,7 +227,15 @@ export default function CreateCollection() {
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-bold text-white">Recruiter Identity</h3>
-                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Build trust with candidates</p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <p className="text-[10px] text-slate-500 uppercase tracking-widest text-nowrap">Build trust with candidates</p>
+                                            {isAutoFilled && (
+                                                <>
+                                                    <span className="w-1 h-1 rounded-full bg-slate-800" />
+                                                    <p className="text-[10px] text-emerald-500/80 font-medium">Auto-filled from your ChainVolio profile</p>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
