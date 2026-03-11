@@ -198,6 +198,39 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Recruiter Card Side Panel */}
+                                {(collection.metadata?.recruiterName || collection.metadata?.companyName) && (
+                                    <div className="md:w-64 flex-shrink-0">
+                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-6 h-full flex flex-col justify-center border-emerald-500/5 group/recruiter transition-all">
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Recruiter Identity</h3>
+                                            </div>
+                                            <div className="space-y-4">
+                                                {collection.metadata?.recruiterName && (
+                                                    <div>
+                                                        <p className="text-sm font-black text-white">{collection.metadata.recruiterName}</p>
+                                                        <p className="text-[11px] font-medium text-slate-500 uppercase tracking-tight">{collection.metadata.recruiterRole || "Hiring Lead"}</p>
+                                                    </div>
+                                                )}
+                                                {collection.metadata?.companyName && (
+                                                    <div className="pt-3 border-t border-white/5">
+                                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-1">Strategic Partner</p>
+                                                        <p className="text-sm font-black text-emerald-400">{collection.metadata.companyName}</p>
+                                                        {collection.metadata.companyDescription && (
+                                                            <p className="text-[10px] text-slate-500 mt-1 lines-clamp-2 leading-relaxed">{collection.metadata.companyDescription}</p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                <div className="pt-3 flex items-center gap-1.5 opacity-60">
+                                                    <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">On-Chain Verified</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
