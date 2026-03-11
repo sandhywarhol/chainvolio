@@ -30,8 +30,7 @@ const COSMETIC_FIELDS: Record<string, string> = {
   telegram: 'telegram',
   linkedin: 'linkedin',
   instagram: 'instagram',
-  headline: 'headline',
-  role: 'role',
+  role: 'professional_role',
   organization: 'organization'
 };
 
@@ -262,8 +261,7 @@ export async function GET(request: Request) {
     cardNumber: data.card_number,
     walletAddress: data.wallet_address,
     createdAt: data.created_at,
-    headline: data.headline,
-    role: data.role,
+    role: data.professional_role,
     organization: data.organization,
     isVerified: orgData?.status === 'verified',
     verifierTier: orgData?.verifier_tier || 1,

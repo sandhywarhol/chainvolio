@@ -3,7 +3,7 @@ import bs58 from "bs58";
 
 export async function signChainVolioAction(
     wallet: WalletContextState,
-    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission",
+    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission" | "view_dashboard",
     context?: string
 ): Promise<{ signature: string; nonce: string; timestamp: number } | null> {
     if (!wallet.publicKey || !wallet.signMessage) return null;

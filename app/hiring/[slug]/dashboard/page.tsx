@@ -36,6 +36,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
+    const [candidateToHire, setCandidateToHire] = useState<string | null>(null);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const router = useRouter();
 
@@ -63,8 +64,27 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
         async function fetchDashboard() {
             try {
-                const { signChainVolioAction } = await import("@/lib/wallet-utils");
-                const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile"); // Reusing high-level action or could add a 'view_dashboard' one
+                // 1. Check for cached signature (Session storage)
+                const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
+                const cached = sessionStorage.getItem(cacheKey);
+                let signedAction = null;
+
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    // Check if signature is still valid (10 min window in backend, let's use 9 min here for safety)
+                    if (Date.now() - parsed.timestamp < 9 * 60 * 1000) {
+                        signedAction = parsed;
+                    }
+                }
+
+                if (!signedAction) {
+                    const { signChainVolioAction } = await import("@/lib/wallet-utils");
+                    signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard");
+
+                    if (signedAction) {
+                        sessionStorage.setItem(cacheKey, JSON.stringify(signedAction));
+                    }
+                }
 
                 if (!signedAction) return;
 
@@ -84,6 +104,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 if (res.ok) {
                     setData(result);
                 } else {
+                    // If backend rejects even after our "safety" check, clear cache and retry once if it was cached
+                    if (res.status === 401 && cached) {
+                        sessionStorage.removeItem(cacheKey);
+                        fetchDashboard();
+                        return;
+                    }
                     setError(result.error || "Failed to load dashboard.");
                 }
             } catch (err) {
@@ -145,9 +171,16 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     }, [expandedId, data]);
 
-    const handleUpdateStatus = async (candidateId: string, newStatus: string) => {
-        if (!publicKey) return;
-        const oldStatus = data?.candidates.find(c => c.id === candidateId)?.recruiterStatus;
+    const handleUpdateStatus = async (candidateId: string, newStatus: string, skipConfirm = false) => {
+        if (!publicKey || !signMessage) return; // Ensure signMessage is available for on-chain actions
+        const candidate = data?.candidates.find(c => c.id === candidateId);
+        const oldStatus = candidate?.recruiterStatus;
+
+        // If it's a 'hired' action and not yet confirmed, trigger modal
+        if (newStatus === 'hired' && !skipConfirm) {
+            setCandidateToHire(candidateId);
+            return;
+        }
 
         // Optimistic update
         setData(prev => {
@@ -171,6 +204,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 const reviewData = {
                     submissionId: candidateId,
                     recruiterWallet: publicKey.toBase58(),
+                    candidateWallet: candidate?.wallet,
+                    organization: data?.collection.title,
+                    role: candidate?.role,
                     status: "HIRED",
                     timestamp: Date.now()
                 };
@@ -190,6 +226,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             type: "recruiter_review",
                             target: "hiring_decision",
                             hash: dataHash,
+                            hashFields: reviewData, // Include the fields that were hashed for transparency
                             timestamp: reviewData.timestamp
                         })) as any,
                     })
@@ -260,6 +297,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     )
                 };
             });
+        } finally {
+            setCandidateToHire(null); // Close the modal if it was open
         }
     };
 
@@ -448,6 +487,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                         type: "recruiter_review",
                         target: "delete_candidate",
                         hash: dataHash,
+                        hashFields: reviewData, // Include the fields that were hashed for transparency
                         timestamp: reviewData.timestamp
                     })) as any,
                 })
@@ -723,8 +763,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 filteredCandidates.map((candidate) => (
                                     <React.Fragment key={candidate.id}>
                                         <tr
-                                            className={`group hover:bg-white/[0.03] transition-all cursor-pointer relative ${expandedId === candidate.id ? 'bg-white/[0.02] shadow-[inset_4px_0_0_0_#6366f1]' : ''}`}
+                                            key={candidate.id}
                                             onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
+                                            className={`group hover:bg-white/[0.01] transition-all cursor-pointer border-b border-white/[0.02] relative ${expandedId === candidate.id ? 'bg-[#121214] border-indigo-500/30' : ''} ${candidate.recruiterStatus === 'rejected' ? 'opacity-40 grayscale-[0.8]' : ''}`}
                                         >
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-4">
@@ -1039,6 +1080,21 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 confirmLabel="Archive"
                 confirmButtonColor="red"
                 iconColor="red"
+            />
+
+            <ConfirmationModal
+                isOpen={!!candidateToHire}
+                onClose={() => setCandidateToHire(null)}
+                onConfirm={() => {
+                    const id = candidateToHire;
+                    setCandidateToHire(null);
+                    handleUpdateStatus(id!, 'hired', true);
+                }}
+                title="Confirm Hiring Choice?"
+                message="Marking this candidate as HIRED will trigger a blockchain transaction to anchor the proof. This record will be immutable and visible on their profile."
+                confirmLabel="Execute Hiring Proof"
+                confirmButtonColor="green"
+                iconColor="green"
             />
 
             {toast && (

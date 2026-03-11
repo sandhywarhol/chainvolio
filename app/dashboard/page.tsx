@@ -41,7 +41,6 @@ type Profile = {
   role?: string;
   verificationStatus?: string;
   verificationType?: string;
-  headline?: string;
   organization?: string;
 };
 
@@ -241,14 +240,8 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Profile Identity (Headline / Role) */}
-                {profile.headline ? (
-                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                    <span className="text-lg font-medium text-emerald-400">
-                      {profile.headline}
-                    </span>
-                  </div>
-                ) : profile.role ? (
+                {/* Profile Identity (Role) */}
+                {profile.role ? (
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                     <span className="text-lg font-medium text-emerald-400">
                       {profile.role}

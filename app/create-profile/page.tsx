@@ -36,7 +36,6 @@ export default function CreateProfilePage() {
     telegram: "",
     linkedin: "",
     instagram: "",
-    headline: "",
     role: "",
     organization: "",
   });
@@ -78,7 +77,6 @@ export default function CreateProfilePage() {
             telegram: data.telegram || "",
             linkedin: data.linkedin || "",
             instagram: data.instagram || "",
-            headline: data.headline || "",
             role: data.role || "",
             organization: data.organization || "",
           });
@@ -243,18 +241,6 @@ export default function CreateProfilePage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm text-slate-400 mb-2">Headline (optional, max 120 chars)</label>
-            <input
-              type="text"
-              value={form.headline}
-              maxLength={120}
-              onChange={(e) => setForm({ ...form, headline: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-              placeholder="Solana Developer | Web3 Researcher | Builder"
-            />
-            <p className="text-right text-[10px] text-slate-500 mt-1">{form.headline.length}/120</p>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>

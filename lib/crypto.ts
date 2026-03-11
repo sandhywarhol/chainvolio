@@ -2,7 +2,7 @@ import { supabaseServer as supabase } from "./supabase/server";
 import nacl from "tweetnacl"; // We might need to install this if web3.js doesn't export it clearly
 import bs58 from "bs58";
 
-export type AuthAction = "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection";
+export type AuthAction = "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "view_dashboard";
 
 export async function verifySignature(
     walletAddress: string,
@@ -33,8 +33,9 @@ export async function verifySignature(
         }
 
         // 3. Check for replay attack (nonce check)
-        if (supabase) {
-            const { data, error } = await supabase
+        // Note: 'view_dashboard' is allowed to reuse nonces within the 10m window for smoother UX (session-like)
+        if (supabase && action !== "view_dashboard") {
+            const { data } = await supabase
                 .from("nonces")
                 .select("id")
                 .eq("wallet_address", walletAddress)
@@ -79,4 +80,15 @@ export async function verifySignature(
         console.error("Signature verification error:", err);
         return { isValid: false, error: "Verification failed" };
     }
+}
+
+/**
+ * Generates a SHA-256 hash of the review data for on-chain anchoring
+ */
+export async function generateReviewHash(data: any): Promise<string> {
+    const jsonStr = JSON.stringify(data);
+    const msgBuffer = new TextEncoder().encode(jsonStr);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }

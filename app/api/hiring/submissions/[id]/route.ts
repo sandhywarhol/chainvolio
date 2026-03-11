@@ -27,7 +27,7 @@ export async function PATCH(
         // 1. Get the submission and its parent collection to check ownership
         const { data: submission, error: fetchError } = await supabase
             .from("collection_submissions")
-            .select("id, collection_id, hiring_collections(owner_wallet)")
+            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title)")
             .eq("id", id)
             .single();
 
@@ -79,6 +79,42 @@ export async function PATCH(
             .eq("id", id);
 
         if (updateError) return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
+
+        // --- 4. Special Integration: Create Hiring Record on Success ---
+        if (status === 'hired' && cleanTxSignature) {
+            try {
+                // Create a verifiable work record (receipt) for the candidate
+                const { data: receipt, error: receiptError } = await supabase
+                    .from("receipts")
+                    .insert({
+                        wallet_address: submission.candidate_wallet,
+                        role: submission.role_strength || "Web3 Professional",
+                        org: (submission as any).hiring_collections?.title || "On-chain Organization",
+                        description: `Official Verified Hiring Proof for ${submission.role_strength || 'Professional Role'}. Recruiter Review anchored via ChainVolio Hirsch-Talent framework.`,
+                        start_date: new Date().toISOString().split('T')[0],
+                        end_date: new Date().toISOString().split('T')[0],
+                        status: "Attested",
+                        tx_signature: cleanTxSignature 
+                    })
+                    .select()
+                    .single();
+
+                if (!receiptError && receipt) {
+                    // Create the attestation record to link to the recruiter
+                    await supabase.from("attestations").insert({
+                        receipt_id: receipt.id,
+                        attester_wallet: wallet,
+                        attester_name: "Verified Recruiter",
+                        attester_role: "Hiring Authority",
+                        attestation_type: "Hiring Proof",
+                        tx_signature: cleanTxSignature
+                    });
+                }
+            } catch (integrationErr) {
+                console.error("Failed to create hiring receipt:", integrationErr);
+                // We don't fail the whole request as the submission status IS updated
+            }
+        }
 
         return NextResponse.json({ ok: true });
     } catch (err: any) {

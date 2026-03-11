@@ -47,7 +47,7 @@ export async function GET(
         const { verifySignature } = await import("@/lib/crypto");
         const { isValid, error: sigError } = await verifySignature(
             wallet,
-            "update_profile", // Reusing the same action to keep it simple, or we could add 'view_dashboard'
+            "view_dashboard", // Using specific view action that allows session-like reuse
             nonce,
             parseInt(timestamp),
             signature
