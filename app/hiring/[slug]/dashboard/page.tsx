@@ -45,6 +45,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [roleFilter, setRoleFilter] = useState("all");
     const [attestedOnly, setAttestedOnly] = useState(false);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState("recent");
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
 
@@ -181,6 +182,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             setCandidateToHire(candidateId);
             return;
         }
+
+        setProcessingId(candidateId);
 
         // Optimistic update
         setData(prev => {
@@ -320,6 +323,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 };
             });
         } finally {
+            setProcessingId(null);
             setCandidateToHire(null); // Close the modal if it was open
         }
     };
@@ -1002,35 +1006,71 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                             <div className="space-y-8 flex-1 flex flex-col">
                                                                 <div className="flex gap-4">
                                                                     <button
+                                                                        disabled={processingId === candidate.id}
                                                                         onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'shortlisted' ? 'pending' : 'shortlisted')}
                                                                         className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'shortlisted'
                                                                             ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.3)]"
                                                                             : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
-                                                                            }`}
+                                                                            } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST'}
+                                                                        {processingId === candidate.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST')}
                                                                     </button>
                                                                     <button
+                                                                        disabled={processingId === candidate.id}
                                                                         onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'rejected' ? 'pending' : 'rejected')}
                                                                         className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'rejected'
                                                                             ? "bg-slate-700 text-white border-slate-600 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
                                                                             : "bg-slate-800/5 border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10 hover:bg-white/5"
-                                                                            }`}
+                                                                            } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
                                                                     >
-                                                                        {candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'REJECT'}
+                                                                        {processingId === candidate.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'REJECT')}
                                                                     </button>
                                                                 </div>
 
                                                                 <div className="relative group/hired">
-                                                                    <button
-                                                                        onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'hired' ? 'pending' : 'hired')}
-                                                                        className={`w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'hired'
-                                                                            ? "bg-indigo-600 text-white border-indigo-500 shadow-[0_10px_40px_rgba(79,70,229,0.4)]"
-                                                                            : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-xl shadow-indigo-500/5"
-                                                                            }`}
-                                                                    >
-                                                                        {candidate.recruiterStatus === 'hired' ? 'HIRED ON-CHAIN' : 'MARK AS HIRED'}
-                                                                    </button>
+                                                                    {candidate.recruiterStatus === 'hired' && candidate.recruiterTxSignature ? (
+                                                                        <div className="flex flex-col gap-3">
+                                                                            <div className="w-full py-4 bg-indigo-600/10 border border-indigo-500/30 rounded-xl text-center">
+                                                                                <span className="text-[11px] font-black text-indigo-400 uppercase tracking-[0.25em]">HIRED ON-CHAIN</span>
+                                                                            </div>
+                                                                            <div className="flex gap-2">
+                                                                                <a
+                                                                                    href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="flex-1 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-black text-slate-300 uppercase tracking-widest text-center transition-all flex items-center justify-center gap-2"
+                                                                                >
+                                                                                    <ExternalLink className="w-3 h-3 text-indigo-400" /> Solscan Proof
+                                                                                </a>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        setToast({ message: "Memo content anchored with SHA-256 fingerprint in the transaction instructions.", type: "warning" });
+                                                                                    }}
+                                                                                    className="flex-1 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-black text-slate-300 uppercase tracking-widest text-center transition-all"
+                                                                                >
+                                                                                    MEMO DETAILS
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <button
+                                                                            disabled={processingId === candidate.id}
+                                                                            onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'hired' ? 'pending' : 'hired')}
+                                                                            className={`w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border relative overflow-hidden ${candidate.recruiterStatus === 'hired'
+                                                                                ? "bg-indigo-600 text-white border-indigo-500 shadow-[0_10px_40px_rgba(79,70,229,0.4)]"
+                                                                                : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-xl shadow-indigo-500/5"
+                                                                                } ${processingId === candidate.id ? "opacity-90 pointer-events-none" : ""}`}
+                                                                        >
+                                                                            {processingId === candidate.id ? (
+                                                                                <div className="flex items-center justify-center gap-3">
+                                                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                                                    <span>ANCHORING PROOF...</span>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <span>{candidate.recruiterStatus === 'hired' ? 'HIRED ON-CHAIN' : 'MARK AS HIRED'}</span>
+                                                                            )}
+                                                                        </button>
+                                                                    )}
                                                                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 px-3 py-2 bg-black border border-white/10 rounded-lg text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/hired:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                                                                         Marking a candidate as Hired will create a verifiable on-chain recruiter proof.
                                                                     </div>
