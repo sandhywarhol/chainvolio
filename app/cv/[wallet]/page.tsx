@@ -198,8 +198,17 @@ export default function CVPage(props: any) {
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [showAllHiring, setShowAllHiring] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const verifiedHiringRecords = useMemo(() => {
+    return receipts.filter(r => (r as any).attestationType === "Hiring Proof");
+  }, [receipts]);
+
+  const contributionReceipts = useMemo(() => {
+    return receipts.filter(r => (r as any).attestationType !== "Hiring Proof");
+  }, [receipts]);
 
   const isProfileComplete = useMemo(() => {
     if (!profile) return false;
@@ -216,7 +225,7 @@ export default function CVPage(props: any) {
       profile.lens ||
       profile.farcaster
     );
-    const hasExperience = receipts && receipts.length > 0;
+    const hasExperience = contributionReceipts && contributionReceipts.length > 0;
 
     return !!(
       profile.bio &&
@@ -224,13 +233,13 @@ export default function CVPage(props: any) {
       hasExperience &&
       hasSocial
     );
-  }, [profile, receipts]);
+  }, [profile, contributionReceipts]);
 
   const totalYearsExperience = useMemo(() => {
-    if (!receipts || receipts.length === 0) return 0;
+    if (!contributionReceipts || contributionReceipts.length === 0) return 0;
 
-    // 1. Convert all receipts into date intervals [start, end]
-    const intervals = receipts
+    // 1. Convert all contribution receipts into date intervals [start, end]
+    const intervals = contributionReceipts
       .map(r => ({
         start: new Date(r.startDate).getTime(),
         end: r.endDate ? new Date(r.endDate).getTime() : new Date().getTime()
@@ -267,11 +276,9 @@ export default function CVPage(props: any) {
     });
 
     return Math.floor(totalMonths / 12);
-  }, [receipts]);
+  }, [contributionReceipts]);
 
-  const verifiedHiringRecords = useMemo(() => {
-    return receipts.filter(r => (r as any).attestationType === "Hiring Proof");
-  }, [receipts]);
+
 
   useEffect(() => {
     if (!wallet) return;
@@ -671,84 +678,21 @@ export default function CVPage(props: any) {
               </div>
             </div>
 
-            {receipts.length > 0 && (
+            {contributionReceipts.length > 0 && (
               <WorkTimeline
-                receipts={receipts}
+                receipts={contributionReceipts}
                 onSelectReceipt={setSelectedReceipt}
               />
             )}
 
-            {/* Verified Hiring Section */}
-            {verifiedHiringRecords.length > 0 && (
-              <div className="mt-16 mb-12">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight">Verified Hiring</h2>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest font-black mt-1">Institutional Consensus Anchored</p>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {verifiedHiringRecords.map((record, i) => (
-                    <div key={i} className="group relative p-6 rounded-2xl bg-gradient-to-br from-emerald-500/[0.03] to-transparent border border-emerald-500/10 hover:border-emerald-500/30 transition-all duration-500 overflow-hidden">
-                      {/* Decorative elements */}
-                      <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/5 blur-3xl rounded-full group-hover:bg-emerald-500/10 transition-colors"></div>
-                      
-                      <div className="relative z-10 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-1 block">Placement Verified</span>
-                            <h3 className="text-xl font-bold text-white leading-tight">{record.role}</h3>
-                            <p className="text-emerald-400 font-bold text-base">{record.org}</p>
-                          </div>
-                          <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
-                             <BadgeCheck className="w-6 h-6" />
-                          </div>
-                        </div>
-                        
-                        <div className="mt-auto pt-6 border-t border-white/[0.03] space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Verification Date</span>
-                              <span className="text-xs text-slate-300 font-medium">
-                                {record.startDate ? new Date(record.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Unknown'}
-                              </span>
-                            </div>
-                            <div className="flex flex-col items-end gap-0.5">
-                                <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Recruiter Identity</span>
-                                <span className="text-xs font-mono text-slate-400">
-                                  {record.attesterWallet ? `${record.attesterWallet.slice(0, 6)}...${record.attesterWallet.slice(-4)}` : 'Verified Source'}
-                                </span>
-                            </div>
-                          </div>
-
-                          {record.txSignature && (
-                            <a
-                              href={`https://solscan.io/tx/${record.txSignature}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/10 hover:border-emerald-500/30 rounded-xl transition-all text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]"
-                            >
-                              <LinkIcon className="w-3 h-3" /> View On-chain Proof
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <h2 className="text-xl font-semibold mt-12 mb-4">Proof of Work</h2>
-            {receipts.length === 0 ? (
-              <p className="text-slate-500">No receipts yet.</p>
+            {contributionReceipts.length === 0 ? (
+              <p className="text-slate-500">No work records submitted yet.</p>
             ) : (
               <div className="space-y-6">
-                {receipts.map((r, i) => (
+                {contributionReceipts.map((r, i) => (
                   <div
                     key={i}
                     onClick={() => setSelectedReceipt(r)}
@@ -917,6 +861,51 @@ export default function CVPage(props: any) {
                     <ReceiptUpdates receipt={r} isOwner={false} />
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Verified Hiring Section - Minimal Appendage */}
+            {verifiedHiringRecords.length > 0 && (
+              <div className="mt-20 border-t border-white/5 pt-12 pb-8">
+                <div className="flex items-center gap-2 mb-8 opacity-60">
+                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Verified Hiring</h2>
+                </div>
+
+                <div className="space-y-6">
+                  {(showAllHiring ? verifiedHiringRecords : verifiedHiringRecords.slice(0, 2)).map((record, i) => (
+                    <div key={i} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-white">Hired by {record.org}</p>
+                        <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
+                           <span>Role: {record.role}</span>
+                           <span className="w-1 h-1 rounded-full bg-slate-800" />
+                           <span>{record.startDate ? new Date(record.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Mar 2026'}</span>
+                        </div>
+                      </div>
+                      
+                      {record.txSignature && (
+                        <a
+                          href={`https://solscan.io/tx/${record.txSignature}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all"
+                        >
+                          View Proof
+                        </a>
+                      )}
+                    </div>
+                  ))}
+
+                  {verifiedHiringRecords.length > 2 && !showAllHiring && (
+                    <button 
+                      onClick={() => setShowAllHiring(true)}
+                      className="w-full py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                      View Full Hiring History
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </>
