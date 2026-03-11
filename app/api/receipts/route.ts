@@ -351,7 +351,7 @@ export async function GET(request: Request) {
         portfolioImages: r.portfolio_images || [],
         status: attestation ? "Attested" : r.status,
         attesterWallet: attestation?.attester_wallet || null,
-        attesterName: attestation?.attester_name || profile?.display_name || "Anonymous",
+        attesterName: attestation?.attester_name || profile?.display_name || (attestation?.attestation_type === "Hiring Proof" ? "Verified Recruiter" : "Anonymous"),
         attesterRole: attestation?.attester_role || profile?.headline || null,
         attesterOrg: attestation?.attester_org || profile?.organization || null,
         isExternal: r.is_external,

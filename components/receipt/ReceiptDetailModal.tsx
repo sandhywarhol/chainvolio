@@ -104,7 +104,11 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                     )}
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-sm font-bold text-white">{receipt.attesterName}</p>
+                                            <p className="text-sm font-bold text-white">
+                                                {receipt.attestationType === "Hiring Proof" && receipt.attesterName === "Anonymous" 
+                                                    ? "Verified Recruiter" 
+                                                    : receipt.attesterName}
+                                            </p>
                                             {receipt.isAttesterVerified && (
                                                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-tight">
                                                     <ShieldCheck className="w-3 h-3" />
@@ -167,10 +171,10 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                         href={`https://solscan.io/tx/${receipt.txSignature}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-black transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all shadow-lg shadow-emerald-900/20"
                                     >
                                         <Globe className="w-3.5 h-3.5" />
-                                        Redirect to Solscan Proof
+                                        View Proof
                                         <ExternalLink className="w-2.5 h-2.5 opacity-50" />
                                     </a>
                                 )}
