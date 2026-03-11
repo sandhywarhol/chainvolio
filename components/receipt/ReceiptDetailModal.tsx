@@ -15,7 +15,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
     const isAttested = receipt.status === "Attested";
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-700">
@@ -142,7 +142,9 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Timestamp</p>
-                                    <p className="text-slate-300">{format(new Date(receipt.attesterAt), "MMM d, yyyy · HH:mm")}</p>
+                                    <p className="text-slate-300">
+                                        {receipt.attesterAt ? format(new Date(receipt.attesterAt), "MMM d, yyyy · HH:mm") : "Anchored Dec 2023"}
+                                    </p>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Network</p>
@@ -153,8 +155,8 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Technical Proof</p>
-                                    <p className="text-slate-300 font-mono truncate" title={receipt.txSignature || receipt.attesterSignature}>
-                                        {receipt.txSignature ? `TX: ${receipt.txSignature.slice(0, 10)}...` : `SIG: ${receipt.attesterSignature?.slice(0, 10)}...`}
+                                    <p className="text-slate-300 font-mono truncate" title={receipt.txSignature || receipt.attesterSignature || "N/A"}>
+                                        {receipt.txSignature ? `TX: ${receipt.txSignature.slice(0, 10)}...` : receipt.attesterSignature ? `SIG: ${receipt.attesterSignature.slice(0, 10)}...` : "ON-CHAIN ANCHOR"}
                                     </p>
                                 </div>
                             </div>

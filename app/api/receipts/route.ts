@@ -362,7 +362,7 @@ export async function GET(request: Request) {
         isAttesterVerified: attestation ? verifiedOrgWallets.has(attestation.attester_wallet) : false,
         attesterTier: attestation ? (verifierTiers[attestation.attester_wallet] || 1) : 1,
         attesterSignature: attestation?.signature || null,
-        txSignature: attestation?.tx_signature || null,
+        txSignature: attestation?.tx_signature || r.tx_signature || null,
         attestationId: attestation?.id || null,
         attesterComment: attestation?.comment || null,
         createdAt: r.created_at,

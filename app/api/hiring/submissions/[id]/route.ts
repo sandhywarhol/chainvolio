@@ -100,12 +100,20 @@ export async function PATCH(
                     .single();
 
                 if (!receiptError && receipt) {
+                    // Fetch recruiter profile for real info
+                    const { data: recProfile } = await supabase
+                        .from("profiles")
+                        .select("display_name, headline, organization")
+                        .eq("wallet_address", wallet)
+                        .single();
+
                     // Create the attestation record to link to the recruiter
                     await supabase.from("attestations").insert({
                         receipt_id: receipt.id,
                         attester_wallet: wallet,
-                        attester_name: "Verified Recruiter",
-                        attester_role: "Hiring Authority",
+                        attester_name: recProfile?.display_name || "Verified Recruiter",
+                        attester_role: recProfile?.headline || "Hiring Authority",
+                        attester_org: recProfile?.organization || (submission as any).hiring_collections?.title || null,
                         attestation_type: "Hiring Proof",
                         tx_signature: cleanTxSignature
                     });
