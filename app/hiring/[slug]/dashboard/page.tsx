@@ -280,9 +280,31 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 throw new Error(errData.error?.message || errData.message || "Status update failed");
             }
 
+            // Update local state with the final result including txSignature
+            setData(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    candidates: prev.candidates.map(c =>
+                        c.id === candidateId ? { 
+                            ...c, 
+                            recruiterStatus: newStatus,
+                            recruiterTxSignature: txSignature || c.recruiterTxSignature 
+                        } : c
+                    )
+                };
+            });
+
             // Show success toast for hired
             if (newStatus === 'hired') {
-                setToast({ message: "Candidate Hired Successfully. On-chain proof anchored.", type: "success" });
+                const message = txSignature 
+                    ? `Hired Successfully. On-chain proof: ${txSignature.slice(0, 8)}...`
+                    : "Candidate status updated to HIRED.";
+                setToast({ message, type: "success" });
+            } else if (newStatus === 'shortlisted') {
+                setToast({ message: "Candidate Shortlisted", type: "success" });
+            } else if (newStatus === 'rejected') {
+                setToast({ message: "Candidate Rejected", type: "success" });
             }
         } catch (err: any) {
             console.error("Failed to update status", err);
@@ -1027,16 +1049,19 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                         className="w-full h-full min-h-[180px] bg-black/40 border border-white/[0.04] rounded-2xl p-6 pt-12 text-[14px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
                                                                     />
                                                                     {candidate.recruiterTxSignature && (
-                                                                        <a
-                                                                            href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="absolute bottom-4 left-6 flex items-center gap-2 text-[10px] font-black text-indigo-400/60 hover:text-indigo-400 transition-colors uppercase tracking-widest"
-                                                                        >
-                                                                            <ShieldCheck className="w-3.5 h-3.5" />
-                                                                            Verify Recruiter Proof
-                                                                            <ExternalLink className="w-2.5 h-2.5 opacity-50" />
-                                                                        </a>
+                                                                        <div className="absolute bottom-4 left-6 flex items-center gap-4">
+                                                                            <a
+                                                                                href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="flex items-center gap-2 text-[10px] font-black text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-[0.15em] bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/10"
+                                                                            >
+                                                                                <ShieldCheck className="w-3.5 h-3.5" />
+                                                                                Verify Recruiter Proof
+                                                                                <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                                                                            </a>
+                                                                            <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest hidden sm:inline">Proof Anchored to Solana Mainnet</span>
+                                                                        </div>
                                                                     )}
                                                                     {isSavingNote && (
                                                                         <div className="absolute bottom-6 right-6 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
