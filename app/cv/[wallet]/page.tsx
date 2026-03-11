@@ -203,11 +203,17 @@ export default function CVPage(props: any) {
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const verifiedHiringRecords = useMemo(() => {
-    return receipts.filter(r => (r as any).attestationType === "Hiring Proof");
+    return receipts.filter(r => 
+      (r as any).attestationType === "Hiring Proof" || 
+      r.description?.includes("Official Verified Hiring Proof")
+    );
   }, [receipts]);
 
   const contributionReceipts = useMemo(() => {
-    return receipts.filter(r => (r as any).attestationType !== "Hiring Proof");
+    return receipts.filter(r => 
+      (r as any).attestationType !== "Hiring Proof" && 
+      !r.description?.includes("Official Verified Hiring Proof")
+    );
   }, [receipts]);
 
   const isProfileComplete = useMemo(() => {
