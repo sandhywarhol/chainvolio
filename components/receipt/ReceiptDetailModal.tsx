@@ -20,8 +20,14 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-700">
                     <div className="flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-emerald-400" />
-                        <h3 className="text-lg font-bold text-white">Work Verification</h3>
+                        {receipt.attestationType === "Hiring Proof" ? (
+                            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                        ) : (
+                            <Briefcase className="w-5 h-5 text-emerald-400" />
+                        )}
+                        <h3 className="text-lg font-bold text-white">
+                            {receipt.attestationType === "Hiring Proof" ? "On-Chain Hiring Proof" : "Work Verification"}
+                        </h3>
                     </div>
                     <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
                         <X size={20} />
@@ -35,7 +41,13 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                         : "bg-slate-800/50 border-slate-700 text-slate-400"
                         }`}>
                         <div className="flex flex-col items-center gap-2">
-                            {isAttested ? (
+                            {receipt.attestationType === "Hiring Proof" ? (
+                                <>
+                                    <ShieldCheck className="w-10 h-10" />
+                                    <p className="font-bold text-lg">Hiring Recorded On-Chain</p>
+                                    <p className="text-xs opacity-80 uppercase tracking-tighter">Institutional Recruitment Decision</p>
+                                </>
+                            ) : isAttested ? (
                                 <>
                                     <ShieldCheck className="w-10 h-10" />
                                     <p className="font-bold text-lg">On-Chain Verified</p>
@@ -81,7 +93,9 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                     {isAttested && (
                         <div className="space-y-4 pt-4 border-t border-slate-800">
                             <div className="space-y-3">
-                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Confirmed By</h4>
+                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                    {receipt.attestationType === "Hiring Proof" ? "Verified Recruiter" : "Confirmed By"}
+                                </h4>
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
                                     {receipt.attesterAvatar ? (
                                         <img src={receipt.attesterAvatar} className="w-10 h-10 rounded-full border border-slate-600" />
@@ -151,10 +165,10 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                         href={`https://solscan.io/tx/${receipt.txSignature}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all border border-slate-700"
+                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-black transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                                     >
                                         <Globe className="w-3.5 h-3.5" />
-                                        View on Chain
+                                        Redirect to Solscan Proof
                                         <ExternalLink className="w-2.5 h-2.5 opacity-50" />
                                     </a>
                                 )}

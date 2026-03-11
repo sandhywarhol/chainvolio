@@ -880,9 +880,13 @@ export default function CVPage(props: any) {
 
                 <div className="space-y-6">
                   {(showAllHiring ? verifiedHiringRecords : verifiedHiringRecords.slice(0, 2)).map((record, i) => (
-                    <div key={i} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                    <div 
+                      key={i} 
+                      onClick={() => setSelectedReceipt(record)}
+                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all cursor-pointer group/hiring"
+                    >
                       <div className="space-y-1">
-                        <p className="text-sm font-bold text-white">Hired by {record.org}</p>
+                        <p className="text-sm font-bold text-white group-hover/hiring:text-emerald-400 transition-colors">Hired by {record.org}</p>
                         <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
                            <span>Role: {record.role}</span>
                            <span className="w-1 h-1 rounded-full bg-slate-800" />
@@ -890,16 +894,9 @@ export default function CVPage(props: any) {
                         </div>
                       </div>
                       
-                      {record.txSignature && (
-                        <a
-                          href={`https://solscan.io/tx/${record.txSignature}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all"
-                        >
-                          View Proof
-                        </a>
-                      )}
+                      <div className="px-4 py-2 bg-emerald-500/5 group-hover/hiring:bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all">
+                        View Details
+                      </div>
                     </div>
                   ))}
 
