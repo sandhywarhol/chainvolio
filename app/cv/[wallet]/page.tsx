@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check } from "lucide-react";
+import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink } from "lucide-react";
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
@@ -68,6 +68,7 @@ type Receipt = {
   isAttesterVerified?: boolean;
   attesterTier?: number;
   attestationId?: string;
+  attestationType?: string;
   isExternal?: boolean;
   txSignature?: string;
   createdAt: string;
@@ -771,8 +772,14 @@ export default function CVPage(props: any) {
                         {r.status === "Attested" && r.attesterWallet && (
                           <div className="mt-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2">
                             <div className="flex items-center justify-between">
-                              <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">Verification Signature</p>
-                              {r.isExternal && (
+                              <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">
+                                {r.attestationType === "Hiring Proof" ? "On-chain Recruiter Proof" : "Verification Signature"}
+                              </p>
+                              {r.attestationType === "Hiring Proof" ? (
+                                <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-tighter uppercase flex items-center gap-1">
+                                  <ShieldCheck className="w-2.5 h-2.5" /> Institutional Verified
+                                </span>
+                              ) : r.isExternal && (
                                 <span className="text-[8px] font-black bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded border border-slate-700 tracking-tighter uppercase">
                                   External Attestation
                                 </span>
@@ -850,6 +857,22 @@ export default function CVPage(props: any) {
                                 </a>
                               ))}
                             </div>
+                          </div>
+                        )}
+
+                        {/* View Transaction Button for Hiring Proofs */}
+                        {r.attestationType === "Hiring Proof" && r.txSignature && (
+                          <div className="mt-6 flex flex-col gap-2">
+                             <div className="h-px bg-white/5 w-full mb-2" />
+                             <a
+                               href={`https://solscan.io/tx/${r.txSignature}`}
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               onClick={(e) => e.stopPropagation()}
+                               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 transition-all border border-emerald-500/20 text-[11px] font-black uppercase tracking-widest"
+                             >
+                               <ExternalLink className="w-3.5 h-3.5" /> View Transaction
+                             </a>
                           </div>
                         )}
 

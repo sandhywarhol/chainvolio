@@ -37,6 +37,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
     const [candidateToHire, setCandidateToHire] = useState<string | null>(null);
+    const [hiringSuccess, setHiringSuccess] = useState<{ txSignature: string; candidateName: string } | null>(null);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const router = useRouter();
 
@@ -298,12 +299,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 };
             });
 
-            // Show success toast for hired
-            if (newStatus === 'hired') {
-                const message = txSignature 
-                    ? `Hired Successfully. On-chain proof: ${txSignature.slice(0, 8)}...`
-                    : "Candidate status updated to HIRED.";
-                setToast({ message, type: "success" });
+            // Show success MODAL for hired
+            if (newStatus === 'hired' && txSignature) {
+                setHiringSuccess({ 
+                    txSignature, 
+                    candidateName: candidate?.displayName || candidate?.wallet?.slice(0, 8) || "Candidate" 
+                });
             } else if (newStatus === 'shortlisted') {
                 setToast({ message: "Candidate Shortlisted", type: "success" });
             } else if (newStatus === 'rejected') {
@@ -324,7 +325,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             });
         } finally {
             setProcessingId(null);
-            setCandidateToHire(null); // Close the modal if it was open
+            setCandidateToHire(null); 
         }
     };
 
@@ -1064,7 +1065,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                             {processingId === candidate.id ? (
                                                                                 <div className="flex items-center justify-center gap-3">
                                                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                                                    <span>ANCHORING PROOF...</span>
+                                                                                    <span>PROCESSING HIRING...</span>
                                                                                 </div>
                                                                             ) : (
                                                                                 <span>{candidate.recruiterStatus === 'hired' ? 'HIRED ON-CHAIN' : 'MARK AS HIRED'}</span>
@@ -1161,6 +1162,42 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 confirmButtonColor="green"
                 iconColor="green"
             />
+
+            {/* Hiring Success Modal */}
+            {hiringSuccess && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setHiringSuccess(null)} />
+                    <div className="relative bg-[#0f0f11] border border-white/10 rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-6">
+                                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                            </div>
+                            
+                            <h2 className="text-2xl font-bold text-white mb-2">Hiring Successfully Recorded</h2>
+                            <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+                                The hiring decision for <span className="text-white font-bold">{hiringSuccess.candidateName}</span> has been permanently recorded on-chain and linked to your recruiter wallet.
+                            </p>
+
+                            <div className="flex flex-col w-full gap-3">
+                                <a 
+                                    href={`https://solscan.io/tx/${hiringSuccess.txSignature}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all flex items-center justify-center gap-2"
+                                >
+                                    <ExternalLink className="w-4 h-4" /> View Hiring Proof
+                                </a>
+                                <button
+                                    onClick={() => setHiringSuccess(null)}
+                                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-slate-400 font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all border border-white/5"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {toast && (
                 <Toast
