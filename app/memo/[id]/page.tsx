@@ -170,11 +170,13 @@ export default function MemoPage() {
                                 </div>
                             )}
                             <h1 className={`text-3xl md:text-5xl font-black tracking-tighter mb-4 ${t.heading}`}>
-                                VERIFICATION MEMO
+                                {attestation.attestation_type === "Hiring Proof" ? "HIRING MEMO" : "VERIFICATION MEMO"}
                             </h1>
                             <p className={`text-sm md:text-base font-medium opacity-60 max-w-xl mx-auto`}>
-                                Official institutional record for work performed by <span className={t.heading}>{receipt?.role || "Recipient"}</span>,
-                                cryptographically verified and anchored on the Solana blockchain.
+                                {attestation.attestation_type === "Hiring Proof" 
+                                    ? `Official record confirming the recruitment of ${receipt?.role || "Recipient"} by ${receipt?.org || "Institution"}.`
+                                    : `Official institutional record for work performed by ${receipt?.role || "Recipient"}, cryptographically verified and anchored on the Solana blockchain.`
+                                }
                             </p>
                         </div>
 
@@ -231,32 +233,52 @@ export default function MemoPage() {
                                 )}
                             </section>
 
-                            {/* Performance ratings */}
-                            <section>
-                                <h2 className={`text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-center lg:text-left ${t.muted}`}>Performance Assessment</h2>
-                                <div className={`p-8 rounded-3xl border space-y-6 ${isDark ? "bg-white/[0.01] border-white/5" : "bg-white border-gray-100 shadow-sm"}`}>
-                                    {PERF_LABELS.map(({ key, label }) => (
-                                        <div key={key} className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold tracking-tight opacity-70">{label}</span>
-                                                <span className="text-xs font-black">{performance?.[key] || 0}/5</span>
+                            {/* Performance ratings - Only show if data exists or NOT a hiring proof */}
+                            {(performance || attestation.attestation_type !== "Hiring Proof") && (
+                                <section>
+                                    <h2 className={`text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-center lg:text-left ${t.muted}`}>Performance Assessment</h2>
+                                    <div className={`p-8 rounded-3xl border space-y-6 ${isDark ? "bg-white/[0.01] border-white/5" : "bg-white border-gray-100 shadow-sm"}`}>
+                                        {PERF_LABELS.map(({ key, label }) => (
+                                            <div key={key} className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-bold tracking-tight opacity-70">{label}</span>
+                                                    <span className="text-xs font-black">{performance?.[key] || (attestation.attestation_type === "Hiring Proof" ? "-" : 0)}/5</span>
+                                                </div>
+                                                <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDark ? "bg-white/5" : "bg-gray-100"}`}>
+                                                    <div
+                                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                                                        style={{ width: `${(performance?.[key] || 0) * 20}%` }}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDark ? "bg-white/5" : "bg-gray-100"}`}>
-                                                <div
-                                                    className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
-                                                    style={{ width: `${(performance?.[key] || 0) * 20}%` }}
-                                                />
+                                        ))}
+                                        {avgPerf !== null && (
+                                            <div className={`pt-6 border-t flex items-center justify-between ${t.divider}`}>
+                                                <span className="text-xs font-black uppercase tracking-widest opacity-40">Aggregate Rating</span>
+                                                <span className={`text-xl font-black ${t.accent}`}>{avgPerf.toFixed(1)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            )}
+
+                            {attestation.attestation_type === "Hiring Proof" && (
+                                <section>
+                                    <h2 className={`text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-center lg:text-left ${t.muted}`}>Hiring Confirmation</h2>
+                                    <div className={`p-8 rounded-3xl border ${isDark ? "bg-emerald-500/[0.02] border-emerald-500/10" : "bg-emerald-50 border-emerald-100"}`}>
+                                        <div className="flex items-start gap-4">
+                                            <ShieldCheck className="w-6 h-6 text-emerald-500 shrink-0 mt-1" />
+                                            <div>
+                                                <p className={`text-lg font-bold mb-2 ${t.heading}`}>Recruitment Decision Confirmed</p>
+                                                <p className="text-sm opacity-70 leading-relaxed">
+                                                    This document serves as high-integrity proof that the recipient has been successfully recruited for the role of <strong>{receipt?.role}</strong>. 
+                                                    The decision was anchored on-chain by the hiring authority at <strong>{receipt?.org}</strong> and is currently active in the Hirsch-Talent framework.
+                                                </p>
                                             </div>
                                         </div>
-                                    ))}
-                                    {avgPerf !== null && (
-                                        <div className={`pt-6 border-t flex items-center justify-between ${t.divider}`}>
-                                            <span className="text-xs font-black uppercase tracking-widest opacity-40">Aggregate Rating</span>
-                                            <span className={`text-xl font-black ${t.accent}`}>{avgPerf.toFixed(1)}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </section>
+                                    </div>
+                                </section>
+                            )}
                         </div>
                     </div>
 

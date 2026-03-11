@@ -894,8 +894,20 @@ export default function CVPage(props: any) {
                         </div>
                       </div>
                       
-                      <div className="px-4 py-2 bg-emerald-500/5 group-hover/hiring:bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all">
-                        View Details
+                      <div className="flex items-center gap-2">
+                        {record.attestationId && (
+                          <Link
+                            href={`/memo/${record.attestationId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all flex items-center gap-1.5"
+                          >
+                            <FileText className="w-3 h-3" />
+                            View Memo
+                          </Link>
+                        )}
+                        <div className="px-4 py-2 bg-emerald-500/5 group-hover/hiring:bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all">
+                          View Details
+                        </div>
                       </div>
                     </div>
                   ))}
