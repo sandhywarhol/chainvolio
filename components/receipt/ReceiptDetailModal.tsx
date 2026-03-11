@@ -142,7 +142,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Wallet Address</p>
-                                    <p className="text-slate-300 font-mono break-all">{receipt.attesterWallet}</p>
+                                    <p className="text-slate-300 font-mono break-all">{receipt.attesterWallet || "Anchored On-Chain"}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Timestamp</p>
@@ -160,7 +160,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Technical Proof</p>
                                     <p className="text-slate-300 font-mono truncate" title={receipt.txSignature || receipt.attesterSignature || "N/A"}>
-                                        {receipt.txSignature ? `TX: ${receipt.txSignature.slice(0, 10)}...` : receipt.attesterSignature ? `SIG: ${receipt.attesterSignature.slice(0, 10)}...` : "ON-CHAIN ANCHOR"}
+                                        {receipt.txSignature ? `TX: ${receipt.txSignature.slice(0, 10)}...` : receipt.attesterSignature ? `SIG: ${receipt.attesterSignature.slice(0, 10)}...` : "ANALYTIC_PROOF_V1"}
                                     </p>
                                 </div>
                             </div>
@@ -171,22 +171,26 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                         href={`https://solscan.io/tx/${receipt.txSignature}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all shadow-lg shadow-emerald-900/20"
+                                        className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-sm font-black text-white transition-all shadow-xl shadow-emerald-900/30"
                                     >
-                                        <Globe className="w-3.5 h-3.5" />
+                                        <Globe className="w-4 h-4" />
                                         View Proof
-                                        <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                                        <ExternalLink className="w-3 h-3 opacity-50" />
                                     </a>
                                 )}
 
-                                {receipt.attestationId && (
+                                {receipt.attestationId ? (
                                     <Link
                                         href={`/memo/${receipt.attestationId}`}
-                                        className={`${receipt.txSignature ? "" : "col-span-2"} flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all shadow-lg shadow-emerald-900/20`}
+                                        className={`${receipt.txSignature ? "" : "col-span-2"} flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-black text-white transition-all border border-white/10`}
                                     >
-                                        <FileText className="w-3.5 h-3.5" />
+                                        <FileText className="w-4 h-4" />
                                         View Memo
                                     </Link>
+                                ) : receipt.attestationType === "Hiring Proof" && (
+                                    <div className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-slate-800/50 text-[10px] font-bold text-slate-500 border border-dashed border-slate-700">
+                                        Memo Pending Sync
+                                    </div>
                                 )}
                             </div>
                         </div>

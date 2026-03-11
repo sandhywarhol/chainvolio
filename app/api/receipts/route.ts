@@ -351,12 +351,14 @@ export async function GET(request: Request) {
         portfolioImages: r.portfolio_images || [],
         status: attestation ? "Attested" : r.status,
         attesterWallet: attestation?.attester_wallet || null,
-        attesterName: attestation?.attester_name || profile?.display_name || (attestation?.attestation_type === "Hiring Proof" ? "Verified Recruiter" : "Anonymous"),
+        attesterName: attestation?.attester_name || profile?.display_name || 
+          (attestation?.attestation_type === "Hiring Proof" || r.description?.includes("Official Verified Hiring Proof") ? "Verified Recruiter" : "Anonymous"),
         attesterRole: attestation?.attester_role || profile?.headline || null,
         attesterOrg: attestation?.attester_org || profile?.organization || null,
         isExternal: r.is_external,
-        attestationType: attestation?.attestation_type || "Direct Verification",
-        confidence: attestation?.confidence_level || null,
+        attestationType: attestation?.attestation_type || 
+          (r.description?.includes("Official Verified Hiring Proof") ? "Hiring Proof" : "Direct Verification"),
+        confidence: attestation?.confidence_level || (r.description?.includes("Official Verified Hiring Proof") ? "Confirmed" : null),
         attesterAvatar: profile?.avatar_url || null,
         attesterAt: attestation?.created_at || null,
         isAttesterVerified: attestation ? verifiedOrgWallets.has(attestation.attester_wallet) : false,
