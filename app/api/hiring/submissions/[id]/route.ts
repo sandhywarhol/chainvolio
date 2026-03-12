@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { Connection, PublicKey } from "@solana/web3.js";
 
 const errorResponse = (code: string, message: string, status: number = 400) => {
     return NextResponse.json({
@@ -27,7 +28,7 @@ export async function PATCH(
         // 1. Get the submission and its parent collection to check ownership
         const { data: submission, error: fetchError } = await supabase
             .from("collection_submissions")
-            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title)")
+            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title, metadata)")
             .eq("id", id)
             .single();
 
@@ -65,6 +66,35 @@ export async function PATCH(
             return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized. You do not own the parent collection.", 403);
         }
 
+        // --- On-Chain Signer Verification ---
+        if (!skipVerify && cleanTxSignature) {
+            try {
+                const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com");
+                
+                // Fetch transaction details
+                const tx = await connection.getParsedTransaction(cleanTxSignature, {
+                    maxSupportedTransactionVersion: 0,
+                    commitment: 'confirmed'
+                });
+
+                if (tx) {
+                    const signers = tx.transaction.message.accountKeys
+                        .filter(a => a.signer)
+                        .map(a => a.pubkey.toBase58());
+                    
+                    if (!signers.includes(ownerWallet)) {
+                        console.error("On-chain verification failed: Owner wallet", ownerWallet, "not in signers", signers);
+                        return errorResponse("ERR_INVALID_SIGNER", "The on-chain proof was not signed by the authorized recruiter.", 403);
+                    }
+                } else {
+                    console.warn("Could not fetch transaction for verification yet. Proceeding with caution.");
+                    // In a production environment, you might want to wait or fail if tx is missing after several retries
+                }
+            } catch (vErr) {
+                console.warn("Transaction verification error:", vErr);
+            }
+        }
+
         // Set transaction context for RLS
         await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
 
@@ -83,14 +113,21 @@ export async function PATCH(
         // --- 4. Special Integration: Create Hiring Record on Success ---
         if (status === 'hired' && cleanTxSignature) {
             try {
+                const hc = (submission as any).hiring_collections;
+                const jobTitle = hc?.title || "Web3 Professional";
+                const recruiterOrg = hc?.metadata?.companyName || jobTitle;
+                const recruiterName = hc?.metadata?.recruiterName || "Verified Recruiter";
+                const recruiterRole = hc?.metadata?.recruiterRole || jobTitle;
+                const jobDescription = hc?.description || `Successfully completed the recruitment process for ${jobTitle} at ${recruiterOrg}.`;
+
                 // Create a verifiable work record (receipt) for the candidate
                 const { data: receipt, error: receiptError } = await supabase
                     .from("receipts")
                     .insert({
                         wallet_address: submission.candidate_wallet,
-                        role: submission.role_strength || "Web3 Professional",
-                        org: (submission as any).hiring_collections?.title || "On-chain Organization",
-                        description: `Official Verified Hiring Proof for ${submission.role_strength || 'Professional Role'}. Recruiter Review anchored via ChainVolio Hirsch-Talent framework.`,
+                        role: jobTitle,
+                        org: recruiterOrg,
+                        description: jobDescription,
                         start_date: new Date().toISOString().split('T')[0],
                         end_date: new Date().toISOString().split('T')[0],
                         status: "Attested",
@@ -100,22 +137,20 @@ export async function PATCH(
                     .single();
 
                 if (!receiptError && receipt) {
-                    // Fetch recruiter profile for real info
-                    const { data: recProfile } = await supabase
-                        .from("profiles")
-                        .select("display_name, headline, organization")
-                        .eq("wallet_address", wallet)
-                        .single();
 
                     // Create the attestation record to link to the recruiter
                     await supabase.from("attestations").insert({
                         receipt_id: receipt.id,
                         attester_wallet: wallet,
-                        attester_name: recProfile?.display_name || "Verified Recruiter",
-                        attester_role: recProfile?.headline || "Hiring Authority",
-                        attester_org: recProfile?.organization || (submission as any).hiring_collections?.title || null,
+                        signature: cleanTxSignature, // Required by DB schema
+                        attester_name: recruiterName,
+                        attester_role: recruiterRole,
+                        attester_org: recruiterOrg,
                         attestation_type: "Hiring Proof",
-                        tx_signature: cleanTxSignature
+                        tx_signature: cleanTxSignature,
+                        confidence_level: "Confirmed",
+                        comment: `Recruitment Decision Confirmed for ${jobTitle}`,
+                        memo_issued_at: new Date().toISOString()
                     });
                 }
             } catch (integrationErr) {

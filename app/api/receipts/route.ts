@@ -335,6 +335,19 @@ export async function GET(request: Request) {
       const attestation = attestationsMap[r.id]?.[0];
       const profile = attestation ? profileMap[attestation.attester_wallet] : null;
       const updates = updatesMap[r.id] || [];
+      const isHiring = attestation?.attestation_type === "Hiring Proof" || r.description?.includes("Official Verified Hiring Proof");
+      
+      // Identity Resolution Priority
+      let attesterName = profile?.display_name;
+      if (!attesterName && attestation?.attester_name && !["Anonymous", "Verified Recruiter"].includes(attestation.attester_name)) {
+        attesterName = attestation.attester_name;
+      }
+      if (!attesterName) {
+        attesterName = profile?.organization || attestation?.attester_org;
+      }
+      if (!attesterName) {
+        attesterName = isHiring ? "Verified Recruiter" : "Anonymous";
+      }
 
       return {
         id: r.id,
@@ -351,14 +364,13 @@ export async function GET(request: Request) {
         portfolioImages: r.portfolio_images || [],
         status: attestation ? "Attested" : r.status,
         attesterWallet: attestation?.attester_wallet || null,
-        attesterName: attestation?.attester_name || profile?.display_name || 
-          (attestation?.attestation_type === "Hiring Proof" || r.description?.includes("Official Verified Hiring Proof") ? "Verified Recruiter" : "Anonymous"),
-        attesterRole: attestation?.attester_role || profile?.headline || null,
-        attesterOrg: attestation?.attester_org || profile?.organization || null,
+        attesterName: attesterName,
+        attesterRole: profile?.headline || attestation?.attester_role || (isHiring ? "Hiring Lead" : null),
+        attesterOrg: profile?.organization || attestation?.attester_org || null,
         isExternal: r.is_external,
         attestationType: attestation?.attestation_type || 
-          (r.description?.includes("Official Verified Hiring Proof") ? "Hiring Proof" : "Direct Verification"),
-        confidence: attestation?.confidence_level || (r.description?.includes("Official Verified Hiring Proof") ? "Confirmed" : null),
+          (isHiring ? "Hiring Proof" : "Direct Verification"),
+        confidence: attestation?.confidence_level || (isHiring ? "Confirmed" : null),
         attesterAvatar: profile?.avatar_url || null,
         attesterAt: attestation?.created_at || null,
         isAttesterVerified: attestation ? verifiedOrgWallets.has(attestation.attester_wallet) : false,

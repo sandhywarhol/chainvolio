@@ -21,7 +21,8 @@ import {
     CheckCircle2,
     XCircle,
     Trash2,
-    AlertCircle
+    AlertCircle,
+    Lock
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -49,6 +50,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [processingId, setProcessingId] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState("recent");
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
+    const [needsAuth, setNeedsAuth] = useState(false);
 
     const { publicKey, connected, signMessage, sendTransaction } = useWallet();
 
@@ -62,66 +64,91 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     useEffect(() => {
-        if (!connected || !publicKey || !signMessage) return;
+        if (!connected || !publicKey) return;
 
-        async function fetchDashboard() {
+        async function initDashboard() {
+            setLoading(true);
             try {
-                // 1. Check for cached signature (Session storage)
                 const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
                 const cached = sessionStorage.getItem(cacheKey);
-                let signedAction = null;
 
                 if (cached) {
                     const parsed = JSON.parse(cached);
-                    // Check if signature is still valid (10 min window in backend, let's use 9 min here for safety)
                     if (Date.now() - parsed.timestamp < 9 * 60 * 1000) {
-                        signedAction = parsed;
-                    }
-                }
-
-                if (!signedAction) {
-                    const { signChainVolioAction } = await import("@/lib/wallet-utils");
-                    signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard");
-
-                    if (signedAction) {
-                        sessionStorage.setItem(cacheKey, JSON.stringify(signedAction));
-                    }
-                }
-
-                if (!signedAction) return;
-
-                const searchParams = new URLSearchParams({
-                    t: Date.now().toString(),
-                    wallet: publicKey?.toBase58() || "",
-                    signature: signedAction.signature,
-                    nonce: signedAction.nonce,
-                    timestamp: signedAction.timestamp.toString()
-                });
-
-                const res = await fetch(`/api/hiring/collections/${slug}/candidates?${searchParams.toString()}`, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
-                const result = await res.json();
-                if (res.ok) {
-                    setData(result);
-                } else {
-                    // If backend rejects even after our "safety" check, clear cache and retry once if it was cached
-                    if (res.status === 401 && cached) {
-                        sessionStorage.removeItem(cacheKey);
-                        fetchDashboard();
+                        await fetchWithSignature(parsed);
                         return;
                     }
-                    setError(result.error || "Failed to load dashboard.");
                 }
+                
+                // If we get here, we need a fresh signature
+                setNeedsAuth(true);
+                setLoading(false);
             } catch (err) {
-                setError("Network error occurred.");
-            } finally {
+                console.error("Dashboard init error:", err);
                 setLoading(false);
             }
         }
-        fetchDashboard();
-    }, [slug, connected, publicKey, signMessage]);
+
+        initDashboard();
+    }, [slug, connected, publicKey]);
+
+    const handleAuthorize = async () => {
+        if (!publicKey || !signMessage) return;
+        setLoading(true);
+        setNeedsAuth(false);
+        try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard");
+
+            if (signedAction) {
+                const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
+                sessionStorage.setItem(cacheKey, JSON.stringify(signedAction));
+                await fetchWithSignature(signedAction);
+            } else {
+                setNeedsAuth(true);
+            }
+        } catch (err) {
+            setError("Authorization failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchWithSignature = async (signedAction: any) => {
+        if (!publicKey) return;
+        try {
+            const searchParams = new URLSearchParams({
+                t: Date.now().toString(),
+                wallet: publicKey.toBase58(),
+                signature: signedAction.signature,
+                nonce: signedAction.nonce,
+                timestamp: signedAction.timestamp.toString()
+            });
+
+            const res = await fetch(`/api/hiring/collections/${slug}/candidates?${searchParams.toString()}`, {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+                setData(result);
+                setNeedsAuth(false);
+            } else {
+                if (res.status === 401) {
+                    const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
+                    sessionStorage.removeItem(cacheKey);
+                    setNeedsAuth(true);
+                } else {
+                    setError(result.error || "Failed to load dashboard.");
+                }
+            }
+        } catch (err) {
+            setError("Network error occurred.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async () => {
         if (!publicKey || !signMessage) return;
@@ -600,6 +627,28 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         </div>
     );
 
+    if (needsAuth) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
+            <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
+                <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
+                    <Lock className="w-10 h-10 text-indigo-500" />
+                </div>
+                <div className="space-y-3">
+                    <h1 className="text-2xl font-bold">Secure Dashboard</h1>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                        To protect sensitive candidate data, please authorize restricted access with your recruiter wallet signature.
+                    </p>
+                </div>
+                <button 
+                    onClick={handleAuthorize}
+                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
+                >
+                    <ShieldCheck className="w-4 h-4" /> Authorize Session
+                </button>
+            </div>
+        </div>
+    );
+
     if (error) return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
             <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
@@ -662,9 +711,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                     {[
-                        { label: "Pipeline Depth", value: data?.candidates.length, icon: Users, color: "text-blue-400/80", desc: "Total applications" },
-                        { label: "Authority Rate", value: `${((data?.candidates.filter(c => c.attestedCount > 0).length || 0) / (data?.candidates.length || 1) * 100).toFixed(0)}%`, icon: ShieldCheck, color: "text-emerald-400/80", desc: "Attested portfolios" },
-                        { label: "Signal Density", value: (data?.candidates.reduce((acc, c) => acc + c.powCount, 0) / (data?.candidates.length || 1)).toFixed(1), icon: Briefcase, color: "text-purple-400/80", desc: "Avg. proof volume" },
+                        { label: "Pipeline Depth", value: data?.candidates?.length || 0, icon: Users, color: "text-blue-400/80", desc: "Total applications" },
+                        { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter(c => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, icon: ShieldCheck, color: "text-emerald-400/80", desc: "Attested portfolios" },
+                        { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc, c) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", icon: Briefcase, color: "text-purple-400/80", desc: "Avg. proof volume" },
                         { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-orange-400/80", desc: "Verified partners" }
                     ].map((stat, i) => (
                         <div key={i} className="bg-[#121215] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">

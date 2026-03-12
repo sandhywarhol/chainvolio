@@ -78,9 +78,14 @@ export default function AttestPage() {
             .then(res => res.ok ? res.json() : null)
             .then(data => {
                 if (data && data.displayName) {
+                    const baseRole = data.role || data.headline || "";
+                    const fullRole = (baseRole && data.organization)
+                        ? `${baseRole} @ ${data.organization}`
+                        : baseRole;
+
                     setAttesterProfile(data);
                     setAttesterName(data.displayName || "");
-                    setAttesterRole(data.headline || data.role || "");
+                    setAttesterRole(fullRole);
                     setAttesterOrg(data.organization || "");
                     setIsExternal(false);
                 } else {

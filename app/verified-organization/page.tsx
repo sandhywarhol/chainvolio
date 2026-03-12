@@ -1,8 +1,8 @@
 "use client";
 
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Navbar } from "@/components/layout/Navbar";
 import { useEffect, useState } from "react";
 import { Footer } from "@/components/layout/Footer";
@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function VerifiedOrganizationPage() {
     const { connected, publicKey } = useWallet();
-    const { setVisible } = useWalletModal();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isVerified, setIsVerified] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -72,7 +72,7 @@ export default function VerifiedOrganizationPage() {
                         {showVerifyCTA && (
                             !connected ? (
                                 <button
-                                    onClick={() => setVisible(true)}
+                                    onClick={() => setIsModalOpen(true)}
                                     className="px-8 py-3.5 rounded-2xl bg-emerald-500 text-white font-extrabold text-lg hover:bg-emerald-400 transition-all hover:scale-105 shadow-2xl shadow-emerald-500/20"
                                 >
                                     Verify your organization
@@ -202,6 +202,8 @@ export default function VerifiedOrganizationPage() {
             <div className="relative z-10">
                 <Footer />
             </div>
+
+            <CustomWalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </main>
     );
 }

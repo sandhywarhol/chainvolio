@@ -886,32 +886,26 @@ export default function CVPage(props: any) {
                       className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all cursor-pointer group/hiring"
                     >
                       <div className="space-y-1">
-                        <p className="text-sm font-bold text-white group-hover/hiring:text-emerald-400 transition-colors">Hired by {record.org}</p>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                           <span>Role: {record.role}</span>
-                           <span className="w-1 h-1 rounded-full bg-slate-800" />
+                        <p className="text-sm font-bold text-white group-hover/hiring:text-emerald-400 transition-colors">{record.role} at {record.org}</p>
+                        <div className="flex flex-col gap-1 text-[11px] text-slate-500 font-medium">
+                           <div className="flex items-center gap-2">
+                              <span>Position: {record.role}</span>
+                              <span className="w-1 h-1 rounded-full bg-slate-800" />
+                              <span className="text-emerald-500/80">Verified by {record.attesterName || record.attesterWallet?.slice(0, 6)}</span>
+                           </div>
                            <span>{record.startDate ? new Date(record.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Mar 2026'}</span>
                         </div>
+                        {record.description && (
+                           <p className="text-[10px] text-slate-400/80 leading-relaxed font-medium mt-1 line-clamp-2 italic">
+                             "{record.description}"
+                           </p>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {record.attestationId ? (
-                          <Link
-                            href={`/memo/${record.attestationId}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-[10px] font-black text-white uppercase tracking-widest transition-all flex items-center gap-1.5"
-                          >
-                            <FileText className="w-3 h-3" />
-                            View Memo
-                          </Link>
-                        ) : record.attestationType === "Hiring Proof" && (
-                          <div className="px-4 py-2 bg-slate-800/50 border border-dashed border-slate-700 rounded-lg text-[9px] font-bold text-slate-500 uppercase tracking-tight">
-                            Memo Syncing
-                          </div>
-                        )}
-                        <div className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/20 rounded-lg text-[10px] font-black text-white uppercase tracking-widest transition-all">
-                          View Proof
-                        </div>
+                        <span className="text-xs px-2 py-0.5 rounded border border-emerald-500/50 text-emerald-400 bg-emerald-500/10 whitespace-nowrap">
+                          ✓ Attested
+                        </span>
                       </div>
                     </div>
                   ))}

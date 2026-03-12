@@ -104,11 +104,18 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                     )}
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-sm font-bold text-white">
-                                                {receipt.attestationType === "Hiring Proof" && receipt.attesterName === "Anonymous" 
-                                                    ? "Verified Recruiter" 
-                                                    : receipt.attesterName}
-                                            </p>
+                                            <div className="flex flex-col">
+                                                <Link 
+                                                    href={`/cv/${receipt.attesterWallet}`}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="text-sm font-bold text-white hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+                                                >
+                                                    {receipt.attestationType === "Hiring Proof" && receipt.attesterName === "Anonymous" 
+                                                        ? "Verified Recruiter" 
+                                                        : receipt.attesterName}
+                                                    <ExternalLink className="w-3 h-3 opacity-30" />
+                                                </Link>
+                                            </div>
                                             {receipt.isAttesterVerified && (
                                                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-tight">
                                                     <ShieldCheck className="w-3 h-3" />

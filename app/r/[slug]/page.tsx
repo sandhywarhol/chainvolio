@@ -28,12 +28,14 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     const { slug } = params;
     const { publicKey, connected, signMessage } = useWallet();
     const [collection, setCollection] = useState<any>(null);
+    const [ownerProfile, setOwnerProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [primarySignal, setPrimarySignal] = useState("");
     const [roleStrength, setRoleStrength] = useState("");
+    const [applicantProfile, setApplicantProfile] = useState<any>(null);
 
     useEffect(() => {
         async function fetchCollection() {
@@ -42,6 +44,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 const data = await res.json();
                 if (data.collection) {
                     setCollection(data.collection);
+                    setOwnerProfile(data.owner_profile);
                 } else {
                     setError("Collection not found or has been closed.");
                 }
@@ -53,6 +56,17 @@ export default function CandidateSubmission({ params }: { params: { slug: string
         }
         fetchCollection();
     }, [slug]);
+
+    useEffect(() => {
+        if (!publicKey) {
+            setApplicantProfile(null);
+            return;
+        }
+        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => setApplicantProfile(data))
+            .catch(() => setApplicantProfile(null));
+    }, [publicKey]);
 
     const handleSubmit = async () => {
         if (!publicKey || !signMessage) return;
@@ -150,91 +164,105 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                             </div>
                         </header>
 
-                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl space-y-10">
-                            <div className="flex flex-col md:flex-row gap-10">
-                                <div className="flex-1 space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                                            <Briefcase className="w-5 h-5" />
+                        <div className="space-y-6">
+                             {/* New Polished Recruiter Identity Box on Top */}
+                            {(collection.metadata?.recruiterName || collection.metadata?.companyName) && (
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 md:p-6 relative overflow-hidden group/recruiter transition-all">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl opacity-30"></div>
+                                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5">
+                                        <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
+                                            {ownerProfile?.avatar_url ? (
+                                                <img src={ownerProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Building2 className="w-6 h-6 text-emerald-400" />
+                                            )}
                                         </div>
-                                        <h2 className="text-xl font-bold">Role Overview</h2>
-                                    </div>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Type</p>
-                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.roleType || "Full-time"}</p>
-                                        </div>
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Work Mode</p>
-                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.workMode || "Remote"}</p>
-                                        </div>
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Timezone</p>
-                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.timezone || "Any"}</p>
-                                        </div>
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Comp. Model</p>
-                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.compensationType || "Crypto + Equity"}</p>
-                                        </div>
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4 border-emerald-500/10">
-                                            <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-1">Salary</p>
-                                            <p className="text-sm font-bold text-emerald-400">{collection.metadata?.salary || "Competitive"}</p>
-                                        </div>
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Experience</p>
-                                            <p className="text-sm font-bold text-slate-300">{collection.metadata?.experienceLevel || "Senior"}</p>
-                                        </div>
-                                    </div>
+                                        <div className="flex-1 text-center md:text-left">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="space-y-0.5">
+                                                    <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/10 px-2 py-0.5 rounded">Hiring Authority</span>
+                                                        <div className="flex items-center gap-1.5 opacity-80">
+                                                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Verified</span>
+                                                        </div>
+                                                    </div>
+                                                    <h3 className="text-xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
+                                                    <p className="text-xs font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
+                                                </div>
 
-                                    <div className="space-y-4 pt-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1 h-1 rounded-full bg-slate-600"></div>
-                                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Job Description</h3>
-                                        </div>
-                                        <div className="prose prose-invert max-w-none">
-                                            <p className="text-slate-400 text-lg leading-relaxed whitespace-pre-wrap">
-                                                {collection.description ? collection.description : "Apply to join the team and showcase your verified on-chain history as part of your application."}
-                                            </p>
+                                                {collection.metadata?.companyName && (
+                                                    <div className="md:text-right">
+                                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Organization</p>
+                                                        <p className="text-base font-black text-emerald-400 leading-tight">{collection.metadata.companyName}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {collection.metadata.companyDescription && (
+                                                <div className="mt-4 pt-3 border-t border-white/5">
+                                                    <p className="text-[10px] text-slate-500 leading-relaxed italic max-w-2xl">"{collection.metadata.companyDescription}"</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
+                            )}
 
-                                {/* Recruiter Card Side Panel */}
-                                {(collection.metadata?.recruiterName || collection.metadata?.companyName) && (
-                                    <div className="md:w-64 flex-shrink-0">
-                                        <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-6 h-full flex flex-col justify-center border-emerald-500/5 group/recruiter transition-all">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Recruiter Identity</h3>
+                            {/* Role Overview Box */}
+                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                                <div className="space-y-10">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                                                <Briefcase className="w-5 h-5" />
                                             </div>
-                                            <div className="space-y-4">
-                                                {collection.metadata?.recruiterName && (
-                                                    <div>
-                                                        <p className="text-sm font-black text-white">{collection.metadata.recruiterName}</p>
-                                                        <p className="text-[11px] font-medium text-slate-500 uppercase tracking-tight">{collection.metadata.recruiterRole || "Hiring Lead"}</p>
-                                                    </div>
-                                                )}
-                                                {collection.metadata?.companyName && (
-                                                    <div className="pt-3 border-t border-white/5">
-                                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-1">Strategic Partner</p>
-                                                        <p className="text-sm font-black text-emerald-400">{collection.metadata.companyName}</p>
-                                                        {collection.metadata.companyDescription && (
-                                                            <p className="text-[10px] text-slate-500 mt-1 lines-clamp-2 leading-relaxed">{collection.metadata.companyDescription}</p>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                <div className="pt-3 flex items-center gap-1.5 opacity-60">
-                                                    <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
-                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">On-Chain Verified</span>
-                                                </div>
+                                            <h2 className="text-xl font-bold">Role Overview</h2>
+                                        </div>
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Type</p>
+                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.roleType || "Full-time"}</p>
+                                            </div>
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Work Mode</p>
+                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.workMode || "Remote"}</p>
+                                            </div>
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Timezone</p>
+                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.timezone || "Any"}</p>
+                                            </div>
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Comp. Model</p>
+                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.compensationType || "Crypto + Equity"}</p>
+                                            </div>
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4 border-emerald-500/10">
+                                                <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-1">Salary</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.salary || "Competitive"}</p>
+                                            </div>
+                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Experience</p>
+                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.experienceLevel || "Senior"}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4 pt-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1 h-1 rounded-full bg-slate-600"></div>
+                                                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Job Description</h3>
+                                            </div>
+                                            <div className="prose prose-invert max-w-none">
+                                                <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">
+                                                    {collection.description ? collection.description : "Apply to join the team and showcase your verified on-chain history as part of your application."}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="bg-[#121214] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-50"></div>
 
                             {!connected ? (
@@ -252,11 +280,17 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                 <div className="space-y-10">
                                     <div className="flex items-center justify-between gap-4 p-5 bg-black/40 border border-white/5 rounded-2xl">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                                                <User className="w-6 h-6 text-emerald-400" />
+                                            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20 overflow-hidden">
+                                                {applicantProfile?.avatarUrl ? (
+                                                    <img src={applicantProfile.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="w-6 h-6 text-emerald-400" />
+                                                )}
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Applicant Wallet</p>
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">
+                                                    {applicantProfile?.displayName || "Applicant Wallet"}
+                                                </p>
                                                 <p className="text-sm font-mono font-bold text-white">
                                                     {publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}
                                                 </p>

@@ -58,14 +58,17 @@ export async function GET(
     // Fetch attester profile
     const { data: profile } = await supabase
         .from("profiles")
-        .select("avatar_url")
+        .select("avatar_url, display_name, headline, professional_role, organization")
         .eq("wallet_address", attestation.attester_wallet)
         .single();
+
+    const issuerRole = profile?.professional_role || profile?.headline || attestation.attester_role || "Verifier";
 
     return NextResponse.json({
         attestation,
         receipt: receipt || null,
         attester_verification: verification || null,
         attester_profile: profile || null,
+        issuer_role: issuerRole,
     });
 }

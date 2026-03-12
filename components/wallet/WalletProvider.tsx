@@ -2,15 +2,12 @@
 
 import { useMemo } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { PhantomProvider } from "@phantom/react-sdk";
 import { AddressType } from "@phantom/browser-sdk";
-
-import "@solana/wallet-adapter-react-ui/styles.css";
 
 // Your Phantom Portal App ID - registers ChainVolio as a recognized app
 // so users see "ChainVolio" instead of "Unknown App" in their Phantom wallet.
@@ -50,7 +47,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     >
       <ConnProv endpoint={endpoint}>
         <SolWallProv wallets={wallets} autoConnect>
-          <WalletModalProvider>{children}</WalletModalProvider>
+          {children}
         </SolWallProv>
       </ConnProv>
     </PhantomProvider>

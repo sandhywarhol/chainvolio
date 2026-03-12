@@ -20,7 +20,17 @@ export async function GET(
             return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
 
-        return NextResponse.json({ collection });
+        // Fetch owner profile for avatar and verified status
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("avatar_url, display_name, headline, professional_role")
+            .eq("wallet_address", collection.owner_wallet)
+            .single();
+
+        return NextResponse.json({ 
+            collection,
+            owner_profile: profile || null
+        });
     } catch (err: any) {
         return NextResponse.json({ error: err.message || "Server Error" }, { status: 500 });
     }

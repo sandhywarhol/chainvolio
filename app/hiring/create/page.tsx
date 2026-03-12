@@ -79,15 +79,20 @@ export default function CreateCollection() {
             try {
                 const { data, error } = await supabase
                     .from("profiles")
-                    .select("display_name, headline, organization, website, twitter")
+                    .select("display_name, headline, professional_role, organization, website, twitter")
                     .eq("wallet_address", publicKey.toBase58())
                     .single();
 
                 if (data && !error) {
+                    const baseRole = data.professional_role || data.headline || "";
+                    const fullRole = (baseRole && data.organization) 
+                        ? `${baseRole} @ ${data.organization}` 
+                        : baseRole;
+
                     setFormData(prev => ({
                         ...prev,
                         recruiterName: prev.recruiterName || data.display_name || "",
-                        recruiterRole: prev.recruiterRole || data.headline || "",
+                        recruiterRole: prev.recruiterRole || fullRole,
                         companyName: prev.companyName || data.organization || "",
                         websiteUrl: prev.websiteUrl || data.website || "",
                         twitterUrl: prev.twitterUrl || data.twitter || ""
@@ -196,11 +201,11 @@ export default function CreateCollection() {
                             <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 backdrop-blur-sm shadow-2xl">
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Collection Title</label>
+                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Job Position</label>
                                         <input
                                             type="text"
                                             required
-                                            placeholder="e.g. Senior Smart Contract Engineer - Q3 Hiring"
+                                            placeholder="e.g. Content Creator, Frontend Engineer"
                                             value={formData.title}
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-lg font-medium focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-500/20"
@@ -248,20 +253,10 @@ export default function CreateCollection() {
                                                 placeholder="e.g. Satoshi (Founder)"
                                                 value={formData.recruiterName}
                                                 onChange={(e) => setFormData({ ...formData, recruiterName: e.target.value })}
-                                                readOnly={isAutoFilled && !!formData.recruiterName}
-                                                className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm ${isAutoFilled && !!formData.recruiterName ? "text-slate-400 cursor-not-allowed" : ""}`}
+                                                readOnly
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm text-slate-400 cursor-not-allowed"
                                             />
-                                            {isAutoFilled && !!formData.recruiterName ? (
-                                                <button 
-                                                    type="button"
-                                                    onClick={() => setIsAutoFilled(false)}
-                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-indigo-400 uppercase tracking-tight hover:text-indigo-300"
-                                                >
-                                                    Change
-                                                </button>
-                                            ) : (
-                                                <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
-                                            )}
+                                            <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
                                         </div>
                                     </div>
                                     <div>
@@ -271,8 +266,7 @@ export default function CreateCollection() {
                                             placeholder="e.g. CTO, Head of Talent"
                                             value={formData.recruiterRole}
                                             onChange={(e) => setFormData({ ...formData, recruiterRole: e.target.value })}
-                                            readOnly={isAutoFilled && !!formData.recruiterRole}
-                                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm ${isAutoFilled && !!formData.recruiterRole ? "text-slate-400 cursor-not-allowed" : ""}`}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
                                         />
                                     </div>
                                 </div>

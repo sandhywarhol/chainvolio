@@ -94,9 +94,11 @@ export default function MemoPage() {
         ? (Object.values(performance) as number[]).reduce((a: number, b: number) => a + b, 0) / 5
         : null;
 
+    const isHiring = attestation.attestation_type === "Hiring Proof";
     const classification = hasMemoV2 ? memo.classification : (attestation.attestation_type || "Professional Attestation");
-    const issuerName = hasMemoV2 ? memo.signature?.signatory_name : (attestation.attester_name || "");
-    const issuerOrg = hasMemoV2 ? memo.signature?.signatory_org : (attestation.attester_org || "");
+    const issuerName = attester_profile?.display_name || (hasMemoV2 ? memo.signature?.signatory_name : (attestation.attester_name !== "Anonymous" ? attestation.attester_name : (isHiring ? "Verified Recruiter" : "Anonymous")));
+    const issuerOrg = attester_profile?.organization || (hasMemoV2 ? memo.signature?.signatory_org : (attestation.attester_org || ""));
+    const issuerRole = data.issuer_role || attester_profile?.professional_role || attester_profile?.headline || attestation.attester_role || (isHiring ? "Hiring Lead" : "Verifier");
 
     const isVerified = attester_verification?.status === "verified";
     const tier = isVerified ? (attester_verification?.verifier_tier || 1) : 1;
@@ -398,7 +400,7 @@ export default function MemoPage() {
                                             </div>
                                         </div>
                                         <p className="text-sm font-medium opacity-60 italic">
-                                            {attestation.attester_role} - {issuerOrg}
+                                            {issuerRole} - {issuerOrg}
                                         </p>
                                         {/* Verification Details */}
                                         {tier > 1 && (
