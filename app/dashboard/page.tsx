@@ -12,6 +12,7 @@ import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
+import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy } from "lucide-react";
 
 type Profile = {
@@ -209,6 +210,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-center md:justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <h1 className="text-3xl font-bold">{profile.displayName}</h1>
+                    <CommunityBadge cvId={profile.cardNumber || 0} />
                     {profile?.isVerified && (
                       <div
                         className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${profile.verifierTier === 3

@@ -12,6 +12,7 @@ import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { CommunityBadge } from "@/components/profile/CommunityBadge";
 
 type Profile = {
   displayName: string;
@@ -454,9 +455,12 @@ export default function CVPage(props: any) {
                   )}
 
                   <div className="flex flex-col md:flex-row md:items-center gap-3">
-                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                      {profile.displayName}
-                    </h1>
+                    <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start">
+                      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                        {profile.displayName}
+                      </h1>
+                      <CommunityBadge cvId={profile.cardNumber || 0} />
+                    </div>
 
                     {/* Wallet Badge - Next to Name */}
                     <button
