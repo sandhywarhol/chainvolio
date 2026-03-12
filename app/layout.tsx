@@ -46,6 +46,9 @@ export const metadata: Metadata = {
     description: "The on-chain standard for professional identity and verifiable career milestones.",
     images: ["/homepage/og%20image%20for%20all.jpg?v=5"],
   },
+  verification: {
+    google: "Crb2ONV_uh-J55SnH6dCcCzSrbNDVlEISKSq51FkKpg",
+  },
 };
 
 export default function RootLayout({
@@ -56,6 +59,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans min-h-screen text-white relative`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "ChainVolio",
+              "url": "https://www.chainvolio.xyz/",
+              "logo": "https://www.chainvolio.xyz/logo.png",
+              "description": "On-chain professional identity and trust infrastructure for Web3 careers.",
+              "sameAs": [
+                "https://x.com/chainvolio",
+                "https://github.com/sandhywarhol/chainvolio"
+              ]
+            })
+          }}
+        />
         <AppBackground />
         <div className="relative z-[60]">
           <WalletProvider>{children}</WalletProvider>
