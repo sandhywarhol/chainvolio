@@ -56,7 +56,7 @@ export function WalletMultiButton() {
         className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2.5"
       >
         {currentWalletIcon ? (
-           <img src={currentWalletIcon} alt="Wallet" className="w-3.5 h-3.5 object-contain" />
+           <img src={currentWalletIcon} alt="Wallet" className="w-3.5 h-3.5 object-contain rounded-md" />
         ) : (
            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
         )}

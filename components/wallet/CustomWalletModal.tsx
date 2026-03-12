@@ -115,7 +115,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             >
                                 <div className="flex items-center gap-4 text-left">
                                     <div className="w-10 h-10 rounded-xl bg-black/50 border border-white/5 p-2 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <img src={wallet.icon} alt={wallet.name} className="w-full h-full object-contain" />
+                                        <img src={wallet.icon} alt={wallet.name} className="w-full h-full object-contain rounded-md" />
                                     </div>
                                     <div>
                                         <p className="font-bold text-white transition-colors">{wallet.name}</p>
