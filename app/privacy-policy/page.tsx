@@ -107,22 +107,21 @@ export default function PrivacyPolicyPage() {
                             We implement industry-standard safeguards for off-chain storage. Data anchored to the blockchain is secured by the underlying public network architecture. ChainVolio does not control or manage independent third-party wallet providers.
                         </p>
                     </div>
-                </div>
-            </section>
 
-
-            {/* Updates & Third Party */}
-            <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
-                <div className="grid md:grid-cols-2 gap-16">
+                    {/* Third Parties */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">07. Non-Custodial Third Parties</h3>
-                        <p className="text-sm text-white/30 font-light leading-relaxed">
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">07. Ecosystem</span>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Third Parties.</h2>
+                        <p className="text-white/40 font-light leading-relaxed">
                             We interact with sovereign wallet providers and public blockchain nodes to facilitate secure authentication. These third-party services operate independently of the ChainVolio infrastructure.
                         </p>
                     </div>
+
+                    {/* Updates */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">08. Prospective Updates</h3>
-                        <p className="text-sm text-white/30 font-light leading-relaxed">
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">08. Governance</span>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Policy Updates.</h2>
+                        <p className="text-white/40 font-light leading-relaxed">
                             Updates to this policy apply prospectively as the infrastructure evolves. Continued interaction with the system constitutes acceptance of the current privacy standards.
                         </p>
                     </div>
