@@ -51,9 +51,9 @@ export function CommunityBadge({ cvId, className = "" }: CommunityBadgeProps) {
   const Icon = tierData.icon;
 
   return (
-    <div className={`relative group/badge inline-block ${className}`}>
-      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[9px] font-bold uppercase tracking-widest ${tierData.containerClass} transition-all duration-300 hover:scale-105 cursor-default`}>
-        <Icon className={`w-3 h-3 ${tierData.iconClass}`} />
+    <div className={`relative group/badge flex items-start ${className}`}>
+      <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${tierData.containerClass} transition-all duration-300 hover:scale-105 cursor-default`}>
+        <Icon className={`w-[10px] h-[10px] ${tierData.iconClass}`} strokeWidth={3} />
         <span>{tierData.badgeLabel}</span>
       </div>
       

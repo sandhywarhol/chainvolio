@@ -181,10 +181,11 @@ export default function DashboardPage() {
                 )}
 
                 {profile.cardNumber && (
-                  <div className="mt-2 text-center md:text-left">
+                  <div className="mt-2 text-center md:text-left flex flex-col gap-2 items-center md:items-start">
                     <span className="font-mono text-[10px] tracking-widest text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded border border-slate-700/50">
                       CV ID #{String(profile.cardNumber).padStart(5, '0')}
                     </span>
+                    <CommunityBadge cvId={profile.cardNumber || 0} />
                   </div>
                 )}
 
@@ -210,7 +211,6 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-center md:justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <h1 className="text-3xl font-bold">{profile.displayName}</h1>
-                    <CommunityBadge cvId={profile.cardNumber || 0} />
                     {profile?.isVerified && (
                       <div
                         className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${profile.verifierTier === 3
