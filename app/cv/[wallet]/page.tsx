@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink } from "lucide-react";
+import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
@@ -141,50 +141,213 @@ function getEvidenceIcon(label: string) {
 }
 
 const TIER_DATA: Record<number, { label: string; icon: boolean; color: string; bars: number; weight: number }> = {
-  1: { label: "Individual", icon: false, color: "text-slate-500 bg-slate-500/10 border-slate-500/20", bars: 1, weight: 1 },
-  2: { label: "Verified Figure", icon: true, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20", bars: 2, weight: 3 },
-  3: { label: "Verified Organization", icon: true, color: "text-teal-400 bg-teal-400/10 border-teal-400/20", bars: 3, weight: 6 },
+  1: { label: "Builder", icon: false, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
+  2: { label: "Public Figure", icon: true, color: "text-pink-400 bg-pink-500/10 border-pink-500/20", bars: 2, weight: 3 },
+  3: { label: "Community", icon: true, color: "text-blue-400 bg-blue-500/10 border-blue-500/20", bars: 3, weight: 6 },
+  4: { label: "Organization", icon: true, color: "text-amber-400 bg-amber-500/10 border-amber-500/20", bars: 4, weight: 10 },
+};
+
+const getBadgeStyles = (verificationType?: string) => {
+  const type = (verificationType || "").toLowerCase();
+  
+  if (type.includes("public") || type.includes("figure")) return {
+    color: "text-pink-400 bg-pink-500/10 border-pink-500/20",
+    iconText: "text-pink-400",
+    border: "border-pink-500/50",
+    bgBase: "bg-pink-500/60",
+    glow: "shadow-[0_0_25px_rgba(236,72,153,0.5)]",
+    bars: 2
+  };
+  
+  if (type.includes("community") || type.includes("dao")) return {
+    color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+    iconText: "text-blue-400",
+    border: "border-blue-500/50",
+    bgBase: "bg-blue-500/60",
+    glow: "shadow-[0_0_20px_rgba(59,130,246,0.4)]",
+    bars: 3
+  };
+  
+  if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
+    color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+    iconText: "text-amber-400",
+    border: "border-amber-500/50",
+    bgBase: "bg-amber-500/60",
+    glow: "shadow-[0_0_20px_rgba(245,158,11,0.4)]",
+    bars: 4
+  };
+  
+  // Default Builder / Emerald
+  return {
+    color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    iconText: "text-emerald-400",
+    border: "border-emerald-500/50",
+    bgBase: "bg-emerald-500/60",
+    glow: "shadow-[0_0_20px_rgba(16,185,129,0.4)]",
+    bars: 1
+  };
 };
 
 function TrustBadge({ tier, isVerified, verificationType, className = "" }: { tier: number; isVerified: boolean; verificationType?: string; className?: string }) {
+  if (!isVerified) return null;
   const data = TIER_DATA[tier as keyof typeof TIER_DATA] || TIER_DATA[1];
-  // Tier 2 & 3 visuals only active if isVerified is true
-  const isActive = tier > 1 ? isVerified : true;
-  const showShield = tier > 1 && isVerified && data.icon;
+  const isActive = isVerified;
+  const showShield = isVerified && data.icon;
 
-  const displayLabel = (isActive && verificationType) ? `Verified ${verificationType}` : data.label;
+  const getNormalizedLabel = (type?: string) => {
+    const t = (type || "").toLowerCase();
+    if (t.includes("figure") || t === "public figure") return "Public Figure";
+    if (t.includes("community") || t.includes("dao")) return "Community / DAO";
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Company / Organization";
+    if (t.includes("builder")) return "Builder";
+    return type || data.label;
+  };
+
+  const displayLabel = getNormalizedLabel(verificationType);
+  const badgeStyleData = getBadgeStyles(verificationType);
+  const badgeStyle = badgeStyleData.color;
+  const barsCount = badgeStyleData.bars;
+
+  const getTooltipContent = () => {
+    const label = getNormalizedLabel(verificationType);
+    if (label === "Public Figure") {
+      return { title: "Verified Public Figure", desc: "Recognized individual with verified identity and proven contribution record." };
+    }
+    if (label === "Community / DAO") {
+      return { title: "Verified DAO / Community", desc: "Official representative or entity with established governance history." };
+    }
+    if (label === "Company / Organization") {
+      return { title: "Verified Company", desc: "Institutional entity with verified registration and professional standing." };
+    }
+    return { title: "Verified Builder", desc: "Individual professional with verified career records and proof of work." };
+  };
+
+  const tooltip = getTooltipContent();
 
   return (
-    <div className={`flex flex-col items-start gap-1 ${className}`}>
-      <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${isActive ? data.color : 'text-slate-500 bg-slate-500/10 border-slate-500/20'}`}>
+    <div className={`relative group/trust flex flex-col items-center gap-1 ${className}`}>
+      <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${badgeStyle} transition-all duration-300 hover:scale-105 cursor-default shadow-sm`}>
         {showShield && <ShieldCheck size={10} strokeWidth={3} />} {displayLabel}
       </span>
       {isActive && (
-        <div className={`text-[8px] leading-none tracking-[-0.1em] transition-opacity duration-300 ${data.color} opacity-60 ml-0.5`}>
-          {"▬".repeat(data.bars)}
+        <div className="flex gap-0.5 pt-0.5">
+          {Array.from({ length: barsCount }).map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-[2px] w-2.5 rounded-full ${badgeStyleData.bgBase} opacity-50 shadow-sm`}
+            />
+          ))}
         </div>
       )}
+
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 opacity-0 group-hover/trust:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+        <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl">
+          <p className={`text-[10px] font-black mb-1 uppercase tracking-widest leading-none ${badgeStyleData.iconText}`}>{tooltip.title}</p>
+          <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
+            {tooltip.desc}
+          </p>
+          <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between">
+            <span className="text-[8px] text-slate-500 uppercase font-black tracking-tighter">Attestation Power</span>
+            <div className="flex gap-0.5">
+              {Array.from({ length: barsCount }).map((_, i) => (
+                <div key={i} className={`h-1 w-2 rounded-full ${badgeStyleData.bgBase}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Arrow pointer */}
+        <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900"></div>
+      </div>
     </div>
   );
 }
 
-function ProfileCompleteBadge({ isComplete, onClick, className = "" }: { isComplete: boolean; onClick?: () => void; className?: string }) {
+function ProfileCompleteBadge({ 
+  isComplete,
+  onClick,
+  className = "" 
+}: { 
+  isComplete: boolean;
+  isVerified?: boolean;
+  verificationType?: string;
+  onClick?: () => void;
+  className?: string; 
+}) {
   if (!isComplete) return null;
+
+  const usedStyle = getBadgeStyles("builder");
+  const labelText = "Profile Complete";
+
   return (
     <div
-      className={`group/badge cursor-pointer ${className}`}
+      className={`relative group/complete flex items-start ${className}`}
       onClick={onClick}
     >
-      <div className="relative flex items-center justify-center">
-        <div className="absolute inset-0 bg-emerald-500/40 rounded-full blur-md animate-pulse"></div>
-        <div className="relative p-2 rounded-full bg-slate-900/90 border border-emerald-500/50 text-emerald-400 backdrop-blur-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-transform duration-300 group-hover/badge:scale-110">
-          <BadgeCheck className="w-6 h-6" />
+      <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${usedStyle.color} transition-all duration-300 hover:scale-105 cursor-pointer`}>
+        <BadgeCheck className={`w-[10px] h-[10px] ${usedStyle.iconText}`} strokeWidth={3} />
+        <span>{labelText}</span>
+      </div>
+
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/complete:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+        <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-center">
+          <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">Profile Complete</p>
+          <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
+            Candidate has fulfilled all requirements: Bio, Skills, Experience, and Contact details.
+          </p>
         </div>
-        {/* Hover Label */}
-        <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/30 backdrop-blur-sm shadow-xl">
-            Profile Complete
-          </span>
+        {/* Arrow pointer */}
+        <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900"></div>
+      </div>
+    </div>
+  );
+}
+
+function VerifiedCheckBadge({ verificationType }: { verificationType?: string }) {
+  const style = getBadgeStyles(verificationType);
+  
+  // Tier-based hex colors for outlines and icons
+  const colorMap: Record<string, string> = {
+    emerald: "#10b981",
+    pink: "#ec4899",
+    blue: "#3b82f6",
+    amber: "#f59e0b"
+  };
+
+  const type = (verificationType || "builder").toLowerCase();
+  let color = colorMap.emerald;
+  if (type.includes("public") || type.includes("figure")) color = colorMap.pink;
+  else if (type.includes("community") || type.includes("dao")) color = colorMap.blue;
+  else if (type.includes("company") || type.includes("organization") || type.includes("org")) color = colorMap.amber;
+
+  return (
+    <div className={`relative group/vcheck transition-all duration-500 cursor-default`}>
+      {/* Outer circular container matching reference image */}
+      <div className={`relative w-12 h-12 flex items-center justify-center rounded-full bg-slate-900/80 border border-slate-700/30 backdrop-blur-xl transition-all duration-500`}
+           style={{ 
+             borderColor: `${color}44`, 
+             boxShadow: `0 0 20px ${color}22` 
+           }}>
+        
+        {/* Scalloped 'Rosette' OUTLINE SVG */}
+        <div className="relative w-7 h-7 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" aria-label="Verified account" className="w-full h-full" style={{ fill: "none", stroke: color, strokeWidth: "1.5" }}>
+            <g>
+              <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z"></path>
+            </g>
+          </svg>
+          {/* Emerald Checkmark (matching the image) */}
+          <Check className="absolute w-3 h-3" style={{ color: color }} strokeWidth={4} />
+        </div>
+      </div>
+      
+      {/* Tooltip */}
+      <div className="absolute top-full right-0 mt-3 w-40 opacity-0 group-hover/vcheck:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+        <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-center">
+          <p className={`text-[10px] font-black uppercase tracking-widest leading-none`} style={{ color: color }}>
+            Verified {verificationType?.toLowerCase().includes("figure") ? "Public Figure" : (verificationType || "Identity")}
+          </p>
         </div>
       </div>
     </div>
@@ -367,13 +530,10 @@ export default function CVPage(props: any) {
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
               <div className="absolute bottom-4 left-4 w-2 h-2 bg-slate-300/60 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }}></div>
 
-              {/* Profile Complete / Verified Badge */}
-              <div className="absolute top-6 right-6 z-30 flex flex-col gap-4 items-center">
-                <ProfileCompleteBadge
-                  isComplete={isProfileComplete}
-                  onClick={() => setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, work evidence, and contact information.")}
-                />
-
+              <div className="absolute top-6 right-6 z-30 flex flex-col gap-5 items-center">
+                {profile.isVerified && (
+                  <VerifiedCheckBadge verificationType={profile.verificationType} />
+                )}
                 {totalYearsExperience > 0 && (
                   <div className="group/exp cursor-default">
                     <div className="relative flex items-center justify-center translate-x-[1px]">
@@ -491,6 +651,12 @@ export default function CVPage(props: any) {
                       tier={profile.verifierTier || 1}
                       isVerified={!!profile.isVerified}
                       verificationType={profile.verificationType}
+                    />
+                    <ProfileCompleteBadge
+                      isComplete={isProfileComplete}
+                      onClick={() => {
+                        setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, work evidence, and contact information.");
+                      }}
                     />
                     <CommunityBadge cvId={profile.cardNumber || 0} />
                   </div>
@@ -679,7 +845,7 @@ export default function CVPage(props: any) {
             </div>
 
             {/* Recruiter Trust Disclaimer */}
-            <div className="mt-10 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-start gap-3">
+            <div className="mt-8 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Recruiter Note: Verified Integrity</p>
@@ -698,7 +864,7 @@ export default function CVPage(props: any) {
 
 
 
-            <h2 className="text-xl font-semibold mt-12 mb-4">Proof of Work</h2>
+            <h2 className="text-xl font-semibold mt-4 mb-4">Proof of Work</h2>
             {contributionReceipts.length === 0 ? (
               <p className="text-slate-500">No work records submitted yet.</p>
             ) : (
@@ -875,55 +1041,77 @@ export default function CVPage(props: any) {
               </div>
             )}
 
-            {/* Verified Hiring Section - Minimal Appendage */}
+            {/* Verified Hiring Section - Redesigned to match Career Timeline style */}
             {verifiedHiringRecords.length > 0 && (
-              <div className="mt-20 border-t border-white/5 pt-12 pb-8">
-                <div className="flex items-center gap-2 mb-8 opacity-60">
-                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                   <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Verified Hiring</h2>
-                </div>
-
-                <div className="space-y-6">
-                  {(showAllHiring ? verifiedHiringRecords : verifiedHiringRecords.slice(0, 2)).map((record, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => setSelectedReceipt(record)}
-                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all cursor-pointer group/hiring"
-                    >
-                      <div className="space-y-1">
-                        <p className="text-sm font-bold text-white group-hover/hiring:text-emerald-400 transition-colors">{record.role} at {record.org}</p>
-                        <div className="flex flex-col gap-1 text-[11px] text-slate-500 font-medium">
-                           <div className="flex items-center gap-2">
-                              <span>Position: {record.role}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-800" />
-                              <span className="text-emerald-500/80">Verified by {record.attesterName || record.attesterWallet?.slice(0, 6)}</span>
-                           </div>
-                           <span>{record.startDate ? new Date(record.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Mar 2026'}</span>
-                        </div>
-                        {record.description && (
-                           <p className="text-[10px] text-slate-400/80 leading-relaxed font-medium mt-1 line-clamp-2 italic">
-                             "{record.description}"
-                           </p>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-0.5 rounded border border-emerald-500/50 text-emerald-400 bg-emerald-500/10 whitespace-nowrap">
-                          ✓ Attested
-                        </span>
-                      </div>
+              <div className="w-full mb-6 border-t border-slate-800/50 pt-12 mt-12">
+                <button
+                  onClick={() => setShowAllHiring(!showAllHiring)}
+                  className="w-full text-left py-2 hover:opacity-80 transition-opacity group flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 flex-shrink-0 bg-blue-500/10 text-blue-400 flex items-center justify-center rounded-lg">
+                      <ShieldCheck className="w-5 h-5" strokeWidth={2.5} />
                     </div>
-                  ))}
+                    <div>
+                      <h2 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors mb-0.5">Verified Hiring</h2>
+                      <p className="text-xs text-slate-400 font-medium tracking-wide">On-chain recruiter proofs and institutional hires.</p>
+                    </div>
+                  </div>
+                  <div className="p-2 flex items-center justify-center text-slate-400">
+                    {showAllHiring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </div>
+                </button>
 
-                  {verifiedHiringRecords.length > 2 && !showAllHiring && (
-                    <button 
-                      onClick={() => setShowAllHiring(true)}
-                      className="w-full py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
-                    >
-                      View Full Hiring History
-                    </button>
-                  )}
-                </div>
+                {showAllHiring && (
+                  <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                    {verifiedHiringRecords.map((record, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setSelectedReceipt(record)}
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/40 hover:bg-blue-500/[0.02] transition-all cursor-pointer group/hiring relative overflow-hidden"
+                      >
+                        {/* Subtle background glow for hiring cards */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] to-transparent opacity-0 group-hover/hiring:opacity-100 transition-opacity" />
+                        
+                        <div className="relative z-10 space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                             <p className="text-base font-bold text-white group-hover/hiring:text-blue-400 transition-colors">
+                               {record.role} at {record.org}
+                             </p>
+                          </div>
+                          
+                          <div className="flex flex-col gap-1.5 ml-3.5 text-[11px] text-slate-400 font-medium tracking-wide">
+                             <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-slate-500 px-1.5 py-0.5 rounded bg-slate-800/50 border border-slate-700/50 uppercase text-[9px]">Recruiter Proof</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                                <span className="text-blue-400/80">Verified by {record.attesterName || record.attesterWallet?.slice(0, 6)}</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                                <span>{record.startDate ? new Date(record.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Mar 2026'}</span>
+                             </div>
+                          </div>
+                          
+                          {record.description && (
+                             <div className="ml-3.5 border-l-2 border-blue-500/10 pl-4 py-1 mt-2">
+                               <p className="text-[11px] text-slate-400/90 leading-relaxed font-medium line-clamp-2 italic">
+                                 "{record.description}"
+                               </p>
+                             </div>
+                          )}
+                        </div>
+                        
+                        <div className="relative z-10 flex items-center gap-3">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[8px] font-black text-blue-500/60 uppercase tracking-[0.2em]">Institutional</span>
+                            <span className="text-[10px] px-3 py-1 rounded-full border border-blue-500/50 text-blue-400 bg-blue-500/10 whitespace-nowrap font-black uppercase tracking-widest shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                              ✓ Attested
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </>
@@ -953,6 +1141,6 @@ export default function CVPage(props: any) {
         </footer>
       </section>
       <Footer />
-    </main >
+    </main>
   );
 }
