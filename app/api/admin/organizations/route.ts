@@ -36,11 +36,10 @@ export async function POST(request: Request) {
             }
         }
 
-        // Fetch pending requests
+        // Fetch all requests (admin needs to view pending AND reviewed)
         const { data, error } = await supabase
             .from("organization_verifications")
-            .select("*")
-            .eq("status", "pending")
+            .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, created_at")
             .order("created_at", { ascending: false });
 
         if (error) {

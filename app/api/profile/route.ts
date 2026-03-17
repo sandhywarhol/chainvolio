@@ -233,9 +233,16 @@ export async function GET(request: Request) {
   // 2. Fetch verification status
   const { data: orgData } = await supabase
     .from("organization_verifications")
-    .select("status, verifier_tier, type")
+    .select("status, verifier_tier, type, rejection_reason, expires_at")
     .eq("wallet_address", wallet)
-    .single();
+    .maybeSingle();
+
+  const now = new Date();
+  const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
+  const isExpired = expiresAtDate ? now > expiresAtDate : false;
+  const isExpiringSoon = expiresAtDate && !isExpired 
+    ? (expiresAtDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) 
+    : false;
 
   return NextResponse.json({
     displayName: data.display_name,
@@ -263,9 +270,13 @@ export async function GET(request: Request) {
     createdAt: data.created_at,
     role: data.professional_role,
     organization: data.organization,
-    isVerified: orgData?.status === 'verified',
+    isVerified: orgData?.status === 'verified' && !isExpired,
+    isExpired,
+    isExpiringSoon,
+    expiresAt: orgData?.expires_at || null,
     verifierTier: orgData?.verifier_tier || 1,
     verificationStatus: orgData?.status || null,
-    verificationType: orgData?.type || null
+    verificationType: orgData?.type || null,
+    rejectionReason: orgData?.rejection_reason || null,
   });
 }

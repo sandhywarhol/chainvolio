@@ -13,7 +13,8 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw } from "lucide-react";
+import { format } from "date-fns";
 
 type Profile = {
   displayName: string;
@@ -38,10 +39,14 @@ type Profile = {
   instagram?: string;
   cardNumber?: number;
   isVerified?: boolean;
+  isExpired?: boolean;
+  isExpiringSoon?: boolean;
+  expiresAt?: string;
   verifierTier?: number;
   role?: string;
   verificationStatus?: string;
   verificationType?: string;
+  rejectionReason?: string;
   organization?: string;
 };
 
@@ -61,6 +66,7 @@ export default function DashboardPage() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [editingReceipt, setEditingReceipt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isRenewal, setIsRenewal] = useState(false);
   const handleShare = async () => {
     if (!profile || !publicKey) return;
 
@@ -211,23 +217,47 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-center md:justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <h1 className="text-3xl font-bold">{profile.displayName}</h1>
-                    {profile?.isVerified && (
-                      <div
-                        className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${profile.verifierTier === 3
-                          ? "bg-teal-500/10 border-teal-500/20 text-teal-400"
-                          : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                    {profile?.isVerified ? (
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${
+                            profile.verifierTier === 4
+                              ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                              : profile.verifierTier === 3
+                              ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                              : profile.verifierTier === 2
+                              ? "bg-pink-500/10 border-pink-500/20 text-pink-400"
+                              : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                           }`}
-                        title={profile.verifierTier === 3 ? "Verified Organization" : "Verified Figure"}
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>{profile.verifierTier === 3 ? "Org" : "Figure"}</span>
+                          title={profile.verificationType || "Verified"}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>{profile.verificationType || "Verified"}</span>
+                        </div>
+                        
+                        {(profile.isExpired || profile.isExpiringSoon) && (
+                          <button
+                            onClick={() => {
+                              setIsRenewal(true);
+                              setShowVerificationModal(true);
+                            }}
+                            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                              profile.isExpired 
+                                ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
+                                : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
+                            }`}
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            <span>{profile.isExpired ? "Expired — Renew" : "Renew Now"}</span>
+                          </button>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!profile?.isVerified && (
+                    ) : (
                       <button
-                        onClick={() => setShowVerificationModal(true)}
+                        onClick={() => {
+                          setIsRenewal(false);
+                          setShowVerificationModal(true);
+                        }}
                         className="hidden md:flex px-4 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 items-center gap-2"
                       >
                         <ShieldCheck className="w-4 h-4" /> Verify Identity
@@ -303,10 +333,24 @@ export default function DashboardPage() {
                 <div className="mt-6 md:hidden flex flex-col gap-3">
                   {!profile?.isVerified && (
                     <button
-                      onClick={() => setShowVerificationModal(true)}
+                      onClick={() => {
+                        setIsRenewal(false);
+                        setShowVerificationModal(true);
+                      }}
                       className="w-full py-3 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 flex items-center justify-center gap-2"
                     >
                       <ShieldCheck className="w-4 h-4" /> Verify Identity
+                    </button>
+                  )}
+                  {profile?.isVerified && (profile.isExpired || profile.isExpiringSoon) && (
+                    <button
+                      onClick={() => {
+                        setIsRenewal(true);
+                        setShowVerificationModal(true);
+                      }}
+                      className="w-full py-3 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 text-sm font-bold transition-colors border border-yellow-500/20 flex items-center justify-center gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" /> Renew Verification
                     </button>
                   )}
                   <Link
@@ -326,17 +370,58 @@ export default function DashboardPage() {
         {profile?.isVerified && (
           <div className="mb-12">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <ShieldCheck className={`w-5 h-5 ${profile.verifierTier === 3 ? "text-teal-400" : "text-emerald-400"}`} />
-              {profile.verifierTier === 3 ? "Organization Impact" : "Professional Impact"}
+              <ShieldCheck className={`w-5 h-5 ${
+                profile.verifierTier === 4 ? "text-amber-400"
+                : profile.verifierTier === 3 ? "text-blue-400"
+                : profile.verifierTier === 2 ? "text-pink-400"
+                : "text-emerald-400"
+              }`} />
+              Verified Identity Impact
             </h2>
-            <div className={`p-4 rounded-xl border mb-4 ${profile.verifierTier === 3
-              ? "bg-teal-500/5 border-teal-500/10"
+            <div className={`p-4 rounded-xl border mb-4 ${
+              profile.verifierTier === 4 ? "bg-amber-500/5 border-amber-500/10"
+              : profile.verifierTier === 3 ? "bg-blue-500/5 border-blue-500/10"
+              : profile.verifierTier === 2 ? "bg-pink-500/5 border-pink-500/10"
               : "bg-emerald-500/5 border-emerald-500/10"
-              }`}>
-              <p className={`text-xs font-medium ${profile.verifierTier === 3 ? "text-teal-400" : "text-emerald-400"}`}>
-                Verified {profile.verifierTier === 3 ? "Organization" : "Figure"} Status: Active
-              </p>
+            }`}>
+              <div className="flex items-center justify-between">
+                <p className={`text-xs font-medium ${
+                  profile.verifierTier === 4 ? "text-amber-400"
+                  : profile.verifierTier === 3 ? "text-blue-400"
+                  : profile.verifierTier === 2 ? "text-pink-400"
+                  : "text-emerald-400"
+                }`}>
+                  {profile.verificationType || "Verified"} — Active
+                </p>
+                {profile.expiresAt && (
+                  <span className="text-[10px] text-white/30 font-medium">
+                    Valid until {format(new Date(profile.expiresAt), 'MMM d, yyyy')}
+                  </span>
+                )}
+              </div>
+              
+              {profile.isExpiringSoon && (
+                <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Subscription expires soon — renew now to maintain your badge</span>
+                </div>
+              )}
+
               <p className="text-[10px] text-emerald-400/50 mt-1">Your attestations now carry the "Verified" shield 🛡️ across the network.</p>
+              
+              {!profile.isExpiringSoon && profile.expiresAt && (
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <button
+                    onClick={() => {
+                      setIsRenewal(true);
+                      setShowVerificationModal(true);
+                    }}
+                    className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Extend Verification
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Summary Stat */}
@@ -445,10 +530,16 @@ export default function DashboardPage() {
           website={profile.website}
           socials={`${profile.twitter || ''} ${profile.linkedin || ''}`.trim()}
           currentStatus={profile.verificationStatus || null}
-          onClose={() => setShowVerificationModal(false)}
+          currentTier={profile.verificationType || null}
+          isRenewal={isRenewal}
+          onClose={() => {
+            setShowVerificationModal(false);
+            setIsRenewal(false);
+          }}
           onSuccess={() => {
             setShowVerificationModal(false);
-            setToastMessage("Verification request submitted successfully.");
+            setIsRenewal(false);
+            setToastMessage(isRenewal ? "Renewal request submitted successfully." : "Verification request submitted successfully.");
             setProfile({ ...profile, verificationStatus: 'pending' });
           }}
         />

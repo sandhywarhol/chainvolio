@@ -2,7 +2,7 @@ import { supabaseServer as supabase } from "./supabase/server";
 import nacl from "tweetnacl"; // We might need to install this if web3.js doesn't export it clearly
 import bs58 from "bs58";
 
-export type AuthAction = "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "view_dashboard";
+export type AuthAction = "submit_cv"| "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "admin_revoke" | "admin_reset" | "admin_expire" | "admin_delete" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "view_dashboard";
 
 export async function verifySignature(
     walletAddress: string,
