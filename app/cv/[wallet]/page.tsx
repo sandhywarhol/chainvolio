@@ -69,6 +69,7 @@ type Receipt = {
   attesterOrg?: string;
   isAttesterVerified?: boolean;
   attesterTier?: number;
+  attesterVerificationType?: string;
   attestationId?: string;
   attestationType?: string;
   isExternal?: boolean;
@@ -894,6 +895,7 @@ export default function CVPage(props: any) {
                                   <TrustBadge
                                     tier={r.attesterTier || 1}
                                     isVerified={!!r.isAttesterVerified}
+                                    verificationType={r.attesterVerificationType}
                                   />
                                   <div className="flex items-center gap-1 text-[10px] text-slate-500 font-normal truncate">
                                     {r.attesterRole && <span>{r.attesterRole}</span>}

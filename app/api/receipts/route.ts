@@ -316,17 +316,26 @@ export async function GET(request: Request) {
     // 4. Fetch Organization Verification Status & Tiers
     let verifiedOrgWallets = new Set<string>();
     let verifierTiers: Record<string, number> = {};
+    let verifierTypes: Record<string, string> = {};
+    
     if (attesterWallets.length > 0) {
       const { data: orgData } = await supabase
         .from("organization_verifications")
-        .select("wallet_address, verifier_tier")
+        .select("wallet_address, verifier_tier, type, expires_at")
         .in("wallet_address", attesterWallets)
         .eq("status", "verified");
 
       if (orgData) {
+        const now = new Date();
         orgData.forEach(o => {
-          verifiedOrgWallets.add(o.wallet_address);
-          verifierTiers[o.wallet_address] = o.verifier_tier || 1;
+          const expiresAt = o.expires_at ? new Date(o.expires_at) : null;
+          const isExpired = expiresAt ? now > expiresAt : false;
+          
+          if (!isExpired) {
+            verifiedOrgWallets.add(o.wallet_address);
+            verifierTiers[o.wallet_address] = o.verifier_tier || 1;
+            verifierTypes[o.wallet_address] = o.type || 'Builder';
+          }
         });
       }
     }
@@ -375,6 +384,7 @@ export async function GET(request: Request) {
         attesterAt: attestation?.created_at || null,
         isAttesterVerified: attestation ? verifiedOrgWallets.has(attestation.attester_wallet) : false,
         attesterTier: attestation ? (verifierTiers[attestation.attester_wallet] || 1) : 1,
+        attesterVerificationType: attestation ? (verifierTypes[attestation.attester_wallet] || null) : null,
         attesterSignature: attestation?.signature || null,
         txSignature: attestation?.tx_signature || r.tx_signature || null,
         attestationId: attestation?.id || null,

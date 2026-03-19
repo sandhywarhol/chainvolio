@@ -279,7 +279,8 @@ export async function GET(request: Request) {
     organization: data.organization,
     // Source of Truth computed fields
     isVerified: orgData?.status === 'verified' && !isExpired,
-    verificationTier, // <--- New computed field
+    verificationTier, // <--- Authoritative string label (e.g. 'Company', 'Builder')
+    verificationType: verificationTier, // Backward compatibility for CVPage
     isExpired,
     isExpiringSoon,
     expiresAt: orgData?.expires_at || null,
