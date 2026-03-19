@@ -71,26 +71,35 @@ export async function POST(request: Request) {
                 const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
                 const connection = new Connection(rpcUrl, "confirmed");
 
-                // Wait/Poll briefly for the transaction to be visible to the RPC
-                let status = await connection.getSignatureStatus(cleanTxSignature, { searchTransactionHistory: true });
+                // Wait/Poll for the transaction to be visible and confirmed by the RPC
+                let status = null;
+                let attempts = 0;
+                const MAX_ATTEMPTS = 15;
 
-                // If not found immediately, wait a few seconds and try one more time 
-                // (Backend needs to be relatively quick, but RPCs can have a lag)
-                if (!status.value) {
-                    await new Promise(r => setTimeout(r, 3000));
-                    status = await connection.getSignatureStatus(cleanTxSignature, { searchTransactionHistory: true });
+                while (attempts < MAX_ATTEMPTS) {
+                    const statusRes = await connection.getSignatureStatus(cleanTxSignature, { searchTransactionHistory: true });
+                    status = statusRes.value;
+
+                    if (status && (status.confirmationStatus === 'confirmed' || status.confirmationStatus === 'finalized')) {
+                        break;
+                    }
+
+                    attempts++;
+                    if (attempts < MAX_ATTEMPTS) {
+                        console.log(`[attestation-api] Waiting for tx confirmation... (Attempt ${attempts}, tx: ${cleanTxSignature})`);
+                        await new Promise(r => setTimeout(r, 2000));
+                    }
                 }
 
-                if (!status.value || (status.value.confirmationStatus !== 'confirmed' && status.value.confirmationStatus !== 'finalized')) {
+                if (!status) {
                     return NextResponse.json({
-                        error: "On-chain proof not found or not yet confirmed. Please wait a moment and try again."
+                        error: "On-chain record not found on the Solana network. It might be delayed, please wait 30 seconds and try again."
                     }, { status: 400 });
                 }
 
-                // CRITICAL: Check if the transaction actually SUCCEEDED
-                if (status.value.err) {
+                if (status.err) {
                     return NextResponse.json({
-                        error: `Blockchain transaction reached consensus but FAILED during execution: ${JSON.stringify(status.value.err)}. Please try again.`
+                        error: `Blockchain transaction reached consensus but FAILED: ${JSON.stringify(status.err)}. Your funds were likely returned (check Solscan for confirmation).`
                     }, { status: 400 });
                 }
             } catch (err: any) {
@@ -167,7 +176,9 @@ export async function POST(request: Request) {
                 .limit(1);
 
             if (!raError && reciprocalAttestations && reciprocalAttestations.length > 0) {
-                return NextResponse.json({ error: "Reciprocal attestation is not allowed to preserve trust integrity." }, { status: 403 });
+                return NextResponse.json({ 
+                    error: "Reciprocal attestation (coworker-swap) is currently not allowed to maintain trust integrity across the network." 
+                }, { status: 403 });
             }
         }
 

@@ -183,18 +183,30 @@ export default function AttestPage() {
             const txSig = await sendTransaction(tx, conn, { skipPreflight: true, preflightCommitment: "confirmed", maxRetries: 5 });
             const signature = txSig.replace(/\s/g, "");
 
-            // 6. Confirm
-            try {
-                await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
-            } catch {
-                let confirmed = false;
-                for (let i = 0; i < 30; i++) {
-                    const st = await conn.getSignatureStatus(signature, { searchTransactionHistory: true });
-                    if (st.value?.err) throw new Error(`Transaction failed: ${JSON.stringify(st.value.err)}`);
-                    if (st.value?.confirmationStatus === "confirmed" || st.value?.confirmationStatus === "finalized") { confirmed = true; break; }
-                    await new Promise(r => setTimeout(r, 2000));
+            // 6. Confirm with robust polling
+            let confirmed = false;
+            const startTime = Date.now();
+            const TIMEOUT = 60000; // 60 seconds
+
+            while (Date.now() - startTime < TIMEOUT) {
+                const statusRes = await conn.getSignatureStatus(signature, { searchTransactionHistory: true });
+                const status = statusRes && statusRes.value;
+
+                if (status && (status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized")) {
+                    confirmed = true;
+                    break;
                 }
-                if (!confirmed) throw new Error("Transaction failed to confirm. Please try again.");
+
+                if (status?.err) {
+                    throw new Error(`Transaction failed on Solana: ${JSON.stringify(status.err)}`);
+                }
+
+                // Wait 2 seconds before polling again
+                await new Promise(r => setTimeout(r, 2000));
+            }
+
+            if (!confirmed) {
+                throw new Error("Transaction took too long to confirm. It might still be successful, please check your wallet.");
             }
 
             // 7. Record in database
