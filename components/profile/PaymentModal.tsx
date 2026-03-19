@@ -5,8 +5,13 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
     PublicKey,
     Transaction,
-    SystemProgram,
 } from "@solana/web3.js";
+import {
+    getAssociatedTokenAddress,
+    createAssociatedTokenAccountInstruction,
+    createTransferCheckedInstruction,
+    TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import {
     ArrowLeft,
     ShieldCheck,
@@ -17,10 +22,9 @@ import {
     Zap,
 } from "lucide-react";
 import {
-    IS_SOL_TEST,
     TREASURY_WALLET,
-    getSolTestPrice,
-    getSolTestLamports,
+    USDC_MINT_MAINNET,
+    USDC_DECIMALS,
 } from "@/lib/paymentConfig";
 
 // ─── Color palette (mirrors VerificationRequestModal) ──────────────────────
@@ -54,7 +58,7 @@ const PHASE_LABELS: Record<Phase, string> = {
 type PaymentModalProps = {
     tierId:        string;
     tierLabel:     string;
-    price:         number;   // in USDC (USDC_PROD) or SOL (SOL_TEST)
+    price:         number;   // in USDC
     billingCycle?: "monthly" | "yearly"; // undefined = one-time (Builder)
     colorKey:      CK;
     walletAddress: string;
@@ -78,17 +82,10 @@ export function PaymentModal({
 
     const col = C[colorKey];
 
-    // ── Derive the actual payment amount based on mode ────────────────────
-    // In SOL_TEST we use the config values (not the passed `price` which is USDC)
-    const solTestAmount  = IS_SOL_TEST ? getSolTestPrice(tierId, billingCycle) : 0;
-    const solTestLamports = IS_SOL_TEST ? getSolTestLamports(tierId, billingCycle) : 0;
-
     // Display helpers
-    const displayAmount  = IS_SOL_TEST ? solTestAmount  : price;
-    const displayCurrency = IS_SOL_TEST ? "SOL" : "USDC";
-    const displayLabel   = IS_SOL_TEST
-        ? `${solTestAmount} SOL (testing)`
-        : `${price} USDC`;
+    const displayAmount  = price;
+    const displayCurrency = "USDC";
+    const displayLabel   = `${price} USDC`;
 
     const isProcessing = phase !== "idle" && phase !== "error" && phase !== "success";
 
@@ -105,97 +102,98 @@ export function PaymentModal({
             return;
         }
 
-        // Guard: must be > 0
-        if (IS_SOL_TEST && solTestLamports <= 0) {
-            setErrorMsg("Payment amount must be greater than zero.");
-            setPhase("error");
-            return;
-        }
-
         setPhase("wallet_pending");
         setErrorMsg("");
 
         try {
             let signature: string;
+            const treasuryPubkey = new PublicKey(TREASURY_WALLET);
+            const { blockhash } = await connection.getLatestBlockhash("confirmed");
+            
+            // ── USDC_PROD: SPL token transfer (transferChecked) ──────────
+            const usdcMintPubkey = new PublicKey(USDC_MINT_MAINNET);
 
-            if (IS_SOL_TEST) {
-                // ── SOL_TEST: native SOL SystemProgram.transfer ──────────────
-                const treasuryPubkey = new PublicKey(TREASURY_WALLET);
+            // 1. Resolve ATAs
+            const userAta = await getAssociatedTokenAddress(usdcMintPubkey, publicKey);
+            const treasuryAta = await getAssociatedTokenAddress(usdcMintPubkey, treasuryPubkey);
 
-                const { blockhash, lastValidBlockHeight } =
-                    await connection.getLatestBlockhash("confirmed");
+            const tx = new Transaction({ recentBlockhash: blockhash, feePayer: publicKey });
 
-                const tx = new Transaction({
-                    recentBlockhash: blockhash,
-                    feePayer:        publicKey,
-                }).add(
-                    SystemProgram.transfer({
-                        fromPubkey: publicKey,
-                        toPubkey:   treasuryPubkey,
-                        lamports:   solTestLamports,
-                    })
+            // Check if treasury ATA exists; if not, create it.
+            const treasuryAtaInfo = await connection.getAccountInfo(treasuryAta);
+            if (!treasuryAtaInfo) {
+                tx.add(
+                    createAssociatedTokenAccountInstruction(
+                        publicKey,
+                        treasuryAta,
+                        treasuryPubkey,
+                        usdcMintPubkey
+                    )
                 );
-
-                try {
-                    signature = await sendTransaction(tx, connection, { 
-                        maxRetries: 5,
-                        skipPreflight: false 
-                    });
-                } catch (walletErr: any) {
-                    const msg = (walletErr?.message || "").toLowerCase();
-                    if (
-                        msg.includes("user rejected") ||
-                        msg.includes("cancelled")     ||
-                        msg.includes("canceled")      ||
-                        msg.includes("closed")
-                    ) {
-                        setPhase("idle");
-                        return;
-                    }
-                    throw walletErr;
-                }
-
-                // Wait for confirmation before handing off to backend.
-                setPhase("network_pending");
-
-                // --- ROBUST POLLING CONFIRMATION ---
-                // We avoid relying solely on connection.confirmTransaction() because it uses
-                // WebSockets (signatureSubscribe) which are failing on the current RPC.
-                let confirmed = false;
-                const startTime = Date.now();
-                const TIMEOUT = 60000; // 60 seconds
-
-                while (Date.now() - startTime < TIMEOUT) {
-                    const statusRes = await connection.getSignatureStatus(signature);
-                    const status = statusRes && statusRes.value;
-
-                    if (status && (status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized")) {
-                        confirmed = true;
-                        break;
-                    }
-
-                    if (status?.err) {
-                        setErrorMsg("Transaction failed on Solana. Please check your balance and try again.");
-                        setPhase("error");
-                        return;
-                    }
-
-                    // Wait 2 seconds before polling again
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-
-                if (!confirmed) {
-                    throw new Error("Transaction took too long to confirm. It might still go through eventually, but please check your wallet before trying again.");
-                }
-
-            } else {
-                // ── USDC_PROD: SPL token transfer (legacy path, preserved) ──
-                // This branch is intentionally left as a placeholder.
-                // Switch PAYMENT_MODE=USDC_PROD to activate and restore full SPL logic.
-                throw new Error("USDC_PROD mode: SPL token transfer not active in this build. Set PAYMENT_MODE=SOL_TEST.");
             }
 
-            // ── Send signature to backend for validation + request creation ──
+            // 2. Add transferChecked instruction
+            const usdcUnits = BigInt(Math.round(price * Math.pow(10, USDC_DECIMALS)));
+            
+            tx.add(
+                createTransferCheckedInstruction(
+                    userAta,
+                    usdcMintPubkey,
+                    treasuryAta,
+                    publicKey,
+                    usdcUnits,
+                    USDC_DECIMALS,
+                    [],
+                    TOKEN_PROGRAM_ID
+                )
+            );
+
+            try {
+                signature = await sendTransaction(tx, connection, { 
+                    maxRetries: 5,
+                    skipPreflight: false 
+                });
+            } catch (walletErr: any) {
+                const msg = (walletErr?.message || "").toLowerCase();
+                if (
+                    msg.includes("user rejected") ||
+                    msg.includes("cancelled")     ||
+                    msg.includes("canceled")      ||
+                    msg.includes("closed")
+                ) {
+                    setPhase("idle");
+                    return;
+                }
+                throw walletErr;
+            }
+
+            setPhase("network_pending");
+
+            let confirmed = false;
+            const startTime = Date.now();
+            const TIMEOUT = 60000;
+
+            while (Date.now() - startTime < TIMEOUT) {
+                const statusRes = await connection.getSignatureStatus(signature);
+                const status = statusRes && statusRes.value;
+
+                if (status && (status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized")) {
+                    confirmed = true;
+                    break;
+                }
+
+                if (status?.err) {
+                    setErrorMsg("Transaction failed on Solana. Please check your balance and try again.");
+                    setPhase("error");
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            if (!confirmed) {
+                throw new Error("Transaction took too long to confirm. It might still go through eventually, but please check your wallet before trying again.");
+            }
+
             setPhase("backend_verifying");
             const res = await fetch("/api/verify/validate-payment", {
                 method:  "POST",
@@ -225,11 +223,10 @@ export function PaymentModal({
             console.error("[PaymentModal] Error:", err);
             let msg = err?.message || "An unexpected error occurred. Please try again.";
             
-            // Make common Solana errors more user-friendly
             if (msg.includes("block height exceeded") || msg.includes("expired")) {
                 msg = "The transaction took too long to confirm on the Solana network. Your funds were likely not sent. Please try again.";
             } else if (msg.includes("insufficient funds") || msg.includes("0x1")) {
-                msg = "Insufficient SOL in your wallet to cover the payment and network fees.";
+                msg = "Insufficient funds in your wallet to cover the payment and network fees.";
             }
 
             setErrorMsg(msg);
@@ -238,7 +235,7 @@ export function PaymentModal({
     }, [
         publicKey, sendTransaction, connection,
         tierId, billingCycle, walletAddress, profileName, website, socials,
-        solTestLamports,
+        price,
     ]);
 
     // ── Success screen ─────────────────────────────────────────────────────
@@ -319,17 +316,10 @@ export function PaymentModal({
                                 )}
                             </div>
                             <p className="text-[10px] text-white/20 mt-1">{billingNote}</p>
-                            {IS_SOL_TEST && (
-                                <p className="text-[9px] text-amber-400/60 mt-1 font-semibold">⚡ Testing mode — mainnet test transaction</p>
-                            )}
                         </div>
                         {/* Currency logo */}
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-[11px] font-black ${
-                            IS_SOL_TEST
-                                ? "bg-[#9945FF]/10 border border-[#9945FF]/20 text-[#9945FF]"
-                                : "bg-[#2775CA]/10 border border-[#2775CA]/20 text-[#2775CA]"
-                        }`}>
-                            {IS_SOL_TEST ? "◎" : "$"}
+                        <div className="w-14 h-14 rounded-full flex items-center justify-center text-[11px] font-black bg-[#2775CA]/10 border border-[#2775CA]/20 text-[#2775CA]">
+                            $
                         </div>
                     </div>
 
@@ -356,7 +346,7 @@ export function PaymentModal({
                         <div>
                             <p className="text-[9px] font-bold text-white/25 uppercase tracking-widest">Payment Network</p>
                             <p className="text-[11px] text-white/55 font-medium">
-                                {IS_SOL_TEST ? "Solana · Native SOL Transfer (Test)" : "Solana · USDC SPL Token"}
+                                Solana · USDC SPL Token
                             </p>
                         </div>
                     </div>

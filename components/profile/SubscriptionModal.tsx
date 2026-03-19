@@ -54,8 +54,8 @@ export function SubscriptionModal({
 
     const activePrice = selected === "monthly" ? monthlyPrice : yearlyPrice;
 
-    const displayCurrency = IS_SOL_TEST ? "SOL" : "USDC";
-    const displayPrefix   = IS_SOL_TEST ? ""    : "$";
+    const displayCurrency = "USDC";
+    const displayPrefix   = "";
 
     return (
         <div className="flex flex-col">

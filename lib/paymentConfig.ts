@@ -11,11 +11,11 @@ export type PaymentMode = "SOL_TEST" | "USDC_PROD";
 
 /** Read on the server (API routes). */
 export const SERVER_PAYMENT_MODE: PaymentMode =
-    (process.env.PAYMENT_MODE as PaymentMode) || "SOL_TEST";
+    (process.env.PAYMENT_MODE as PaymentMode) || "USDC_PROD";
 
 /** Read on the client (components). Must be exposed via NEXT_PUBLIC_ prefix. */
 export const CLIENT_PAYMENT_MODE: PaymentMode =
-    (process.env.NEXT_PUBLIC_PAYMENT_MODE as PaymentMode) || "SOL_TEST";
+    (process.env.NEXT_PUBLIC_PAYMENT_MODE as PaymentMode) || "USDC_PROD";
 
 export const IS_SOL_TEST = CLIENT_PAYMENT_MODE === "SOL_TEST";
 

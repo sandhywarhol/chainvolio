@@ -341,7 +341,7 @@ export default function AdminVerificationPage() {
                                                 <span className={`text-sm font-bold ${
                                                     req.amount_paid > 0 ? "text-emerald-400" : "text-white/30"
                                                 }`}>
-                                                    {req.amount_paid > 0 ? `$${req.amount_paid} USDC` : "Free"}
+                                                    {req.amount_paid > 0 ? `${req.amount_paid} USDC` : "Free"}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs text-slate-600 italic">—</span>

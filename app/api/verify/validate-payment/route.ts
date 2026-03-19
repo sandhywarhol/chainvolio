@@ -263,30 +263,50 @@ export async function POST(request: Request) {
                 const ACCEPTED_MINTS = new Set([USDC_MINT_MAINNET, USDC_MINT_DEVNET]);
                 const preTokenBalances  = tx.meta.preTokenBalances  || [];
                 const postTokenBalances = tx.meta.postTokenBalances || [];
-                let receivedUSDCAmount = BigInt(0);
+                
+                let treasuryReceived = BigInt(0);
+                let senderPaid       = BigInt(0);
 
+                // 1. Verify Treasury received the funds
                 for (const post of postTokenBalances) {
                     if (!ACCEPTED_MINTS.has(post.mint)) continue;
                     if (post.owner !== TREASURY_WALLET) continue;
 
-                    const pre       = preTokenBalances.find(p => p.accountIndex === post.accountIndex);
-                    const preAmount  = BigInt(pre?.uiTokenAmount.amount  || "0");
+                    const pre = preTokenBalances.find(p => p.accountIndex === post.accountIndex);
+                    const preAmount  = BigInt(pre?.uiTokenAmount.amount || "0");
                     const postAmount = BigInt(post.uiTokenAmount.amount || "0");
-                    const received   = postAmount - preAmount;
+                    const change     = postAmount - preAmount;
 
-                    if (received <= BigInt(0)) continue;
-                    receivedUSDCAmount = received;
-
-                    if (received >= (expectedAmountRaw as bigint)) {
-                        validTransfer = true;
-                        break;
+                    if (change > BigInt(0)) {
+                        treasuryReceived += change;
                     }
                 }
 
-                if (!validTransfer && receivedUSDCAmount > BigInt(0)) {
-                    const got  = (Number(receivedUSDCAmount) / 1_000_000).toFixed(2);
-                    const need = (Number(expectedAmountRaw) / 1_000_000).toFixed(2);
-                    throw new Error(`Incorrect payment amount. Expected ${need} USDC but found ${got} USDC paid to the treasury.`);
+                // 2. Verify Sender actually paid the funds
+                for (const pre of preTokenBalances) {
+                    if (!ACCEPTED_MINTS.has(pre.mint)) continue;
+                    if (pre.owner !== walletAddress) continue;
+
+                    const post = postTokenBalances.find(p => p.accountIndex === pre.accountIndex);
+                    const preAmount  = BigInt(pre.uiTokenAmount.amount || "0");
+                    const postAmount = BigInt(post?.uiTokenAmount.amount || "0");
+                    const change     = preAmount - postAmount; // How much they lost
+
+                    if (change > BigInt(0)) {
+                        senderPaid += change;
+                    }
+                }
+
+                // Validation logic:
+                // We need both the sender to have paid enough AND the treasury to have received enough.
+                const expected = expectedAmountRaw as bigint;
+                
+                if (treasuryReceived >= expected && senderPaid >= expected) {
+                    validTransfer = true;
+                } else if (treasuryReceived > BigInt(0)) {
+                    const got  = (Number(treasuryReceived) / 1_000_000).toFixed(2);
+                    const need = (Number(expected) / 1_000_000).toFixed(2);
+                    throw new Error(`Incorrect USDC amount. Expected ${need} but found ${got} received by treasury.`);
                 }
             }
 
