@@ -169,19 +169,31 @@ export async function POST(request: Request) {
             const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
             const connection = new Connection(rpcUrl, "finalized");
 
-            let tx: Awaited<ReturnType<typeof connection.getParsedTransaction>>;
-            try {
-                tx = await connection.getParsedTransaction(txSignature, {
-                    commitment: "finalized",
-                    maxSupportedTransactionVersion: 0,
-                });
-            } catch (rpcErr: any) {
-                console.error("RPC error:", rpcErr);
-                throw new Error("Could not reach the Solana network. Please try again.");
+            let tx: Awaited<ReturnType<typeof connection.getParsedTransaction>> = null;
+            let attempts = 0;
+            const MAX_ATTEMPTS = 5;
+
+            while (attempts < MAX_ATTEMPTS) {
+                try {
+                    tx = await connection.getParsedTransaction(txSignature, {
+                        commitment: "finalized",
+                        maxSupportedTransactionVersion: 0,
+                    });
+                    
+                    if (tx) break; // Found it!
+                } catch (rpcErr: any) {
+                    console.error(`RPC error (attempt ${attempts + 1}):`, rpcErr);
+                }
+
+                attempts++;
+                if (attempts < MAX_ATTEMPTS) {
+                    console.log(`[TEST-MONITOR] Transaction not finalized yet, waiting 2s... (Attempt ${attempts})`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
             }
 
             if (!tx) {
-                throw new Error("Transaction not found. It may not be confirmed yet — please wait a moment and try again.");
+                throw new Error("Transaction not found or not finalized yet. Please wait a moment and try again.");
             }
 
             if (!tx.meta) {

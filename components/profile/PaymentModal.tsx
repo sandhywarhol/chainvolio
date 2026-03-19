@@ -137,7 +137,10 @@ export function PaymentModal({
                 );
 
                 try {
-                    signature = await sendTransaction(tx, connection);
+                    signature = await sendTransaction(tx, connection, { 
+                        maxRetries: 5,
+                        skipPreflight: false 
+                    });
                 } catch (walletErr: any) {
                     const msg = (walletErr?.message || "").toLowerCase();
                     if (
@@ -152,18 +155,37 @@ export function PaymentModal({
                     throw walletErr;
                 }
 
-                // Wait for finalization before handing off to backend.
-                // "finalized" guarantees the tx is on the canonical chain and cannot be rolled back.
+                // Wait for confirmation before handing off to backend.
                 setPhase("network_pending");
-                const confirmResult = await connection.confirmTransaction(
-                    { signature, blockhash, lastValidBlockHeight },
-                    "finalized"
-                );
 
-                if (confirmResult.value.err) {
-                    setErrorMsg("Transaction was rejected by the Solana network. Please check your SOL balance and try again.");
-                    setPhase("error");
-                    return;
+                // --- ROBUST POLLING CONFIRMATION ---
+                // We avoid relying solely on connection.confirmTransaction() because it uses
+                // WebSockets (signatureSubscribe) which are failing on the current RPC.
+                let confirmed = false;
+                const startTime = Date.now();
+                const TIMEOUT = 60000; // 60 seconds
+
+                while (Date.now() - startTime < TIMEOUT) {
+                    const statusRes = await connection.getSignatureStatus(signature);
+                    const status = statusRes && statusRes.value;
+
+                    if (status && (status.confirmationStatus === "confirmed" || status.confirmationStatus === "finalized")) {
+                        confirmed = true;
+                        break;
+                    }
+
+                    if (status?.err) {
+                        setErrorMsg("Transaction failed on Solana. Please check your balance and try again.");
+                        setPhase("error");
+                        return;
+                    }
+
+                    // Wait 2 seconds before polling again
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                if (!confirmed) {
+                    throw new Error("Transaction took too long to confirm. It might still go through eventually, but please check your wallet before trying again.");
                 }
 
             } else {
@@ -201,7 +223,15 @@ export function PaymentModal({
 
         } catch (err: any) {
             console.error("[PaymentModal] Error:", err);
-            const msg = err?.message || "An unexpected error occurred. Please try again.";
+            let msg = err?.message || "An unexpected error occurred. Please try again.";
+            
+            // Make common Solana errors more user-friendly
+            if (msg.includes("block height exceeded") || msg.includes("expired")) {
+                msg = "The transaction took too long to confirm on the Solana network. Your funds were likely not sent. Please try again.";
+            } else if (msg.includes("insufficient funds") || msg.includes("0x1")) {
+                msg = "Insufficient SOL in your wallet to cover the payment and network fees.";
+            }
+
             setErrorMsg(msg);
             setPhase("error");
         }
