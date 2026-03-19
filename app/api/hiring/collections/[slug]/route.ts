@@ -27,9 +27,25 @@ export async function GET(
             .eq("wallet_address", collection.owner_wallet)
             .single();
 
+        // 2. Fetch Owner's Verification Tier (Single Source of Truth)
+        const { data: orgData } = await supabase
+            .from("organization_verifications")
+            .select("status, type, expires_at")
+            .eq("wallet_address", collection.owner_wallet)
+            .maybeSingle();
+
+        const isExpired = orgData?.expires_at ? new Date(orgData.expires_at) < new Date() : false;
+        const isVerified = orgData?.status === 'verified' && !isExpired;
+        const verificationTier = isVerified ? orgData?.type : null;
+
         return NextResponse.json({ 
             collection,
-            owner_profile: profile || null
+            owner_profile: profile ? { 
+                ...profile, 
+                isVerified, 
+                verificationTier,
+                verificationStatus: orgData?.status || 'unverified'
+            } : null
         });
     } catch (err: any) {
         return NextResponse.json({ error: err.message || "Server Error" }, { status: 500 });

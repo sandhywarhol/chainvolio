@@ -68,6 +68,8 @@ export default function DashboardPage() {
   const [editingReceipt, setEditingReceipt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isRenewal, setIsRenewal] = useState(false);
+  const [attestationCount, setAttestationCount] = useState(0);
+
   const handleShare = async () => {
     if (!profile || !publicKey) return;
 
@@ -94,9 +96,10 @@ export default function DashboardPage() {
     }
 
     const wallet = publicKey.toBase58();
+    setLoading(true);
 
-    // 1. Fetch Profile
-    fetch(`/api/profile?wallet=${wallet}`)
+    // 1. Fetch Profile - use /api/user/me for verification authority
+    fetch(`/api/user/me?wallet=${wallet}`)
       .then((r) => r.json())
       .then((data) => {
         setProfile(data);
@@ -131,10 +134,6 @@ export default function DashboardPage() {
 
   }, [publicKey, connected]);
 
-  const [attestationCount, setAttestationCount] = useState(0);
-
-  // ... (Login screen remains)
-
   if (!publicKey) {
     return (
       <main className="min-h-screen text-white bg-[#030303]">
@@ -154,7 +153,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
-      {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
 
@@ -215,155 +213,134 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center justify-center md:justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold">{profile.displayName}</h1>
-                    {profile?.isVerified ? (
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 ${
-                            profile.verifierTier === 4
-                              ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                              : profile.verifierTier === 3
-                              ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
-                              : profile.verifierTier === 2
-                              ? "bg-pink-500/10 border-pink-500/20 text-pink-400"
-                              : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                          }`}
-                          title={profile.verificationType || "Verified"}
-                        >
-                          <ShieldCheck className="w-3.5 h-3.5" />
-                          <span>{profile.verificationType || "Verified"}</span>
-                        </div>
-                        
-                        {(profile.isExpired || profile.isExpiringSoon) && (
-                          <button
-                            onClick={() => {
-                              setIsRenewal(true);
-                              setShowVerificationModal(true);
-                            }}
-                            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                              profile.isExpired 
-                                ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
-                                : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
-                            }`}
-                          >
-                            <RefreshCw className="w-3 h-3" />
-                            <span>{profile.isExpired ? "Expired — Renew" : "Renew Now"}</span>
-                          </button>
-                        )}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-3xl font-bold">{profile?.displayName}</h1>
+                      <div className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${
+                        profile?.isVerified ? (
+                          profile?.verifierTier === 4 ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
+                          profile?.verifierTier === 3 ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
+                          profile?.verifierTier === 2 ? "bg-pink-500/10 border-pink-500/20 text-pink-400" :
+                          "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                        ) : profile?.isExpired ? (
+                          "bg-red-500/10 border-red-500/20 text-red-500"
+                        ) : (
+                          "bg-slate-500/10 border-slate-500/20 text-slate-500 opacity-60"
+                        )
+                      }`}>
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>
+                          {profile?.isVerified 
+                            ? `Verified ${profile?.verificationTier}` 
+                            : profile?.isExpired 
+                              ? "Expired Verification" 
+                              : "Unverified User"}
+                        </span>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setIsRenewal(false);
-                          setShowVerificationModal(true);
-                        }}
-                        className="hidden md:flex px-4 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 items-center gap-2"
+
+                      {(profile?.isExpired || profile?.isExpiringSoon) && (
+                        <button
+                          onClick={() => {
+                            setIsRenewal(true);
+                            setShowVerificationModal(true);
+                          }}
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                            profile?.isExpired 
+                              ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
+                              : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
+                          }`}
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          <span>{profile?.isExpired ? "Expired — Renew" : "Renew Now"}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 justify-center md:justify-end">
+                      {!profile?.isVerified && !profile?.isExpired && (
+                        <button
+                          onClick={() => {
+                            setIsRenewal(false);
+                            setShowVerificationModal(true);
+                          }}
+                          className="px-4 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 flex items-center gap-2"
+                        >
+                          <ShieldCheck className="w-4 h-4" /> Verify Identity
+                        </button>
+                      )}
+
+                      <Link
+                        href="/create-profile"
+                        className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
                       >
-                        <ShieldCheck className="w-4 h-4" /> Verify Identity
-                      </button>
-                    )}
-                    <Link
-                      href="/create-profile"
-                      className="hidden md:block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
-                    >
-                      Edit Profile
-                    </Link>
+                        Edit Profile
+                      </Link>
+                    </div>
                   </div>
-                </div>
 
-                {/* Profile Identity (Role/Tier) - Single Source of Truth */}
-                {(profile.verificationTier || profile.role) ? (
-                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                    <span className="text-lg font-medium text-emerald-400">
-                      {profile.verificationTier || profile.role}
-                      {profile.organization && <span className="text-slate-500 font-normal"> at {profile.organization}</span>}
-                    </span>
-                  </div>
-                ) : null}
-
-                {profile.lookingFor && (
-                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center gap-1.5">
-                      <Briefcase className="w-3.5 h-3.5" />
-                      {profile.lookingFor}
-                    </span>
-                  </div>
-                )}
-
-                {profile.bio && (
-                  <ExpandableText
-                    text={profile.bio}
-                    maxLength={300}
-                    className="text-slate-400 mb-6 leading-relaxed"
-                  />
-                )}
-
-                {profile.skills && (
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
-                    {profile.skills.split(',').map((skill: string, i: number) => (
-                      <span key={i} className="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-[11px] text-slate-300">
-                        {skill.trim()}
+                  {/* Profile Identity (Role/Tier) - Single Source of Truth */}
+                  {(profile?.verificationTier || profile?.role) ? (
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                      <span className="text-lg font-medium text-emerald-400">
+                        {profile?.verificationTier !== 'unverified' && profile?.isVerified 
+                          ? profile?.verificationTier 
+                          : profile?.role}
+                        {profile?.organization && <span className="text-slate-500 font-normal"> at {profile?.organization}</span>}
                       </span>
-                    ))}
+                    </div>
+                  ) : null}
+
+                  {profile.lookingFor && (
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center gap-1.5">
+                        <Briefcase className="w-3.5 h-3.5" />
+                        {profile.lookingFor}
+                      </span>
+                    </div>
+                  )}
+
+                  {profile.bio && (
+                    <ExpandableText
+                      text={profile.bio}
+                      maxLength={300}
+                      className="text-slate-400 mb-6 leading-relaxed"
+                    />
+                  )}
+
+                  {profile.skills && (
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
+                      {profile.skills.split(',').map((skill: string, i: number) => (
+                        <span key={i} className="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-[11px] text-slate-300">
+                          {skill.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    {profile.twitter && <Twitter className="w-4 h-4 text-slate-500" />}
+                    {profile.github && <Github className="w-4 h-4 text-slate-500" />}
+                    {profile.linkedin && <Linkedin className="w-4 h-4 text-slate-500" />}
+                    {profile.instagram && <Instagram className="w-4 h-4 text-slate-500" />}
+                    {profile.lens && <span className="text-sm grayscale opacity-70" title="Lens">🌿</span>}
+                    {profile.farcaster && <span className="text-sm grayscale opacity-70" title="Farcaster">🟣</span>}
+                    {profile.website && <Globe className="w-4 h-4 text-slate-500" />}
+                    {profile.email && <Mail className="w-4 h-4 text-slate-500" />}
+                    {profile.discord && (
+                      <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 11.721 11.721 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.862-1.295 1.192-1.996a.076.076 0 0 0-.041-.106 13.046 13.046 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                      </svg>
+                    )}
+                    {profile.telegram && (
+                      <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.944 0C5.347 0 0 5.347 0 11.944c0 6.597 5.347 11.944 11.944 11.944 6.597 0 11.944-5.347 11.944-11.944C23.888 5.347 18.541 0 11.944 0zm5.204 8.525c-.179 1.884-.962 5.925-1.359 8.041-.168.9-.499 1.203-.82 1.232-.698.064-1.226-.462-1.902-.905-1.057-.695-1.655-1.127-2.682-1.803-1.187-.781-.417-1.21.258-1.912.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212-.071-.064-.175-.041-.249-.024-.106.024-1.793 1.141-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.14.121.098.154.228.163.319.009.091.011.201.009.324z" />
+                      </svg>
+                    )}
                   </div>
-                )}
-
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                  {profile.twitter && <Twitter className="w-4 h-4 text-slate-500" />}
-                  {profile.github && <Github className="w-4 h-4 text-slate-500" />}
-                  {profile.linkedin && <Linkedin className="w-4 h-4 text-slate-500" />}
-                  {profile.instagram && <Instagram className="w-4 h-4 text-slate-500" />}
-                  {profile.lens && <span className="text-sm grayscale opacity-70" title="Lens">🌿</span>}
-                  {profile.farcaster && <span className="text-sm grayscale opacity-70" title="Farcaster">🟣</span>}
-                  {profile.website && <Globe className="w-4 h-4 text-slate-500" />}
-                  {profile.email && <Mail className="w-4 h-4 text-slate-500" />}
-                  {profile.discord && (
-                    <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 11.721 11.721 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.862-1.295 1.192-1.996a.076.076 0 0 0-.041-.106 13.046 13.046 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-                    </svg>
-                  )}
-                  {profile.telegram && (
-                    <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M11.944 0C5.347 0 0 5.347 0 11.944c0 6.597 5.347 11.944 11.944 11.944 6.597 0 11.944-5.347 11.944-11.944C23.888 5.347 18.541 0 11.944 0zm5.204 8.525c-.179 1.884-.962 5.925-1.359 8.041-.168.9-.499 1.203-.82 1.232-.698.064-1.226-.462-1.902-.905-1.057-.695-1.655-1.127-2.682-1.803-1.187-.781-.417-1.21.258-1.912.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212-.071-.064-.175-.041-.249-.024-.106.024-1.793 1.141-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.14.121.098.154.228.163.319.009.091.011.201.009.324z" />
-                    </svg>
-                  )}
-                </div>
-
-                <div className="mt-6 md:hidden flex flex-col gap-3">
-                  {!profile?.isVerified && (
-                    <button
-                      onClick={() => {
-                        setIsRenewal(false);
-                        setShowVerificationModal(true);
-                      }}
-                      className="w-full py-3 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 flex items-center justify-center gap-2"
-                    >
-                      <ShieldCheck className="w-4 h-4" /> Verify Identity
-                    </button>
-                  )}
-                  {profile?.isVerified && (profile.isExpired || profile.isExpiringSoon) && (
-                    <button
-                      onClick={() => {
-                        setIsRenewal(true);
-                        setShowVerificationModal(true);
-                      }}
-                      className="w-full py-3 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 text-sm font-bold transition-colors border border-yellow-500/20 flex items-center justify-center gap-2"
-                    >
-                      <RefreshCw className="w-4 h-4" /> Renew Verification
-                    </button>
-                  )}
-                  <Link
-                    href="/create-profile"
-                    className="w-full py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600 block text-center"
-                  >
-                    Edit Profile
-                  </Link>
                 </div>
               </div>
             </div>
-
           </div>
         )}
 
@@ -372,45 +349,45 @@ export default function DashboardPage() {
           <div className="mb-12">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <ShieldCheck className={`w-5 h-5 ${
-                profile.verifierTier === 4 ? "text-amber-400"
-                : profile.verifierTier === 3 ? "text-blue-400"
-                : profile.verifierTier === 2 ? "text-pink-400"
+                profile?.verifierTier === 4 ? "text-amber-400"
+                : profile?.verifierTier === 3 ? "text-blue-400"
+                : profile?.verifierTier === 2 ? "text-pink-400"
                 : "text-emerald-400"
               }`} />
               Verified Identity Impact
             </h2>
             <div className={`p-4 rounded-xl border mb-4 ${
-              profile.verifierTier === 4 ? "bg-amber-500/5 border-amber-500/10"
-              : profile.verifierTier === 3 ? "bg-blue-500/5 border-blue-500/10"
-              : profile.verifierTier === 2 ? "bg-pink-500/5 border-pink-500/10"
+              profile?.verifierTier === 4 ? "bg-amber-500/5 border-amber-500/10"
+              : profile?.verifierTier === 3 ? "bg-blue-500/5 border-blue-500/10"
+              : profile?.verifierTier === 2 ? "bg-pink-500/5 border-pink-500/10"
               : "bg-emerald-500/5 border-emerald-500/10"
             }`}>
               <div className="flex items-center justify-between">
                 <p className={`text-xs font-medium ${
-                  profile.verifierTier === 4 ? "text-amber-400"
-                  : profile.verifierTier === 3 ? "text-blue-400"
-                  : profile.verifierTier === 2 ? "text-pink-400"
+                  profile?.verifierTier === 4 ? "text-amber-400"
+                  : profile?.verifierTier === 3 ? "text-blue-400"
+                  : profile?.verifierTier === 2 ? "text-pink-400"
                   : "text-emerald-400"
                 }`}>
-                  {profile.verificationType || "Verified"} — Active
+                  {profile?.verificationTier} — Active Official Status
                 </p>
-                {profile.expiresAt && (
+                {profile?.expiresAt && (
                   <span className="text-[10px] text-white/30 font-medium">
                     Valid until {format(new Date(profile.expiresAt), 'MMM d, yyyy')}
                   </span>
                 )}
               </div>
               
-              {profile.isExpiringSoon && (
+              {profile?.isExpiringSoon && (
                 <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>Subscription expires soon — renew now to maintain your badge</span>
+                  <span>Subscription expires soon — renew now to maintain your official status</span>
                 </div>
               )}
 
-              <p className="text-[10px] text-emerald-400/50 mt-1">Your attestations now carry the "Verified" shield 🛡️ across the network.</p>
+              <p className="text-[10px] text-emerald-400/50 mt-1">Your professional endorsements now carry the "Verified" shield 🛡️ across the network.</p>
               
-              {!profile.isExpiringSoon && profile.expiresAt && (
+              {!profile?.isExpiringSoon && profile?.expiresAt && (
                 <div className="mt-4 pt-4 border-t border-white/5">
                   <button
                     onClick={() => {
@@ -425,7 +402,6 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Summary Stat */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Attestations Issued</span>
@@ -531,7 +507,7 @@ export default function DashboardPage() {
           website={profile.website}
           socials={`${profile.twitter || ''} ${profile.linkedin || ''}`.trim()}
           currentStatus={profile.verificationStatus || null}
-          currentTier={profile.verificationType || null}
+          currentTier={profile.verificationTier || null}
           isRenewal={isRenewal}
           onClose={() => {
             setShowVerificationModal(false);
@@ -542,9 +518,8 @@ export default function DashboardPage() {
             setIsRenewal(false);
             setToastMessage(isRenewal ? "Renewal request submitted successfully." : "Verification request submitted successfully.");
             
-            // Refetch profile to sync state
             const wallet = publicKey.toBase58();
-            fetch(`/api/profile?wallet=${wallet}`)
+            fetch(`/api/user/me?wallet=${wallet}`)
               .then((r) => r.json())
               .then((data) => setProfile(data))
               .catch(err => console.error("Error refetching profile:", err));

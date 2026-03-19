@@ -74,7 +74,8 @@ export default function AttestPage() {
         }
 
         // Sync profile data if logged in
-        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+        // Sync profile data if logged in - Single Source of Truth
+        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {
                 if (data && data.displayName) {
@@ -418,8 +419,19 @@ export default function AttestPage() {
                                             <span className="font-bold uppercase tracking-tighter">Wallet:</span> <span className="font-mono text-[9px]">{publicKey?.toBase58()}</span>
                                         </p>
                                     </div>
-                                    <p className="text-[9px] text-emerald-500 font-medium bg-emerald-500/5 px-2 py-1 rounded inline-block">
-                                        ✓ Profile Verified Identity
+                                    <p className={`text-[9px] font-black px-2 py-1 rounded-md border transition-all ${
+                                        attesterProfile.isVerified 
+                                        ? "text-emerald-500 bg-emerald-500/5 border-emerald-500/10 shadow-sm" 
+                                        : attesterProfile.isExpired
+                                          ? "text-amber-500 bg-amber-500/5 border-amber-500/10"
+                                          : "text-slate-500 bg-slate-500/5 border-slate-700/50"
+                                    }`}>
+                                        {attesterProfile.isVerified 
+                                            ? `Verified ${attesterProfile.verificationTier}` 
+                                            : attesterProfile.isExpired
+                                              ? "Expired Verification"
+                                              : "Unverified User"
+                                        }
                                     </p>
                                 </div>
                             ) : (

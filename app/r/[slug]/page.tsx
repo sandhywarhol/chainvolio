@@ -62,7 +62,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             setApplicantProfile(null);
             return;
         }
-        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setApplicantProfile(data))
             .catch(() => setApplicantProfile(null));
@@ -182,10 +182,21 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                 <div className="space-y-0.5">
                                                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                                                         <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/10 px-2 py-0.5 rounded">Hiring Authority</span>
-                                                        <div className="flex items-center gap-1.5 opacity-80">
-                                                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
-                                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Verified</span>
-                                                        </div>
+                                                        {ownerProfile?.isVerified ? (
+                                                            <div className="flex items-center gap-1.5">
+                                                                <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 shadow-sm" />
+                                                                <span className="text-[9px] font-black text-emerald-400/80 uppercase tracking-widest leading-none">
+                                                                    Verified {ownerProfile?.verificationTier}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1.5">
+                                                                <AlertCircle className={`w-3.5 h-3.5 ${ownerProfile?.isExpired ? "text-amber-500" : "text-slate-500 opacity-50"}`} />
+                                                                <span className={`text-[9px] font-black uppercase tracking-widest leading-none ${ownerProfile?.isExpired ? "text-amber-500" : "text-slate-500 opacity-50"}`}>
+                                                                    {ownerProfile?.isExpired ? "Expired Verification" : "Unverified User"}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <h3 className="text-xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
                                                     <p className="text-xs font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
@@ -296,8 +307,19 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="px-3 py-1.5 bg-emerald-500/10 rounded-lg text-[10px] font-bold text-emerald-400 uppercase tracking-widest border border-emerald-500/10">
-                                            Connected
+                                        <div className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                                            applicantProfile?.isVerified 
+                                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                            : applicantProfile?.isExpired
+                                              ? "bg-amber-500/5 border-amber-500/10 text-amber-500"
+                                              : "bg-slate-500/10 border-slate-500/20 text-slate-400"
+                                        }`}>
+                                            {applicantProfile?.isVerified 
+                                                ? `Verified ${applicantProfile?.verificationTier}`
+                                                : applicantProfile?.isExpired
+                                                  ? "Expired Verification"
+                                                  : "Unverified User"
+                                            }
                                         </div>
                                     </div>
 

@@ -249,7 +249,7 @@ export async function GET(request: Request) {
   // We use orgData.type if verified and not expired.
   const verificationTier = (orgData?.status === 'verified' && !isExpired) 
     ? orgData.type 
-    : "Builder";
+    : "unverified";
 
   return NextResponse.json({
     displayName: data.display_name,

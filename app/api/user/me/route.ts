@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         // 2. Fetch Verification Status
         const { data: orgData } = await supabase
             .from("organization_verifications")
-            .select("status, type, expires_at, rejection_reason")
+            .select("status, type, expires_at, rejection_reason, verifier_tier")
             .eq("wallet_address", wallet)
             .maybeSingle();
 
@@ -41,24 +41,32 @@ export async function GET(request: Request) {
         const isVerified = orgData?.status === 'verified' && !isExpired;
 
         // 3. Compute Source of Truth
-        // Logic: Verified Tier (if active) -> Company/DAO/etc., else "Builder"
-        const verificationTier = isVerified ? orgData.type : "Builder";
+        // Logic: Verified Tier (if active) -> (Builder, Figure, etc.), else "unverified"
+        const verificationTier = isVerified ? orgData.type : "unverified";
         
         return NextResponse.json({
             walletAddress: wallet,
             isVerified,
             verificationTier,
             verificationStatus: orgData?.status || 'unverified',
+            isExpired,
             verificationType: orgData?.type || null,
             rejectionReason: orgData?.rejection_reason || null,
             expiresAt: orgData?.expires_at || null,
-            isExpired,
-            profile: profile ? {
-                displayName: profile.display_name,
-                role: profile.professional_role,
-                organization: profile.organization,
-                avatarUrl: profile.avatar_url,
-            } : null
+            verifierTier: orgData?.verifier_tier || 1,
+            // Profile fields flattened
+            displayName: profile?.display_name || null,
+            role: profile?.professional_role || null,
+            organization: profile?.organization || null,
+            avatarUrl: profile?.avatar_url || null,
+            bio: profile?.bio || null,
+            skills: profile?.skills || null,
+            cardNumber: profile?.card_number || null,
+            country: profile?.country || null,
+            timezone: profile?.timezone || null,
+            isExpiringSoon: expiresAtDate && !isExpired 
+              ? (expiresAtDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) 
+              : false,
         });
     } catch (err: any) {
         console.error("api/user/me error:", err);
