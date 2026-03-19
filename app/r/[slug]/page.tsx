@@ -200,6 +200,17 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     </div>
                                                     <h3 className="text-xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
                                                     <p className="text-xs font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
+                                                    
+                                                    {collection.metadata?.isTrusted && (
+                                                        <div className="mt-2 flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group/trust relative overflow-hidden transition-all hover:bg-emerald-500/20 max-w-fit mx-auto md:mx-0">
+                                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/trust:translate-x-full transition-transform duration-1000"></div>
+                                                            <BadgeCheck className="w-4 h-4" />
+                                                            <div className="flex flex-col text-left">
+                                                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Trusted Hiring Source</span>
+                                                                <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">Verified {collection.metadata.verificationTier}</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 {collection.metadata?.companyName && (

@@ -62,3 +62,14 @@ export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: numb
     Community: { monthly: 30,  yearly: 300  },
     Company:   { monthly: 100, yearly: 1000 },
 };
+export const ATTESTATION_QUOTAS: Record<string, number> = {
+    "Builder":               10,
+    "Public Figure":         20,
+    "Community / DAO":       40,
+    "Company / Organization": 80,
+    "unverified":           0, // Or whatever limit for free users
+};
+
+export function getAttestationQuota(tier: string): number {
+    return ATTESTATION_QUOTAS[tier] ?? 0;
+}

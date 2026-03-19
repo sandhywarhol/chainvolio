@@ -218,6 +218,7 @@ export async function GET(request: Request) {
 
   if (!wallet) return errorResponse("ERR_INVALID_REQUEST", "wallet required", 400);
 
+  // 1. Fetch profile
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
@@ -245,11 +246,13 @@ export async function GET(request: Request) {
     : false;
 
   // 3. Compute Source of Truth for Verification & Tier
-  // The verification tier is the single source of truth for high-trust users.
-  // We use orgData.type if verified and not expired.
   const verificationTier = (orgData?.status === 'verified' && !isExpired) 
     ? orgData.type 
     : "unverified";
+
+  // 4. Quota Info (Benefit System)
+  const { getAttestationQuota } = await import("@/lib/paymentConfig");
+  const attestationQuota = getAttestationQuota(verificationTier);
 
   return NextResponse.json({
     displayName: data.display_name,
@@ -279,13 +282,18 @@ export async function GET(request: Request) {
     organization: data.organization,
     // Source of Truth computed fields
     isVerified: orgData?.status === 'verified' && !isExpired,
-    verificationTier, // <--- Authoritative string label (e.g. 'Company', 'Builder')
-    verificationType: verificationTier, // Backward compatibility for CVPage
+    verificationTier,
+    verificationType: verificationTier,
     isExpired,
     isExpiringSoon,
     expiresAt: orgData?.expires_at || null,
     verifierTier: orgData?.verifier_tier || 1,
     verificationStatus: orgData?.status || null,
     rejectionReason: orgData?.rejection_reason || null,
+    // Attestation Quota (Benefit System)
+    attestationQuota,
+    attestationUsed: data.attestation_used || 0,
+    attestationResetDate: data.attestation_reset_date || null,
+    canAttest: (data.attestation_used || 0) < attestationQuota,
   });
 }

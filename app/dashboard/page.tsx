@@ -49,6 +49,10 @@ type Profile = {
   verificationType?: string;
   rejectionReason?: string;
   organization?: string;
+  attestationQuota?: number;
+  attestationUsed?: number;
+  attestationResetDate?: string;
+  canAttest?: boolean;
 };
 
 type HiringCollection = {
@@ -403,9 +407,18 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Attestations Issued</span>
-                <span className="text-2xl font-bold text-white">{attestationCount}</span>
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center relative group">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Monthly Benefits</span>
+                <span className="text-sm font-bold text-white leading-tight">
+                  {profile?.attestationUsed ?? 0} <span className="text-slate-500">/</span> {profile?.attestationQuota ?? 0}
+                </span>
+                <span className="text-[9px] text-slate-600 mt-1 uppercase tracking-tight">Attestations used</span>
+                
+                {profile?.attestationResetDate && (
+                  <div className="absolute -bottom-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <span className="text-[8px] text-slate-600 font-mono">Resets {format(new Date(profile.attestationResetDate), 'MMM d')}</span>
+                  </div>
+                )}
               </div>
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact Tier</span>

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const SLIDES = [
     { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
@@ -56,6 +57,8 @@ function CryptoLogo({ src, name, scale = 1 }: { src: string; name: string; scale
 }
 
 export function LandingPageClient() {
+    const { publicKey, connected } = useWallet();
+    const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
     const searchParams = useSearchParams();
@@ -74,11 +77,25 @@ export function LandingPageClient() {
         return () => clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+        if (!connected || !publicKey) {
+            setProfile(null);
+            return;
+        }
+        const wallet = publicKey.toBase58();
+        fetch(`/api/user/me?wallet=${wallet}`)
+            .then((r) => r.json())
+            .then((data) => setProfile(data))
+            .catch(() => setProfile(null));
+    }, [publicKey, connected]);
+
     return (
         <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
             <Navbar
+                isVerified={!!profile?.isVerified}
+                verifierTier={profile?.verifierTier}
                 onHowItWorksClick={() => setActiveModal('how')}
                 onRecruitersClick={() => setActiveModal('recruiters')}
                 onTalentClick={() => setActiveModal('talent')}
@@ -104,7 +121,9 @@ export function LandingPageClient() {
                     </div>
                     <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
                         <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Start Your On-Chain Career</Link>
-                        <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Discover Talent</Link>
+                        {!connected && (
+                            <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Discover Talent</Link>
+                        )}
                     </div>
                 </div>
 
@@ -196,7 +215,7 @@ export function LandingPageClient() {
                                             <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Core Features</h3>
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Solana Verification</h4>
+                                                    <h4 className="text-[10px) font-bold uppercase text-white/70 mb-2">Solana Verification</h4>
                                                     <p className="text-[11px] text-white/40 leading-relaxed">Professional entries are anchored as immutable, network-secured blockchain transactions.</p>
                                                 </div>
                                                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
@@ -204,7 +223,7 @@ export function LandingPageClient() {
                                                     <p className="text-[11px] text-white/40 leading-relaxed">A unified, wallet-bound professional ledger with public auditability.</p>
                                                 </div>
                                                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Infrastructure Model</h4>
+                                                    <h4 className="text-[10px) font-bold uppercase text-white/70 mb-2">Infrastructure Model</h4>
                                                     <p className="text-[11px] text-white/40 leading-relaxed">Neutral infrastructure with no subscription fees. Built for ecosystem integrity.</p>
                                                 </div>
                                             </div>
@@ -326,7 +345,7 @@ export function LandingPageClient() {
                                 <div className="space-y-16 py-4">
                                     <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">Sourcing</h2><p className="text-white/40 text-sm max-w-md">Eliminate the friction of static files. Request live, verified links to capture higher signal talent.</p></div>
                                     <div className="grid md:grid-cols-2 gap-12 pt-8">
-                                        <div className="space-y-6"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Shift</h3><div className="space-y-4"><div className="p-6 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/20 uppercase mb-3 text-[8px] tracking-[0.2em]">Traditional Query</p><p className="text-sm text-white/40 font-light">"Please attach your CV as a PDF."</p></div><div className="p-6 bg-emerald-400/[0.03] border border-emerald-400/10 rounded-sm"><p className="text-[10px] text-emerald-400/40 uppercase mb-3 text-[8px] tracking-[0.2em]">Native Query</p><p className="text-sm text-emerald-400/90 font-medium">"Drop your ChainVolio link."</p></div></div></div>
+                                        <div className="space-y-6"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Shift</h3><div className="space-y-4"><div className="p-6 bg-white/[0.02] border border-white/5 rounded-sm"><p className="text-[10px] text-white/20 uppercase mb-3 text-[10px] tracking-[0.2em]">Traditional Query</p><p className="text-sm text-white/40 font-light">"Please attach your CV as a PDF."</p></div><div className="p-6 bg-emerald-400/[0.03] border border-emerald-400/10 rounded-sm"><p className="text-[10px] text-emerald-400/40 uppercase mb-3 text-[10px] tracking-[0.2em]">Native Query</p><p className="text-sm text-emerald-400/90 font-medium">"Drop your ChainVolio link."</p></div></div></div>
                                         <div className="space-y-6"><h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Operational Value</h3><div className="space-y-5 text-xs text-white/60"><div className="flex gap-4"><span className="text-emerald-400/40 font-bold">/</span><p className="font-light leading-relaxed">Direct access to verified work history without logins.</p></div><div className="flex gap-4"><span className="text-emerald-400/40 font-bold">/</span><p className="font-light leading-relaxed">Unified view of portfolio, code, and peer proof.</p></div><div className="flex gap-4"><span className="text-emerald-400/40 font-bold">/</span><p className="font-light leading-relaxed">Signal-rich screening for global, remote pipelines.</p></div></div></div>
                                     </div>
                                 </div>

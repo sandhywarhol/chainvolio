@@ -48,6 +48,26 @@ export async function POST(request: Request) {
         const randomHash = Math.random().toString(36).substring(2, 7);
         const slug = `${baseSlug}-${randomHash}`;
 
+        // --- Trusted Hiring Signal Logic (Benefit System) ---
+        const { data: orgData } = await supabase
+            .from("organization_verifications")
+            .select("status, type, expires_at")
+            .eq("wallet_address", ownerWallet)
+            .maybeSingle();
+
+        const now = new Date();
+        const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
+        const isExpired = expiresAtDate ? now > expiresAtDate : false;
+        const isVerified = orgData?.status === 'verified' && !isExpired;
+
+        const updatedMetadata = { ...metadata };
+        if (isVerified && (orgData?.type === 'Community / DAO' || orgData?.type === 'Company / Organization')) {
+            updatedMetadata.isTrusted = true;
+            updatedMetadata.verificationTier = orgData.type;
+        } else {
+            updatedMetadata.isTrusted = false;
+        }
+
         const { data, error } = await supabase
             .from("hiring_collections")
             .insert({
@@ -55,7 +75,7 @@ export async function POST(request: Request) {
                 description,
                 slug,
                 owner_wallet: ownerWallet,
-                metadata: metadata,
+                metadata: updatedMetadata,
                 eligibility_filters: filters || {}
             })
             .select()

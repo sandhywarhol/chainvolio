@@ -119,40 +119,81 @@ export async function POST(request: Request) {
             );
         }
 
-        // --- Identity Integrity Enforcement (Single Source of Truth) ---
+        // --- Identity & Quota Enforcement ---
         let finalAttesterName = attesterName;
         let finalAttesterRole = attesterRole;
         let finalAttesterOrg = attesterOrg;
+        let verificationTier = "unverified";
 
-        if (isExternal === false) {
-            // Join profile and verification status
-            const { data: profile } = await supabase
-                .from("profiles")
-                .select("display_name, headline, professional_role, organization")
-                .eq("wallet_address", attesterWallet)
-                .single();
+        // Fetch profile and verification status to determine identity and quota
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("display_name, headline, professional_role, organization, attestation_used, attestation_reset_date")
+            .eq("wallet_address", attesterWallet)
+            .single();
 
-            const { data: orgData } = await supabase
-                .from("organization_verifications")
-                .select("status, type, expires_at")
-                .eq("wallet_address", attesterWallet)
-                .maybeSingle();
+        const { data: orgData } = await supabase
+            .from("organization_verifications")
+            .select("status, type, expires_at")
+            .eq("wallet_address", attesterWallet)
+            .maybeSingle();
 
-            if (profile) {
-                const now = new Date();
-                const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
-                const isExpired = expiresAtDate ? now > expiresAtDate : false;
-                const isVerified = orgData?.status === 'verified' && !isExpired;
+        const now = new Date();
+        const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
+        const isExpired = expiresAtDate ? now > expiresAtDate : false;
+        const isVerified = orgData?.status === 'verified' && !isExpired;
 
-                finalAttesterName = profile.display_name;
-                finalAttesterOrg = profile.organization || null;
+        if (isVerified && orgData?.type) {
+            verificationTier = orgData.type;
+        }
 
-                // Priority Logic: Official Verification Tier, then Profile Headline/Role, then "Builder"
-                if (isVerified && orgData.type) {
-                    finalAttesterRole = orgData.type;
-                } else {
-                    finalAttesterRole = profile.headline || profile.professional_role || "Builder";
-                }
+        // 1. Resolve Identity
+        if (profile && isExternal === false) {
+            finalAttesterName = profile.display_name;
+            finalAttesterOrg = profile.organization || null;
+            if (isVerified) {
+                finalAttesterRole = verificationTier;
+            } else {
+                finalAttesterRole = profile.headline || profile.professional_role || "Builder";
+            }
+        }
+
+        // 2. Attestation Quota Check
+        const { getAttestationQuota } = await import("@/lib/paymentConfig");
+        const quota = getAttestationQuota(verificationTier);
+
+        if (profile) {
+            let used = profile.attestation_used || 0;
+            let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : now;
+
+            // Monthly Reset Logic
+            if (now > resetDate) {
+                used = 0;
+                resetDate = new Date();
+                resetDate.setDate(resetDate.getDate() + 30);
+                
+                // Update reset date in DB immediately
+                await supabase
+                    .from("profiles")
+                    .update({ 
+                        attestation_used: 0, 
+                        attestation_reset_date: resetDate.toISOString() 
+                    })
+                    .eq("wallet_address", attesterWallet);
+            }
+
+            // enforcement
+            if (used >= quota) {
+                return NextResponse.json({ 
+                    error: `Monthly attestation limit reached (${quota}/${quota}). Please upgrade your verification tier to increase your quota.` 
+                }, { status: 403 });
+            }
+        } else {
+            // No profile = unverified user without tracking capacity yet
+            if (quota <= 0) {
+                return NextResponse.json({ 
+                    error: "Verification is required to give attestations in the network." 
+                }, { status: 403 });
             }
         }
         // ----------------------------------------
@@ -233,6 +274,15 @@ export async function POST(request: Request) {
             .from("receipts")
             .update({ status: "Attested" })
             .eq("id", receiptId);
+
+        // Update user attestation count
+        if (profile) {
+            const used = profile.attestation_used || 0;
+            await supabase
+                .from("profiles")
+                .update({ attestation_used: used + 1 })
+                .eq("wallet_address", attesterWallet);
+        }
 
         return NextResponse.json({ ok: true });
     } catch (err) {

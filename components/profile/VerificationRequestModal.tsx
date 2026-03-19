@@ -231,12 +231,13 @@ function TierCard({
                 <div className="h-px bg-white/6" />
 
                 {/* Attestation authority */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                     <p className="text-[9px] font-bold text-white/25 uppercase tracking-[0.18em]">Attestation Authority</p>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11.5px] font-black text-white leading-tight">{tier.authority}</span>
-                        <span className="text-[10px] text-white/30 font-medium">—</span>
-                        <span className="text-[10px] text-white/50 font-semibold">{tier.attestationLimit} / month</span>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[12px] font-black text-white leading-tight">{tier.authority}</span>
+                        <span className="text-[10px] text-white/50 font-medium tracking-tight">
+                            {tier.attestationLimit} attestations / month
+                        </span>
                     </div>
                     <PowerStrips count={tier.attestationPower} colorKey={tier.colorKey} />
                 </div>
