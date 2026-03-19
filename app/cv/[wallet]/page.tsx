@@ -39,6 +39,7 @@ type Profile = {
   isVerified?: boolean;
   verifierTier?: number;
   verificationType?: string;
+  verificationTier?: string;
   role?: string;
   organization?: string;
 };
@@ -608,10 +609,10 @@ export default function CVPage(props: any) {
                     </button>
                   </div>
 
-                  {/* Profile Identity (Role) */}
-                  {profile.role ? (
+                  {/* Profile Identity (Role/Tier) - Single Source of Truth */}
+                  {(profile.verificationTier || profile.role) ? (
                     <p className="text-sm font-medium text-slate-400 mt-1">
-                      {profile.role}
+                      {profile.verificationTier || profile.role}
                       {profile.organization && <span> at {profile.organization}</span>}
                     </p>
                   ) : null}

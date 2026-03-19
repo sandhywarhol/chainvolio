@@ -44,6 +44,7 @@ type Profile = {
   expiresAt?: string;
   verifierTier?: number;
   role?: string;
+  verificationTier?: string;
   verificationStatus?: string;
   verificationType?: string;
   rejectionReason?: string;
@@ -272,11 +273,11 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Profile Identity (Role) */}
-                {profile.role ? (
+                {/* Profile Identity (Role/Tier) - Single Source of Truth */}
+                {(profile.verificationTier || profile.role) ? (
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                     <span className="text-lg font-medium text-emerald-400">
-                      {profile.role}
+                      {profile.verificationTier || profile.role}
                       {profile.organization && <span className="text-slate-500 font-normal"> at {profile.organization}</span>}
                     </span>
                   </div>
@@ -540,7 +541,13 @@ export default function DashboardPage() {
             setShowVerificationModal(false);
             setIsRenewal(false);
             setToastMessage(isRenewal ? "Renewal request submitted successfully." : "Verification request submitted successfully.");
-            setProfile({ ...profile, verificationStatus: 'pending' });
+            
+            // Refetch profile to sync state
+            const wallet = publicKey.toBase58();
+            fetch(`/api/profile?wallet=${wallet}`)
+              .then((r) => r.json())
+              .then((data) => setProfile(data))
+              .catch(err => console.error("Error refetching profile:", err));
           }}
         />
       )}

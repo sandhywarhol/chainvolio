@@ -119,22 +119,40 @@ export async function POST(request: Request) {
             );
         }
 
-        // --- Identity Integrity Enforcement ---
+        // --- Identity Integrity Enforcement (Single Source of Truth) ---
         let finalAttesterName = attesterName;
         let finalAttesterRole = attesterRole;
         let finalAttesterOrg = attesterOrg;
 
         if (isExternal === false) {
+            // Join profile and verification status
             const { data: profile } = await supabase
                 .from("profiles")
-                .select("display_name, headline, role, organization")
+                .select("display_name, headline, professional_role, organization")
                 .eq("wallet_address", attesterWallet)
                 .single();
 
+            const { data: orgData } = await supabase
+                .from("organization_verifications")
+                .select("status, type, expires_at")
+                .eq("wallet_address", attesterWallet)
+                .maybeSingle();
+
             if (profile) {
+                const now = new Date();
+                const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
+                const isExpired = expiresAtDate ? now > expiresAtDate : false;
+                const isVerified = orgData?.status === 'verified' && !isExpired;
+
                 finalAttesterName = profile.display_name;
-                finalAttesterRole = profile.headline || profile.role || "ChainVolio Builder";
                 finalAttesterOrg = profile.organization || null;
+
+                // Priority Logic: Official Verification Tier, then Profile Headline/Role, then "Builder"
+                if (isVerified && orgData.type) {
+                    finalAttesterRole = orgData.type;
+                } else {
+                    finalAttesterRole = profile.headline || profile.professional_role || "Builder";
+                }
             }
         }
         // ----------------------------------------

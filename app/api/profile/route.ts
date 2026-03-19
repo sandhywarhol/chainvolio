@@ -244,6 +244,13 @@ export async function GET(request: Request) {
     ? (expiresAtDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) 
     : false;
 
+  // 3. Compute Source of Truth for Verification & Tier
+  // The verification tier is the single source of truth for high-trust users.
+  // We use orgData.type if verified and not expired.
+  const verificationTier = (orgData?.status === 'verified' && !isExpired) 
+    ? orgData.type 
+    : "Builder";
+
   return NextResponse.json({
     displayName: data.display_name,
     bio: data.bio,
@@ -270,13 +277,14 @@ export async function GET(request: Request) {
     createdAt: data.created_at,
     role: data.professional_role,
     organization: data.organization,
+    // Source of Truth computed fields
     isVerified: orgData?.status === 'verified' && !isExpired,
+    verificationTier, // <--- New computed field
     isExpired,
     isExpiringSoon,
     expiresAt: orgData?.expires_at || null,
     verifierTier: orgData?.verifier_tier || 1,
     verificationStatus: orgData?.status || null,
-    verificationType: orgData?.type || null,
     rejectionReason: orgData?.rejection_reason || null,
   });
 }
