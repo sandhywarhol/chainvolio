@@ -409,7 +409,17 @@ export default function DashboardPage() {
               </div>
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact Tier</span>
-                <span className="text-2xl font-bold text-emerald-400">II</span>
+                <span className={`text-2xl font-bold ${
+                  profile?.verifierTier === 4 ? "text-amber-400" :
+                  profile?.verifierTier === 3 ? "text-blue-400" :
+                  profile?.verifierTier === 2 ? "text-pink-400" :
+                  "text-emerald-400"
+                }`}>
+                  {profile?.verifierTier === 4 ? "IV" : 
+                   profile?.verifierTier === 3 ? "III" : 
+                   profile?.verifierTier === 2 ? "II" : 
+                   "I"}
+                </span>
               </div>
             </div>
           </div>
