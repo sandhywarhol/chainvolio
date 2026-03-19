@@ -96,6 +96,7 @@ export function LandingPageClient() {
             <Navbar
                 isVerified={!!profile?.isVerified}
                 verifierTier={profile?.verifierTier}
+                verificationTier={profile?.verificationTier}
                 onHowItWorksClick={() => setActiveModal('how')}
                 onRecruitersClick={() => setActiveModal('recruiters')}
                 onTalentClick={() => setActiveModal('talent')}
@@ -103,6 +104,7 @@ export function LandingPageClient() {
                 onScreeningClick={() => setActiveModal('screening')}
                 onAttestationClick={() => setActiveModal('attestation')}
             />
+
 
             <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
                 <div className="text-left max-w-3xl lg:w-[52%]">

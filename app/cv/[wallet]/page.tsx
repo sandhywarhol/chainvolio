@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { getVerificationLabel } from "@/lib/paymentConfig";
+
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
@@ -311,8 +313,9 @@ function VerifiedCheckBadge({ verificationType }: { verificationType?: string })
       <div className="absolute top-full right-0 mt-2 w-44 opacity-0 group-hover/vcheck:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
         <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl">
           <p className="text-[10px] font-black uppercase tracking-widest leading-tight" style={{ color }}>
-            Verified {s.tierLabel}
+            {getVerificationLabel(verificationType)}
           </p>
+
           <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between">
             <span className="text-[8px] text-slate-500 uppercase font-black tracking-tight">Attestation Power</span>
             <div className="flex gap-[3px]">
@@ -452,7 +455,8 @@ export default function CVPage(props: any) {
     <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
+      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
+
 
       <div className="max-w-3xl mx-auto px-6 pt-24 pb-2 flex justify-end">
         <span className="text-[10px] font-mono text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">
@@ -610,13 +614,19 @@ export default function CVPage(props: any) {
                     </button>
                   </div>
 
-                  {/* Profile Identity (Role/Tier) - Single Source of Truth */}
-                  {(profile.verificationTier || profile.role) ? (
+                  {/* Profile Identity (Role/Organization) */}
+                  {profile.role ? (
                     <p className="text-sm font-medium text-slate-400 mt-1">
-                      {profile.verificationTier || profile.role}
+                      {profile.role}
                       {profile.organization && <span> at {profile.organization}</span>}
                     </p>
+                  ) : profile.organization ? (
+                    <p className="text-sm font-medium text-slate-400 mt-1">
+                      {profile.organization}
+                    </p>
                   ) : null}
+
+
 
                   {/* Badges & Trust Hierarchy */}
                   <div className="flex flex-wrap items-start justify-center md:justify-start gap-4 mt-4">

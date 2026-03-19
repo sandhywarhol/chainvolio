@@ -8,11 +8,13 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PU
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function main() {
-    const { data, error } = await supabase.from("profiles").select("*").limit(1);
-    if (error) {
-        console.error("Error fetching profiles:", error);
+    const { data, error } = await supabase.rpc('get_tables');
+    // If rpc not defined, use a standard query
+    const { data: tables, error: err } = await supabase.from('pg_catalog.pg_tables').select('tablename').eq('schemaname', 'public');
+    if (err) {
+        console.error("Error fetching tables:", err);
     } else {
-        console.log("Profile keys:", Object.keys(data[0] || {}));
+        console.log("Tables:", tables.map(t => t.tablename));
     }
 }
 

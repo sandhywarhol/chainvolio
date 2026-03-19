@@ -3,6 +3,8 @@
 import { X, ShieldCheck, UserCheck, Calendar, Globe, MapPin, ExternalLink, Link as LinkIcon, Briefcase, FileText } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
+import { getVerificationLabel } from "@/lib/paymentConfig";
+
 
 interface ReceiptDetailModalProps {
     receipt: any;
@@ -119,9 +121,10 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                             {receipt.isAttesterVerified && (
                                                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-tight">
                                                     <ShieldCheck className="w-3 h-3" />
-                                                    Verified Org
+                                                    {getVerificationLabel(receipt.attesterVerificationType)}
                                                 </div>
                                             )}
+
                                         </div>
                                         <p className="text-xs text-slate-400">
                                             {receipt.attesterRole}

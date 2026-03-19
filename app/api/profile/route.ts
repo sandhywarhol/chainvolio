@@ -1,5 +1,30 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { ALL_SKILLS } from "@/constants/skills";
+
+// Helper function to handle skill pool registration
+async function syncSkillPool(skillsStr: string) {
+  if (!skillsStr || !supabase) return;
+  const skills = Array.from(new Set(skillsStr.split(",").map(s => s.trim()).filter(Boolean)));
+  
+  for (const skill of skills) {
+    const isCustom = !ALL_SKILLS.includes(skill);
+    // Upsert into skill_pool: if exists, increment usage_count (handled by function or separate call)
+    // For simplicity with Supabase v1/v2:
+    const { error } = await supabase.rpc('increment_skill_usage', { 
+        s_name: skill, 
+        s_custom: isCustom 
+    });
+    
+    // Fallback if RPC doesn't exist yet (for first run/MVP)
+    if (error) {
+       await supabase.from("skill_pool").upsert({ 
+         name: skill, 
+         is_custom: isCustom 
+       }, { onConflict: 'name' });
+    }
+  }
+}
 
 const errorResponse = (code: string, message: string, status: number = 400) => {
   return NextResponse.json({
@@ -100,6 +125,11 @@ export async function POST(request: Request) {
 
     if (profileError) return errorResponse("ERR_DATABASE_ERROR", `Profile error: ${profileError.message}`, 500);
 
+    // Sync skill pool asynchronously
+    if (body.skills) {
+      await syncSkillPool(body.skills);
+    }
+
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error("POST Profile Error:", err);
@@ -157,6 +187,11 @@ export async function PATCH(request: Request) {
       .eq("wallet_address", walletAddress);
 
     if (updateError) return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
+
+    // Sync skill pool asynchronously
+    if (body.skills) {
+      await syncSkillPool(body.skills);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

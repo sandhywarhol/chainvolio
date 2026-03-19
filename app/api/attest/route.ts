@@ -148,19 +148,22 @@ export async function POST(request: Request) {
         }
 
         // 1. Resolve Identity
+        const { getVerificationLabel, getAttestationQuota } = await import("@/lib/paymentConfig");
+        
         if (profile && isExternal === false) {
             finalAttesterName = profile.display_name;
             finalAttesterOrg = profile.organization || null;
             if (isVerified) {
-                finalAttesterRole = verificationTier;
+                finalAttesterRole = getVerificationLabel(verificationTier);
             } else {
                 finalAttesterRole = profile.headline || profile.professional_role || "Builder";
             }
         }
 
         // 2. Attestation Quota Check
-        const { getAttestationQuota } = await import("@/lib/paymentConfig");
         const quota = getAttestationQuota(verificationTier);
+
+
 
         if (profile) {
             let used = profile.attestation_used || 0;

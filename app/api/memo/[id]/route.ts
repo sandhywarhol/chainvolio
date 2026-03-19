@@ -50,7 +50,8 @@ export async function GET(
     // Fetch attester verification status
     const { data: verification } = await supabase
         .from("organization_verifications")
-        .select("status, verifier_tier")
+        .select("status, verifier_tier, type")
+
         .eq("wallet_address", attestation.attester_wallet)
         .eq("status", "verified")
         .single();

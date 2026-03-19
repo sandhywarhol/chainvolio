@@ -55,21 +55,30 @@ export function SkillSelector({ value, onChange, maxSkills = 8 }: SkillSelectorP
         <div className="space-y-3" ref={wrapperRef}>
             {/* Selected Skills Tags */}
             <div className="flex flex-wrap gap-2">
-                {selectedSkills.map((skill) => (
-                    <span
-                        key={skill}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium animate-in fade-in zoom-in duration-200"
-                    >
-                        {skill}
-                        <button
-                            type="button"
-                            onClick={() => removeSkill(skill)}
-                            className="hover:text-white transition-colors"
+                {selectedSkills.map((skill) => {
+                    const isCustom = !ALL_SKILLS.includes(skill);
+                    return (
+                        <span
+                            key={skill}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium animate-in fade-in zoom-in duration-200 ${
+                                isCustom 
+                                ? "bg-slate-500/10 border border-slate-500/30 text-slate-400" 
+                                : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                            }`}
                         >
-                            ×
-                        </button>
-                    </span>
-                ))}
+                            {isCustom && <span className="w-1 h-1 rounded-full bg-slate-500/50" />}
+                            {skill}
+                            <button
+                                type="button"
+                                onClick={() => removeSkill(skill)}
+                                className="hover:text-white transition-colors"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    );
+                })}
+
                 {selectedSkills.length === 0 && (
                     <span className="text-xs text-slate-600 italic">No skills selected yet</span>
                 )}
@@ -85,6 +94,12 @@ export function SkillSelector({ value, onChange, maxSkills = 8 }: SkillSelectorP
                         setIsOpen(true);
                     }}
                     onFocus={() => setIsOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && searchTerm.trim()) {
+                            e.preventDefault();
+                            addSkill(searchTerm.trim());
+                        }
+                    }}
                     className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
                     placeholder={selectedSkills.length >= maxSkills ? "Maximum skills reached" : "Search & add skills (e.g. Rust, UI/UX, DeFi)"}
                     disabled={selectedSkills.length >= maxSkills}
@@ -108,14 +123,16 @@ export function SkillSelector({ value, onChange, maxSkills = 8 }: SkillSelectorP
                                 <p className="text-slate-500 text-sm mb-2">Skill not found in bank</p>
                                 <button
                                     type="button"
-                                    className="text-xs text-emerald-400 hover:underline"
+                                    onClick={() => addSkill(searchTerm.trim())}
+                                    className="px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 hover:bg-emerald-500/20 transition-all font-bold"
                                 >
-                                    Request to add "{searchTerm}"
+                                    Add manually: "{searchTerm}"
                                 </button>
                             </div>
                         )}
                     </div>
                 )}
+
 
                 {/* Category Browsing (Only when not searching) */}
                 {isOpen && searchTerm.length === 0 && (

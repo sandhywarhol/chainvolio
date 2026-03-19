@@ -39,14 +39,45 @@ export async function POST(request: Request) {
         // Fetch all requests (admin needs to view pending AND reviewed)
         const { data, error } = await supabase
             .from("organization_verifications")
-            .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, created_at")
+            .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, created_at, expires_at")
             .order("created_at", { ascending: false });
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ ok: true, data });
+        // --- Analytics Helper ---
+        // 1. Total User Count
+        const { count: totalUsers } = await supabase
+            .from("profiles")
+            .select("*", { count: "exact", head: true });
+
+        // 2. Geographic Distribution (Top 5)
+        const { data: geoData } = await supabase
+            .from("profiles")
+            .select("country")
+            .not("country", "is", null);
+        
+        const geoDistribution: Record<string, number> = {};
+        geoData?.forEach(p => {
+            if (p.country) {
+                geoDistribution[p.country] = (geoDistribution[p.country] || 0) + 1;
+            }
+        });
+        const topCountries = Object.entries(geoDistribution)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([name, count]) => ({ name, count }));
+
+        return NextResponse.json({ 
+            ok: true, 
+            data,
+            analytics: {
+                totalUsers: totalUsers || 0,
+                topCountries
+            }
+        });
+
     } catch (err) {
         console.error("Admin organizations fetch error:", err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });

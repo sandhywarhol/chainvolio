@@ -14,7 +14,9 @@ import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw } from "lucide-react";
+import { getVerificationLabel } from "@/lib/paymentConfig";
 import { format } from "date-fns";
+
 
 type Profile = {
   displayName: string;
@@ -158,7 +160,8 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} />
+      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
+
 
       <section className="max-w-3xl mx-auto px-6 pt-32 pb-8">
         {loading ? (
@@ -236,12 +239,13 @@ export default function DashboardPage() {
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>
                           {profile?.isVerified 
-                            ? `Verified ${profile?.verificationTier}` 
+                            ? getVerificationLabel(profile?.verificationTier) 
                             : profile?.isExpired 
                               ? "Expired Verification" 
                               : "Unverified User"}
                         </span>
                       </div>
+
 
                       {(profile?.isExpired || profile?.isExpiringSoon) && (
                         <button
@@ -283,17 +287,23 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Profile Identity (Role/Tier) - Single Source of Truth */}
-                  {(profile?.verificationTier || profile?.role) ? (
+                  {/* Profile Identity (Role/Organization) */}
+                  {profile?.role ? (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                       <span className="text-lg font-medium text-emerald-400">
-                        {profile?.verificationTier !== 'unverified' && profile?.isVerified 
-                          ? profile?.verificationTier 
-                          : profile?.role}
+                        {profile?.role}
                         {profile?.organization && <span className="text-slate-500 font-normal"> at {profile?.organization}</span>}
                       </span>
                     </div>
+                  ) : profile?.organization ? (
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                      <span className="text-lg font-medium text-emerald-400">
+                        {profile?.organization}
+                      </span>
+                    </div>
                   ) : null}
+
+
 
                   {profile.lookingFor && (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
@@ -373,8 +383,9 @@ export default function DashboardPage() {
                   : profile?.verifierTier === 2 ? "text-pink-400"
                   : "text-emerald-400"
                 }`}>
-                  {profile?.verificationTier} — Active Official Status
+                  {getVerificationLabel(profile?.verificationTier)} — Active Official Status
                 </p>
+
                 {profile?.expiresAt && (
                   <span className="text-[10px] text-white/30 font-medium">
                     Valid until {format(new Date(profile.expiresAt), 'MMM d, yyyy')}

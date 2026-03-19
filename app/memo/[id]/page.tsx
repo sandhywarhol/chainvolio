@@ -6,6 +6,8 @@ import Link from "next/link";
 import QRCode from "react-qr-code";
 import { format } from "date-fns";
 import { ShieldCheck, Globe, FileText, ExternalLink, Copy, Check, Share2, Printer, Award, User, Building } from "lucide-react";
+import { getVerificationLabel } from "@/lib/paymentConfig";
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 const PERF_LABELS = [
@@ -105,12 +107,16 @@ export default function MemoPage() {
 
     // Tier classification model
     const TIER_DATA: Record<number, { label: string; icon: boolean; color: string; bars: number; weight: number }> = {
-        1: { label: "Individual", icon: false, color: "text-slate-500 bg-slate-500/10 border-slate-500/20", bars: 1, weight: 1 },
-        2: { label: "Verified Figure", icon: true, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20", bars: 2, weight: 3 },
-        3: { label: "Verified Organization", icon: true, color: "text-teal-400 bg-teal-400/10 border-teal-400/20", bars: 3, weight: 6 },
+        1: { label: "Verified Individual", icon: false, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
+        2: { label: "Verified Builder", icon: true, color: "text-pink-400 bg-pink-400/10 border-pink-400/20", bars: 2, weight: 3 },
+        3: { label: "Verified Public Figure", icon: true, color: "text-blue-400 bg-blue-400/10 border-blue-400/20", bars: 3, weight: 6 },
+        4: { label: "Verified Organization", icon: true, color: "text-amber-400 bg-amber-400/10 border-amber-400/20", bars: 4, weight: 10 },
     };
 
+
     const currentTier = TIER_DATA[tier as keyof typeof TIER_DATA] || TIER_DATA[1];
+    const displayLabel = isVerified ? getVerificationLabel(attester_verification?.type) : currentTier.label;
+
     const avatarUrl = attester_profile?.avatar_url;
 
     const t = isDark ? {
@@ -391,8 +397,9 @@ export default function MemoPage() {
                                                 <p className={`text-2xl font-black tracking-tight ${t.heading}`}>{issuerName}</p>
                                                 <div className="flex flex-col items-start gap-1">
                                                     <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${currentTier.color}`}>
-                                                        {currentTier.icon && <ShieldCheck size={10} />} {currentTier.label}
+                                                        {currentTier.icon && <ShieldCheck size={10} />} {displayLabel}
                                                     </span>
+
                                                     <div className={`text-[8px] leading-none tracking-[-0.1em] transition-opacity duration-300 ${currentTier.color} opacity-60`}>
                                                         {"▬".repeat(currentTier.bars)}
                                                     </div>

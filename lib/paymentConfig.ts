@@ -71,5 +71,25 @@ export const ATTESTATION_QUOTAS: Record<string, number> = {
 };
 
 export function getAttestationQuota(tier: string): number {
-    return ATTESTATION_QUOTAS[tier] ?? 0;
+    const t = tier.toLowerCase();
+    if (t.includes("builder")) return 10;
+    if (t.includes("figure") || t.includes("public")) return 20;
+    if (t.includes("community") || t.includes("dao")) return 40;
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return 80;
+    return 0; // default for unverified or unknown
 }
+
+
+/**
+ * Returns the official display label for a verification tier.
+ * Maps DB types/tiers to the "Verified X" format.
+ */
+export function getVerificationLabel(type?: string): string {
+    const t = (type || "").toLowerCase();
+    if (t.includes("builder")) return "Verified Builder";
+    if (t.includes("figure") || t.includes("public")) return "Verified Public Figure";
+    if (t.includes("community") || t.includes("dao")) return "Verified Community";
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Verified Organization";
+    return "Verified Entity";
+}
+

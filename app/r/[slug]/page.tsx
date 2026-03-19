@@ -23,6 +23,8 @@ import {
     Briefcase,
     Globe
 } from "lucide-react";
+import { getVerificationLabel } from "@/lib/paymentConfig";
+
 
 export default function CandidateSubmission({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -186,8 +188,9 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                             <div className="flex items-center gap-1.5">
                                                                 <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 shadow-sm" />
                                                                 <span className="text-[9px] font-black text-emerald-400/80 uppercase tracking-widest leading-none">
-                                                                    Verified {ownerProfile?.verificationTier}
+                                                                    {getVerificationLabel(ownerProfile?.verificationTier)}
                                                                 </span>
+
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center gap-1.5">
@@ -207,7 +210,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                             <BadgeCheck className="w-4 h-4" />
                                                             <div className="flex flex-col text-left">
                                                                 <span className="text-[10px] font-black uppercase tracking-widest leading-none">Trusted Hiring Source</span>
-                                                                <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">Verified {collection.metadata.verificationTier}</span>
+                                                                <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">{getVerificationLabel(collection.metadata.verificationTier)}</span>
+
                                                             </div>
                                                         </div>
                                                     )}
@@ -326,7 +330,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                               : "bg-slate-500/10 border-slate-500/20 text-slate-400"
                                         }`}>
                                             {applicantProfile?.isVerified 
-                                                ? `Verified ${applicantProfile?.verificationTier}`
+                                                ? getVerificationLabel(applicantProfile?.verificationTier)
+
                                                 : applicantProfile?.isExpired
                                                   ? "Expired Verification"
                                                   : "Unverified User"

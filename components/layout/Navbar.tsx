@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, ShieldCheck } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { usePathname } from "next/navigation";
+import { getVerificationLabel } from "@/lib/paymentConfig";
+
 
 interface NavbarProps {
     onHowItWorksClick?: () => void;
@@ -16,9 +18,12 @@ interface NavbarProps {
     onAttestationClick?: () => void;
     isVerified?: boolean;
     verifierTier?: number;
+    verificationTier?: string;
 }
 
-export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier }: NavbarProps) {
+
+export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier, verificationTier }: NavbarProps) {
+
     const { publicKey } = useWallet();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -128,10 +133,11 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         </svg>
                         <span>
                             {isVerified
-                                ? verifierTier === 3 ? "Verified Organization" : "Verified Figure"
+                                ? getVerificationLabel(verificationTier)
                                 : "Verified Organization"
                             }
                         </span>
+
                     </Link>
 
                     {/* Removed redundant verified badge for CV view consistency */}
@@ -191,10 +197,14 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <span>Organization</span>
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>
+                            {isVerified
+                                ? getVerificationLabel(verificationTier)
+                                : "Organization"
+                            }
+                        </span>
+
                     </Link>
 
                     <div className="pt-4 border-t border-white/5">
