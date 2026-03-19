@@ -314,20 +314,22 @@ export default function AttestPage() {
                     <p className="text-slate-400">Confirm a candidate's professional contributions on-chain.</p>
                 </div>
 
-                {/* Trust Signal Hint */}
-                <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-                    <div className="space-y-2">
-                        <p className="font-semibold text-white">No ChainVolio account required.</p>
-                        <p className="text-slate-400 leading-relaxed text-sm">
-                            However, registered users and verified organizations provide stronger trust signals and help the candidate build a more credible professional reputation.
-                        </p>
+                {/* Trust Signal Hint - Only for newcomers */}
+                {!publicKey && (
+                    <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
+                        <div className="space-y-2">
+                            <p className="font-semibold text-white">No ChainVolio account required.</p>
+                            <p className="text-slate-400 leading-relaxed text-sm">
+                                However, registered users and verified organizations provide stronger trust signals and help the candidate build a more credible professional reputation.
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap gap-3 pt-1">
+                            <Link href="/verified-organization" className="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500/30 text-[11px] font-bold text-slate-300 hover:text-white transition-all duration-300">
+                                Register your organization
+                            </Link>
+                        </div>
                     </div>
-                    <div className="flex flex-wrap gap-3 pt-1">
-                        <Link href="/verified-organization" className="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500/30 text-[11px] font-bold text-slate-300 hover:text-white transition-all duration-300">
-                            Register your organization
-                        </Link>
-                    </div>
-                </div>
+                )}
 
                 {/* Work record */}
                 {receipt && (
