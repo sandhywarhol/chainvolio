@@ -64,6 +64,18 @@ export async function GET(request: Request) {
             cardNumber: profile?.card_number || null,
             country: profile?.country || null,
             timezone: profile?.timezone || null,
+            twitter: profile?.twitter || null,
+            github: profile?.github || null,
+            linkedin: profile?.linkedin || null,
+            instagram: profile?.instagram || null,
+            telegram: profile?.telegram || null,
+            lens: profile?.lens || null,
+            farcaster: profile?.farcaster || null,
+            website: profile?.website || null,
+            discord: profile?.discord || null,
+            email: profile?.email || null,
+            whatsapp: profile?.whatsapp || null,
+            tags: profile?.tags || [],
             isExpiringSoon: expiresAtDate && !isExpired 
               ? (expiresAtDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) 
               : false,

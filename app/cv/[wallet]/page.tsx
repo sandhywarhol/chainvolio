@@ -470,15 +470,7 @@ export default function CVPage(props: any) {
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-
-
-      <div className="max-w-3xl mx-auto px-6 pt-24 pb-2 flex justify-end">
-        <span className="text-[10px] font-mono text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">
-          Source: {wallet}
-        </span>
-      </div>
-
-      <section className="max-w-3xl mx-auto px-6 pt-4 pb-12">
+      <section className="max-w-3xl mx-auto px-6 pt-32 pb-12">
         {!profile ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
@@ -621,21 +613,6 @@ export default function CVPage(props: any) {
                           </Link>
                         )}
                       </div>
-
-                      {/* Wallet Badge - Next to Name */}
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(wallet);
-                          setToastMessage("Wallet address copied!");
-                        }}
-                        className="group flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-slate-900/50 border border-slate-700/50 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all cursor-pointer mt-2 md:mt-0"
-                      >
-                        <Wallet className="w-3 h-3 text-purple-400" />
-                        <span className="font-mono text-[10px] text-slate-400 group-hover:text-purple-400 transition-colors">
-                          {wallet.slice(0, 4)}...{wallet.slice(-4)}
-                        </span>
-                        <Copy className="w-2.5 h-2.5 text-slate-500 group-hover:text-purple-400 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
                     </div>
 
                   {/* Profile Identity (Role/Organization) */}
@@ -840,10 +817,27 @@ export default function CVPage(props: any) {
                 </div>
               </div>
 
-              {/* Card Number */}
+              {/* Card Number & Wallet ID Positioning */}
+              <div className="absolute bottom-6 left-8 z-30 opacity-40 group-hover:opacity-100 transition-all duration-500 flex flex-col items-start translate-y-1 group-hover:translate-y-0">
+                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1.5 opacity-80">Source Wallet</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(wallet);
+                    setToastMessage("Wallet address copied!");
+                  }}
+                  className="group/wallet flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg bg-slate-950/40 border border-slate-700/30 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer backdrop-blur-sm"
+                >
+                  <Wallet className="w-3 h-3 text-purple-400/80 group-hover/wallet:text-purple-400" />
+                  <span className="font-mono text-[10px] text-slate-400 group-hover/wallet:text-purple-300 transition-colors">
+                    {wallet.slice(0, 6)}...{wallet.slice(-6)}
+                  </span>
+                  <Copy className="w-2.5 h-2.5 text-slate-500 group-hover/wallet:text-purple-400 ml-0.5 opacity-0 group-hover/wallet:opacity-100 transition-all" />
+                </button>
+              </div>
+
               {profile.cardNumber && (
-                <div className="absolute bottom-6 right-8 z-30 opacity-40 group-hover:opacity-100 transition-opacity flex flex-col items-end">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-0.5">CV ID</span>
+                <div className="absolute bottom-6 right-8 z-30 opacity-40 group-hover:opacity-100 transition-all duration-500 flex flex-col items-end translate-y-1 group-hover:translate-y-0">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1.5 opacity-80">CV ID</span>
                   <span className="font-mono text-xs tracking-[0.2em] text-white/80">
                     #{String(profile.cardNumber).padStart(5, '0')}
                   </span>
