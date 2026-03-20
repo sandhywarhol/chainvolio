@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { isRecruiterTier } from "@/lib/paymentConfig";
 
 const errorResponse = (code: string, message: string, status: number = 400) => {
     return NextResponse.json({
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         const isVerified = orgData?.status === 'verified' && !isExpired;
 
         const updatedMetadata = { ...metadata };
-        if (isVerified && (orgData?.type === 'Community / DAO' || orgData?.type === 'Company / Organization')) {
+        if (isVerified && isRecruiterTier(orgData?.type)) {
             updatedMetadata.isTrusted = true;
             updatedMetadata.verificationTier = orgData.type;
         } else {

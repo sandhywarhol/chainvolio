@@ -21,7 +21,9 @@ import {
     Clock,
     DollarSign,
     Briefcase,
-    Globe
+    Globe,
+    Eye,
+    Filter
 } from "lucide-react";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
@@ -167,21 +169,21 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         </header>
 
                         <div className="space-y-6">
-                             {/* New Polished Recruiter Identity Box on Top */}
+                            {/* Group 1: Recruiter Identity (About Recruiter) */}
                             {(collection.metadata?.recruiterName || collection.metadata?.companyName) && (
-                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-5 md:p-6 relative overflow-hidden group/recruiter transition-all">
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl opacity-30"></div>
-                                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5">
-                                        <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden group/recruiter transition-all">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-30"></div>
+                                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+                                        <div className="w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
                                             {ownerProfile?.avatar_url ? (
                                                 <img src={ownerProfile.avatar_url} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <Building2 className="w-6 h-6 text-emerald-400" />
+                                                <Building2 className="w-8 h-8 text-emerald-400" />
                                             )}
                                         </div>
-                                        <div className="flex-1 text-center md:text-left">
+                                        <div className="flex-1 text-center md:text-left space-y-4">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                <div className="space-y-0.5">
+                                                <div className="space-y-1">
                                                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                                                         <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/10 px-2 py-0.5 rounded">Hiring Authority</span>
                                                         {ownerProfile?.isVerified ? (
@@ -190,7 +192,6 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                                 <span className="text-[9px] font-black text-emerald-400/80 uppercase tracking-widest leading-none">
                                                                     {getVerificationLabel(ownerProfile?.verificationTier)}
                                                                 </span>
-
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center gap-1.5">
@@ -201,41 +202,87 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <h3 className="text-xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
-                                                    <p className="text-xs font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
+                                                    <h3 className="text-2xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
+                                                    <p className="text-sm font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
                                                     
                                                     {collection.metadata?.isTrusted && (
-                                                        <div className="mt-2 flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group/trust relative overflow-hidden transition-all hover:bg-emerald-500/20 max-w-fit mx-auto md:mx-0">
+                                                        <div className="mt-3 flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group/trust relative overflow-hidden transition-all hover:bg-emerald-500/20 max-w-fit mx-auto md:mx-0">
                                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/trust:translate-x-full transition-transform duration-1000"></div>
                                                             <BadgeCheck className="w-4 h-4" />
                                                             <div className="flex flex-col text-left">
-                                                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Trusted Hiring Source</span>
+                                                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                                                                    {collection.metadata.verificationTier?.toLowerCase().includes("company") || collection.metadata.verificationTier?.toLowerCase().includes("organization") ? "Trusted Hiring Source" : "Trusted Opportunity"}
+                                                                </span>
                                                                 <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">{getVerificationLabel(collection.metadata.verificationTier)}</span>
-
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                {collection.metadata?.companyName && (
-                                                    <div className="md:text-right">
-                                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Organization</p>
-                                                        <p className="text-base font-black text-emerald-400 leading-tight">{collection.metadata.companyName}</p>
-                                                    </div>
-                                                )}
+                                                <div className="md:text-right space-y-2">
+                                                    {collection.metadata?.companyName && (
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Company / Project Name</p>
+                                                            <p className="text-lg font-black text-emerald-400 leading-tight">{collection.metadata.companyName}</p>
+                                                        </div>
+                                                    )}
+                                                    {collection.metadata?.projectStage && (
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Project Stage</p>
+                                                            <p className="text-xs font-bold text-white uppercase tracking-wider bg-white/5 px-2 py-1 rounded inline-block">{collection.metadata.projectStage}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {collection.metadata.companyDescription && (
-                                                <div className="mt-4 pt-3 border-t border-white/5">
-                                                    <p className="text-[10px] text-slate-500 leading-relaxed italic max-w-2xl">"{collection.metadata.companyDescription}"</p>
+                                                <div className="pt-4 border-t border-white/5">
+                                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">One-line Project Description</p>
+                                                    <p className="text-sm text-slate-300 leading-relaxed italic max-w-2xl">"{collection.metadata.companyDescription}"</p>
                                                 </div>
                                             )}
+
+                                            {/* Social Links & Contact */}
+                                            <div className="pt-4 flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    {collection.metadata?.websiteUrl && (
+                                                        <a href={collection.metadata.websiteUrl.startsWith('http') ? collection.metadata.websiteUrl : `https://${collection.metadata.websiteUrl}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Website">
+                                                            <Globe className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.twitterUrl && (
+                                                        <a href={collection.metadata.twitterUrl.startsWith('http') ? collection.metadata.twitterUrl : `https://x.com/${collection.metadata.twitterUrl.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Twitter / X">
+                                                            <Twitter className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.githubUrl && (
+                                                        <a href={collection.metadata.githubUrl.startsWith('http') ? collection.metadata.githubUrl : `https://github.com/${collection.metadata.githubUrl}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="GitHub">
+                                                            <Github className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.discordUrl && (
+                                                        <a href={collection.metadata.discordUrl} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Discord">
+                                                            <MessageSquare className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                </div>
+
+                                                {collection.metadata?.contactChannel && (
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-indigo-400">
+                                                        <Send className="w-3.5 h-3.5" />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[8px] font-black uppercase tracking-widest leading-none text-indigo-500/60">Preferred Contact Method</span>
+                                                            <span className="text-[10px] font-bold mt-0.5">{collection.metadata.contactChannel}</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Role Overview Box */}
+                            {/* Group 2: Job Details (Role Overview) */}
                             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
                                 <div className="space-y-10">
                                     <div className="space-y-6">
@@ -243,11 +290,11 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                             <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                                                 <Briefcase className="w-5 h-5" />
                                             </div>
-                                            <h2 className="text-xl font-bold">Role Overview</h2>
+                                            <h2 className="text-xl font-bold">Job Details</h2>
                                         </div>
                                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
                                             <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Type</p>
+                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Role Type</p>
                                                 <p className="text-sm font-bold text-slate-300">{collection.metadata?.roleType || "Full-time"}</p>
                                             </div>
                                             <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
@@ -282,6 +329,94 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     {collection.description ? collection.description : "Apply to join the team and showcase your verified on-chain history as part of your application."}
                                                 </p>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Group 3: Evaluation Criteria (Focus Areas) */}
+                            {collection.metadata?.focusAreas && collection.metadata.focusAreas.length > 0 && (
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                                                <Eye className="w-5 h-5" />
+                                            </div>
+                                            <h2 className="text-xl font-bold">Evaluation Focus</h2>
+                                        </div>
+                                        <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Selected evaluation areas to highlight</p>
+                                        <div className="flex flex-wrap gap-3 pt-2">
+                                            {collection.metadata.focusAreas.map((area: string) => {
+                                                const labels: Record<string, string> = {
+                                                    "on_chain": "On-Chain History",
+                                                    "github": "GitHub Code",
+                                                    "dao": "DAO Governance",
+                                                    "hackathon": "Hackathons",
+                                                    "nft": "NFT Portfolio"
+                                                };
+                                                return (
+                                                    <div key={area} className="px-4 py-2 rounded-xl bg-blue-500/5 border border-blue-500/10 text-blue-400 text-sm font-bold flex items-center gap-2">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                                        {labels[area] || area.replace(/_/g, ' ').toUpperCase()}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Group 4: Requirements / Eligibility */}
+                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+                                                <Filter className="w-5 h-5" />
+                                            </div>
+                                            <h2 className="text-xl font-bold">Eligibility Filters</h2>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {collection.eligibility_filters?.minReceiptsThreshold > 0 ? (
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
+                                                    <CheckCircle className="w-4 h-4 text-purple-400" />
+                                                    <span className="text-xs font-bold text-slate-300">Active Wallet Only</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 opacity-50">
+                                                    <Globe className="w-4 h-4 text-slate-500" />
+                                                    <span className="text-xs font-bold text-slate-500">Open to All Wallets</span>
+                                                </div>
+                                            )}
+                                            {collection.eligibility_filters?.verifiedOnly ? (
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                                                    <span className="text-xs font-bold text-slate-300">Verified Profiles Only</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 opacity-50">
+                                                    <User className="w-4 h-4 text-slate-500" />
+                                                    <span className="text-xs font-bold text-slate-500">Unverified Profiles Accepted</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400">
+                                                <CalendarDays className="w-5 h-5" />
+                                            </div>
+                                            <h2 className="text-xl font-bold">Submission Deadline</h2>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-black/20 border border-white/5">
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Final Date</p>
+                                            <p className="text-lg font-black text-white">
+                                                {collection.metadata?.deadline 
+                                                    ? new Date(collection.metadata.deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                                                    : "No Deadline Set"
+                                                }
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

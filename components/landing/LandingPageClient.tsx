@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
+import { Toast } from "@/components/ui/Toast";
+import { isRecruiterTier } from "@/lib/paymentConfig";
 
 const SLIDES = [
     { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
@@ -61,7 +64,10 @@ export function LandingPageClient() {
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     useEffect(() => {
         const modal = searchParams.get('modal');
@@ -123,9 +129,19 @@ export function LandingPageClient() {
                     </div>
                     <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
                         <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Start Your On-Chain Career</Link>
-                        {!connected && (
-                            <Link href="/hiring/create" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Discover Talent</Link>
-                        )}
+                        <button
+                            onClick={() => {
+                                if (!connected) {
+                                  setIsWalletModalOpen(true);
+                                  return;
+                                }
+
+                                router.push("/hiring/create");
+                            }}
+                            className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap"
+                        >
+                            Discover Talent
+                        </button>
                     </div>
                 </div>
 
@@ -164,6 +180,16 @@ export function LandingPageClient() {
             </div>
 
             <Footer />
+
+            <CustomWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
+            
+            {toast && (
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={() => setToast(null)} 
+                />
+            )}
 
             {activeModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-8" onClick={() => setActiveModal(null)}>

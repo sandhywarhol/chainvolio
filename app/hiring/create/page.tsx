@@ -66,7 +66,7 @@ export default function CreateCollection() {
         visibility: "public",
         focusAreas: [] as string[],
         filters: {
-            minTransactions: false,
+            minReceiptsThreshold: 0,
             verifiedOnly: false
         }
     });
@@ -196,6 +196,24 @@ export default function CreateCollection() {
                         </header>
 
                         <form onSubmit={handleSubmit} className="space-y-8">
+                            {/* Upgrade Notice for Unverified Users */}
+                            <div className="mb-8 p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                        <ShieldCheck className="w-6 h-6" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-sm font-bold text-white">Verification Trust Signal</h4>
+                                        <p className="text-xs text-slate-400 max-w-md">Verify your organization or community to gain <span className="text-emerald-400 font-bold uppercase tracking-widest text-[10px] ml-1">Trusted Hiring Status</span> and increase candidate confidence.</p>
+                                    </div>
+                                </div>
+                                <Link 
+                                    href="/dashboard" 
+                                    className="px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 whitespace-nowrap"
+                                >
+                                    Get Verified
+                                </Link>
+                            </div>
 
                             {/* Main Info Card */}
                             <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 backdrop-blur-sm shadow-2xl">
@@ -528,25 +546,25 @@ export default function CreateCollection() {
                                     <div
                                         onClick={() => setFormData(prev => ({
                                             ...prev,
-                                            filters: { ...prev.filters, minTransactions: !prev.filters.minTransactions }
+                                            filters: { ...prev.filters, minReceiptsThreshold: prev.filters.minReceiptsThreshold === 5 ? 0 : 5 }
                                         }))}
                                         className={`
                                             cursor-pointer p-4 rounded-xl border transition-all duration-200 group relative
-                                            ${formData.filters.minTransactions
+                                            ${formData.filters.minReceiptsThreshold === 5
                                                 ? 'bg-purple-500/10 border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
                                                 : 'bg-[#121214] border-white/5 hover:border-white/10 hover:bg-white/[0.02]'}
                                         `}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${formData.filters.minTransactions ? 'bg-purple-500/20 text-purple-400' : 'bg-white/5 text-slate-400'}`}>
+                                            <div className={`p-2 rounded-lg ${formData.filters.minReceiptsThreshold === 5 ? 'bg-purple-500/20 text-purple-400' : 'bg-white/5 text-slate-400'}`}>
                                                 <Clock className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-bold ${formData.filters.minTransactions ? 'text-purple-100' : 'text-slate-300'}`}>Active Wallet Only</p>
+                                                <p className={`text-sm font-bold ${formData.filters.minReceiptsThreshold === 5 ? 'text-purple-100' : 'text-slate-300'}`}>Active Wallet Only</p>
                                                 <p className="text-[10px] text-slate-500">Requires 5+ on-chain receipts/txs</p>
                                             </div>
                                         </div>
-                                        {formData.filters.minTransactions && <div className="absolute top-2 right-2 text-purple-500"><Check className="w-4 h-4" /></div>}
+                                        {formData.filters.minReceiptsThreshold === 5 && <div className="absolute top-2 right-2 text-purple-500"><Check className="w-4 h-4" /></div>}
                                     </div>
 
                                     <div

@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
-import { getVerificationLabel } from "@/lib/paymentConfig";
+import { getVerificationLabel, isRecruiterTier } from "@/lib/paymentConfig";
 
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
@@ -332,15 +333,17 @@ function VerifiedCheckBadge({ verificationType }: { verificationType?: string })
 
 export default function CVPage(props: any) {
   const params = useParams();
+  const { publicKey } = useWallet();
   const wallet = props?.walletAddressOverride || (params?.wallet as string);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [viewerProfile, setViewerProfile] = useState<any>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [showAllHiring, setShowAllHiring] = useState(false);
-    const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showAllHiring, setShowAllHiring] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const verifiedHiringRecords = useMemo(() => {
     return receipts.filter(r => 
@@ -425,6 +428,17 @@ export default function CVPage(props: any) {
   }, [contributionReceipts]);
 
 
+
+  useEffect(() => {
+    if (publicKey) {
+      fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
+        .then(r => r.json())
+        .then(data => setViewerProfile(data))
+        .catch(() => setViewerProfile(null));
+    } else {
+      setViewerProfile(null);
+    }
+  }, [publicKey]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -591,28 +605,38 @@ export default function CVPage(props: any) {
                     </div>
                   )}
 
-                  <div className="flex flex-col md:flex-row md:items-center gap-3">
-                    <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start">
-                      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                        {profile.displayName}
-                      </h1>
-                    </div>
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 flex-1">
+                      <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate">
+                          {profile.displayName}
+                        </h1>
 
-                    {/* Wallet Badge - Next to Name */}
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(wallet);
-                        setToastMessage("Wallet address copied!");
-                      }}
-                      className="group flex items-center gap-1 px-2 py-1 rounded-full bg-slate-900/50 border border-slate-700/50 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all cursor-pointer self-center md:self-auto"
-                    >
-                      <Wallet className="w-3 h-3 text-purple-400" />
-                      <span className="font-mono text-[10px] text-slate-400 group-hover:text-purple-400 transition-colors">
-                        {wallet.slice(0, 4)}...{wallet.slice(-4)}
-                      </span>
-                      <Copy className="w-2.5 h-2.5 text-slate-500 group-hover:text-purple-400 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                  </div>
+                        {/* Hire Talent Button for all viewers */}
+                        {publicKey?.toBase58() && publicKey?.toBase58() !== wallet && (
+                          <Link
+                            href="/hiring/create"
+                            className="px-4 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-black uppercase tracking-widest transition-all hover:bg-emerald-400 hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.2)] ml-auto md:ml-2"
+                          >
+                            Hire Talent
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Wallet Badge - Next to Name */}
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(wallet);
+                          setToastMessage("Wallet address copied!");
+                        }}
+                        className="group flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-slate-900/50 border border-slate-700/50 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all cursor-pointer mt-2 md:mt-0"
+                      >
+                        <Wallet className="w-3 h-3 text-purple-400" />
+                        <span className="font-mono text-[10px] text-slate-400 group-hover:text-purple-400 transition-colors">
+                          {wallet.slice(0, 4)}...{wallet.slice(-4)}
+                        </span>
+                        <Copy className="w-2.5 h-2.5 text-slate-500 group-hover:text-purple-400 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    </div>
 
                   {/* Profile Identity (Role/Organization) */}
                   {profile.role ? (

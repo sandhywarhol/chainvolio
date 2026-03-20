@@ -25,7 +25,7 @@ export async function GET(request: Request) {
             .from("profiles")
             .select("*")
             .eq("wallet_address", wallet)
-            .single();
+            .maybeSingle();
 
         // 2. Fetch Verification Status
         const { data: orgData } = await supabase

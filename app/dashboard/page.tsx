@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw } from "lucide-react";
-import { getVerificationLabel } from "@/lib/paymentConfig";
+import { getVerificationLabel, isRecruiterTier } from "@/lib/paymentConfig";
 import { format } from "date-fns";
 
 
@@ -166,7 +166,7 @@ export default function DashboardPage() {
       <section className="max-w-3xl mx-auto px-6 pt-32 pb-8">
         {loading ? (
           <p className="text-slate-400">Loading...</p>
-        ) : !profile ? (
+        ) : !profile?.displayName ? (
           <div className="mb-8 p-4 rounded-lg bg-slate-800 border border-slate-700">
             <p className="mb-4">No profile yet. Create one first.</p>
             <Link
@@ -177,7 +177,8 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="mb-12">
+          <>
+            <div className="mb-12">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div className="flex-shrink-0">
                 {profile.avatarUrl ? (
@@ -266,6 +267,15 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-3 justify-center md:justify-end">
+                      {profile?.isVerified && isRecruiterTier(profile?.verificationTier) && (
+                        <Link
+                          href="/hiring/create"
+                          className="px-4 py-2 rounded-lg bg-emerald-500 text-black text-sm font-black transition-all hover:bg-emerald-400 hover:scale-105 flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                        >
+                          Hire Talent
+                        </Link>
+                      )}
+
                       {!profile?.isVerified && !profile?.isExpired && (
                         <button
                           onClick={() => {
@@ -356,7 +366,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-        )}
 
         {/* Organization Impact - For Verified Orgs */}
         {profile?.isVerified && (
@@ -449,41 +458,78 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Hiring Collections - For Recruiters */}
-        {collections.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+        {/* Hiring Collections - For all users */}
+        <div className="mb-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2">
               <LayoutDashboard className="w-5 h-5 text-emerald-500" />
-              Hiring Collections
+              Hiring Center
             </h2>
-            <div className="grid gap-4">
-              {collections.map(col => (
-                <div key={col.id} className="p-4 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-between group hover:border-emerald-500/50 transition-colors">
-                  <div>
-                    <h3 className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{col.title}</h3>
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
-                      <span>Created {new Date(col.created_at).toLocaleDateString()}</span>
-                      <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1">
-                        View Public Page <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/hiring/${col.slug}/dashboard`}
-                    className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg transition-colors border border-emerald-500/20"
-                  >
-                    Open Dashboard
-                  </Link>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-4 border-t border-slate-800">
-              <Link href="/hiring/create" className="text-sm font-bold text-slate-400 hover:text-white flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Create another collection
-              </Link>
-            </div>
+            <Link 
+              href="/hiring/create"
+              className="text-xs font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-3.5 h-3.5" /> New Collection
+            </Link>
           </div>
-        )}
+
+          {!profile?.isVerified && (
+            <div className="mb-6 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                <p className="text-xs text-slate-400">
+                  <span className="text-white font-bold">Trust Signal:</span> Verify your organization to gain <span className="text-emerald-400 font-bold">trusted hiring status</span>.
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowVerificationModal(true)}
+                className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/30 transition-all border border-indigo-500/20"
+              >
+                Upgrade
+              </button>
+            </div>
+          )}
+
+            {collections.length > 0 ? (
+              <div className="grid gap-4">
+                {collections.map(col => (
+                  <div key={col.id} className="p-4 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-between group hover:border-emerald-500/50 transition-colors">
+                    <div>
+                      <h3 className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{col.title}</h3>
+                      <div className="flex items-center gap-4 text-xs text-slate-400">
+                        <span>Created {new Date(col.created_at).toLocaleDateString()}</span>
+                        <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1">
+                          View Public Page <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/hiring/${col.slug}/dashboard`}
+                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg transition-colors border border-emerald-500/20"
+                    >
+                      Open Dashboard
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-10 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+                  <LayoutDashboard className="w-8 h-8 text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Ready to Source Talent?</h3>
+                <p className="text-sm text-slate-400 mb-6 max-w-sm">
+                  Create your first collection to start discovering and tracking high-signal talent. Verified users gain trusted status.
+                </p>
+                <Link
+                  href="/hiring/create"
+                  className="px-6 py-3 bg-emerald-500 text-black font-black rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                >
+                  Create Hiring Collection
+                </Link>
+              </div>
+            )}
+          </div>
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Proof of Work</h2>
@@ -532,6 +578,8 @@ export default function DashboardPage() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
+          </>
+        )}
       </section>
 
       {showVerificationModal && profile && (

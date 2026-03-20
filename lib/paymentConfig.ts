@@ -93,3 +93,9 @@ export function getVerificationLabel(type?: string): string {
     return "Verified Entity";
 }
 
+/** Returns true if the tier/type is authorized for recruiter features. */
+export function isRecruiterTier(tier?: string): boolean {
+    const t = (tier || "").toLowerCase();
+    return t.includes("company") || t.includes("organization") || t.includes("org") || t.includes("community") || t.includes("dao");
+}
+
