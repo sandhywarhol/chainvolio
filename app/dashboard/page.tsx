@@ -160,12 +160,12 @@ export default function DashboardPage() {
   const walletAddress = publicKey.toBase58();
 
   return (
-    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
 
 
-      <section className="max-w-3xl mx-auto px-6 pt-32 pb-8">
+      <section className="flex-1 max-w-3xl mx-auto px-6 pt-32 pb-8">
         {loading ? (
           <p className="text-slate-400">Loading...</p>
         ) : !profile?.displayName ? (
@@ -182,15 +182,15 @@ export default function DashboardPage() {
           <>
             <div className="mb-12">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}
                     alt={profile.displayName}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-slate-700 shadow-xl"
+                    className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-700 shadow-xl"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-slate-500 text-4xl font-bold shadow-xl">
+                  <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-slate-500 text-3xl md:text-4xl font-bold shadow-xl">
                     {profile.displayName?.[0] || '?'}
                   </div>
                 )}
@@ -256,19 +256,19 @@ export default function DashboardPage() {
                             setIsRenewal(true);
                             setShowVerificationModal(true);
                           }}
-                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0 ${
                             profile?.isExpired 
                               ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
                               : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
                           }`}
                         >
-                          <RefreshCw className="w-3 h-3" />
-                          <span>{profile?.isExpired ? "Expired — Renew" : "Renew Now"}</span>
+                           <RefreshCw className="w-3 h-3" />
+                           <span>{profile?.isExpired ? "Expired — Renew" : "Renew Now"}</span>
                         </button>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-3 justify-center md:justify-end">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center md:justify-end w-full md:w-auto">
 
 
                       {!profile?.isVerified && !profile?.isExpired && (
@@ -352,17 +352,9 @@ export default function DashboardPage() {
                     )}
 
                     {profile?.github && (
-                      <a
-                        href={`https://github.com/${profile.github}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
-                        title="GitHub"
-                      >
-                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                        </svg>
-                      </a>
+                       <a href={`https://github.com/${profile.github}`} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all font-bold text-xs" title="GitHub">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
+                       </a>
                     )}
 
                     {profile?.linkedin && (
@@ -388,7 +380,7 @@ export default function DashboardPage() {
                         title="Instagram"
                       >
                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 2.122 1.381.762.297 1.634.501 2.911.558 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.277-.057 2.149-.261 2.911-.558.788-.306 1.457-.715 2.122-1.381.666-.665 1.075-1.334 1.381-2.122.297-.762.501-1.634.558-2.911.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.819-.679-1.381-.896-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 1.381 2.122.297.762.501 1.634.558 2.911.058 1.28.072 1.688.072 4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                         </svg>
                       </a>
                     )}

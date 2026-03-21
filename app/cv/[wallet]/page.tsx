@@ -466,15 +466,16 @@ export default function CVPage(props: any) {
   }
 
   return (
-    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-      <section className="max-w-3xl mx-auto px-6 pt-32 pb-12">
+      <section className="flex-1 max-w-3xl mx-auto px-6 pt-32 pb-12">
         {!profile ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
           <>
+            {/* MAIN CV CARD COMPONENT */}
             <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 mb-8 p-8 rounded-3xl overflow-hidden group">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse"></div>
@@ -513,7 +514,7 @@ export default function CVPage(props: any) {
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
               <div className="absolute bottom-4 left-4 w-2 h-2 bg-slate-300/60 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }}></div>
 
-              <div className="absolute top-6 right-6 z-30 flex flex-col gap-5 items-center">
+              <div className="hidden md:flex absolute top-6 right-6 z-30 flex-col gap-5 items-center">
                 {profile.isVerified && (
                   <VerifiedCheckBadge verificationType={profile.verificationType} />
                 )}
@@ -538,18 +539,25 @@ export default function CVPage(props: any) {
               {/* Content wrapper */}
               <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 w-full z-10">
                 {/* Avatar Column */}
-                <div className="flex-shrink-0">
-                  {profile.avatarUrl ? (
-                    <img
-                      src={profile.avatarUrl}
-                      alt={profile.displayName}
-                      className="w-32 h-32 rounded-full object-cover border-4 border-slate-800 shadow-xl"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-4xl border-4 border-slate-800 shadow-xl">
-                      👤
+                <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
+                  <div className="relative group/avatar">
+                    {profile.avatarUrl ? (
+                      <img
+                        src={profile.avatarUrl}
+                        alt={profile.displayName}
+                        className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-800 shadow-xl"
+                      />
+                    ) : (
+                      <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-3xl md:text-4xl border-4 border-slate-800 shadow-xl">
+                        👤
+                      </div>
+                    )}
+                    
+                    {/* Mobile-only Trust Badge Overlay */}
+                    <div className="md:hidden absolute -bottom-2 -right-2">
+                       {profile.isVerified && <VerifiedCheckBadge verificationType={profile.verificationType} />}
                     </div>
-                  )}
+                  </div>
 
                   {/* Country below avatar */}
                   {(profile.country || profile.timezone) && (
@@ -599,18 +607,37 @@ export default function CVPage(props: any) {
 
                     <div className="flex flex-col md:flex-row md:items-center gap-3 flex-1">
                       <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
-                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate">
+                        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
                           {profile.displayName}
                         </h1>
 
-                        {/* Hire Talent Button for all viewers */}
+                        {/* Hire Talent Button - Better Mobile Experience */}
                         {publicKey?.toBase58() && publicKey?.toBase58() !== wallet && (
                           <Link
                             href="/hiring/create"
-                            className="px-4 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-black uppercase tracking-widest transition-all hover:bg-emerald-400 hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.2)] ml-auto md:ml-2"
+                            className="hidden md:flex px-4 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-black uppercase tracking-widest transition-all hover:bg-emerald-400 hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.2)] ml-auto md:ml-2"
                           >
                             Hire Talent
                           </Link>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Mobile-only Action Area */}
+                    <div className="md:hidden flex flex-col gap-3 w-full pt-2">
+                      {publicKey?.toBase58() && publicKey?.toBase58() !== wallet && (
+                        <Link
+                          href="/hiring/create"
+                          className="w-full py-4 rounded-xl bg-emerald-500 text-black text-xs font-black uppercase tracking-widest text-center shadow-lg active:scale-95 transition-all"
+                        >
+                          Hire {profile.displayName.split(' ')[0]}
+                        </Link>
+                      )}
+                      <div className="flex justify-center gap-4">
+                        {totalYearsExperience > 0 && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400">
+                             {totalYearsExperience}+ Years Experience
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1136,7 +1163,7 @@ export default function CVPage(props: any) {
           />
         )}
 
-        <footer className="mt-16 text-center border-t border-slate-800 pt-8 pb-4">
+        <footer className="mt-auto text-center border-t border-slate-800 pt-8 pb-4">
           <p className="text-slate-600 text-xs max-w-md mx-auto">
             ChainVolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by ChainVolio itself. Please verify critical claims independently.
           </p>

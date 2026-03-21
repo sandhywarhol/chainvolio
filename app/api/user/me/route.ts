@@ -27,6 +27,10 @@ export async function GET(request: Request) {
             .eq("wallet_address", wallet)
             .maybeSingle();
 
+        if (profile?.is_test) {
+            return NextResponse.json({ error: "Profile hidden or not found." }, { status: 404 });
+        }
+
         // 2. Fetch Verification Status
         const { data: orgData } = await supabase
             .from("organization_verifications")

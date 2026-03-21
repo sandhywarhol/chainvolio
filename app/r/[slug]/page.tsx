@@ -149,22 +149,37 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             <section className="max-w-3xl mx-auto px-6 py-12 relative z-10">
                 {!submitted ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <header className="text-center mb-12">
-                            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight leading-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
+                        <header className="text-center mb-16">
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
                                 {collection.title}
                             </h1>
-                            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
-                                <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-md text-emerald-500/80">
-                                    <ShieldCheck className="w-3.5 h-3.5" /> Verified Pool
-                                </span>
-                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
-                                <span className="flex items-center gap-1.5 font-sans">
-                                    <Clock className="w-3.5 h-3.5 text-blue-500" /> {collection.metadata?.roleType || "Active"}
-                                </span>
-                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
-                                <span className="flex items-center gap-1.5 text-emerald-400 font-sans">
-                                    <DollarSign className="w-3.5 h-3.5" /> {collection.metadata?.salary || "Competitive"}
-                                </span>
+                            <div className="flex flex-col items-center gap-6">
+                                <div className="flex flex-wrap items-center justify-center gap-3 gap-y-4 px-2">
+                                    <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-md text-emerald-500/80 text-[10px] md:text-xs">
+                                        <ShieldCheck className="w-3.5 h-3.5" /> Verified Pool
+                                    </span>
+                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-slate-800"></span>
+                                    <span className="flex items-center gap-1.5 font-sans text-[10px] md:text-xs text-slate-500">
+                                        <Clock className="w-3.5 h-3.5 text-blue-500" /> {collection.metadata?.roleType || "Active"}
+                                    </span>
+                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-slate-800"></span>
+                                    <span className="flex items-center gap-1.5 text-emerald-400 font-sans text-[10px] md:text-xs">
+                                        <DollarSign className="w-3.5 h-3.5" /> {collection.metadata?.salary || "Competitive"}
+                                    </span>
+                                </div>
+
+                                {collection.metadata?.isTrusted && (
+                                    <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group/trust relative overflow-hidden transition-all hover:bg-emerald-500/20 max-w-fit mx-auto">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/trust:translate-x-full transition-transform duration-1000"></div>
+                                        <BadgeCheck className="w-4 h-4" />
+                                        <div className="flex flex-col text-left">
+                                            <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                                                {collection.metadata.verificationTier?.toLowerCase().includes("company") || collection.metadata.verificationTier?.toLowerCase().includes("organization") ? "Trusted Hiring Source" : "Trusted Opportunity"}
+                                            </span>
+                                            <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">{getVerificationLabel(collection.metadata.verificationTier)}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </header>
 
@@ -174,14 +189,14 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                 <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden group/recruiter transition-all">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-30"></div>
                                     <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
-                                        <div className="w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
+                                        <div className="w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
                                             {ownerProfile?.avatar_url ? (
                                                 <img src={ownerProfile.avatar_url} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <Building2 className="w-8 h-8 text-emerald-400" />
+                                                <Building2 className="w-10 h-10 text-emerald-400" />
                                             )}
                                         </div>
-                                        <div className="flex-1 text-center md:text-left space-y-4">
+                                        <div className="flex-1 text-center md:text-left space-y-4 w-full">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
@@ -205,18 +220,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     <h3 className="text-2xl font-black text-white">{collection.metadata.recruiterName || "Lead Recruiter"}</h3>
                                                     <p className="text-sm font-bold text-slate-400 leading-tight">{collection.metadata.recruiterRole || "Recruitment Manager"}</p>
                                                     
-                                                    {collection.metadata?.isTrusted && (
-                                                        <div className="mt-3 flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group/trust relative overflow-hidden transition-all hover:bg-emerald-500/20 max-w-fit mx-auto md:mx-0">
-                                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/trust:translate-x-full transition-transform duration-1000"></div>
-                                                            <BadgeCheck className="w-4 h-4" />
-                                                            <div className="flex flex-col text-left">
-                                                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                                                                    {collection.metadata.verificationTier?.toLowerCase().includes("company") || collection.metadata.verificationTier?.toLowerCase().includes("organization") ? "Trusted Hiring Source" : "Trusted Opportunity"}
-                                                                </span>
-                                                                <span className="text-[8px] font-bold text-emerald-400/60 uppercase tracking-tighter mt-0.5 leading-none">{getVerificationLabel(collection.metadata.verificationTier)}</span>
-                                                            </div>
-                                                        </div>
-                                                    )}
+
                                                 </div>
 
                                                 <div className="md:text-right space-y-2">

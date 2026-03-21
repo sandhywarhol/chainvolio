@@ -157,7 +157,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
             </div>
 
             {/* Mobile Navigation */}
-            <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-white/5 bg-black/40 backdrop-blur-xl ${isMobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+            <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-white/5 bg-black/40 backdrop-blur-xl ${isMobileMenuOpen ? 'max-h-[80vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
                 }`}>
                 <div className="px-8 py-6 space-y-4 text-sm font-bold">
                     <MobileAccordion
@@ -207,8 +207,11 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
                     </Link>
 
-                    <div className="pt-4 border-t border-white/5">
-                        <WalletMultiButton />
+                    <div className="pt-6 pb-4 border-t border-white/5 flex flex-col gap-3">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Account</span>
+                        <div className="w-full scale-100 origin-left">
+                            <WalletMultiButton />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -5,13 +5,13 @@ import { createClient } from "@supabase/supabase-js";
 // ONLY use this after you have manually verified the user's signature/identity.
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
     if (process.env.NODE_ENV === 'production') {
-        console.error("FATAL: SUPABASE_SERVICE_ROLE_KEY missing in production.");
+        console.error("FATAL: SUPABASE credentials missing in production.");
     } else {
-        console.warn("Supabase Service Role Key missing. Server mutations will fail.");
+        console.warn("Supabase credentials missing. API routes will fail.");
     }
 }
 

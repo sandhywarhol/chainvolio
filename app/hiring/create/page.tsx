@@ -446,6 +446,7 @@ export default function CreateCollection() {
                                                 <option className="bg-[#121214] text-white">Contract</option>
                                                 <option className="bg-[#121214] text-white">Freelance</option>
                                                 <option className="bg-[#121214] text-white">Part-time</option>
+                                                <option className="bg-[#121214] text-white">Internship</option>
                                             </select>
                                             <Briefcase className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none" />
                                         </div>
@@ -513,6 +514,7 @@ export default function CreateCollection() {
                                                 <option className="bg-[#121214] text-white">Fiat + Equity</option>
                                                 <option className="bg-[#121214] text-white">Crypto Only</option>
                                                 <option className="bg-[#121214] text-white">DAO Tokens</option>
+                                                <option className="bg-[#121214] text-white">Unpaid / Contributor</option>
                                             </select>
                                             <DollarSign className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600 pointer-events-none" />
                                         </div>

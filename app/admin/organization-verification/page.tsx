@@ -63,10 +63,16 @@ export default function AdminVerificationPage() {
     } | null>(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
-    const [activeTab, setActiveTab] = useState<"pending" | "reviewed">("pending");
+    const [activeTab, setActiveTab] = useState<"pending" | "reviewed" | "curated">("pending");
+    const [curatedSearch, setCuratedSearch] = useState("");
+    const [curatedProfile, setCuratedProfile] = useState<any>(null);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [grantLoading, setGrantLoading] = useState(false);
+    const [selectedTier, setSelectedTier] = useState("Builder");
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [tierFilter, setTierFilter] = useState("all");
+    const [showTestUsers, setShowTestUsers] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [analytics, setAnalytics] = useState<{ totalUsers: number; topCountries: any[] } | null>(null);
@@ -88,7 +94,7 @@ export default function AdminVerificationPage() {
         }
         setIsAuthorized(true);
         fetchRequests();
-    }, [connected, publicKey]);
+    }, [connected, publicKey, showTestUsers]);
 
     const fetchRequests = async () => {
         setLoading(true);
@@ -103,7 +109,7 @@ export default function AdminVerificationPage() {
             const res = await fetch("/api/admin/organizations", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp }),
+                body: JSON.stringify({ adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, showTestUsers }),
             });
 
             if (!res.ok) throw new Error("Failed to fetch requests");
@@ -171,6 +177,70 @@ export default function AdminVerificationPage() {
             setToast({ message: err.message || "Action failed.", type: "error" });
         } finally {
             setActionLoading(null);
+        }
+    };
+
+    const handleCuratedSearch = async () => {
+        if (!curatedSearch) return;
+        setSearchLoading(true);
+        setCuratedProfile(null);
+        try {
+            const timestamp = Date.now();
+            const nonce = Math.random().toString(36).substring(2, 11);
+            const messageStr = `ChainVolio Action: admin_access\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
+            const message = new TextEncoder().encode(messageStr);
+            const signature = await signMessage!(message);
+            const signatureBase58 = bs58.encode(signature);
+
+            const res = await fetch("/api/admin/curated/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, cvId: curatedSearch, showTestUsers }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Search failed");
+            
+            setCuratedProfile(data.data);
+            setToast({ message: "Profile found", type: "success" });
+        } catch (err: any) {
+            setToast({ message: err.message || "Failed to find profile", type: "error" });
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    const handleGrantVerification = async () => {
+        if (!curatedProfile) return;
+        setGrantLoading(true);
+        try {
+            const timestamp = Date.now();
+            const nonce = Math.random().toString(36).substring(2, 11);
+            const messageStr = `ChainVolio Action: admin_access\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
+            const message = new TextEncoder().encode(messageStr);
+            const signature = await signMessage!(message);
+            const signatureBase58 = bs58.encode(signature);
+
+            const res = await fetch("/api/admin/curated/grant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, 
+                    walletAddress: curatedProfile.wallet_address, tier: selectedTier 
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Grant failed");
+            
+            setToast({ message: "User successfully verified via admin override", type: "success" });
+            setCuratedProfile(null);
+            setCuratedSearch("");
+            fetchRequests();
+        } catch (err: any) {
+            setToast({ message: err.message || "Failed to grant verification", type: "error" });
+        } finally {
+            setGrantLoading(false);
         }
     };
 
@@ -417,9 +487,26 @@ export default function AdminVerificationPage() {
                         >
                             {statusFilter !== "all" ? `Filtered Results (${filteredRequests.length})` : `Reviewed (${allReviewed.length})`}
                         </button>
+                        <button
+                            onClick={() => setActiveTab("curated")}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "curated"
+                                ? "bg-purple-500/10 border border-purple-500/30 text-purple-400"
+                                : "bg-white/[0.02] border border-white/5 text-slate-500 hover:text-white"
+                            }`}
+                        >
+                            Curated Verification
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-4 ml-auto">
+                        <label className="flex items-center gap-2 cursor-pointer opacity-70 hover:opacity-100 transition-opacity mr-2">
+                            <div className={`w-8 h-4 rounded-full transition-colors relative ${showTestUsers ? 'bg-indigo-500' : 'bg-white/10'}`}>
+                                <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${showTestUsers ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                            </div>
+                            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Show Test Users</span>
+                            <input type="checkbox" className="hidden" checked={showTestUsers} onChange={(e) => setShowTestUsers(e.target.checked)} />
+                        </label>
+                        <div className="w-[1px] h-4 bg-white/10 mr-2" />
                         <button onClick={fetchRequests} className="text-xs font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2">
                             <RotateCcw className="w-3 h-3" /> Refresh
                         </button>
@@ -543,7 +630,95 @@ export default function AdminVerificationPage() {
                 )}
 
 
-                {/* Main Table */}
+                {activeTab === "curated" ? (
+                    <div className="rounded-[32px] bg-white/[0.01] border border-white/5 overflow-hidden p-8 max-w-2xl mx-auto mt-8">
+                        <h2 className="text-2xl font-bold mb-2">Curated Verification</h2>
+                        <p className="text-white/40 mb-8">Manually verify early adopters, high-impact users, and strategic accounts without requiring payment.</p>
+                        
+                        <div className="flex gap-4 mb-8">
+                            <input 
+                                type="text" 
+                                placeholder="Enter numeric CV ID (e.g. 7)" 
+                                className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm focus:border-purple-500/50 outline-none transition-all placeholder:text-slate-600 focus:bg-white/[0.05]"
+                                value={curatedSearch}
+                                onChange={(e) => setCuratedSearch(e.target.value.replace(/[^0-9]/g, ''))}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCuratedSearch()}
+                            />
+                            <button 
+                                onClick={handleCuratedSearch}
+                                disabled={searchLoading || !curatedSearch}
+                                className="px-8 py-4 rounded-2xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {searchLoading ? "Searching..." : "Search"}
+                            </button>
+                        </div>
+
+                        {curatedProfile && (
+                            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 mt-6 space-y-6">
+                                <div className="flex items-start justify-between">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xl font-bold">{curatedProfile.display_name} <span className="text-slate-500 font-mono text-sm ml-2">#{String(curatedProfile.card_number).padStart(5, '0')}</span></h3>
+                                        <p className={curatedProfile.role && curatedProfile.role.toLowerCase() !== 'none' ? "text-slate-400 mb-2 font-medium" : "text-slate-500/70 mb-2 italic text-sm"}>
+                                            {curatedProfile.role && curatedProfile.role.toLowerCase() !== 'none' ? curatedProfile.role : "Add your role"}
+                                        </p>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/5 font-mono text-[10px] text-white/60 mb-2">
+                                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                            {curatedProfile.wallet_address}
+                                        </div>
+                                        <div className="mt-2">
+                                            <a 
+                                                href={`/cv/${curatedProfile.wallet_address}`} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/70 hover:text-white hover:bg-white/10 transition-all font-bold"
+                                            >
+                                                <ExternalLink className="w-3.5 h-3.5" /> View Profile CV
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Current Status</span>
+                                        {curatedProfile.verification_status === 'verified' ? (
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-tight flex items-center gap-1"><CheckCircle className="w-3 h-3" /> {curatedProfile.verification_status}</span>
+                                                <span className="text-[10px] text-slate-400">{curatedProfile.verification_tier}</span>
+                                            </div>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded bg-slate-500/10 border border-slate-500/20 text-slate-400 text-xs font-bold uppercase tracking-tight flex items-center gap-1"><Clock8 className="w-3 h-3" /> {curatedProfile.verification_status}</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-white/5">
+                                    <label className="block text-sm font-bold text-slate-400 mb-2">Select Verification Tier to Grant</label>
+                                    <select 
+                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-purple-500/50 outline-none transition-all cursor-pointer mb-6"
+                                        value={selectedTier}
+                                        onChange={(e) => setSelectedTier(e.target.value)}
+                                    >
+                                        <option value="Builder" className="bg-slate-900 text-white">Builder (Individual)</option>
+                                        <option value="Public Figure" className="bg-slate-900 text-white">Public Figure (High Profile)</option>
+                                        <option value="Community / DAO" className="bg-slate-900 text-white">Community / DAO (Group)</option>
+                                        <option value="Company / Organization" className="bg-slate-900 text-white">Company / Organization (Enterprise)</option>
+                                    </select>
+
+                                    <button 
+                                        onClick={handleGrantVerification}
+                                        disabled={grantLoading}
+                                        className="w-full py-4 rounded-xl bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {grantLoading ? "Processing..." : (
+                                            <>
+                                                <CheckCircle className="w-5 h-5" /> Grant Verification
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+
                 <div className="rounded-[32px] bg-white/[0.01] border border-white/5 overflow-hidden">
                     <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -751,6 +926,7 @@ export default function AdminVerificationPage() {
                         </table>
                     </div>
                 </div>
+                )}
             </div>
 
             {/* CONFIRMATION OVERLAY */}

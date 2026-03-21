@@ -36,27 +36,54 @@ export async function POST(request: Request) {
             }
         }
 
-        // Fetch all requests (admin needs to view pending AND reviewed)
-        const { data, error } = await supabase
+        const { showTestUsers } = body;
+
+        let query = supabase
             .from("organization_verifications")
             .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, created_at, expires_at")
             .order("created_at", { ascending: false });
+
+        if (!showTestUsers) {
+            // Only exclude users officially flagged as "is_test: true"
+            const { data: testProfiles } = await supabase
+                .from("profiles")
+                .select("wallet_address")
+                .eq("is_test", true);
+
+            if (testProfiles && testProfiles.length > 0) {
+                const excludedWallets = testProfiles.map(p => `"${p.wallet_address}"`).join(',');
+                query = query.not("wallet_address", "in", `(${excludedWallets})`);
+            }
+        }
+
+        const { data, error } = await query;
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         // --- Analytics Helper ---
-        // 1. Total User Count
-        const { count: totalUsers } = await supabase
+        // 1. Total User Count (Active profiles only)
+        let totalCountQuery = supabase
             .from("profiles")
-            .select("*", { count: "exact", head: true });
-
+            .select("*", { count: "exact", head: true })
+            .not("display_name", "is", null)
+            .not("display_name", "ilike", "%Debug%")
+            .not("display_name", "ilike", "%Test%");
+            
         // 2. Geographic Distribution (Top 5)
-        const { data: geoData } = await supabase
+        let geoQuery = supabase
             .from("profiles")
             .select("country")
             .not("country", "is", null);
+
+        if (!showTestUsers) {
+            totalCountQuery = totalCountQuery.eq("is_test", false);
+            geoQuery = geoQuery.eq("is_test", false);
+        }
+
+        const { count: totalUsers } = await totalCountQuery;
+        const { data: geoData } = await geoQuery;
         
         const geoDistribution: Record<string, number> = {};
         geoData?.forEach(p => {

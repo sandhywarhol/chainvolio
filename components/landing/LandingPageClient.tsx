@@ -99,87 +99,164 @@ export function LandingPageClient() {
         <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
-            <Navbar
-                isVerified={!!profile?.isVerified}
-                verifierTier={profile?.verifierTier}
-                verificationTier={profile?.verificationTier}
-                onHowItWorksClick={() => setActiveModal('how')}
-                onRecruitersClick={() => setActiveModal('recruiters')}
-                onTalentClick={() => setActiveModal('talent')}
-                onAskClick={() => setActiveModal('ask')}
-                onScreeningClick={() => setActiveModal('screening')}
-                onAttestationClick={() => setActiveModal('attestation')}
-            />
+            {/* DESKTOP LAYOUT (HIDDEN ON MOBILE) */}
+            <div className="hidden md:flex flex-col flex-1 relative">
+                <Navbar
+                    isVerified={!!profile?.isVerified}
+                    verifierTier={profile?.verifierTier}
+                    verificationTier={profile?.verificationTier}
+                    onHowItWorksClick={() => setActiveModal('how')}
+                    onRecruitersClick={() => setActiveModal('recruiters')}
+                    onTalentClick={() => setActiveModal('talent')}
+                    onAskClick={() => setActiveModal('ask')}
+                    onScreeningClick={() => setActiveModal('screening')}
+                    onAttestationClick={() => setActiveModal('attestation')}
+                />
 
+                <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
+                    <div className="text-left max-w-3xl lg:w-[52%]">
+                        <h1 className="text-4xl md:text-5xl lg:text-[56px] font-extrabold font-display leading-[1.1] tracking-tight mb-8 text-white">
+                            Verifiable professional<br />
+                            identity for Web3 careers.
+                        </h1>
+                        <div className="mb-16 space-y-8">
+                            <p className="text-white/80 text-lg md:text-xl font-medium font-display leading-relaxed max-w-xl tracking-normal">
+                                Build a work history that can't be faked.<br />
+                                Verifiable achievements & attestations secured on-chain.
+                            </p>
+                            <p className="text-white/30 text-[11px] font-display tracking-[0.4em] uppercase font-bold">
+                                The trust layer for Web3 careers.
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
+                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Build Your Reputation</Link>
+                            <button
+                                onClick={() => {
+                                    if (!connected) {
+                                        setIsWalletModalOpen(true);
+                                        return;
+                                    }
 
-            <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
-                <div className="text-left max-w-3xl lg:w-[52%]">
-                    <h1 className="text-4xl md:text-5xl lg:text-[56px] font-extrabold font-display leading-[1.1] tracking-tight mb-8 text-white">
-                        Verifiable professional<br />
-                        identity for Web3 careers.
-                    </h1>
-                    <div className="mb-16 space-y-8">
-                        <p className="text-white/80 text-lg md:text-xl font-medium font-display leading-relaxed max-w-xl tracking-normal">
-                            Build a work history that can't be faked.<br />
-                            Verifiable achievements & attestations secured on-chain.
-                        </p>
-                        <p className="text-white/30 text-[11px] font-display tracking-[0.4em] uppercase font-bold">
-                            The trust layer for Web3 careers.
+                                    router.push("/hiring/create");
+                                }}
+                                className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap"
+                            >
+                                Discover Talent
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="lg:w-[45%] w-full relative group" style={{ perspective: '2000px' }}>
+                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
+                            {SLIDES.map((slide, index) => (
+                                <div key={slide.src} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"}`}>
+                                    <img src={slide.src} alt={slide.label} className="w-full h-full object-cover object-top opacity-80" />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                            <button onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+                        </div>
+                        <div className="flex justify-center gap-2 mt-12 relative z-50">
+                            {SLIDES.map((_, index) => (
+                                <button key={index} onClick={() => setCurrentSlide(index)} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"}`} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                <div className="w-full py-10 overflow-hidden relative group/marquee">
+                    <div className="absolute left-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
+                    <div className="flex animate-marquee whitespace-nowrap items-center w-max">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
+                                {PARTNERS.map((partner) => (
+                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={partner.scale} />
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <Footer />
+            </div>
+
+            {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
+            <div className="block md:hidden">
+                <Navbar
+                    isVerified={!!profile?.isVerified}
+                    verifierTier={profile?.verifierTier}
+                    verificationTier={profile?.verificationTier}
+                    onHowItWorksClick={() => setActiveModal('how')}
+                    onRecruitersClick={() => setActiveModal('recruiters')}
+                    onTalentClick={() => setActiveModal('talent')}
+                    onAskClick={() => setActiveModal('ask')}
+                    onScreeningClick={() => setActiveModal('screening')}
+                    onAttestationClick={() => setActiveModal('attestation')}
+                />
+
+                <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
+                    <div className="space-y-8">
+                        <h1 className="text-[34px] font-black leading-[1.15] tracking-tight text-white px-2">
+                            Verifiable professional<br />
+                            identity for Web3.
+                        </h1>
+                        <p className="text-white/70 text-base font-medium leading-relaxed px-4">
+                            Build a work history that can't be faked. Verifiable achievements secured on-chain.
                         </p>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
-                        <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Start Your On-Chain Career</Link>
+
+                    {/* Simple Mobile Slide */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
+                        <img 
+                            src={SLIDES[currentSlide].src} 
+                            alt={SLIDES[currentSlide].label} 
+                            className="w-full h-full object-cover object-top opacity-60 transition-opacity duration-500" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                    </div>
+
+                    <div className="flex flex-col gap-4 px-2">
+                        <Link href="/create-profile" className="w-full py-4 solana-glossy-button text-white font-bold text-base text-center rounded-xl shadow-lg">
+                            Build Your Reputation
+                        </Link>
                         <button
                             onClick={() => {
                                 if (!connected) {
-                                  setIsWalletModalOpen(true);
-                                  return;
+                                    setIsWalletModalOpen(true);
+                                    return;
                                 }
-
                                 router.push("/hiring/create");
                             }}
-                            className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap"
+                            className="w-full py-4 hiring-glossy-button text-white font-bold text-base rounded-xl shadow-lg"
                         >
                             Discover Talent
                         </button>
                     </div>
-                </div>
 
-                <div className="lg:w-[45%] w-full relative group" style={{ perspective: '2000px' }}>
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
-                        {SLIDES.map((slide, index) => (
-                            <div key={slide.src} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"}`}>
-                                <img src={slide.src} alt={slide.label} className="w-full h-full object-cover object-top opacity-80" />
+                    <div className="pt-8">
+                        <p className="text-white/20 text-[10px] font-bold tracking-[0.4em] uppercase">
+                            The trust layer for Web3
+                        </p>
+                    </div>
+                </section>
+
+                <div className="w-full py-6 overflow-hidden relative">
+                    <div className="flex animate-marquee whitespace-nowrap items-center w-max">
+                        {[...Array(2)].map((_, i) => (
+                            <div key={i} className="flex gap-16 items-center flex-shrink-0 pr-16">
+                                {PARTNERS.slice(0, 10).map((partner) => (
+                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={(partner.scale ?? 1) * 0.8} />
+                                ))}
                             </div>
                         ))}
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-                        <button onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
-                    </div>
-                    <div className="flex justify-center gap-2 mt-12 relative z-50">
-                        {SLIDES.map((_, index) => (
-                            <button key={index} onClick={() => setCurrentSlide(index)} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"}`} />
-                        ))}
-                    </div>
                 </div>
-            </section>
 
-            <div className="w-full py-10 overflow-hidden relative group/marquee">
-                <div className="absolute left-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
-                <div className="absolute right-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
-                <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
-                            {PARTNERS.map((partner) => (
-                                <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={partner.scale} />
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                <Footer />
             </div>
-
-            <Footer />
 
             <CustomWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
             
