@@ -7,6 +7,6 @@
   "scripts": {
     "dev": "npm run dev:web",
     "dev:web": "npm run dev --workspace=@chainvolio/web",
-    "build": "npm run build --workspace=@chainvolio/web && cp -r apps/web/.next .next"
+    "build": "npm run build --workspace=@chainvolio/web"
   }
 }
