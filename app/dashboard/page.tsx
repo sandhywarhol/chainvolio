@@ -165,7 +165,7 @@ export default function DashboardPage() {
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
 
 
-      <section className="flex-1 max-w-3xl mx-auto px-6 pt-32 pb-8">
+      <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
         {loading ? (
           <p className="text-slate-400">Loading...</p>
         ) : !profile?.displayName ? (
@@ -181,7 +181,7 @@ export default function DashboardPage() {
         ) : (
           <>
             <div className="mb-12">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
               <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                 {profile.avatarUrl ? (
                   <img
@@ -225,9 +225,9 @@ export default function DashboardPage() {
               <div className="flex-1 text-center md:text-left">
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-3xl font-bold">{profile?.displayName}</h1>
-                      <div className={`px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                      <h1 className="text-2xl md:text-3xl font-bold">{profile?.displayName}</h1>
+                      <div className={`px-2 py-1 rounded-lg border text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${
                         profile?.isVerified ? (
                           profile?.verifierTier === 4 ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
                           profile?.verifierTier === 3 ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
@@ -239,13 +239,13 @@ export default function DashboardPage() {
                           "bg-slate-500/10 border-slate-500/20 text-slate-500 opacity-60"
                         )
                       }`}>
-                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5" />
                         <span>
                           {profile?.isVerified 
                             ? getVerificationLabel(profile?.verificationTier) 
                             : profile?.isExpired 
-                              ? "Expired Verification" 
-                              : "Unverified User"}
+                              ? "Expired" 
+                              : "Unverified"}
                         </span>
                       </div>
 
@@ -256,38 +256,36 @@ export default function DashboardPage() {
                             setIsRenewal(true);
                             setShowVerificationModal(true);
                           }}
-                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0 ${
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[9px] md:text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0 ${
                             profile?.isExpired 
                               ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
                               : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
                           }`}
                         >
-                           <RefreshCw className="w-3 h-3" />
-                           <span>{profile?.isExpired ? "Expired — Renew" : "Renew Now"}</span>
+                           <RefreshCw className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                           <span>{profile?.isExpired ? "Expired — Renew" : "Renew"}</span>
                         </button>
                       )}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center md:justify-end w-full md:w-auto">
-
-
+                    <div className="flex flex-row md:flex-row items-center gap-2 justify-center md:justify-end w-full md:w-auto">
                       {!profile?.isVerified && !profile?.isExpired && (
                         <button
                           onClick={() => {
                             setIsRenewal(false);
                             setShowVerificationModal(true);
                           }}
-                          className="px-4 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-sm font-bold transition-colors border border-teal-500/20 flex items-center gap-2"
+                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-[10px] md:text-sm font-bold transition-colors border border-teal-500/20 flex items-center gap-1.5 md:gap-2"
                         >
-                          <ShieldCheck className="w-4 h-4" /> Verify Identity
+                          <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Verify
                         </button>
                       )}
 
                       <Link
                         href="/create-profile"
-                        className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm font-medium transition-colors border border-slate-600"
+                        className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] md:text-sm font-medium transition-colors border border-slate-600"
                       >
-                        Edit Profile
+                        Edit
                       </Link>
                     </div>
                   </div>
@@ -681,24 +679,24 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h2 className="text-lg font-semibold">Proof of Work</h2>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 md:gap-3">
             <Link
               href={`/cv/${walletAddress}`}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-sm font-medium transition-colors"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-medium transition-colors"
             >
               View CV
             </Link>
             <button
               onClick={handleShare}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-sm font-medium transition-colors"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-medium transition-colors"
             >
-              Share CV
+              Share
             </button>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-sm font-medium"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black text-xs md:text-sm font-bold shadow-lg"
             >
               {showForm ? "Close" : "+ Add Proof"}
             </button>

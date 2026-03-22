@@ -66,7 +66,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                 ? "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
                 : "border-white/0 bg-transparent py-5"
             }`}>
-            <div className="flex items-center justify-between px-8 py-3 max-w-[1600px] w-full mx-auto">
+            <div className="flex items-center justify-between px-4 md:px-8 py-3 max-w-[1600px] w-full mx-auto">
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-1.5 group">
                         <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
@@ -159,7 +159,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
             {/* Mobile Navigation */}
             <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-white/5 bg-black/40 backdrop-blur-xl ${isMobileMenuOpen ? 'max-h-[80vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
                 }`}>
-                <div className="px-8 py-6 space-y-4 text-sm font-bold">
+                <div className="px-6 md:px-8 py-6 space-y-4 text-sm font-bold">
                     <MobileAccordion
                         label="Products"
                         href="/why"

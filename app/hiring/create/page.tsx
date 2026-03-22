@@ -179,7 +179,7 @@ export default function CreateCollection() {
 
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30">
-            <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
+            <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
                 <Link href="/" className="flex items-center gap-2 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
                     <span className="text-xl font-bold tracking-tight">ChainVolio <span className="text-emerald-500">recruit</span></span>
@@ -187,7 +187,7 @@ export default function CreateCollection() {
                 <WalletMultiButton />
             </nav>
 
-            <section className="max-w-3xl mx-auto px-6 py-12 relative z-10">
+            <section className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
                 {!createdSlug ? (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="mb-10 text-center">
@@ -197,26 +197,26 @@ export default function CreateCollection() {
 
                         <form onSubmit={handleSubmit} className="space-y-8">
                             {/* Upgrade Notice for Unverified Users */}
-                            <div className="mb-8 p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
-                                <div className="flex items-center gap-4">
+                            <div className="mb-8 p-5 md:p-6 rounded-2xl md:rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
+                                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
                                     <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                        <ShieldCheck className="w-6 h-6" />
+                                        <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="text-sm font-bold text-white">Verification Trust Signal</h4>
-                                        <p className="text-xs text-slate-400 max-w-md">Verify your organization or community to gain <span className="text-emerald-400 font-bold uppercase tracking-widest text-[10px] ml-1">Trusted Hiring Status</span> and increase candidate confidence.</p>
+                                        <h4 className="text-sm font-bold text-white">Verification Status</h4>
+                                        <p className="text-[11px] md:text-xs text-slate-400 max-w-md">Verify your organization to unlock <span className="text-emerald-400 font-bold uppercase tracking-widest text-[9px] md:text-[10px] ml-1">Trusted Hiring Signal</span>.</p>
                                     </div>
                                 </div>
                                 <Link 
                                     href="/dashboard" 
-                                    className="px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 whitespace-nowrap"
+                                    className="w-full md:w-auto px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 text-center"
                                 >
                                     Get Verified
                                 </Link>
                             </div>
 
                             {/* Main Info Card */}
-                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 backdrop-blur-sm shadow-2xl">
+                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
                                 <div className="space-y-6">
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Job Position</label>
@@ -243,7 +243,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* Recruiter Identity Card */}
-                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 backdrop-blur-sm shadow-2xl space-y-8">
+                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl space-y-8">
                                 <div className="flex items-center gap-3 pb-2 border-b border-white/5">
                                     <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                                         <Building2 className="w-5 h-5" />
@@ -433,7 +433,7 @@ export default function CreateCollection() {
                                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                                     <Briefcase className="w-4 h-4 text-blue-500" /> Role Details
                                 </h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Role Type</label>
                                         <div className="relative">

@@ -331,6 +331,243 @@ function VerifiedCheckBadge({ verificationType }: { verificationType?: string })
   );
 }
 
+// ── WorkRecordCard: A collapsible card for each work history entry ──
+function WorkRecordCard({ 
+  r, 
+  onSelect, 
+  onPortfolioSelect,
+  isDesktop = false
+}: { 
+  r: Receipt; 
+  onSelect: (r: Receipt) => void; 
+  onPortfolioSelect: (p: PortfolioItem) => void;
+  isDesktop?: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+
+  return (
+    <div
+      onClick={() => onSelect(r)}
+      className="p-4 md:p-5 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer group/work relative"
+    >
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 min-w-0 max-w-full">
+          {/* Primary: Role + Organization */}
+          <div className="space-y-1 break-words whitespace-normal">
+            {r.role && <h3 className="text-base font-semibold text-white break-words">{r.role}</h3>}
+            {r.org && <p className={`text-base text-emerald-400 font-bold break-words ${!r.role ? "text-white" : ""}`}>{r.org}</p>}
+          </div>
+
+          {/* Secondary: Date, Duration, Work Type */}
+          <p className="text-xs text-slate-500 mt-1 break-words whitespace-normal max-w-full">
+            {formatDateRange(r.startDate, r.endDate)} · {r.workType}
+            {r.compensationType && ` · ${r.compensationType}`}
+          </p>
+
+          {/* Collapsible Content Wrapper (Mobile) */}
+          <div className={`mt-3 ${!isExpanded ? "hidden md:block" : "block"}`}>
+            {/* Attester info (if attested) */}
+            {r.status === "Attested" && r.attesterWallet && (
+              <div className="mb-4 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">
+                    {r.attestationId ? "On-chain Recruiter Proof" : "Verification Signature"}
+                  </p>
+                  {r.attestationType === "Hiring Proof" ? (
+                    <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-tighter uppercase flex items-center gap-1">
+                      <ShieldCheck className="w-2.5 h-2.5" /> Institutional Verified
+                    </span>
+                  ) : r.isExternal && (
+                    <span className="text-[8px] font-black bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded border border-slate-700 tracking-tighter uppercase">
+                      External Attestation
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center items-start gap-4">
+                  <div className="flex-shrink-0 relative group/attester">
+                    {r.attesterAvatar ? (
+                      <img
+                        src={r.attesterAvatar}
+                        alt={r.attesterName}
+                        className="w-10 h-10 rounded-full object-cover border border-emerald-500/20 shadow-lg"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-slate-800 border border-emerald-500/20 flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
+                        {r.attesterName?.[0] || '?'}
+                      </div>
+                    )}
+                    <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0 max-w-full">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                      <p className="text-xs font-bold text-white leading-none">
+                        {r.attesterName || "Community Attester"}
+                      </p>
+                      <TrustBadge
+                        tier={r.attesterTier || 1}
+                        isVerified={!!r.isAttesterVerified}
+                        verificationType={r.attesterVerificationType}
+                      />
+                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] text-slate-500 font-normal break-words whitespace-normal leading-tight">
+                        {r.attesterRole && <span className="break-words">{r.attesterRole}</span>}
+                        {r.attesterOrg && <span className="break-words">at {r.attesterOrg}</span>}
+                      </div>
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-500 break-words whitespace-normal mt-1 leading-tight">
+                      {typeof r.attesterWallet === 'string' ? `${r.attesterWallet.slice(0, 8)}...${r.attesterWallet.slice(-6)}` : '0x...'}
+                      {r.attesterAt && <span className="ml-2 opacity-50">· {new Date(r.attesterAt).toLocaleDateString()}</span>}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="mt-3">
+             <div className={`text-sm text-slate-300 leading-relaxed break-words whitespace-normal max-w-full 
+               ${isExpanded ? "line-clamp-none" : "line-clamp-3"}
+               ${isDescExpanded ? "md:line-clamp-none" : "md:line-clamp-3"}
+             `}>
+                {r.description}
+             </div>
+             
+             {/* Toggle Button - Mobile (Expands entire card) */}
+             <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 setIsExpanded(!isExpanded);
+               }}
+               className="md:hidden mt-2 text-emerald-400 hover:text-emerald-300 text-xs font-bold flex items-center gap-1 group"
+             >
+               {isExpanded ? "Show less" : "Read more"}
+               <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+             </button>
+
+             {/* Toggle Button - Desktop (Expands description only) */}
+             <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 setIsDescExpanded(!isDescExpanded);
+               }}
+               className="hidden md:flex mt-2 text-emerald-400/70 hover:text-emerald-400 text-[10px] font-bold items-center gap-1 group uppercase tracking-widest transition-colors"
+             >
+               {isDescExpanded ? "Show less" : "Show more"}
+               <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isDescExpanded ? "rotate-180" : ""}`} />
+             </button>
+          </div>
+
+          {/* Deep Content - Collapsible on Mobile, Always Visible on Desktop */}
+          <div className={`space-y-4 ${!isExpanded ? "hidden md:block" : "block mt-4 animate-in slide-in-from-top-2 duration-300"} md:mt-4`}>
+            {/* Career Timeline Updates */}
+            <div className="pt-2 border-t border-white/5">
+               <ReceiptUpdates receipt={r} isOwner={false} />
+            </div>
+
+            {/* Impact (if present) */}
+            {r.impact && r.impact.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-2">Impact</p>
+                <ul className="space-y-1.5">
+                  {r.impact.map((item, idx) => (
+                    <li key={idx} className="text-sm text-slate-300 flex items-start gap-2 max-w-full">
+                      <span className="text-emerald-400 mt-0.5">•</span>
+                      <span className="break-words whitespace-normal">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Evidence Links */}
+            {r.evidenceLinks && r.evidenceLinks.length > 0 && (
+              <div>
+                <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">Evidence</p>
+                <div className="flex flex-wrap gap-2">
+                  {r.evidenceLinks.map((link, idx) => (
+                    <a
+                      key={idx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      title={getEvidenceTooltip(link.label)}
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-slate-600 shadow-sm"
+                    >
+                      {getEvidenceIcon(link.label)} {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Portfolio Images */}
+            {r.portfolioImages && r.portfolioImages.length > 0 && (
+              <div>
+                <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Portfolio</p>
+                <div className="flex flex-wrap gap-2">
+                  {r.portfolioImages.map((img: any, idx: number) => (
+                    <div 
+                      key={idx} 
+                      className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/5 hover:border-emerald-500/30 transition-all cursor-zoom-in"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPortfolioSelect({ title: r.role, description: r.org, imageUrl: img.imageUrl, id: `${r.id}-${idx}`, thumbnailUrl: img.thumbnailUrl });
+                      }}
+                    >
+                      <img
+                        src={img.thumbnailUrl}
+                        alt={`Portfolio ${idx + 1}`}
+                        className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* View Transaction Button for Hiring Proofs */}
+            {r.attestationType === "Hiring Proof" && r.txSignature && (
+              <div className="pt-2">
+                 <a
+                   href={`https://solscan.io/tx/${r.txSignature}`}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   onClick={(e) => e.stopPropagation()}
+                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 transition-all border border-emerald-500/20 text-[11px] font-black uppercase tracking-widest w-full sm:w-auto"
+                 >
+                   <ExternalLink className="w-3.5 h-3.5" /> View Transaction
+                 </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Tertiary: Status Badge (top-right) */}
+        <div className="flex-shrink-0 flex items-start">
+           <span
+             className={`text-[9px] px-2 py-0.5 rounded border whitespace-nowrap font-black uppercase tracking-widest ${r.status === "Attested"
+               ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10"
+               : "border-slate-600 text-slate-400 bg-slate-800"
+               }`}
+             title={
+               r.status === "Attested"
+                 ? "Verified by wallet signature"
+                 : "Reported by candidate"
+             }
+           >
+             {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
+           </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CVPage(props: any) {
   const params = useParams();
   const { publicKey } = useWallet();
@@ -470,22 +707,22 @@ export default function CVPage(props: any) {
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-      <section className="flex-1 max-w-3xl mx-auto px-6 pt-32 pb-12">
+      <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
         {!profile ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 mb-8 p-8 rounded-3xl overflow-hidden group">
+            <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 mb-8 p-6 pb-16 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full">
               {/* Animated silver gradient border */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse"></div>
 
               {/* Dark solid background */}
-              <div className="absolute inset-[1px] rounded-3xl bg-slate-800/80"></div>
+              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-slate-800/80"></div>
 
               {/* Main Card Background Image */}
               <div
-                className="absolute inset-[1px] rounded-3xl opacity-60 bg-cover bg-center mix-blend-overlay"
+                className="absolute inset-[1px] rounded-2xl md:rounded-3xl opacity-60 bg-cover bg-center mix-blend-overlay"
                 style={{
                   backgroundImage: 'url("/card%20background.jpeg")',
                   backgroundSize: 'cover',
@@ -494,10 +731,10 @@ export default function CVPage(props: any) {
               ></div>
 
               {/* Dark gradient overlay */}
-              <div className="absolute inset-[1px] rounded-3xl bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-900/80"></div>
+              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-900/80"></div>
 
               {/* Lightning shine effect - diagonal sweep (Always active) */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl z-10">
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl md:rounded-3xl z-10">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine"></div>
               </div>
 
@@ -505,10 +742,10 @@ export default function CVPage(props: any) {
               <div className="absolute inset-0 bg-gradient-to-br from-slate-300/5 via-transparent to-white/5"></div>
 
               {/* Inner silver glow */}
-              <div className="absolute inset-0 rounded-3xl shadow-[inset_0_1px_0_0_rgba(241,245,249,0.1),inset_0_-1px_0_0_rgba(241,245,249,0.05)]"></div>
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(241,245,249,0.1),inset_0_-1px_0_0_rgba(241,245,249,0.05)]"></div>
 
               {/* Outer glow with silver accent */}
-              <div className="absolute -inset-[2px] rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
+              <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
 
               {/* Sparkle effect on corners */}
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
@@ -537,7 +774,7 @@ export default function CVPage(props: any) {
               </div>
 
               {/* Content wrapper */}
-              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 w-full z-10">
+              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 w-full z-10">
                 {/* Avatar Column */}
                 <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                   <div className="relative group/avatar">
@@ -607,7 +844,7 @@ export default function CVPage(props: any) {
 
                     <div className="flex flex-col md:flex-row md:items-center gap-3 flex-1">
                       <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
-                        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
+                        <h1 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
                           {profile.displayName}
                         </h1>
 
@@ -674,9 +911,9 @@ export default function CVPage(props: any) {
 
                   {/* Skills Pills */}
                   {profile.skills && (
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-3">
                       {profile.skills.split(',').map((skill, i) => (
-                        <span key={i} className="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
+                        <span key={i} className="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-slate-800 border border-slate-700 text-[10px] md:text-xs text-slate-300">
                           {skill.trim()}
                         </span>
                       ))}
@@ -845,31 +1082,34 @@ export default function CVPage(props: any) {
               </div>
 
               {/* Card Number & Wallet ID Positioning */}
-              <div className="absolute bottom-6 left-8 z-30 opacity-40 group-hover:opacity-100 transition-all duration-500 flex flex-col items-start translate-y-1 group-hover:translate-y-0">
-                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1.5 opacity-80">Source Wallet</span>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(wallet);
-                    setToastMessage("Wallet address copied!");
-                  }}
-                  className="group/wallet flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg bg-slate-950/40 border border-slate-700/30 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer backdrop-blur-sm"
-                >
-                  <Wallet className="w-3 h-3 text-purple-400/80 group-hover/wallet:text-purple-400" />
-                  <span className="font-mono text-[10px] text-slate-400 group-hover/wallet:text-purple-300 transition-colors">
-                    {wallet.slice(0, 6)}...{wallet.slice(-6)}
-                  </span>
-                  <Copy className="w-2.5 h-2.5 text-slate-500 group-hover/wallet:text-purple-400 ml-0.5 opacity-0 group-hover/wallet:opacity-100 transition-all" />
-                </button>
-              </div>
-
-              {profile.cardNumber && (
-                <div className="absolute bottom-6 right-8 z-30 opacity-40 group-hover:opacity-100 transition-all duration-500 flex flex-col items-end translate-y-1 group-hover:translate-y-0">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1.5 opacity-80">CV ID</span>
-                  <span className="font-mono text-xs tracking-[0.2em] text-white/80">
-                    #{String(profile.cardNumber).padStart(5, '0')}
-                  </span>
+              <div className="absolute bottom-4 md:bottom-6 left-6 right-6 md:left-8 md:right-8 z-30 opacity-60 md:opacity-40 group-hover:opacity-100 transition-all duration-500 flex flex-row justify-between items-end gap-y-0 translate-y-0 md:translate-y-1 group-hover:translate-y-0">
+                {/* Wallet Section */}
+                <div className="flex flex-col items-start">
+                  <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1 opacity-80">Source Wallet</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(wallet);
+                      setToastMessage("Wallet address copied!");
+                    }}
+                    className="group/wallet flex items-center justify-center gap-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg bg-slate-950/40 border border-slate-700/30 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer backdrop-blur-sm"
+                  >
+                    <Wallet className="w-2.5 h-2.5 md:w-3 md:h-3 text-purple-400/80 group-hover/wallet:text-purple-400" />
+                    <span className="font-mono text-[9px] md:text-[10px] text-slate-400 group-hover/wallet:text-purple-300 transition-colors">
+                      {typeof wallet === 'string' ? `${wallet.slice(0, 5)}...${wallet.slice(-4)}` : '0x...'}
+                    </span>
+                  </button>
                 </div>
-              )}
+
+                {/* CV ID Section */}
+                {profile.cardNumber && (
+                  <div className="flex flex-col items-end">
+                    <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-1 opacity-60">CV ID</span>
+                    <span className="font-mono text-[9px] md:text-xs tracking-[0.2em] text-white/60 md:text-white/80">
+                      #{String(profile.cardNumber).padStart(5, '0')}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Recruiter Trust Disclaimer */}
@@ -892,180 +1132,18 @@ export default function CVPage(props: any) {
 
 
 
-            <h2 className="text-xl font-semibold mt-4 mb-4">Proof of Work</h2>
+            <h2 className="text-xl font-semibold mt-6 mb-4">Proof of Work</h2>
             {contributionReceipts.length === 0 ? (
               <p className="text-slate-500">No work records submitted yet.</p>
             ) : (
               <div className="space-y-6">
                 {contributionReceipts.map((r, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setSelectedReceipt(r)}
-                    className="p-5 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer group/work"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        {/* Primary: Role + Organization */}
-                        <div className="space-y-1">
-                          {r.role && <h3 className="text-base font-semibold text-white">{r.role}</h3>}
-                          {r.org && <p className={`text-base text-emerald-400 font-bold ${!r.role ? "text-white" : ""}`}>{r.org}</p>}
-                        </div>
-
-                        {/* Secondary: Date, Duration, Work Type */}
-                        <p className="text-xs text-slate-500 mt-1">
-                          {formatDateRange(r.startDate, r.endDate)} · {r.workType}
-                          {r.compensationType && ` · ${r.compensationType}`}
-                        </p>
-
-                        {/* Attester info (if attested) */}
-                        {r.status === "Attested" && r.attesterWallet && (
-                          <div className="mt-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2">
-                            <div className="flex items-center justify-between">
-                              <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">
-                                {r.attestationType === "Hiring Proof" ? "On-chain Recruiter Proof" : "Verification Signature"}
-                              </p>
-                              {r.attestationType === "Hiring Proof" ? (
-                                <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-tighter uppercase flex items-center gap-1">
-                                  <ShieldCheck className="w-2.5 h-2.5" /> Institutional Verified
-                                </span>
-                              ) : r.isExternal && (
-                                <span className="text-[8px] font-black bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded border border-slate-700 tracking-tighter uppercase">
-                                  External Attestation
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                {r.attesterAvatar ? (
-                                  <img src={r.attesterAvatar} alt="" className="w-full h-full rounded-full object-cover" />
-                                ) : (
-                                  <BadgeCheck className="w-4 h-4 text-emerald-500" />
-                                )}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-1.5 mb-1">
-                                  <p className="text-xs font-bold text-white leading-none">
-                                    {r.attesterName || "Community Attester"}
-                                  </p>
-                                  <TrustBadge
-                                    tier={r.attesterTier || 1}
-                                    isVerified={!!r.isAttesterVerified}
-                                    verificationType={r.attesterVerificationType}
-                                  />
-                                  <div className="flex items-center gap-1 text-[10px] text-slate-500 font-normal truncate">
-                                    {r.attesterRole && <span>{r.attesterRole}</span>}
-                                    {r.attesterOrg && <span>at {r.attesterOrg}</span>}
-                                  </div>
-                                </div>
-                                <p className="text-[10px] font-mono text-slate-500">
-                                  {r.attesterWallet.slice(0, 8)}...{r.attesterWallet.slice(-6)}
-                                  {r.attesterAt && <span className="ml-2 opacity-50">· {new Date(r.attesterAt).toLocaleDateString()}</span>}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Description */}
-                        <ExpandableText
-                          text={r.description}
-                          maxLength={320}
-                          className="text-sm text-slate-300 mt-3 leading-relaxed"
-                        />
-
-                        {/* Impact (if present) */}
-                        {r.impact && r.impact.length > 0 && (
-                          <div className="mt-3">
-                            <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-1">Impact</p>
-                            <ul className="space-y-1">
-                              {r.impact.map((item, idx) => (
-                                <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
-                                  <span className="text-emerald-400 mt-0.5">•</span>
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        {/* Evidence Links */}
-                        {r.evidenceLinks && r.evidenceLinks.length > 0 && (
-                          <div className="mt-3">
-                            <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">Evidence</p>
-                            <div className="flex flex-wrap gap-2">
-                              {r.evidenceLinks.map((link, idx) => (
-                                <a
-                                  key={idx}
-                                  href={link.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  title={getEvidenceTooltip(link.label)}
-                                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-slate-600"
-                                >
-                                  {getEvidenceIcon(link.label)} {link.label}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* View Transaction Button for Hiring Proofs */}
-                        {r.attestationType === "Hiring Proof" && r.txSignature && (
-                          <div className="mt-6 flex flex-col gap-2">
-                             <div className="h-px bg-white/5 w-full mb-2" />
-                             <a
-                               href={`https://solscan.io/tx/${r.txSignature}`}
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               onClick={(e) => e.stopPropagation()}
-                               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 transition-all border border-emerald-500/20 text-[11px] font-black uppercase tracking-widest"
-                             >
-                               <ExternalLink className="w-3.5 h-3.5" /> View Transaction
-                             </a>
-                          </div>
-                        )}
-
-                        {/* Portfolio Images */}
-                        {r.portfolioImages && r.portfolioImages.length > 0 && (
-                          <div className="mt-3">
-                            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Portfolio</p>
-                            <div className="flex flex-wrap gap-2">
-                              {r.portfolioImages.map((img: any, idx: number) => (
-                                <img
-                                  key={idx}
-                                  src={img.thumbnailUrl}
-                                  alt={`Portfolio ${idx + 1}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedPortfolio({ title: r.role, description: r.org, imageUrl: img.imageUrl } as any);
-                                  }}
-                                  className="w-16 h-16 rounded object-cover border border-slate-700 hover:border-emerald-500 cursor-pointer transition-all"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Tertiary: Status Badge (top-right) */}
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded border whitespace-nowrap ${r.status === "Attested"
-                          ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10"
-                          : "border-slate-600 text-slate-400 bg-slate-800"
-                          }`}
-                        title={
-                          r.status === "Attested"
-                            ? "Verified by wallet signature"
-                            : "Reported by candidate"
-                        }
-                      >
-                        {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
-                      </span>
-                    </div>
-
-                    <ReceiptUpdates receipt={r} isOwner={false} />
-                  </div>
+                  <WorkRecordCard 
+                    key={r.id || i}
+                    r={r}
+                    onSelect={setSelectedReceipt}
+                    onPortfolioSelect={setSelectedPortfolio}
+                  />
                 ))}
               </div>
             )}
@@ -1121,8 +1199,8 @@ export default function CVPage(props: any) {
                           </div>
                           
                           {record.description && (
-                             <div className="ml-3.5 border-l-2 border-blue-500/10 pl-4 py-1 mt-2">
-                               <p className="text-[11px] text-slate-400/90 leading-relaxed font-medium line-clamp-2 italic">
+                             <div className="ml-3.5 border-l-2 border-blue-500/10 pl-4 py-1 mt-2 max-w-full">
+                               <p className="text-[11px] text-slate-400/90 leading-relaxed font-medium line-clamp-2 italic break-words whitespace-normal">
                                  "{record.description}"
                                </p>
                              </div>

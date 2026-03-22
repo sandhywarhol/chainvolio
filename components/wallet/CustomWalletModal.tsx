@@ -13,9 +13,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const { wallets, select } = useWallet();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
+
+        // Mobile detection
+        const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        setIsMobile(checkMobile);
 
         // Requirement 2: Phantom Detection
         const isPhantom = !!(window as any).solana?.isPhantom;
@@ -30,6 +35,19 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleConnect = (walletName: string) => {
         const wallet = wallets.find(w => w.adapter.name === walletName);
+        
+        // Mobile Deep Linking Logic
+        if (isMobile && !phantomAvailable && !solflareAvailable) {
+            const currentUrl = window.location.href;
+            if (walletName === "Phantom") {
+                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
+                return;
+            } else if (walletName === "Solflare") {
+                window.location.href = `https://solflare.com/ul/v1/browse/${encodeURIComponent(currentUrl)}`;
+                return;
+            }
+        }
+
         if (wallet) {
             select(wallet.adapter.name);
         } else {
@@ -92,9 +110,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                             <div className="space-y-1">
-                                <p className="text-xs font-bold text-amber-200">No supported Solana wallet detected.</p>
+                                <p className="text-xs font-bold text-amber-200">
+                                    {isMobile ? "Connect via Wallet App" : "No supported Solana wallet detected."}
+                                </p>
                                 <p className="text-[10px] text-amber-500/80 leading-relaxed">
-                                    To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue.
+                                    {isMobile 
+                                      ? "Click a wallet below to open this page inside your wallet app for a secure connection."
+                                      : "To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue."
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -105,7 +128,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             <div 
                                 key={wallet.name}
                                 onClick={() => {
-                                    if (wallet.available) {
+                                    if (wallet.available || isMobile) {
                                         handleConnect(wallet.name);
                                     } else {
                                         handleInstall(wallet.downloadUrl);
@@ -120,15 +143,15 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                     <div>
                                         <p className="font-bold text-white transition-colors">{wallet.name}</p>
                                         <p className="text-[10px] text-slate-500">
-                                            {wallet.available ? "Detected & Ready" : "Not Installed"}
+                                            {wallet.available ? "Detected & Ready" : isMobile ? "Connect via App" : "Not Installed"}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Requirement 5 & 6: Install vs Connect label */}
-                                {wallet.available ? (
+                                {wallet.available || isMobile ? (
                                     <div className="px-4 py-2 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-indigo-500/10">
-                                        Connect
+                                        {isMobile && !wallet.available ? "Open App" : "Connect"}
                                     </div>
                                 ) : (
                                     <div className="px-4 py-2 bg-white/5 group-hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all border border-white/10 flex items-center gap-2">

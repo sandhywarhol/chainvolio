@@ -199,7 +199,7 @@ export function LandingPageClient() {
 
                 <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
                     <div className="space-y-8">
-                        <h1 className="text-[34px] font-black leading-[1.15] tracking-tight text-white px-2">
+                        <h1 className="text-3xl sm:text-[34px] font-black leading-[1.15] tracking-tight text-white px-2">
                             Verifiable professional<br />
                             identity for Web3.
                         </h1>

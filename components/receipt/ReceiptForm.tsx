@@ -216,7 +216,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
         <label className="block text-sm text-slate-400 mb-1">Job description *</label>
         <textarea required value={form.description} maxLength={500} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-20 disabled:opacity-50" placeholder="Summary of tasks and contributions" />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm text-slate-400 mb-1">Start date *</label>
           <input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" />
@@ -294,22 +294,24 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
         <label className="block text-sm text-slate-400 mb-2">Evidence Links</label>
         <div className="space-y-3">
           {form.evidenceLinks.map((link: any, index: number) => (
-            <div key={index} className="flex gap-2">
+            <div key={index} className="flex flex-col sm:flex-row gap-2">
               <select value={link.label} onChange={(e) => {
                 const newLinks = [...form.evidenceLinks];
                 newLinks[index].label = e.target.value;
                 setForm({ ...form, evidenceLinks: newLinks });
-              }} disabled={isLocked} className="w-1/3 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50">
+              }} disabled={isLocked} className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50">
                 {LINK_LABELS.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
-              <input type="url" value={link.url} onChange={(e) => {
-                const newLinks = [...form.evidenceLinks];
-                newLinks[index].url = e.target.value;
-                setForm({ ...form, evidenceLinks: newLinks });
-              }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50" placeholder="https://..." />
-              {!isLocked && (
-                <button type="button" onClick={() => setForm({ ...form, evidenceLinks: form.evidenceLinks.filter((_: any, i: number) => i !== index) })} className="px-3 py-2 text-red-400 hover:bg-red-400/10 rounded-lg text-sm">✕</button>
-              )}
+              <div className="flex gap-2 flex-1">
+                <input type="url" value={link.url} onChange={(e) => {
+                  const newLinks = [...form.evidenceLinks];
+                  newLinks[index].url = e.target.value;
+                  setForm({ ...form, evidenceLinks: newLinks });
+                }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50" placeholder="https://..." />
+                {!isLocked && (
+                  <button type="button" onClick={() => setForm({ ...form, evidenceLinks: form.evidenceLinks.filter((_: any, i: number) => i !== index) })} className="px-3 py-2 text-red-400 hover:bg-red-400/10 rounded-lg text-sm">✕</button>
+                )}
+              </div>
             </div>
           ))}
           {!isLocked && (

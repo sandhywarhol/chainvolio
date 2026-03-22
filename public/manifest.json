@@ -2,23 +2,23 @@
     "name": "ChainVolio",
     "short_name": "ChainVolio",
     "description": "On-Chain Professional Trust Infrastructure",
-    "start_url": "https://www.chainvolio.xyz/",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#07070B",
+    "background_color": "#000000",
     "theme_color": "#000000",
     "icons": [
         {
-            "src": "https://www.chainvolio.xyz/logo.png",
+            "src": "/icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "https://www.chainvolio.xyz/logo.png",
+            "src": "/icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "https://www.chainvolio.xyz/logo.png",
+            "src": "/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
