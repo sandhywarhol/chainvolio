@@ -28,7 +28,7 @@ export async function PATCH(
         // 1. Get the submission and its parent collection to check ownership
         const { data: submission, error: fetchError } = await supabase
             .from("collection_submissions")
-            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title, metadata)")
+            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title, slug, metadata)")
             .eq("id", id)
             .single();
 
@@ -109,6 +109,40 @@ export async function PATCH(
             .eq("id", id);
 
         if (updateError) return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
+
+        // --- 3.5 Trigger Notifications ---
+        if (status && ['shortlisted', 'rejected', 'hired'].includes(status)) {
+            try {
+                const roleTitle = (submission as any).hiring_collections?.title || "Role";
+                let notificationTitle = "Hiring Update";
+                let notificationMessage = "";
+
+                if (status === 'shortlisted') {
+                    notificationMessage = `You’ve been shortlisted for ${roleTitle}`;
+                } else if (status === 'rejected') {
+                    notificationMessage = "Your application was not selected";
+                } else if (status === 'hired') {
+                    notificationTitle = "Selected 🎉";
+                    notificationMessage = `You’ve been selected for ${roleTitle}`;
+                }
+
+                if (notificationMessage) {
+                    const colSlug = (submission as any).hiring_collections?.slug;
+                    await supabase.from("notifications").insert({
+                        wallet_address: submission.candidate_wallet,
+                        title: notificationTitle,
+                        message: notificationMessage,
+                        type: 'hiring',
+                        related_id: id,
+                        link: colSlug ? `/r/${colSlug}#application-status` : '/dashboard',
+                        is_read: false
+                    });
+                }
+            } catch (notifErr) {
+                console.error("Failed to trigger notification:", notifErr);
+                // Non-blocking
+            }
+        }
 
         // --- 4. Special Integration: Create Hiring Record on Success ---
         if (status === 'hired' && cleanTxSignature) {

@@ -55,6 +55,8 @@ type Profile = {
   attestationUsed?: number;
   attestationResetDate?: string;
   canAttest?: boolean;
+  completionPercentage: number;
+  isProfileComplete: boolean;
 };
 
 type HiringCollection = {
@@ -305,6 +307,28 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   ) : null}
+
+                  {/* Profile Completion Progress Indicator */}
+                  {profile && profile.completionPercentage < 100 && (
+                    <div className="mt-2 mb-8 p-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl md:rounded-3xl space-y-3 max-w-sm mx-auto md:mx-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Profile Completion</span>
+                        </div>
+                        <span className="text-[10px] font-black text-emerald-400">{profile.completionPercentage}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-emerald-500/40 to-emerald-400 rounded-full transition-all duration-1000 ease-out" 
+                          style={{ width: `${profile.completionPercentage}%` }}
+                        />
+                      </div>
+                      <p className="text-[9px] text-slate-500 leading-relaxed font-medium">
+                        Add a <span className="text-slate-400">bio</span>, <span className="text-slate-400">skills</span>, and <span className="text-white/60">contact info</span> to reach 100% visibility.
+                      </p>
+                    </div>
+                  )}
 
 
 

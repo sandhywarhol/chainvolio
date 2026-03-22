@@ -136,6 +136,30 @@ export async function POST(request: Request) {
             if (!auditNote) auditNote = "Approved by admin.";
             console.log("[TEST-MONITOR] Approval complete.");
 
+            // --- 2.5 Trigger Approval Notification ---
+            try {
+                let celebrateMessage = "";
+                const type = org.type || "Builder";
+                
+                if (type.includes("Builder")) celebrateMessage = "You are now a Verified Builder 🎉";
+                else if (type.includes("Public Figure")) celebrateMessage = "You are now a Verified Public Figure 🎉";
+                else if (type.includes("Company")) celebrateMessage = "Your account is now verified as a Company 🎉";
+                else if (type.includes("Community") || type.includes("DAO")) celebrateMessage = "Your account is now verified as a Community 🎉";
+                else celebrateMessage = `Your account is now verified as ${type} 🎉`;
+
+                await supabase.from("notifications").insert({
+                    wallet_address: org.wallet_address,
+                    title: "Verification Approved",
+                    message: celebrateMessage,
+                    type: 'verification',
+                    related_id: id,
+                    link: '/dashboard#verification-status',
+                    is_read: false
+                });
+            } catch (notifErr) {
+                console.error("Failed to trigger verification approval notification:", notifErr);
+            }
+
         } else if (action === "reject") {
             updateData.status = "rejected";
             updateData.reviewed_at = nowIso;

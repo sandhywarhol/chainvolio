@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Menu, X, ShieldCheck } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { NotificationBell } from "./NotificationBell";
 import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
@@ -56,9 +57,9 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     ];
 
     const guidesItems = [
-        { label: "Sourcing", href: "/?modal=ask", onClick: onAskClick },
-        { label: "Screening", href: "/?modal=screening", onClick: onScreeningClick },
-        { label: "Attestation", href: "/?modal=attestation", onClick: onAttestationClick },
+        { label: "Sourcing Guide", href: "/guides/sourcing" },
+        { label: "Screening Protocol", href: "/guides/screening" },
+        { label: "Proof Standards", href: "/guides/attestation" },
     ];
 
     return (
@@ -142,9 +143,12 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
                     {/* Removed redundant verified badge for CV view consistency */}
 
+                    {/* Desktop Wallet & Global Notification Bell */}
                     <div className="hidden md:block">
                         <WalletMultiButton />
                     </div>
+                    
+                    <NotificationBell />
 
                     {/* Mobile Menu Toggle */}
                     <button

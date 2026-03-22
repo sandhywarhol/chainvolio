@@ -204,7 +204,7 @@ export async function POST(request: Request) {
         // 0. Verify Receipt state
         const { data: receipt, error: fetchError } = await supabase
             .from("receipts")
-            .select("status, wallet_address")
+            .select("status, wallet_address, role, org")
             .eq("id", receiptId)
             .single();
 
@@ -277,6 +277,27 @@ export async function POST(request: Request) {
             .from("receipts")
             .update({ status: "Attested" })
             .eq("id", receiptId);
+
+        // --- 3. Trigger Notification for Candidate ---
+        try {
+            const verifierLabel = finalAttesterOrg || finalAttesterName;
+            const projectTitle = (receipt as any).role || "Work Record";
+            const notificationTitle = "New Attestation";
+            const notificationMessage = `Your work as ${projectTitle} has been attested by ${verifierLabel}`;
+
+            await supabase.from("notifications").insert({
+                wallet_address: receipt.wallet_address,
+                title: notificationTitle,
+                message: notificationMessage,
+                type: 'attestation',
+                related_id: receiptId,
+                link: `/dashboard#receipt-${receiptId}`,
+                is_read: false
+            });
+        } catch (notifErr) {
+            console.error("Failed to trigger attestation notification:", notifErr);
+            // Non-blocking
+        }
 
         // Update user attestation count
         if (profile) {

@@ -677,6 +677,29 @@ export default function CVPage(props: any) {
     }
   }, [publicKey]);
 
+  // --- Profile View Exposure Notification ---
+  useEffect(() => {
+    // Only trigger if we have a target (wallet), a viewer (publicKey), and we know the viewer's profile type
+    if (!wallet || !publicKey || !viewerProfile) return;
+    
+    // Don't notify if the user is viewing their own profile
+    if (publicKey.toBase58() === wallet) return;
+
+    const isRecruiter = !!(viewerProfile.isVerified && isRecruiterTier(viewerProfile.verificationType));
+    
+    // Call the dedicated view notification API
+    fetch('/api/profile/view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetWallet: wallet,
+        viewerWallet: publicKey.toBase58(),
+        isRecruiter: isRecruiter
+      })
+    }).catch(err => console.error("Failed to sync profile view notification:", err));
+    
+  }, [wallet, publicKey, viewerProfile]);
+
   useEffect(() => {
     if (!wallet) return;
 

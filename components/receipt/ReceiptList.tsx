@@ -36,7 +36,21 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
   useEffect(() => {
     fetch(`/api/receipts?wallet=${walletAddress}`)
       .then((r) => r.json())
-      .then((data) => setReceipts(Array.isArray(data) ? data : []))
+      .then((data) => {
+        setReceipts(Array.isArray(data) ? data : []);
+        // Check for hash link and scroll
+        setTimeout(() => {
+          const hash = window.location.hash;
+          if (hash && hash.startsWith('#receipt-')) {
+            const el = document.getElementById(hash.slice(1));
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('animate-highlight');
+              setTimeout(() => el.classList.remove('animate-highlight'), 5000);
+            }
+          }
+        }, 500);
+      })
       .finally(() => setLoading(false));
   }, [walletAddress]);
 
@@ -55,21 +69,13 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
         {receipts.map((r, i) => (
           <div
             key={i}
-            className="p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+            id={`receipt-${r.id}`}
+            className="p-4 rounded-lg bg-slate-800/50 border border-slate-700 scroll-mt-24 transition-all duration-500"
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold">{r.role}</h3>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded border ${r.status === "Attested"
-                      ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10"
-                      : "border-slate-600 text-slate-400 bg-slate-800"
-                      }`}
-                    title={r.status === "Attested" ? `Verified by ${r.attesterWallet}` : "Self-reported by candidate"}
-                  >
-                    {r.status === "Attested" ? "✓ Attested" : "Candidate Claim"}
-                  </span>
                 </div>
 
                 <p className="text-emerald-400 text-base font-bold">{r.org}</p>
@@ -108,6 +114,16 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                   </div>
                 )}
               </div>
+
+              <span
+                className={`text-[10px] md:text-xs px-2 py-0.5 rounded border flex-shrink-0 self-start transition-all ${r.status === "Attested"
+                  ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.1)]"
+                  : "border-slate-700/50 text-slate-500 bg-slate-800/30"
+                  }`}
+                title={r.status === "Attested" ? `Verified by ${r.attesterWallet}` : "Self-reported by candidate"}
+              >
+                {r.status === "Attested" ? "✓ Attested" : "Candidate Claim"}
+              </span>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-between items-center">
               <div className="flex items-center gap-4">

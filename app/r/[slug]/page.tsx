@@ -61,16 +61,44 @@ export default function CandidateSubmission({ params }: { params: { slug: string
         fetchCollection();
     }, [slug]);
 
+    const [existingSubmission, setExistingSubmission] = useState<any>(null);
+
     useEffect(() => {
         if (!publicKey) {
             setApplicantProfile(null);
+            setExistingSubmission(null);
             return;
         }
+
+        // 1. Fetch Profile
         fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setApplicantProfile(data))
             .catch(() => setApplicantProfile(null));
-    }, [publicKey]);
+
+        // 2. Fetch Existing Submission
+        fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey.toBase58()}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data?.submission) {
+                    setExistingSubmission(data.submission);
+                    setSubmitted(true);
+
+                    // Deep link highlight logic
+                    setTimeout(() => {
+                        const hash = window.location.hash;
+                        if (hash === '#application-status') {
+                            const el = document.getElementById('application-status');
+                            if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                el.classList.add('animate-highlight');
+                            }
+                        }
+                    }, 1000);
+                }
+            })
+            .catch(() => {});
+    }, [publicKey, slug]);
 
     const handleSubmit = async () => {
         if (!publicKey || !signMessage) return;
@@ -546,6 +574,52 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         <p className="text-slate-400 mb-12 text-lg">
                             The hiring team at <span className="text-white font-bold">{collection.title}</span> has received your verified credentials.
                         </p>
+
+                        {/* Application Status Snapshot */}
+                        {existingSubmission && (
+                            <div 
+                              id="application-status"
+                              className="bg-[#121214] border border-white/5 rounded-3xl p-8 text-left space-y-6 max-w-lg mx-auto scroll-mt-24 transition-all duration-1000"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Live Status</span>
+                                    </div>
+                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${
+                                        existingSubmission.recruiter_status === 'hired' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" :
+                                        existingSubmission.recruiter_status === 'shortlisted' ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
+                                        existingSubmission.recruiter_status === 'rejected' ? "bg-red-500/10 border-red-500/20 text-red-400" :
+                                        "bg-slate-500/10 border-slate-500/20 text-slate-400"
+                                    }`}>
+                                        {existingSubmission.recruiter_status || 'Pending'}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-xl font-bold text-white">Application Snapshot</h3>
+                                    <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
+                                        <div className="flex justify-between text-[11px] font-medium">
+                                            <span className="text-slate-500">Signal Area</span>
+                                            <span className="text-emerald-400">{existingSubmission.primary_signal || 'General'}</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px] font-medium">
+                                            <span className="text-slate-500">Role Focus</span>
+                                            <span className="text-white">{existingSubmission.role_strength || 'Contributor'}</span>
+                                        </div>
+                                    </div>
+
+                                    {existingSubmission.recruiter_notes && (
+                                        <div className="space-y-2 pt-2">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Recruiter Notes</span>
+                                            <p className="text-sm text-slate-400 leading-relaxed italic border-l-2 border-emerald-500/30 pl-4 py-1">
+                                                "{existingSubmission.recruiter_notes}"
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </section>

@@ -84,7 +84,7 @@ export function Footer() {
                     {/* CENTER Column: Branding & Legal */}
                     <div className="flex flex-col items-center gap-2 w-1/3 text-center">
                         <p className="text-white/40 text-[9px] uppercase tracking-[0.2em] whitespace-nowrap">
-                            Built on Solana – Permissionless – No Token Required
+                            Built on Solana, Permissionless, No Token Required
                         </p>
                         {/* Legal Links */}
                         <div className="flex items-center gap-4 text-[9px] font-semibold text-white/30">
