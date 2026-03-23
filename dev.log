@@ -1,0 +1,57 @@
+
+> chainvolio@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.10
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1845ms
+ ○ Compiling / ...
+ ✓ Compiled / in 11s (2141 modules)
+ GET / 200 in 11968ms
+ ✓ Compiled in 1044ms (988 modules)
+ ○ Compiling /api/user/me ...
+ ✓ Compiled /api/user/me in 5.6s (1204 modules)
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 6525ms
+ GET / 200 in 333ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 761ms
+ ○ Compiling /why ...
+ ✓ Compiled /why in 1253ms (2187 modules)
+ ✓ Compiled /guides/sourcing in 428ms (2193 modules)
+ ✓ Compiled in 3.9s (2138 modules)
+ ✓ Compiled in 666ms (993 modules)
+ ✓ Compiled in 297ms (993 modules)
+ ✓ Compiled in 1834ms (2138 modules)
+ GET /guides/sourcing 200 in 299ms
+ ○ Compiling /guides/screening ...
+ ✓ Compiled /guides/screening in 2.5s (2134 modules)
+ ○ Compiling /guides/attestation ...
+ ✓ Compiled /guides/attestation in 695ms (2144 modules)
+ ○ Compiling /api/user/me ...
+ ✓ Compiled /api/user/me in 524ms (1226 modules)
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1597ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 485ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 3.7s (2670 modules)
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 661ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 487ms
+ ✓ Compiled /api/receipts in 493ms (1463 modules)
+ GET /api/receipts?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1486ms
+ GET /api/receipts?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 811ms
+ ○ Compiling /cv/[wallet] ...
+ ✓ Compiled /cv/[wallet] in 1251ms (2700 modules)
+ ○ Compiling /api/portfolio ...
+ ✓ Compiled /api/portfolio in 643ms (1478 modules)
+ ✓ Compiled (1480 modules)
+ GET /api/portfolio?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1677ms
+ GET /api/profile?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1820ms
+ GET /api/portfolio?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 168ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1956ms
+ GET /api/profile?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 317ms
+ GET /api/receipts?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 2266ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 468ms
+ GET /api/receipts?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 794ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 899ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 616ms
