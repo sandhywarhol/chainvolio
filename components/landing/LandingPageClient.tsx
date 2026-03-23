@@ -130,7 +130,7 @@ export function LandingPageClient() {
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
-                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap">Build Your Reputation</Link>
+                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Build Your Reputation</Link>
                             <button
                                 onClick={() => {
                                     if (!connected) {
@@ -140,7 +140,7 @@ export function LandingPageClient() {
 
                                     router.push("/hiring/create");
                                 }}
-                                className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap"
+                                className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap"
                             >
                                 Discover Talent
                             </button>
@@ -220,7 +220,7 @@ export function LandingPageClient() {
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
-                        <Link href="/create-profile" className="w-full py-4 solana-glossy-button text-white font-bold text-base text-center rounded-xl shadow-lg">
+                        <Link href="/create-profile" className="w-full py-4 hiring-glossy-button text-white font-bold text-base text-center rounded-xl shadow-lg">
                             Build Your Reputation
                         </Link>
                         <button
@@ -231,7 +231,7 @@ export function LandingPageClient() {
                                 }
                                 router.push("/hiring/create");
                             }}
-                            className="w-full py-4 hiring-glossy-button text-white font-bold text-base rounded-xl shadow-lg"
+                            className="w-full py-4 solana-glossy-button text-white font-bold text-base rounded-xl shadow-lg"
                         >
                             Discover Talent
                         </button>

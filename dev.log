@@ -55,3 +55,7 @@
  GET /api/receipts?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 794ms
  GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 899ms
  GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 616ms
+ ✓ Compiled in 4.5s (2674 modules)
+ ✓ Compiled /api/user/me in 466ms (1464 modules)
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 1384ms
+ GET /api/user/me?wallet=FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv 200 in 612ms
