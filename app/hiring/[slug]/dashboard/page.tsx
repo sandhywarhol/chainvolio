@@ -69,18 +69,37 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         async function initDashboard() {
             setLoading(true);
             try {
-                const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
-                const cached = sessionStorage.getItem(cacheKey);
+                // Use the CANONICAL key written by signChainVolioAction in wallet-utils.ts
+                const walletStr = publicKey!.toBase58();
+                const canonicalKey = `cv_sig_view_dashboard_${walletStr}_${slug}`;
+                const cached = sessionStorage.getItem(canonicalKey);
 
                 if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (Date.now() - parsed.timestamp < 9 * 60 * 1000) {
-                        await fetchWithSignature(parsed);
-                        return;
+                    try {
+                        const parsed = JSON.parse(cached);
+                        const twoHours = 2 * 60 * 60 * 1000;
+                        const fifteenMinutes = 15 * 60 * 1000;
+                        const now = Date.now();
+                        const lastActive = parseInt(sessionStorage.getItem(`${canonicalKey}_active`) || "0");
+
+                        const notExpired = now - parsed.timestamp < twoHours;
+                        const notIdle = lastActive > 0 && now - lastActive < fifteenMinutes;
+
+                        if (notExpired && notIdle) {
+                            sessionStorage.setItem(`${canonicalKey}_active`, now.toString());
+                            await fetchWithSignature(parsed);
+                            return;
+                        } else {
+                            // Clear stale session
+                            sessionStorage.removeItem(canonicalKey);
+                            sessionStorage.removeItem(`${canonicalKey}_active`);
+                        }
+                    } catch {
+                        sessionStorage.removeItem(canonicalKey);
                     }
                 }
-                
-                // If we get here, we need a fresh signature
+
+                // No valid session — show the auth button, do NOT auto-sign
                 setNeedsAuth(true);
                 setLoading(false);
             } catch (err) {
@@ -92,17 +111,39 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         initDashboard();
     }, [slug, connected, publicKey]);
 
+    // Activity listener — keeps session alive during active use (updates canonical key)
+    useEffect(() => {
+        if (!connected || !publicKey) return;
+
+        const refreshActivity = () => {
+            const canonicalKey = `cv_sig_view_dashboard_${publicKey!.toBase58()}_${slug}`;
+            if (sessionStorage.getItem(canonicalKey)) {
+                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
+            }
+        };
+
+        window.addEventListener('mousedown', refreshActivity);
+        window.addEventListener('keydown', refreshActivity);
+
+        return () => {
+            window.removeEventListener('mousedown', refreshActivity);
+            window.removeEventListener('keydown', refreshActivity);
+        };
+    }, [slug, connected, publicKey]);
+
     const handleAuthorize = async () => {
         if (!publicKey || !signMessage) return;
         setLoading(true);
         setNeedsAuth(false);
         try {
             const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard");
+            // forceFresh=true so the user always consciously signs when they click "Authorize"
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard", slug, { forceFresh: true });
 
             if (signedAction) {
-                const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
-                sessionStorage.setItem(cacheKey, JSON.stringify(signedAction));
+                // Stamp the activity timestamp alongside the canonical signature key
+                const canonicalKey = `cv_sig_view_dashboard_${publicKey.toBase58()}_${slug}`;
+                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
                 await fetchWithSignature(signedAction);
             } else {
                 setNeedsAuth(true);
@@ -134,10 +175,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             if (res.ok) {
                 setData(result);
                 setNeedsAuth(false);
+                // Refresh activity timestamp on successful interaction
+                const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
+                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
             } else {
                 if (res.status === 401) {
-                    const cacheKey = `cv_dashboard_sig_${slug}_${publicKey?.toBase58()}`;
-                    sessionStorage.removeItem(cacheKey);
+                    const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
+                    sessionStorage.removeItem(canonicalKey);
+                    sessionStorage.removeItem(`${canonicalKey}_active`);
                     setNeedsAuth(true);
                 } else {
                     setError(result.error || "Failed to load dashboard.");

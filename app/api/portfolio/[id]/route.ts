@@ -37,7 +37,8 @@ export async function DELETE(
         }
 
         // --- Signature Verification ---
-        if (!wallet || !signature || !nonce || !timestamp) {
+        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+        if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
             return NextResponse.json({ error: "Signature required to delete portfolio item." }, { status: 401 });
         }
 
@@ -47,11 +48,11 @@ export async function DELETE(
 
         const { verifySignature } = await import("@/lib/crypto");
         const { isValid, error: sigError } = await verifySignature(
-            wallet,
+            wallet!,
             "update_profile",
-            nonce,
-            parseInt(timestamp),
-            signature
+            nonce || "",
+            parseInt(timestamp || "0"),
+            signature || ""
         );
 
         if (!isValid) {

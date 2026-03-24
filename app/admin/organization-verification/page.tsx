@@ -9,7 +9,6 @@ import { ShieldCheck, XCircle, CheckCircle, Globe, Clock, ShieldAlert, LayoutDas
 
 
 import { format } from "date-fns";
-import bs58 from "bs58";
 import { Toast } from "@/components/ui/Toast";
 
 const ADMIN_WALLET = "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv";
@@ -99,17 +98,23 @@ export default function AdminVerificationPage() {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const timestamp = Date.now();
-            const nonce = Math.random().toString(36).substring(2, 11);
-            const messageStr = `ChainVolio Action: admin_access\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
-            const message = new TextEncoder().encode(messageStr);
-            const signature = await signMessage!(message);
-            const signatureBase58 = bs58.encode(signature);
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "admin_access");
+            if (!signedAction) {
+                setLoading(false);
+                return;
+            }
 
             const res = await fetch("/api/admin/organizations", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, showTestUsers }),
+                body: JSON.stringify({ 
+                    adminWallet: ADMIN_WALLET, 
+                    signature: signedAction.signature, 
+                    nonce: signedAction.nonce, 
+                    timestamp: signedAction.timestamp, 
+                    showTestUsers 
+                }),
             });
 
             if (!res.ok) throw new Error("Failed to fetch requests");
@@ -127,18 +132,18 @@ export default function AdminVerificationPage() {
     const handleAction = async (id: string, action: string) => {
         setActionLoading(id);
         try {
-            const timestamp = Date.now();
-            const nonce = Math.random().toString(36).substring(2, 11);
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
             
             // Map action for signature
-            let actionType = `admin_${action}`;
+            let actionType: any = `admin_${action}`;
             if (action === 'approve') actionType = 'approve_org';
             else if (action === 'reject') actionType = 'reject_org';
 
-            const messageStr = `ChainVolio Action: ${actionType}\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
-            const message = new TextEncoder().encode(messageStr);
-            const signature = await signMessage!(message);
-            const signatureBase58 = bs58.encode(signature);
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, actionType);
+            if (!signedAction) {
+                setActionLoading(null);
+                return;
+            }
 
             const res = await fetch("/api/admin/organizations/review", {
                 method: "POST",
@@ -147,8 +152,9 @@ export default function AdminVerificationPage() {
                     id, action,
                     reason: (action === 'reject' || action === 'revoke') ? rejectionReason : null,
                     adminWallet: ADMIN_WALLET,
-                    signature: signatureBase58,
-                    nonce, timestamp
+                    signature: signedAction.signature,
+                    nonce: signedAction.nonce,
+                    timestamp: signedAction.timestamp
                 }),
             });
 
@@ -185,17 +191,24 @@ export default function AdminVerificationPage() {
         setSearchLoading(true);
         setCuratedProfile(null);
         try {
-            const timestamp = Date.now();
-            const nonce = Math.random().toString(36).substring(2, 11);
-            const messageStr = `ChainVolio Action: admin_access\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
-            const message = new TextEncoder().encode(messageStr);
-            const signature = await signMessage!(message);
-            const signatureBase58 = bs58.encode(signature);
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "admin_access");
+            if (!signedAction) {
+                setToast({ message: "Could not obtain session signature.", type: "error" });
+                return;
+            }
 
             const res = await fetch("/api/admin/curated/search", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, cvId: curatedSearch, showTestUsers }),
+                body: JSON.stringify({ 
+                    adminWallet: ADMIN_WALLET, 
+                    signature: signedAction.signature, 
+                    nonce: signedAction.nonce, 
+                    timestamp: signedAction.timestamp, 
+                    cvId: curatedSearch, 
+                    showTestUsers 
+                }),
             });
 
             const data = await res.json();
@@ -214,19 +227,23 @@ export default function AdminVerificationPage() {
         if (!curatedProfile) return;
         setGrantLoading(true);
         try {
-            const timestamp = Date.now();
-            const nonce = Math.random().toString(36).substring(2, 11);
-            const messageStr = `ChainVolio Action: admin_access\nWallet: ${ADMIN_WALLET}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
-            const message = new TextEncoder().encode(messageStr);
-            const signature = await signMessage!(message);
-            const signatureBase58 = bs58.encode(signature);
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "admin_access");
+            if (!signedAction) {
+                setToast({ message: "Could not obtain session signature.", type: "error" });
+                return;
+            }
 
             const res = await fetch("/api/admin/curated/grant", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    adminWallet: ADMIN_WALLET, signature: signatureBase58, nonce, timestamp, 
-                    walletAddress: curatedProfile.wallet_address, tier: selectedTier 
+                    adminWallet: ADMIN_WALLET, 
+                    signature: signedAction.signature, 
+                    nonce: signedAction.nonce, 
+                    timestamp: signedAction.timestamp, 
+                    walletAddress: curatedProfile.wallet_address, 
+                    tier: selectedTier 
                 }),
             });
 

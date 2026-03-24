@@ -3,14 +3,40 @@ import bs58 from "bs58";
 
 export async function signChainVolioAction(
     wallet: WalletContextState,
-    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission" | "view_dashboard",
-    context?: string
+    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission" | "view_dashboard" | "admin_access" | "approve_org" | "reject_org",
+    context?: string,
+    options: { forceFresh?: boolean } = {}
 ): Promise<{ signature: string; nonce: string; timestamp: number } | null> {
     if (!wallet.publicKey || !wallet.signMessage) return null;
 
+    const walletAddress = wallet.publicKey.toBase58();
+    const storageKey = `cv_sig_${action}_${walletAddress}${context ? `_${context}` : ""}`;
+
+    // 1. Check for cached session signature unless forced
+    if (!options.forceFresh && typeof window !== "undefined") {
+        const cached = sessionStorage.getItem(storageKey);
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                const tenMinutes = 10 * 60 * 1000;
+                const twoHours = 2 * 60 * 60 * 1000;
+                
+                // For most actions, allow 2 hour cache (backend now supports this)
+                const cacheWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org")
+                    ? twoHours
+                    : tenMinutes;
+
+                if (Date.now() - parsed.timestamp < cacheWindow - 30000) { // 30s buffer
+                    return parsed;
+                }
+            } catch (e) {
+                sessionStorage.removeItem(storageKey);
+            }
+        }
+    }
+
     const nonce = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const timestamp = Date.now();
-    const walletAddress = wallet.publicKey.toBase58();
 
     let message = `ChainVolio Action: ${action}\nWallet: ${walletAddress}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
     if (context) {
@@ -23,7 +49,14 @@ export async function signChainVolioAction(
         const signatureBytes = await wallet.signMessage(messageBytes);
         const signature = bs58.encode(signatureBytes);
 
-        return { signature, nonce, timestamp };
+        const result = { signature, nonce, timestamp };
+
+        // Cache for future use in this session
+        if (typeof window !== "undefined") {
+            sessionStorage.setItem(storageKey, JSON.stringify(result));
+        }
+
+        return result;
     } catch (err) {
         console.error("Signing failed:", err);
         return null;

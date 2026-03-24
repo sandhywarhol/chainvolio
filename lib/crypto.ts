@@ -20,10 +20,17 @@ export async function verifySignature(
 
     try {
 
-        // 1. Check timestamp (prevent long-expired signatures, e.g. 10 min window)
+        // 1. Check entries and window
         const now = Date.now();
         const tenMinutes = 10 * 60 * 1000;
-        if (now - timestamp > tenMinutes) {
+        const twoHours = 2 * 60 * 60 * 1000;
+        
+        // Session-based actions get a longer window
+        const expiryWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org") 
+            ? twoHours 
+            : tenMinutes;
+
+        if (now - timestamp > expiryWindow) {
             return { isValid: false, error: "Signature expired" };
         }
 
@@ -33,8 +40,10 @@ export async function verifySignature(
         }
 
         // 3. Check for replay attack (nonce check)
-        // Note: 'view_dashboard' is allowed to reuse nonces within the 10m window for smoother UX (session-like)
-        if (supabase && action !== "view_dashboard") {
+        // We allow some actions to reuse nonces for smoother UX (session-like behavior)
+        const isSessionAction = ["view_dashboard", "update_profile", "update_profile_identity", "update_work", "submit_work", "create_collection", "update_collection", "apply_job", "admin_access", "approve_org", "reject_org"].includes(action);
+
+        if (supabase && !isSessionAction) {
             const { data } = await supabase
                 .from("nonces")
                 .select("id")
