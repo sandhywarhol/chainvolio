@@ -82,10 +82,9 @@ export async function GET(request: Request) {
         const hasBio = !!profile?.bio;
         const hasSkills = !!profile?.skills;
         const hasContact = !!(
-            profile?.email || profile?.twitter || profile?.github || 
-            profile?.linkedin || profile?.instagram || profile?.telegram || 
             profile?.website || profile?.discord || profile?.whatsapp || 
-            profile?.lens || profile?.farcaster
+            profile?.email || profile?.twitter || profile?.github ||
+            profile?.linkedin || profile?.instagram || profile?.telegram
         );
 
         let completionScore = 0;
@@ -177,13 +176,10 @@ export async function GET(request: Request) {
             linkedin: profile?.linkedin || null,
             instagram: profile?.instagram || null,
             telegram: profile?.telegram || null,
-            lens: profile?.lens || null,
-            farcaster: profile?.farcaster || null,
             website: profile?.website || null,
             discord: profile?.discord || null,
             email: profile?.email || null,
             whatsapp: profile?.whatsapp || null,
-            tags: profile?.tags || [],
             isExpiringSoon,
         });
     } catch (err: any) {

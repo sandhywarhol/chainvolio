@@ -23,13 +23,13 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
     const latestEndDate = Math.max(...sortedReceipts.map(r => r.endDate ? new Date(r.endDate).getTime() : new Date().getTime()));
 
     return (
-        <div className="w-full mb-6 border-t border-slate-800/50 pt-6 mt-6">
+        <div className="w-full mb-3 border-t border-slate-800/50 pt-4 mt-6">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full text-left py-2 hover:opacity-80 transition-opacity group flex items-center justify-between"
+                className="w-full text-left py-1 hover:opacity-80 transition-opacity group flex items-center justify-between"
             >
-                <div className="flex items-center gap-3">
-                    <div className="p-2 flex-shrink-0 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-lg">
+                <div className="flex items-center gap-2">
+                    <div className="p-1.5 flex-shrink-0 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-lg">
                         <TrendingUp className="w-5 h-5" />
                     </div>
                     <div>

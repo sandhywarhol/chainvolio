@@ -42,7 +42,7 @@ export default function VerifiedOrganizationPage() {
                     loop
                     muted
                     playsInline
-                    className="w-full h-full object-cover opacity-20"
+                    className="w-full h-full object-cover opacity-[0.1]"
                 >
                     <source src="/video-background.mp4" type="video/mp4" />
                 </video>

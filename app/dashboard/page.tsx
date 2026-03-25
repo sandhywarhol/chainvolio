@@ -13,6 +13,8 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
+import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
+import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier } from "@/lib/paymentConfig";
 import { format } from "date-fns";
@@ -33,9 +35,6 @@ type Profile = {
   lookingFor?: string;
   timezone?: string;
   workPreference?: string[];
-  lens?: string;
-  farcaster?: string;
-  tags?: string[];
   telegram?: string;
   linkedin?: string;
   instagram?: string;
@@ -79,6 +78,8 @@ export default function DashboardPage() {
   const [attestationCount, setAttestationCount] = useState(0);
   const [isHiringExpanded, setIsHiringExpanded] = useState(false);
   const [isImpactExpanded, setIsImpactExpanded] = useState(false);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [showCertModal, setShowCertModal] = useState(false);
 
   const handleShare = async () => {
     if (!profile || !publicKey) return;
@@ -142,7 +143,27 @@ export default function DashboardPage() {
     }
     fetchAttestationCount();
 
+    // 4. Fetch Certificates
+    fetch(`/api/certificates?wallet=${wallet}`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setCertificates(data); })
+      .catch(() => {});
+
   }, [publicKey, connected]);
+
+  const handleDeleteCertificate = async (id: string) => {
+    if (!publicKey) return;
+    await fetch(`/api/certificates?id=${id}&wallet=${publicKey.toBase58()}`, { method: "DELETE" });
+    setCertificates(prev => prev.filter(c => c.id !== id));
+  };
+
+  const handleCertUploadSuccess = () => {
+    if (!publicKey) return;
+    fetch(`/api/certificates?wallet=${publicKey.toBase58()}`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setCertificates(data); })
+      .catch(() => {});
+  };
 
   if (!publicKey) {
     return (
@@ -402,34 +423,11 @@ export default function DashboardPage() {
                         title="Instagram"
                       >
                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.819-.679-1.381-.896-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 1.381 2.122.297.762.501 1.634.558 2.911.058 1.28.072 1.688.072 4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.166.054 1.8.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.427.359 1.061.413 2.227.057 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.166-.249 1.8-.415 2.227-.217.562-.477.96-.896 1.382-.42.419-.819.679-1.381.896-.427.164-1.061.359-2.227.413-1.266.057-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.166-.054-1.8-.249-2.227-.415-.562-.217-.96-.477-1.382-.896-.419-.42-.679-.819-.896-1.381-.164-.427-.359-1.061-.413-2.227-.057-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.054-1.166.249-1.8.415-2.227.217-.562.477-.96.896-1.382.42-.419.819-.679 1.381-.896.427-.164 1.061-.359 2.227-.413 1.266-.057 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.277.057-2.149.261-2.911.558-.788.306-1.457.715-2.122 1.381-.666.665-1.075 1.334-1.381 2.122-.297.762-.501 1.634-.558 2.911-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.057 1.277.261 2.149.558 2.911.306.788.715 1.457 1.381 2.122.665.666 1.334 1.075 2.122 1.381.762.297 1.634.501 2.911.558 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.277-.057 2.149-.261 2.911-.558.788-.306 1.457-.715 2.122-1.381.666-.665 1.075-1.334 1.381-2.122.297-.762.501-1.634.558-2.911.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.057-1.277-.261-2.149-.558-2.911-.306-.788-.715-1.457-1.381-2.122-.665-.666-1.334-1.075-2.122-1.381-.762-.297-1.634-.501-2.911-.558-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                         </svg>
                       </a>
                     )}
 
-                    {profile?.lens && (
-                      <a
-                        href={`https://lens.xyz/${profile.lens.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 px-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#BFC500] hover:bg-[#BFC500]/10 hover:border-[#BFC500]/20 transition-all font-bold text-xs"
-                        title="Lens Protocol"
-                      >
-                        🌿
-                      </a>
-                    )}
-
-                    {profile?.farcaster && (
-                      <a
-                        href={`https://warpcast.com/${profile.farcaster.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 px-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#855DCD] hover:bg-[#855DCD]/10 hover:border-[#855DCD]/20 transition-all font-bold text-xs"
-                        title="Farcaster"
-                      >
-                        🟣
-                      </a>
-                    )}
 
                     {profile?.website && (
                       <a
@@ -489,10 +487,10 @@ export default function DashboardPage() {
 
         {/* Organization Impact - For Verified Orgs */}
         {profile?.isVerified && (
-          <div className="mb-12">
+          <div className="mb-6 pb-6 border-b border-slate-800/60 overflow-hidden">
             <div 
               onClick={() => setIsImpactExpanded(!isImpactExpanded)}
-              className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:border-white/10 hover:bg-white/[0.03] transition-all group"
+              className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:border-white/10 hover:bg-white/[0.03] transition-all group"
             >
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${isImpactExpanded ? (
@@ -617,10 +615,10 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="mb-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <div 
+        <div className="mb-6 pb-6 border-b border-slate-800/60 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden">
+          <div
             onClick={() => setIsHiringExpanded(!isHiringExpanded)}
-            className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-emerald-500/[0.03] hover:border-emerald-500/20 transition-all group"
+            className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-emerald-500/[0.03] hover:border-emerald-500/20 transition-all group"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${isHiringExpanded ? 'bg-emerald-500/10' : 'bg-slate-500/10'} transition-colors`}>
@@ -703,7 +701,17 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        {/* ── VERIFIED CREDENTIALS ── */}
+        <div className="mb-6 pb-6 border-b border-slate-800/60">
+          <CertificateSection
+            certs={certificates}
+            isOwner={true}
+            onDelete={handleDeleteCertificate}
+            onAdd={() => setShowCertModal(true)}
+          />
+        </div>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <h2 className="text-lg font-semibold">Proof of Work</h2>
           <div className="flex flex-wrap gap-2 md:gap-3">
             <Link
@@ -720,7 +728,7 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black text-xs md:text-sm font-bold shadow-lg"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs md:text-sm font-bold shadow-lg"
             >
               {showForm ? "Close" : "+ Add Proof"}
             </button>
@@ -780,6 +788,14 @@ export default function DashboardPage() {
                 .catch(err => console.error("Error refetching profile:", err));
             }
           }}
+        />
+      )}
+
+      {showCertModal && publicKey && (
+        <CertificateUploadModal
+          walletAddress={publicKey.toBase58()}
+          onClose={() => setShowCertModal(false)}
+          onSuccess={handleCertUploadSuccess}
         />
       )}
 

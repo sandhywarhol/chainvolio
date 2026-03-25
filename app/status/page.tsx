@@ -16,22 +16,25 @@ export default function StatusPage() {
     }, []);
 
     const components = [
-        { name: "API Services", status: "Operational" },
-        { name: "Database Layer", status: "Operational" },
+        { name: "Identity & Authentication", status: "Operational" },
+        { name: "Profile & CV System", status: "Operational" },
+        { name: "Proof of Work Engine", status: "Operational" },
+        { name: "Attestation Protocol", status: "Operational" },
+        { name: "Hiring & Talent Pipeline", status: "Operational" },
+        { name: "Verification System", status: "Operational" },
         { name: "Signature Verification", status: "Operational" },
-        { name: "CV Attestation Pipeline", status: "Operational" },
     ];
 
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white pb-20">
             {/* Refined noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
             <Navbar />
 
-            <div className="flex-1 flex flex-col justify-center w-full">
+            <div className="flex-1 flex flex-col w-full">
                 {/* Hero Section */}
-                <section className="relative z-40 pt-10 pb-8 px-8 max-w-[1240px] mx-auto w-full text-center">
+                <section className="relative z-40 pt-32 pb-12 px-8 max-w-[1240px] mx-auto w-full text-center">
                     <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-4">
                         <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-emerald-400/60">Transparency</span>
                     </div>
@@ -45,7 +48,7 @@ export default function StatusPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                         </span>
-                        <span className="text-xl font-bold text-white tracking-tight uppercase tracking-wider">Operational <span className="text-emerald-500/80 font-normal">(Pre-Launch)</span></span>
+                        <span className="text-xl font-bold text-white tracking-tight uppercase tracking-wider">Operational <span className="text-emerald-500/80 font-normal ml-1">(Pre-Launch)</span></span>
                     </div>
                 </section>
 
@@ -53,21 +56,22 @@ export default function StatusPage() {
 
                 {/* Status Grid */}
                 <section className="relative z-40 py-8 px-8 max-w-2xl mx-auto w-full">
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {components.map((comp, i) => (
-                            <div key={i} className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-sm hover:border-white/10 transition-colors group">
+                            <div key={i} className="flex items-center justify-between p-5 bg-white/[0.02] border border-white/5 rounded-sm hover:border-white/10 transition-colors group">
                                 <span className="text-sm font-bold text-white uppercase tracking-widest">{comp.name}</span>
                                 <div className="flex items-center gap-3">
                                     <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{comp.status}</span>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-pulse" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="mt-8 p-6 border-l border-white/10 bg-white/[0.01]">
-                        <p className="text-sm text-white/40 leading-relaxed font-light italic">
-                            “This page reflects internal system health checks. Live metrics and incident history will be added as the platform matures.”
+                    <div className="mt-8 p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex flex-col gap-2">
+                        <p className="text-sm font-bold text-emerald-400 uppercase tracking-wider">All core systems are operational.</p>
+                        <p className="text-sm text-slate-400 leading-relaxed">
+                            ChainVolio's identity, proof, and hiring infrastructure are fully functional and secured.
                         </p>
                     </div>
 

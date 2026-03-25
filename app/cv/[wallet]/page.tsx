@@ -16,6 +16,8 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
+import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
+import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
 
 type Profile = {
   displayName: string;
@@ -32,9 +34,6 @@ type Profile = {
   lookingFor?: string;
   timezone?: string;
   workPreference?: string[];
-  lens?: string;
-  farcaster?: string;
-  tags?: string[];
   telegram?: string;
   linkedin?: string;
   instagram?: string;
@@ -581,6 +580,10 @@ export default function CVPage(props: any) {
   const [loading, setLoading] = useState(true);
   const [showAllHiring, setShowAllHiring] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [hasFetchedCerts, setHasFetchedCerts] = useState(false);
+  const [isCertsLoading, setIsCertsLoading] = useState(false);
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
 
   const verifiedHiringRecords = useMemo(() => {
     return receipts.filter(r => 
@@ -607,9 +610,7 @@ export default function CVPage(props: any) {
       profile.email ||
       profile.website ||
       profile.linkedin ||
-      profile.instagram ||
-      profile.lens ||
-      profile.farcaster
+      profile.instagram
     );
     const hasExperience = contributionReceipts && contributionReceipts.length > 0;
 
@@ -717,6 +718,31 @@ export default function CVPage(props: any) {
     }).finally(() => setLoading(false));
   }, [wallet]);
 
+  const fetchCertificates = async () => {
+    if (hasFetchedCerts || !wallet) return;
+    setIsCertsLoading(true);
+    try {
+      const res = await fetch(`/api/certificates?wallet=${wallet}`);
+      const data = await res.json();
+      if (Array.isArray(data)) setCertificates(data);
+      setHasFetchedCerts(true);
+    } catch (err) {
+      console.error("Failed to load certificates:", err);
+    } finally {
+      setIsCertsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (wallet && !hasFetchedCerts) {
+        fetchCertificates();
+    }
+  }, [wallet]);
+
+  const handleExpandCerts = () => {
+      // Logic handled by useEffect now, but kept for interface compatibility
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen text-white flex items-center justify-center">
@@ -738,14 +764,14 @@ export default function CVPage(props: any) {
             {/* MAIN CV CARD COMPONENT */}
             <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 mb-8 p-6 pb-16 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full">
               {/* Animated silver gradient border */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
               {/* Dark solid background */}
-              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-slate-800/80"></div>
+              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-slate-800/80 pointer-events-none"></div>
 
               {/* Main Card Background Image */}
               <div
-                className="absolute inset-[1px] rounded-2xl md:rounded-3xl opacity-60 bg-cover bg-center mix-blend-overlay"
+                className="absolute inset-[1px] rounded-2xl md:rounded-3xl opacity-60 bg-cover bg-center mix-blend-overlay pointer-events-none"
                 style={{
                   backgroundImage: 'url("/card%20background.jpeg")',
                   backgroundSize: 'cover',
@@ -754,7 +780,7 @@ export default function CVPage(props: any) {
               ></div>
 
               {/* Dark gradient overlay */}
-              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-900/80"></div>
+              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-900/80 pointer-events-none"></div>
 
               {/* Lightning shine effect - diagonal sweep (Always active) */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl md:rounded-3xl z-10">
@@ -762,13 +788,13 @@ export default function CVPage(props: any) {
               </div>
 
               {/* Subtle silver shimmer overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-300/5 via-transparent to-white/5"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-300/5 via-transparent to-white/5 pointer-events-none"></div>
 
               {/* Inner silver glow */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(241,245,249,0.1),inset_0_-1px_0_0_rgba(241,245,249,0.05)]"></div>
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(241,245,249,0.1),inset_0_-1px_0_0_rgba(241,245,249,0.05)] pointer-events-none"></div>
 
               {/* Outer glow with silver accent */}
-              <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
+              <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl pointer-events-none"></div>
 
               {/* Sparkle effect on corners */}
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
@@ -797,7 +823,7 @@ export default function CVPage(props: any) {
               </div>
 
               {/* Content wrapper */}
-              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 w-full z-10">
+              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 w-full z-40">
                 {/* Avatar Column */}
                 <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                   <div className="relative group/avatar">
@@ -952,7 +978,7 @@ export default function CVPage(props: any) {
                   )}
 
                   {/* Social Row */}
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2 relative z-50">
                     {profile.twitter && (
                       <a
                         href={`https://x.com/${profile.twitter.replace('@', '')}`}
@@ -1009,29 +1035,6 @@ export default function CVPage(props: any) {
                       </a>
                     )}
 
-                    {profile.lens && (
-                      <a
-                        href={`https://lens.xyz/${profile.lens.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 px-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#BFC500] hover:bg-[#BFC500]/10 hover:border-[#BFC500]/20 transition-all font-bold text-xs"
-                        title="Lens Protocol"
-                      >
-                        🌿
-                      </a>
-                    )}
-
-                    {profile.farcaster && (
-                      <a
-                        href={`https://warpcast.com/${profile.farcaster.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 px-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#855DCD] hover:bg-[#855DCD]/10 hover:border-[#855DCD]/20 transition-all font-bold text-xs"
-                        title="Farcaster"
-                      >
-                        🟣
-                      </a>
-                    )}
 
                     {profile.website && (
                       <a
@@ -1153,7 +1156,16 @@ export default function CVPage(props: any) {
               />
             )}
 
-
+            {/* Verified Credentials Section */}
+            <div className="mt-6 mb-8 pt-4 border-t border-slate-800/50">
+              <CertificateSection 
+                certs={certificates} 
+                isOwner={false} 
+                onExpand={handleExpandCerts}
+                isLoading={isCertsLoading}
+                onPreview={setSelectedCert}
+              />
+            </div>
 
             <h2 className="text-xl font-semibold mt-6 mb-4">Proof of Work</h2>
             {contributionReceipts.length === 0 ? (
@@ -1173,12 +1185,12 @@ export default function CVPage(props: any) {
 
             {/* Verified Hiring Section - Redesigned to match Career Timeline style */}
             {verifiedHiringRecords.length > 0 && (
-              <div className="w-full mb-6 border-t border-slate-800/50 pt-12 mt-12">
+              <div className="w-full mb-3 border-t border-slate-800/50 pt-4 mt-6">
                 <button
                   onClick={() => setShowAllHiring(!showAllHiring)}
                   className="w-full text-left py-2 hover:opacity-80 transition-opacity group flex items-center justify-between"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <div className="p-2 flex-shrink-0 bg-blue-500/10 text-blue-400 flex items-center justify-center rounded-lg">
                       <ShieldCheck className="w-5 h-5" strokeWidth={2.5} />
                     </div>
@@ -1255,6 +1267,11 @@ export default function CVPage(props: any) {
         <ReceiptDetailModal
           receipt={selectedReceipt}
           onClose={() => setSelectedReceipt(null)}
+        />
+
+        <CertificatePreviewModal
+          cert={selectedCert}
+          onClose={() => setSelectedCert(null)}
         />
 
         {toastMessage && (

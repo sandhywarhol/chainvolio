@@ -30,9 +30,6 @@ export default function CreateProfilePage() {
     lookingFor: "",
     timezone: "",
     workPreference: [] as string[],
-    lens: "",
-    farcaster: "",
-    tags: [] as string[],
     telegram: "",
     linkedin: "",
     instagram: "",
@@ -71,9 +68,6 @@ export default function CreateProfilePage() {
             lookingFor: data.lookingFor || "",
             timezone: data.timezone || "",
             workPreference: data.workPreference || [],
-            lens: data.lens || "",
-            farcaster: data.farcaster || "",
-            tags: data.tags || [],
             telegram: data.telegram || "",
             linkedin: data.linkedin || "",
             instagram: data.instagram || "",
@@ -341,32 +335,6 @@ export default function CreateProfilePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                🌿 Lens Protocol (optional)
-              </label>
-              <input
-                type="text"
-                value={form.lens}
-                onChange={(e) => setForm({ ...form, lens: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="username.lens or @username"
-              />
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                🟣 Farcaster (optional)
-              </label>
-              <input
-                type="text"
-                value={form.farcaster}
-                onChange={(e) => setForm({ ...form, farcaster: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="username or FID"
-              />
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -487,32 +455,6 @@ export default function CreateProfilePage() {
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm text-slate-400 mb-2">Recruiter Tags (max 5)</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {form.tags.map((tag) => (
-                  <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-700 text-xs text-slate-200">
-                    {tag}
-                    <button type="button" onClick={() => setForm({ ...form, tags: form.tags.filter((t) => t !== tag) })} className="hover:text-white">×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    const val = e.currentTarget.value.trim();
-                    if (val && !form.tags.includes(val) && form.tags.length < 5) {
-                      setForm({ ...form, tags: [...form.tags, val] });
-                      e.currentTarget.value = "";
-                    }
-                  }
-                }}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="Type and press Enter (e.g. DeFi, Design, Remote)"
-              />
-            </div>
           </div>
 
           <button type="submit" disabled={loading || uploading} className="w-full py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 font-medium">

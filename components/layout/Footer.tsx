@@ -14,11 +14,18 @@ export function Footer() {
                     <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/3 order-3 md:order-1">
                         <div className="flex items-center gap-2 text-[10px] text-white/40 tracking-wide">
                             <span>Supported by</span>
-                            <Image
-                                src={superteamLogo}
-                                alt="Superteam Indonesia"
-                                className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity object-contain"
-                            />
+                            <a 
+                                href="https://x.com/SuperteamINDO" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="transition-all hover:scale-110 active:scale-95 flex items-center"
+                            >
+                                <Image
+                                    src={superteamLogo}
+                                    alt="Superteam Indonesia"
+                                    className="h-4 w-auto opacity-70 hover:opacity-100 transition-opacity object-contain"
+                                />
+                            </a>
                         </div>
                     </div>
 
@@ -99,11 +106,18 @@ export function Footer() {
                         {/* Endorsement */}
                         <div className="flex items-center gap-2 text-[9px] text-white/30 tracking-wide">
                             <span>Supported by</span>
-                            <Image
-                                src={superteamLogo}
-                                alt="Superteam Indonesia"
-                                className="h-4 w-auto opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all object-contain"
-                            />
+                            <a 
+                                href="https://x.com/SuperteamINDO" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="transition-all hover:scale-110 active:scale-95 flex items-center"
+                            >
+                                <Image
+                                    src={superteamLogo}
+                                    alt="Superteam Indonesia"
+                                    className="h-4 w-auto opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all object-contain"
+                                />
+                            </a>
                         </div>
                     </div>
                 </div>
