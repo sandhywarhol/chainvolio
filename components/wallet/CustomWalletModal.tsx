@@ -10,7 +10,7 @@ interface CustomWalletModalProps {
 }
 
 export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
-    const { wallets, select } = useWallet();
+    const { wallets, select, connect } = useWallet();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -33,28 +33,32 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     if (!isOpen) return null;
 
-    const handleConnect = (walletName: string) => {
-        const wallet = wallets.find(w => w.adapter.name === walletName);
-        
-        // Mobile Deep Linking Logic
-        if (isMobile && !phantomAvailable && !solflareAvailable) {
-            const currentUrl = window.location.href;
-            if (walletName === "Phantom") {
-                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
-                return;
-            } else if (walletName === "Solflare") {
-                window.location.href = `https://solflare.com/ul/v1/browse/${encodeURIComponent(currentUrl)}`;
-                return;
+    const handleConnect = async (walletName: string) => {
+        try {
+            // Mobile Deep Linking Logic
+            if (isMobile && !phantomAvailable && !solflareAvailable) {
+                const currentUrl = window.location.href;
+                if (walletName === "Phantom") {
+                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
+                    return;
+                } else if (walletName === "Solflare") {
+                    window.location.href = `https://solflare.com/ul/v1/browse/${encodeURIComponent(currentUrl)}`;
+                    return;
+                }
             }
-        }
 
-        if (wallet) {
-            select(wallet.adapter.name);
-        } else {
-            // Fallback for known names if adapter isn't initialized yet
-            select(walletName as any);
+            const targetWallet = wallets.find(w => w.adapter.name === walletName);
+            if (targetWallet) {
+                select(targetWallet.adapter.name);
+            } else {
+                select(walletName as any);
+            }
+
+            onClose();
+        } catch (err) {
+            console.error("Selection failed:", err);
+            onClose();
         }
-        onClose();
     };
 
     const handleInstall = (url: string) => {

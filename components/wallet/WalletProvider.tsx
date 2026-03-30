@@ -2,10 +2,12 @@
 
 import { useMemo } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
-// Legacy adapters removed in favor of standard detection
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
-// Removed legacy Phantom explicit imports which conflicted with standard injected providers
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const network = WalletAdapterNetwork.Mainnet;
@@ -16,18 +18,21 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   );
 
   const wallets = useMemo(
-    () => [], // Using standard wallet detection instead of hardcoded legacy adapters
+    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], // Reverted to explicitly defined legacy adapters for connection stability
     []
   );
 
   // Support for type variations in Next.js 14 environment
   const ConnProv = ConnectionProvider as any;
   const SolWallProv = SolanaWalletProvider as any;
+  const ModalProv = WalletModalProvider as any;
 
   return (
     <ConnProv endpoint={endpoint}>
       <SolWallProv wallets={wallets} autoConnect>
-        {children}
+        <ModalProv>
+          {children}
+        </ModalProv>
       </SolWallProv>
     </ConnProv>
   );
