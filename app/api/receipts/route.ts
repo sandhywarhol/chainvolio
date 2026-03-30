@@ -76,6 +76,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log(`[API] Work Receipt submitted for ${walletAddress}`);
+
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error(err);

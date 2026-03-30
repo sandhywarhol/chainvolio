@@ -125,6 +125,8 @@ export async function POST(request: Request) {
 
     if (profileError) return errorResponse("ERR_DATABASE_ERROR", `Profile error: ${profileError.message}`, 500);
 
+    console.log(`[API] Profile Upsert (POST) for ${walletAddress}`);
+
     // Sync skill pool asynchronously
     if (body.skills) {
       await syncSkillPool(body.skills);
@@ -187,6 +189,8 @@ export async function PATCH(request: Request) {
       .eq("wallet_address", walletAddress);
 
     if (updateError) return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
+
+    console.log(`[API] Profile Update (PATCH) for ${walletAddress}`);
 
     // Sync skill pool asynchronously
     if (body.skills) {
@@ -274,15 +278,16 @@ export async function GET(request: Request) {
     .maybeSingle();
 
   // --- Merit-based Builder Auto-Verification ---
-  const { count: powCount } = await supabase
+  const { data: powEntries } = await supabase
     .from("receipts")
-    .select("*", { count: 'exact', head: true })
+    .select("role")
     .eq("wallet_address", wallet)
-    .not("title", "is", null)
-    .neq("title", "");
+    .not("role", "is", null)
+    .neq("role", "");
 
+  const validPowCount = powEntries?.filter((p: any) => p.role && p.role.trim().length > 2).length || 0;
   const hasRequiredProfile = !!data?.display_name;
-  const meetsBuilderCriteria = hasRequiredProfile && (powCount || 0) >= 1;
+  const meetsBuilderCriteria = hasRequiredProfile && validPowCount >= 1;
 
   if (meetsBuilderCriteria) {
       const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');

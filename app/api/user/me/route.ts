@@ -39,27 +39,76 @@ export async function GET(request: Request) {
             .maybeSingle();
 
         // --- Merit-based Builder Auto-Verification ---
-        // 1. Proof of work count (valid entries only)
-        const { count: powCount } = await supabase
-            .from("receipts")
-            .select("*", { count: 'exact', head: true })
-            .eq("wallet_address", wallet)
-            .not("title", "is", null)
-            .neq("title", "");
+        const { searchParams } = new URL(request.url);
+        const isDebug = searchParams.get("debug") === "true";
 
-        // 2. Profile completion criteria for Builder
+        // 1. Proof of work count (valid entries only)
+        const powQuery = supabase
+            .from("receipts")
+            .select("role")
+            .eq("wallet_address", wallet)
+            .not("role", "is", null)
+            .neq("role", "");
+
+        const { data: powEntries, error: powError } = await powQuery;
+        const validPowEntries = powEntries?.filter((p: any) => (p.role?.trim().length || 0) > 2) || [];
+        const powCount = validPowEntries.length;
+        
+        // 2. Profile completion criteria
+        // Note: isProfileCompleteNow is computed below, but let's move it up to use it for criteria.
+        const hasBio = !!profile?.bio;
+        const hasSkills = !!profile?.skills;
+        const hasContact = !!(
+            profile?.website || profile?.discord || profile?.whatsapp || 
+            profile?.email || profile?.twitter || profile?.github ||
+            profile?.linkedin || profile?.instagram || profile?.telegram
+        );
+        let completionScoreNow = 0;
+        if (hasBio) completionScoreNow += 33;
+        if (hasSkills) completionScoreNow += 33;
+        if (hasContact) completionScoreNow += 34;
+        const isProfileCompleteNow = completionScoreNow === 100;
+
         const hasRequiredProfile = !!profile?.display_name;
-        const meetsBuilderCriteria = hasRequiredProfile && (powCount || 0) >= 1;
+        // Require name and AT LEAST one valid proof of work entry 
+        // to meet automatic Builder criteria. 
+        const meetsBuilderCriteria = hasRequiredProfile && powCount >= 1;
+
+        if (isDebug) {
+            console.log(`[DEBUG] Auto-Verification Check for ${wallet}`);
+            console.log(`- display_name: "${profile?.display_name || 'null'}"`);
+            console.log(`- profile_completed (full): ${isProfileCompleteNow}`);
+            console.log(`- powCount (valid role entries > 2 chars): ${powCount}`);
+            console.log(`- meetsBuilderCriteria (normalized): ${meetsBuilderCriteria}`);
+            if (powCount > 0) {
+                 console.log(`- raw pow entries roles:`, validPowEntries.map((p: any) => p.role));
+            }
+            if (powError) console.error(`- powQuery error:`, powError);
+        }
+
+        let debugInfo: any = {
+            profile_completed: isProfileCompleteNow,
+            display_name: profile?.display_name || null,
+            proof_of_work_count: powCount,
+            eligible: meetsBuilderCriteria,
+            verification_exists: !!orgData,
+            upsert_triggered: false,
+            upsert_success: false,
+            errors: []
+        };
 
         // 3. Auto-verify if they meet criteria AND are not already verified in another tier
         if (meetsBuilderCriteria) {
             const isAlreadyVerified = orgData?.status === 'verified';
-            // If pending/rejected for Builder, OR no record at all, verify them.
-            // Do NOT overwrite pending 'Company', 'Community', or 'Figure' requests unless desired.
-            // To be safe, only apply if no orgData or if it's currently Builder but not verified.
             const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');
             
+            if (isDebug) {
+                console.log(`- isAlreadyVerified Status: ${isAlreadyVerified}`);
+                console.log(`- canAutoVerify: ${canAutoVerify} (orgData Type: ${orgData?.type || 'none'}, Status: ${orgData?.status || 'none'})`);
+            }
+
             if (canAutoVerify) {
+                debugInfo.upsert_triggered = true;
                 const upsertData = {
                     wallet_address: wallet,
                     type: 'Builder',
@@ -67,10 +116,24 @@ export async function GET(request: Request) {
                     name: profile?.display_name || wallet,
                 };
                 
-                if (orgData?.id) {
-                    await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
-                } else {
-                    await supabase.from("organization_verifications").insert(upsertData);
+                try {
+                    let result;
+                    if (orgData?.id) {
+                        result = await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
+                    } else {
+                        result = await supabase.from("organization_verifications").insert(upsertData);
+                    }
+                    
+                    if (result.error) {
+                         debugInfo.errors.push(result.error.message);
+                         if (isDebug) console.error(`- Upsert Error:`, result.error.message);
+                    } else {
+                        debugInfo.upsert_success = true;
+                        if (isDebug) console.log(`- Upsert Success! Verified as Builder.`);
+                    }
+                } catch (upsertErr: any) {
+                    debugInfo.errors.push(upsertErr.message);
+                    if (isDebug) console.error(`- Upsert Exception:`, upsertErr);
                 }
                 
                 // Re-fetch to apply immediately in this response
@@ -81,7 +144,12 @@ export async function GET(request: Request) {
                     .maybeSingle();
                     
                 orgData = newOrgData;
+                debugInfo.verification_exists = !!orgData;
             }
+        } else if (isDebug && !meetsBuilderCriteria) {
+             console.log(`- Skipping auto-verify: Criteria not met.`);
+             if (!hasRequiredProfile) console.log(`  > Missing display_name`);
+             if ((powCount || 0) < 1) console.log(`  > Missing proof of work (current count: ${powCount || 0})`);
         }
         // ---------------------------------------------
 
@@ -126,19 +194,8 @@ export async function GET(request: Request) {
         }
 
         // 3. Compute Completeness & Notifications
-        const hasBio = !!profile?.bio;
-        const hasSkills = !!profile?.skills;
-        const hasContact = !!(
-            profile?.website || profile?.discord || profile?.whatsapp || 
-            profile?.email || profile?.twitter || profile?.github ||
-            profile?.linkedin || profile?.instagram || profile?.telegram
-        );
-
-        let completionScore = 0;
-        if (hasBio) completionScore += 33;
-        if (hasSkills) completionScore += 33;
-        if (hasContact) completionScore += 34;
-        const isComplete = completionScore === 100;
+        // (Moved some computation up for debug purposes, using results here)
+        const isComplete = isProfileCompleteNow;
 
         // --- 2.6 Trigger Profile Status Notifications ---
         try {
@@ -195,7 +252,7 @@ export async function GET(request: Request) {
         // Logic: Verified Tier (if active) -> (Builder, Figure, etc.), else "unverified"
         const verificationTier = isVerified ? orgData?.type : "unverified";
         
-        return NextResponse.json({
+        const responseData: any = {
             walletAddress: wallet,
             isVerified,
             verificationTier,
@@ -206,7 +263,7 @@ export async function GET(request: Request) {
             expiresAt: orgData?.expires_at || null,
             verifierTier: orgData?.verifier_tier || 1,
             // Profile metrics
-            completionPercentage: completionScore,
+            completionPercentage: completionScoreNow,
             isProfileComplete: isComplete,
             // Profile fields flattened
             displayName: profile?.display_name || null,
@@ -228,7 +285,13 @@ export async function GET(request: Request) {
             email: profile?.email || null,
             whatsapp: profile?.whatsapp || null,
             isExpiringSoon,
-        });
+        };
+
+        if (isDebug) {
+            responseData._debug = debugInfo;
+        }
+
+        return NextResponse.json(responseData);
     } catch (err: any) {
         console.error("api/user/me error:", err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
