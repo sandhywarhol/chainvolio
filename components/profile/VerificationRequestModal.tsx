@@ -41,7 +41,6 @@ const TIERS = [
         attestationLimit: 10,
         button: "Earn Verification",
         attestationPower: 1,
-        popular: true,
         benefits: [
             "Verified Builder Badge",
             "Profile becomes more trusted by organizations",
@@ -72,7 +71,7 @@ const TIERS = [
         Icon: Users,
         label: "Community / DAO",
         desc: "DAOs, Web3 communities & decentralized groups.",
-        price: "30 USDC",
+        price: "29 USDC",
         billing: "/ month",
         authority: "Collective Authority",
         attestationLimit: 40,
@@ -90,7 +89,7 @@ const TIERS = [
         Icon: Building,
         label: "Company / Org",
         desc: "Startups, agencies, studios & official organizations.",
-        price: "100 USDC",
+        price: "99 USDC",
         billing: "/ month",
         authority: "Institutional Authority",
         attestationLimit: 80,
@@ -122,8 +121,8 @@ const TIER_PRICES: Record<string, TierPricing> = IS_SOL_TEST
     : {
         Builder:   10,
         Figure:    null,
-        Community: { monthly: 30,  yearly: 300  },
-        Company:   { monthly: 100, yearly: 1000 },
+        Community: { monthly: 29,  yearly: 290  },
+        Company:   { monthly: 99,  yearly: 990  },
     };
 
 const isSubscriptionTier = (id: string) =>
@@ -135,6 +134,14 @@ const REVERSE_TIER_MAP: Record<string, string> = {
     "Public Figure":         "Figure",
     "Community / DAO":       "Community",
     "Company / Organization": "Company",
+};
+
+// ─── Tier hierarchy rankings ──────────────────────────────────────────────
+const TIER_RANK: Record<string, number> = { 
+    "Builder": 1, 
+    "Figure": 2, 
+    "Community": 3, 
+    "Company": 4 
 };
 
 // ─── Attestation power strips ──────────────────────────────────────────────
@@ -158,28 +165,39 @@ function TierCard({
     tier,
     onSelect,
     isLoading,
+    isUnavailable,
+    isCurrent,
 }: {
     tier: (typeof TIERS)[number];
     onSelect: (tierId: string) => void;
     isLoading: boolean;
+    isUnavailable?: boolean;
+    isCurrent?: boolean;
 }) {
     const col = C[tier.colorKey];
     const hex = col.hex;
 
     return (
         <div
-            className="relative flex flex-col rounded-2xl bg-black/30 border border-white/10 overflow-hidden transition-all duration-300 hover:border-white/20 hover:bg-black/40 group backdrop-blur-sm"
-            style={{ boxShadow: `0 1px 32px ${hex}08` }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 32px ${hex}20, 0 0 0 1px ${hex}18`; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = `0 1px 32px ${hex}08`; }}
+            className={`relative flex flex-col rounded-2xl bg-black/30 border border-white/10 overflow-hidden transition-all duration-300 group backdrop-blur-sm ${
+                isUnavailable ? 'opacity-50 grayscale-[0.8]' : 'hover:border-white/20 hover:bg-black/40'
+            }`}
+            style={{ boxShadow: isUnavailable ? 'none' : `0 1px 32px ${hex}08` }}
+            onMouseEnter={e => { if (!isUnavailable) e.currentTarget.style.boxShadow = `0 4px 32px ${hex}20, 0 0 0 1px ${hex}18`; }}
+            onMouseLeave={e => { if (!isUnavailable) e.currentTarget.style.boxShadow = `0 1px 32px ${hex}08`; }}
         >
+            {isCurrent && (
+                <div className="absolute top-2 left-2 z-20 px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[8px] font-black uppercase tracking-widest">
+                    Current
+                </div>
+            )}
             {/* Popular ribbon */}
             {"popular" in tier && tier.popular && (
                 <div
                     className="absolute top-0 right-4 text-[8px] font-black uppercase tracking-widest text-white px-2 py-1 rounded-b-lg"
                     style={{ background: hex }}
                 >
-                    {tier.id === "Builder" ? "Popular" : "Most Trust"}
+                    {"Most Trust"}
                 </div>
             )}
 
@@ -245,11 +263,15 @@ function TierCard({
                 {/* CTA button */}
                 <button
                     type="button"
-                    disabled={isLoading}
+                    disabled={isLoading || isUnavailable}
                     onClick={() => onSelect(tier.id)}
-                    className="w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg hover:shadow-emerald-500/25 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isCurrent 
+                            ? "bg-white/5 text-white/40 border border-white/10" 
+                            : "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg hover:shadow-emerald-500/25"
+                    }`}
                 >
-                    {isLoading ? "Submitting…" : tier.button}
+                    {isLoading ? "Loading..." : isCurrent ? "Active" : isUnavailable ? "Locked" : "Select Tier"}
                 </button>
 
             </div>
@@ -363,7 +385,11 @@ export function VerificationRequestModal({
     }
 
     // ── Already verified ──
-    if (currentStatus === "verified") {
+    const currentId = REVERSE_TIER_MAP[currentTier || ""] || null;
+    const currentRank = TIER_RANK[currentId || ""] || 0;
+    const canUpgrade = currentStatus === "verified" && currentRank > 0 && currentRank < 4;
+
+    if (currentStatus === "verified" && !canUpgrade) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
                 <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
@@ -431,14 +457,24 @@ export function VerificationRequestModal({
                         <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                             <Shield className="w-4 h-4 text-emerald-400" />
                         </div>
-                        <div>
-                            <h2 className="text-[15px] font-black text-white tracking-tight leading-tight">Verify Identity</h2>
-                            <p className="text-[10px] text-white/30 leading-none mt-0.5">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-[14px] font-black text-white tracking-tight leading-tight">Verify Identity</h2>
+                                {currentStatus === "verified" && (
+                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-extrabold uppercase">
+                                        <ShieldCheck className="w-2.5 h-2.5" />
+                                        Current: {currentTier}
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-white/30 leading-none mt-1">
                                 {showSubscription
                                     ? `Select billing cycle for ${activeTier?.label}`
                                     : showPayment
                                         ? `Complete payment for ${activeTier?.label} verification`
-                                        : "Choose a verification tier to claim your badge and attestation authority."}
+                                        : currentStatus === "verified" 
+                                            ? "Upgrade your verification to unlock more features"
+                                            : "Choose a verification tier to claim your badge and attestation authority."}
                             </p>
                         </div>
                     </div>
@@ -514,14 +550,24 @@ export function VerificationRequestModal({
                         )}
 
                         <div className="grid grid-cols-4 gap-4">
-                            {TIERS.map((tier) => (
-                                <TierCard
-                                    key={tier.id}
-                                    tier={tier}
-                                    onSelect={handleSelectTier}
-                                    isLoading={loading && !selectedTier}
-                                />
-                            ))}
+                            {TIERS.map((tier) => {
+                                const currentId = REVERSE_TIER_MAP[currentTier || ""] || null;
+                                const currentRank = TIER_RANK[currentId || ""] || 0;
+                                const isSelected = currentId === tier.id && currentStatus === "verified";
+                                const isLowerRank = TIER_RANK[tier.id] < currentRank;
+                                const isUnavailable = isSelected || isLowerRank;
+
+                                return (
+                                    <TierCard
+                                        key={tier.id}
+                                        tier={tier}
+                                        onSelect={handleSelectTier}
+                                        isLoading={loading && !selectedTier}
+                                        isUnavailable={isUnavailable}
+                                        isCurrent={isSelected}
+                                    />
+                                );
+                            })}
                         </div>
 
                         <p className="mt-4 text-center text-[10px] text-white/20">

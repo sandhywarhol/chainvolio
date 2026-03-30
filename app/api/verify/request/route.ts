@@ -30,16 +30,41 @@ export async function POST(request: Request) {
         // Check if a request already exists for this wallet
         const { data: existing } = await supabase
             .from("organization_verifications")
-            .select("id, status")
+            .select("id, status, type, verification_source")
             .eq("wallet_address", walletAddress)
-            .single();
+            .maybeSingle();
 
         if (existing) {
             if (existing.status === "pending") {
                 return NextResponse.json({ error: "A verification request is already pending." }, { status: 409 });
             }
+
+            // Hierarchical check to prevent downgrades or redundant requests
+            // Basic hierarchy: Builder(1) < Public Figure(2) < Community(3) < Company(4)
+            const TIER_RANK: Record<string, number> = { "Builder": 1, "Public Figure": 2, "Community / DAO": 3, "Company / Organization": 4 };
+            const currentRank = TIER_RANK[existing.type] || 0;
+            const targetRank = TIER_RANK[type] || 0;
+
             if (existing.status === "verified") {
-                return NextResponse.json({ error: "This wallet is already verified." }, { status: 409 });
+                if (targetRank <= currentRank) {
+                    return NextResponse.json({ error: `You are already verified as ${existing.type}. Please apply for a higher tier to upgrade.` }, { status: 400 });
+                }
+
+                // ALLOW UPGRADE: Store in pending_upgrade columns to preserve current status
+                const { error: upgradeError } = await supabase
+                    .from("organization_verifications")
+                    .update({
+                        pending_upgrade_type: type,
+                        pending_upgrade_status: "pending",
+                        name: profileName || walletAddress,
+                        website: website || null,
+                        social_link: socials || null,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", existing.id);
+
+                if (upgradeError) return NextResponse.json({ error: upgradeError.message }, { status: 500 });
+                return NextResponse.json({ ok: true, upgrade: true });
             }
 
             // Rejected → allow resubmission by updating the existing row

@@ -109,10 +109,17 @@ export async function GET(
 
         const attestationMap = new Set(attestations?.map(a => a.receipt_id));
 
+        // 5.5 Batch fetch verification status
+        const { data: verifications } = await supabase
+            .from("organization_verifications")
+            .select("wallet_address, status, type, expires_at")
+            .in("wallet_address", wallets);
+
         // 6. Aggregate data per candidate
         const candidates = submissions.map(sub => {
             const profile = profiles?.find(p => p.wallet_address === sub.candidate_wallet);
             const userReceipts = receipts?.filter(r => r.wallet_address === sub.candidate_wallet) || [];
+            const userVerifications = verifications?.filter(v => v.wallet_address === sub.candidate_wallet) || [];
 
             const attestedReceipts = userReceipts.filter(r => attestationMap.has(r.id));
             const orgs = Array.from(new Set(attestedReceipts.map(r => r.org))).filter(Boolean);
@@ -148,6 +155,8 @@ export async function GET(
                 attestedOrgs: orgs,
                 lastActive: latestActivity,
                 status: attestedReceipts.length > 0 ? "Attested" : "Self-Declared",
+                isVerified: userVerifications.some(v => v.status === 'verified'),
+                verificationTier: userVerifications.find(v => v.status === 'verified')?.type || "unverified",
                 recruiterStatus: sub.recruiter_status,
                 recruiterNotes: sub.recruiter_notes,
                 recruiterTxSignature: sub.tx_signature,

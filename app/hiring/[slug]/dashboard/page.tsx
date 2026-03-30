@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
+import { generateHiringReport, generateHiringCSV } from "@/lib/report-generator";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -506,31 +507,23 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         return Array.from(new Set(roles));
     }, [data]);
 
-    const handleExportCSV = () => {
+    const handleDownloadReport = async () => {
         if (!data || !data.candidates.length) return;
-
-        const headers = ["Wallet", "Display Name", "Role", "Primary Signal", "Proof Count", "Attested Count", "Status", "Notes", "Submitted At"];
-        const rows = data.candidates.map(c => [
-            c.wallet,
-            c.displayName || "Anonymous",
-            c.role,
-            c.primarySignal,
-            c.powCount,
-            c.attestedCount,
-            c.recruiterStatus,
-            `"${(c.recruiterNotes || "").replace(/"/g, '""')}"`, // Escape quotes
-            c.submittedAt
-        ]);
-
-        const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `${data.collection.title.replace(/\s+/g, '_')}_candidates.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        
+        setToast({ message: "Generating Hiring Intelligence Report...", type: "success" });
+        
+        try {
+            // 1. Generate PDF (Primary)
+            await generateHiringReport(data);
+            
+            // 2. Generate CSV (Raw Data)
+            generateHiringCSV(data);
+            
+            setToast({ message: "Reports generated successfully", type: "success" });
+        } catch (err) {
+            console.error("Report generation failed:", err);
+            setToast({ message: "Failed to generate report", type: "error" });
+        }
     };
 
 
@@ -740,7 +733,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             Terminate
                         </button>
                         <button
-                            onClick={handleExportCSV}
+                            onClick={handleDownloadReport}
                             className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/[0.03] text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-white/5"
                         >
                             <Download className="w-3 h-3" /> Report

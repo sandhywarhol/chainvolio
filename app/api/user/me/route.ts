@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         // 2. Fetch Verification Status
         let { data: orgData } = await supabase
             .from("organization_verifications")
-            .select("id, status, type, expires_at, rejection_reason, verifier_tier")
+            .select("id, status, type, expires_at, rejection_reason, verifier_tier, pending_upgrade_type, pending_upgrade_status, verification_source")
             .eq("wallet_address", wallet)
             .maybeSingle();
 
@@ -256,9 +256,11 @@ export async function GET(request: Request) {
             walletAddress: wallet,
             isVerified,
             verificationTier,
-            verificationStatus: orgData?.status || 'unverified',
+            verificationStatus: (isVerified && orgData?.pending_upgrade_status === 'pending') ? 'pending' : (orgData?.status || 'unverified'),
             isExpired,
             verificationType: orgData?.type || null,
+            pendingUpgradeType: orgData?.pending_upgrade_type || null,
+            pendingUpgradeStatus: orgData?.pending_upgrade_status || null,
             rejectionReason: orgData?.rejection_reason || null,
             expiresAt: orgData?.expires_at || null,
             verifierTier: orgData?.verifier_tier || 1,

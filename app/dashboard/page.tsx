@@ -292,17 +292,27 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex flex-row md:flex-row items-center gap-2 justify-center md:justify-end w-full md:w-auto">
-                      {!profile?.isVerified && !profile?.isExpired && (
+                      {(!profile?.isVerified && !profile?.isExpired) ? (
                         <button
                           onClick={() => {
                             setIsRenewal(false);
                             setShowVerificationModal(true);
                           }}
-                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-[10px] md:text-sm font-bold transition-colors border border-teal-500/20 flex items-center gap-1.5 md:gap-2"
+                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-[10px] md:text-sm font-medium transition-colors border border-teal-500/20 flex items-center gap-1.5 md:gap-2"
                         >
                           <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Verify
                         </button>
-                      )}
+                      ) : (profile?.isVerified && profile?.verifierTier && profile.verifierTier < 4) ? (
+                        <button
+                          onClick={() => {
+                            setIsRenewal(false);
+                            setShowVerificationModal(true);
+                          }}
+                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] md:text-sm font-medium transition-all border border-amber-500/20 flex items-center gap-1.5 md:gap-2 shadow-[0_0_15px_rgba(245,158,11,0.08)] active:scale-95"
+                        >
+                          <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Upgrade
+                        </button>
+                      ) : null}
 
                       <Link
                         href="/create-profile"

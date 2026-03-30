@@ -53,14 +53,14 @@ export const USDC_DECIMALS     = 6;
 
 export const USDC_PROD_PRICES: Record<string, { monthly?: bigint; yearly?: bigint; oneTime?: bigint }> = {
     Builder:   { oneTime: BigInt("10000000")  },   // 10 USDC
-    Community: { monthly: BigInt("30000000"),  yearly: BigInt("300000000")  },  // 30 / 300 USDC
-    Company:   { monthly: BigInt("100000000"), yearly: BigInt("1000000000") },  // 100 / 1000 USDC
+    Community: { monthly: BigInt("29000000"),  yearly: BigInt("290000000")  },  // 29 / 290 USDC
+    Company:   { monthly: BigInt("99000000"), yearly: BigInt("990000000") },  // 99 / 990 USDC
 };
 
 export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: number; oneTime?: number }> = {
     Builder:   { oneTime: 10 },
-    Community: { monthly: 30,  yearly: 300  },
-    Company:   { monthly: 100, yearly: 1000 },
+    Community: { monthly: 29,  yearly: 290  },
+    Company:   { monthly: 99,  yearly: 990  },
 };
 export const ATTESTATION_QUOTAS: Record<string, number> = {
     "Builder":               10,

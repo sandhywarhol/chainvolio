@@ -89,7 +89,7 @@ export async function POST(request: Request) {
 
         if (txAlreadyUsed) {
             return NextResponse.json(
-                { error: "This transaction signature has already been used for a verification request." },
+                { error: "This transaction signature has already been used." },
                 { status: 409 }
             );
         }
@@ -97,49 +97,45 @@ export async function POST(request: Request) {
         // ── Check existing status for this wallet ────────────────────────────
         const { data: existing } = await supabase
             .from("organization_verifications")
-            .select("id, status")
+            .select("id, status, type, pending_upgrade_status")
             .eq("wallet_address", walletAddress)
             .maybeSingle();
 
-        if (existing?.status === "verifying") {
-            return NextResponse.json(
-                { error: "Another payment verification is already in progress for this wallet. Please wait a moment." },
-                { status: 429 }
-            );
+        const TIER_RANK: Record<string, number> = { "Builder": 1, "Public Figure": 2, "Community / DAO": 3, "Company / Organization": 4 };
+        const currentRank = TIER_RANK[existing?.type || ""] || 0;
+        const targetRank = TIER_RANK[type] || 0;
+
+        if (existing?.status === "verifying" || (existing?.status === "verified" && existing?.pending_upgrade_status === "verifying")) {
+            return NextResponse.json({ error: "Another payment verification is already in progress." }, { status: 429 });
         }
-        if (existing?.status === "pending") {
-            return NextResponse.json(
-                { error: "A verification request is already pending for this wallet." },
-                { status: 409 }
-            );
+        if (existing?.status === "pending" || (existing?.status === "verified" && existing?.pending_upgrade_status === "pending")) {
+            return NextResponse.json({ error: "A verification request is already pending." }, { status: 409 });
         }
-        if (existing?.status === "verified") {
-            return NextResponse.json(
-                { error: "This wallet is already verified." },
-                { status: 409 }
-            );
+        if (existing?.status === "verified" && targetRank <= currentRank) {
+            return NextResponse.json({ error: `You are already verified as ${existing.type}.` }, { status: 409 });
         }
 
         // ── LOCK: Set status to 'verifying' ──────────────────────────────────
-        // This prevents race conditions while we wait for Solana finalization.
-        // By including the tx_signature here, the DB's UNIQUE index will block
-        // any other wallet from using this signature immediately (fail-fast).
         let lockRecordId: string | null = existing?.id || null;
         if (existing) {
+            const updateProps: any = { 
+                tx_signature: txSignature,
+                updated_at: new Date().toISOString() 
+            };
+            if (existing.status === "verified") {
+                updateProps.pending_upgrade_status = "verifying";
+                updateProps.pending_upgrade_type = type;
+            } else {
+                updateProps.status = "verifying";
+            }
+
             const { error: lockErr } = await supabase
                 .from("organization_verifications")
-                .update({ 
-                    status: "verifying", 
-                    tx_signature: txSignature,
-                    updated_at: new Date().toISOString() 
-                })
+                .update(updateProps)
                 .eq("id", existing.id);
             
             if (lockErr) {
-                return NextResponse.json(
-                    { error: "This transaction is already being verified or has been used. Please check your transaction signature." },
-                    { status: 409 }
-                );
+                return NextResponse.json({ error: "Failed to lock for verification." }, { status: 409 });
             }
         } else {
             const { data: newRec, error: lockErr } = await supabase
@@ -155,17 +151,13 @@ export async function POST(request: Request) {
                 .single();
             
             if (lockErr) {
-                return NextResponse.json(
-                    { error: "This transaction or wallet is already in the verification process. Please check your transaction signature." },
-                    { status: 409 }
-                );
+                return NextResponse.json({ error: "Failed to create verification lock." }, { status: 409 });
             }
             lockRecordId = newRec?.id || null;
         }
 
         // ── Solana Evaluation ──
         try {
-            // ── Fetch & validate Solana transaction ──────────────────────────────
             const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
             const connection = new Connection(rpcUrl, "finalized");
 
@@ -179,198 +171,107 @@ export async function POST(request: Request) {
                         commitment: "finalized",
                         maxSupportedTransactionVersion: 0,
                     });
-                    
-                    if (tx) break; // Found it!
-                } catch (rpcErr: any) {
+                    if (tx) break;
+                } catch (rpcErr) {
                     console.error(`RPC error (attempt ${attempts + 1}):`, rpcErr);
                 }
-
                 attempts++;
-                if (attempts < MAX_ATTEMPTS) {
-                    console.log(`[TEST-MONITOR] Transaction not finalized yet, waiting 2s... (Attempt ${attempts})`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
+                if (attempts < MAX_ATTEMPTS) await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
-            if (!tx) {
-                throw new Error("Transaction not found or not finalized yet. Please wait a moment and try again.");
-            }
+            if (!tx) throw new Error("Transaction not found or not finalized yet.");
+            if (!tx.meta) throw new Error("Transaction metadata is unavailable.");
+            if (tx.meta.err) throw new Error("This transaction failed on-chain.");
 
-            if (!tx.meta) {
-                throw new Error("Transaction metadata is unavailable. Please try again.");
-            }
-
-            if (tx.meta.err) {
-                throw new Error("This transaction failed on-chain. Please use a successful transaction.");
-            }
-
-            console.log(`[TEST-MONITOR] Transaction ${txSignature} confirmed and finalized.`);
-
-            // ── Extract Transaction Sender (Fee Payer) ───────────────────────────
-            // accountKeys[0] is always the fee-payer and primary signer.
             const senderKey = tx.transaction.message.accountKeys[0]?.pubkey.toString();
-            if (!senderKey) {
-                throw new Error("Could not determine transaction sender.");
-            }
+            if (!senderKey) throw new Error("Could not determine transaction sender.");
 
-            // ── Validate payment ─────────────────────────────────────────────────
             let validTransfer = false;
-
             if (isSolTest) {
-                // ── SOL Validate ────────────────────────────────────────────────
-
-                // 1. Verify the sender matches the wallet that submitted the request.
-                if (senderKey !== walletAddress) {
-                    console.warn(
-                        `[validate-payment] Sender mismatch — tx sender: ${senderKey}, claimed wallet: ${walletAddress}, tx: ${txSignature}`
-                    );
-                    throw new Error("Sender wallet mismatch. The transaction was not sent from your connected wallet.");
-                }
-
-                // 2. Verify the treasury received the correct amount.
-                const treasuryIndex = tx.transaction.message.accountKeys.findIndex(
-                    (key) => key.pubkey.toString() === TREASURY_WALLET
-                );
-
-                if (treasuryIndex === -1) {
-                    throw new Error("Treasury wallet was not involved in this transaction.");
-                }
-
+                if (senderKey !== walletAddress) throw new Error("Sender wallet mismatch.");
+                const treasuryIndex = tx.transaction.message.accountKeys.findIndex(k => k.pubkey.toString() === TREASURY_WALLET);
+                if (treasuryIndex === -1) throw new Error("Treasury wallet was not involved.");
                 const preBalance  = tx.meta.preBalances[treasuryIndex];
                 const postBalance = tx.meta.postBalances[treasuryIndex];
                 const received    = postBalance - preBalance;
-
-                // Allow a tolerance of 0.00001 SOL (10_000 lamports) to absorb any rounding or
-                // RPC precision differences without falsely rejecting a valid payment.
-                //
-                // We use a floor check (received >= expected - tolerance) rather than a symmetric
-                // abs() window so that overpayments are still accepted — a user who accidentally
-                // sends more than required should not be rejected.
-                const TOLERANCE_LAMPORTS = 10_000; // 0.00001 SOL
+                const TOLERANCE_LAMPORTS = 10_000;
                 const minimumAccepted   = Number(expectedAmountRaw) - TOLERANCE_LAMPORTS;
-
-                if (received > 0 && received >= minimumAccepted) {
-                    validTransfer = true;
-                    console.log(`[TEST-MONITOR] Payment validated: Received ${received} lamports (Target: ${expectedAmountRaw}, Tolerance: ${TOLERANCE_LAMPORTS})`);
-                } else if (received > 0) {
-                    const got  = (received         / 1_000_000_000).toFixed(7);
-                    const need = (Number(expectedAmountRaw) / 1_000_000_000).toFixed(7);
-                    const tol  = (TOLERANCE_LAMPORTS / 1_000_000_000).toFixed(7);
-                    throw new Error(`Incorrect payment amount. Expected ${need} SOL (±${tol} tolerance) but received ${got} SOL.`);
-                }
+                if (received >= minimumAccepted) validTransfer = true;
             } else {
-                // ── USDC Validate ───────────────────────────────────────────────
                 const ACCEPTED_MINTS = new Set([USDC_MINT_MAINNET, USDC_MINT_DEVNET]);
                 const preTokenBalances  = tx.meta.preTokenBalances  || [];
                 const postTokenBalances = tx.meta.postTokenBalances || [];
-                
                 let treasuryReceived = BigInt(0);
                 let senderPaid       = BigInt(0);
 
-                // 1. Verify Treasury received the funds
                 for (const post of postTokenBalances) {
                     if (!ACCEPTED_MINTS.has(post.mint)) continue;
                     if (post.owner !== TREASURY_WALLET) continue;
-
                     const pre = preTokenBalances.find(p => p.accountIndex === post.accountIndex);
-                    const preAmount  = BigInt(pre?.uiTokenAmount.amount || "0");
-                    const postAmount = BigInt(post.uiTokenAmount.amount || "0");
-                    const change     = postAmount - preAmount;
-
-                    if (change > BigInt(0)) {
-                        treasuryReceived += change;
-                    }
+                    const diff = BigInt(post.uiTokenAmount.amount || "0") - BigInt(pre?.uiTokenAmount.amount || "0");
+                    if (diff > 0) treasuryReceived += diff;
                 }
-
-                // 2. Verify Sender actually paid the funds
                 for (const pre of preTokenBalances) {
                     if (!ACCEPTED_MINTS.has(pre.mint)) continue;
                     if (pre.owner !== walletAddress) continue;
-
                     const post = postTokenBalances.find(p => p.accountIndex === pre.accountIndex);
-                    const preAmount  = BigInt(pre.uiTokenAmount.amount || "0");
-                    const postAmount = BigInt(post?.uiTokenAmount.amount || "0");
-                    const change     = preAmount - postAmount; // How much they lost
-
-                    if (change > BigInt(0)) {
-                        senderPaid += change;
-                    }
+                    const diff = BigInt(pre.uiTokenAmount.amount || "0") - BigInt(post?.uiTokenAmount.amount || "0");
+                    if (diff > 0) senderPaid += diff;
                 }
-
-                // Validation logic:
-                // We need both the sender to have paid enough AND the treasury to have received enough.
                 const expected = expectedAmountRaw as bigint;
-                
-                if (treasuryReceived >= expected && senderPaid >= expected) {
-                    validTransfer = true;
-                } else if (treasuryReceived > BigInt(0)) {
-                    const got  = (Number(treasuryReceived) / 1_000_000).toFixed(2);
-                    const need = (Number(expected) / 1_000_000).toFixed(2);
-                    throw new Error(`Incorrect USDC amount. Expected ${need} but found ${got} received by treasury.`);
-                }
+                if (treasuryReceived >= expected && senderPaid >= expected) validTransfer = true;
             }
 
-            if (!validTransfer) {
-                const currency = isSolTest ? "SOL" : "USDC";
-                throw new Error(`No ${currency} payment to the treasury wallet was found in this transaction.`);
+            if (!validTransfer) throw new Error("Payment not found or insufficient.");
+
+            const updateData: any = {
+                name:             profileName || walletAddress,
+                website:          website  || null,
+                social_link:      socials  || null,
+                tx_signature:     txSignature,
+                sender_wallet:    senderKey,
+                amount_paid:      displayPrice,
+                billing_cycle:    billingCycle || null,
+                rejection_reason: null,
+                reviewed_at:      null,
+                updated_at:       new Date().toISOString(),
+            };
+
+            if (existing?.status === "verified") {
+                updateData.pending_upgrade_status = "pending";
+                updateData.pending_upgrade_type = type;
+            } else {
+                updateData.type = type;
+                updateData.status = "pending";
             }
 
-            // ── SUCCESS: Set status to 'pending' ─────────────────────────────────
-            const now = new Date().toISOString();
-            const { error: updateErr } = await supabase
+            const { error: finalError } = await supabase
                 .from("organization_verifications")
-                .update({
-                    type,
-                    name:             profileName || walletAddress,
-                    website:          website  || null,
-                    social_link:      socials  || null,
-                    status:           "pending",
-                    tx_signature:     txSignature,
-                    sender_wallet:    senderKey,
-                    amount_paid:      displayPrice,
-                    billing_cycle:    billingCycle || null,
-                    rejection_reason: null,
-                    reviewed_at:      null,
-                    updated_at:       now,
-                })
+                .update(updateData)
                 .eq("id", lockRecordId);
 
-            if (updateErr) {
-                throw new Error(`Database error: ${updateErr.message}`);
-            }
-
-            console.log(`[TEST-MONITOR] Validation SUCCESS. Record ${lockRecordId} set to 'pending'.`);
+            if (finalError) throw new Error(`Database error: ${finalError.message}`);
 
             return NextResponse.json({ ok: true });
 
         } catch (err: any) {
             console.error("[validate-payment] Validation failure:", err);
-
-            // ── ROLLBACK: Revert the lock ──────────────────────────────────────
             if (existing) {
-                // Return to previous status (likely 'rejected') and clear the failed signature lock
-                await supabase
-                    .from("organization_verifications")
-                    .update({ 
-                        status: existing.status, 
-                        tx_signature: null,
-                        updated_at: new Date().toISOString() 
-                    })
-                    .eq("id", existing.id);
-            } else if (lockRecordId) {
-                // New record that failed → delete the lock record entirely.
-                await supabase
-                    .from("organization_verifications")
-                    .delete()
-                    .eq("id", lockRecordId);
-            }
+                const rollbackProps: any = { 
+                    tx_signature: null,
+                    updated_at: new Date().toISOString() 
+                };
+                if (existing.status === "verified") rollbackProps.pending_upgrade_status = null;
+                else rollbackProps.status = existing.status;
 
+                await supabase.from("organization_verifications").update(rollbackProps).eq("id", existing.id);
+            } else if (lockRecordId) {
+                await supabase.from("organization_verifications").delete().eq("id", lockRecordId);
+            }
             return NextResponse.json({ error: err.message || "Payment verification failed." }, { status: 400 });
         }
-
     } catch (err: any) {
         console.error("Payment validation error:", err);
-        return NextResponse.json({ error: "Server error. Please try again." }, { status: 500 });
+        return NextResponse.json({ error: "Server error." }, { status: 500 });
     }
 }
-
