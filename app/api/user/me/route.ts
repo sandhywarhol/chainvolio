@@ -139,7 +139,7 @@ export async function GET(request: Request) {
                 // Re-fetch to apply immediately in this response
                 const { data: newOrgData } = await supabase
                     .from("organization_verifications")
-                    .select("id, status, type, expires_at, rejection_reason, verifier_tier")
+                    .select("id, status, type, expires_at, rejection_reason, verifier_tier, pending_upgrade_type, pending_upgrade_status, verification_source")
                     .eq("wallet_address", wallet)
                     .maybeSingle();
                     
