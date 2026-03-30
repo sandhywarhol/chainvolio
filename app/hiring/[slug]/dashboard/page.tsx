@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
-import { generateHiringReport, generateHiringCSV } from "@/lib/report-generator";
+import { generateHiringReport } from "@/lib/report-generator";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -513,13 +513,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         setToast({ message: "Generating Hiring Intelligence Report...", type: "success" });
         
         try {
-            // 1. Generate PDF (Primary)
+            // Generate PDF Intelligence Report
             await generateHiringReport(data);
             
-            // 2. Generate CSV (Raw Data)
-            generateHiringCSV(data);
-            
-            setToast({ message: "Reports generated successfully", type: "success" });
+            setToast({ message: "Report generated successfully", type: "success" });
         } catch (err) {
             console.error("Report generation failed:", err);
             setToast({ message: "Failed to generate report", type: "error" });

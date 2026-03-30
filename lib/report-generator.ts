@@ -113,26 +113,28 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     const topCandidates = sortedCandidates.slice(0, 5);
     
     const shortlistData = topCandidates.map((c, i) => {
-        let decision = "Technical Screening Required";
+        let decision = "Technical Screening";
         let reason = "Strong volume, requires skills validation.";
         
         if (c.signalScore >= 75 && c.isVerified) {
             decision = "Proceed to Interview";
             reason = "High on-chain credibility and strong attestation backing.";
         } else if (c.signalScore < 30) {
-            decision = "Monitor / Low Priority";
+            decision = "Monitor";
             reason = "Limited cryptographically verifiable history.";
         } else if (c.isVerified) {
             decision = "Proceed to Interview";
             reason = "Verified professional standing with confirmed history.";
         } else if (c.powCount > 8) {
-            decision = "Technical Screening Required";
+            decision = "Technical Screening";
             reason = "Exceptional proof-of-work volume but unverified identity.";
         }
         
         return [
             (i + 1).toString(),
             c.displayName || c.wallet.slice(0, 8),
+            c.verificationTier || "None",
+            `${c.signalScore}/100`,
             decision,
             reason
         ];
@@ -140,13 +142,13 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
 
     autoTable(doc, {
         startY: y + 8,
-        head: [['Rank', 'Candidate', 'Decision', 'Decision Rationale']],
+        head: [['Rank', 'Candidate', 'Tier', 'Score', 'Decision', 'Decision Rationale']],
         body: shortlistData,
         theme: 'striped',
         headStyles: { fillColor: [16, 185, 129] }, // emerald-500
         styles: { fontSize: 8, cellPadding: 3 },
         columnStyles: {
-            2: { fontStyle: 'bold' }
+            4: { fontStyle: 'bold' }
         },
         margin: { left: 15, right: 15 }
     });
@@ -203,7 +205,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
 
     autoTable(doc, {
         startY: y + 8,
-        head: [['Name', 'Tier', 'Signal', 'Verification Score', 'Attest. Ratio', 'Proofs', 'Attest.']],
+        head: [['Name', 'Reputation Tier', 'Strength', 'Verification Score', 'Attest. Ratio', 'Proofs', 'Attest.']],
         body: breakdownData,
         theme: 'grid',
         headStyles: { fillColor: [51, 65, 85] },
@@ -271,32 +273,4 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     // --- Finalize PDF ---
     const fileName = `ChainVolio_Report_${collection.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
-};
-
-export const generateHiringCSV = (data: { collection: any; candidates: any[] }) => {
-    const { collection, candidates } = data;
-    const headers = ["Wallet", "Display Name", "CV ID", "Tier", "Signal Score", "Signal Strength", "Proof Count", "Attestation Count", "Status", "Notes", "Submitted At"];
-    const rows = candidates.map(c => [
-        c.wallet,
-        c.displayName || "Anonymous",
-        c.cardNumber || "",
-        c.verificationTier || "unverified",
-        c.signalScore || 0,
-        c.signalStrength || "Low",
-        c.powCount,
-        c.attestedCount,
-        c.recruiterStatus || "Applied",
-        `"${(c.recruiterNotes || "").replace(/"/g, '""')}"`,
-        c.submittedAt
-    ]);
-
-    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `ChainVolio_Data_${collection.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 };
