@@ -22,7 +22,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   );
 
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    () => [], // Using standard wallet detection instead of hardcoded legacy adapters
     []
   );
 

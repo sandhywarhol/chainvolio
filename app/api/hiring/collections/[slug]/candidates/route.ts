@@ -50,7 +50,8 @@ export async function GET(
             "view_dashboard", // Using specific view action that allows session-like reuse
             nonce,
             parseInt(timestamp),
-            signature
+            signature,
+            slug // Pass the context parameter so the signed message matches
         );
 
         if (!isValid) {

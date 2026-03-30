@@ -267,11 +267,47 @@ export async function GET(request: Request) {
   if (!data) return NextResponse.json(null);
 
   // 2. Fetch verification status
-  const { data: orgData } = await supabase
+  let { data: orgData } = await supabase
     .from("organization_verifications")
-    .select("status, verifier_tier, type, rejection_reason, expires_at")
+    .select("status, verifier_tier, type, rejection_reason, expires_at, id")
     .eq("wallet_address", wallet)
     .maybeSingle();
+
+  // --- Merit-based Builder Auto-Verification ---
+  const { count: powCount } = await supabase
+    .from("receipts")
+    .select("*", { count: 'exact', head: true })
+    .eq("wallet_address", wallet)
+    .not("title", "is", null)
+    .neq("title", "");
+
+  const hasRequiredProfile = !!data?.display_name;
+  const meetsBuilderCriteria = hasRequiredProfile && (powCount || 0) >= 1;
+
+  if (meetsBuilderCriteria) {
+      const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');
+      if (canAutoVerify) {
+          const upsertData = {
+              wallet_address: wallet,
+              type: 'Builder',
+              status: 'verified',
+              name: data?.display_name || wallet,
+          };
+          if (orgData?.id) {
+              await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
+          } else {
+              await supabase.from("organization_verifications").insert(upsertData);
+          }
+          // Re-fetch
+          const { data: newOrgData } = await supabase
+              .from("organization_verifications")
+              .select("status, verifier_tier, type, rejection_reason, expires_at, id")
+              .eq("wallet_address", wallet)
+              .maybeSingle();
+          orgData = newOrgData;
+      }
+  }
+  // ---------------------------------------------
 
   const now = new Date();
   const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;

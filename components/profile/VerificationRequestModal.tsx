@@ -34,12 +34,12 @@ const TIERS = [
         colorKey: "emerald" as CK,
         Icon: Code2,
         label: "Builder",
-        desc: "Developers, designers & Web3 contributors.",
-        price: "10 USDC",
-        billing: "One-time unlock",
+        desc: "Earn verification by completing your profile and adding at least 1 proof of work.",
+        price: "Free",
+        billing: "Earn via profile",
         authority: "Builder Contributor",
         attestationLimit: 10,
-        button: "Unlock Verification",
+        button: "Earn Verification",
         attestationPower: 1,
         popular: true,
         benefits: [
@@ -290,6 +290,14 @@ export function VerificationRequestModal({
 
     const handleSelectTier = async (tierId: string) => {
         setError(null);
+        
+        // ── Builder Tier → redirect to profile completion ───────────────────
+        if (tierId === "Builder") {
+            onClose();
+            window.location.href = "/dashboard";
+            return;
+        }
+
         const pricing = TIER_PRICES[tierId];
 
         // ── Free tier (Public Figure) → submit directly ─────────────────────

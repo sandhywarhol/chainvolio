@@ -32,11 +32,58 @@ export async function GET(request: Request) {
         }
 
         // 2. Fetch Verification Status
-        const { data: orgData } = await supabase
+        let { data: orgData } = await supabase
             .from("organization_verifications")
             .select("id, status, type, expires_at, rejection_reason, verifier_tier")
             .eq("wallet_address", wallet)
             .maybeSingle();
+
+        // --- Merit-based Builder Auto-Verification ---
+        // 1. Proof of work count (valid entries only)
+        const { count: powCount } = await supabase
+            .from("receipts")
+            .select("*", { count: 'exact', head: true })
+            .eq("wallet_address", wallet)
+            .not("title", "is", null)
+            .neq("title", "");
+
+        // 2. Profile completion criteria for Builder
+        const hasRequiredProfile = !!profile?.display_name;
+        const meetsBuilderCriteria = hasRequiredProfile && (powCount || 0) >= 1;
+
+        // 3. Auto-verify if they meet criteria AND are not already verified in another tier
+        if (meetsBuilderCriteria) {
+            const isAlreadyVerified = orgData?.status === 'verified';
+            // If pending/rejected for Builder, OR no record at all, verify them.
+            // Do NOT overwrite pending 'Company', 'Community', or 'Figure' requests unless desired.
+            // To be safe, only apply if no orgData or if it's currently Builder but not verified.
+            const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');
+            
+            if (canAutoVerify) {
+                const upsertData = {
+                    wallet_address: wallet,
+                    type: 'Builder',
+                    status: 'verified',
+                    name: profile?.display_name || wallet,
+                };
+                
+                if (orgData?.id) {
+                    await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
+                } else {
+                    await supabase.from("organization_verifications").insert(upsertData);
+                }
+                
+                // Re-fetch to apply immediately in this response
+                const { data: newOrgData } = await supabase
+                    .from("organization_verifications")
+                    .select("id, status, type, expires_at, rejection_reason, verifier_tier")
+                    .eq("wallet_address", wallet)
+                    .maybeSingle();
+                    
+                orgData = newOrgData;
+            }
+        }
+        // ---------------------------------------------
 
         const now = new Date();
         const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
