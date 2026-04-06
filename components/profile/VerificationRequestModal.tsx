@@ -21,9 +21,9 @@ type VerificationRequestModalProps = {
 // ─── Tier color palette ────────────────────────────────────────────────────
 const C = {
     emerald: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", bar: "bg-emerald-500", hex: "#10b981" },
-    pink:    { text: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/20",    bar: "bg-pink-500",    hex: "#ec4899" },
-    blue:    { text: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20",    bar: "bg-blue-500",    hex: "#3b82f6" },
-    amber:   { text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20",   bar: "bg-amber-500",   hex: "#f59e0b" },
+    pink: { text: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20", bar: "bg-pink-500", hex: "#ec4899" },
+    blue: { text: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", bar: "bg-blue-500", hex: "#3b82f6" },
+    amber: { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", bar: "bg-amber-500", hex: "#f59e0b" },
 } as const;
 type CK = keyof typeof C;
 
@@ -113,16 +113,16 @@ type TierPricing = number | { monthly: number; yearly: number } | null;
 // In SOL_TEST mode use ultra-low SOL amounts; in USDC_PROD use real USDC amounts.
 const TIER_PRICES: Record<string, TierPricing> = IS_SOL_TEST
     ? {
-        Builder:   SOL_TEST_PRICES.Builder.oneTime!,
-        Figure:    null,
+        Builder: SOL_TEST_PRICES.Builder.oneTime!,
+        Figure: null,
         Community: { monthly: SOL_TEST_PRICES.Community.monthly!, yearly: SOL_TEST_PRICES.Community.yearly! },
-        Company:   { monthly: SOL_TEST_PRICES.Company.monthly!,   yearly: SOL_TEST_PRICES.Company.yearly!   },
+        Company: { monthly: SOL_TEST_PRICES.Company.monthly!, yearly: SOL_TEST_PRICES.Company.yearly! },
     }
     : {
-        Builder:   10,
-        Figure:    null,
-        Community: { monthly: 29,  yearly: 290  },
-        Company:   { monthly: 99,  yearly: 990  },
+        Builder: 10,
+        Figure: null,
+        Community: { monthly: 29, yearly: 290 },
+        Company: { monthly: 99, yearly: 990 },
     };
 
 const isSubscriptionTier = (id: string) =>
@@ -130,18 +130,18 @@ const isSubscriptionTier = (id: string) =>
 
 // ─── Reverse mapping for renewals ──────────────────────────────────────────
 const REVERSE_TIER_MAP: Record<string, string> = {
-    "Builder":               "Builder",
-    "Public Figure":         "Figure",
-    "Community / DAO":       "Community",
+    "Builder": "Builder",
+    "Public Figure": "Figure",
+    "Community / DAO": "Community",
     "Company / Organization": "Company",
 };
 
 // ─── Tier hierarchy rankings ──────────────────────────────────────────────
-const TIER_RANK: Record<string, number> = { 
-    "Builder": 1, 
-    "Figure": 2, 
-    "Community": 3, 
-    "Company": 4 
+const TIER_RANK: Record<string, number> = {
+    "Builder": 1,
+    "Figure": 2,
+    "Community": 3,
+    "Company": 4
 };
 
 // ─── Attestation power strips ──────────────────────────────────────────────
@@ -179,9 +179,8 @@ function TierCard({
 
     return (
         <div
-            className={`relative flex flex-col rounded-2xl bg-black/30 border border-white/10 overflow-hidden transition-all duration-300 group backdrop-blur-sm ${
-                isUnavailable ? 'opacity-50 grayscale-[0.8]' : 'hover:border-white/20 hover:bg-black/40'
-            }`}
+            className={`relative flex flex-col rounded-2xl bg-black/30 border border-white/10 overflow-hidden transition-all duration-300 group backdrop-blur-sm ${isUnavailable ? 'opacity-50 grayscale-[0.8]' : 'hover:border-white/20 hover:bg-black/40'
+                }`}
             style={{ boxShadow: isUnavailable ? 'none' : `0 1px 32px ${hex}08` }}
             onMouseEnter={e => { if (!isUnavailable) e.currentTarget.style.boxShadow = `0 4px 32px ${hex}20, 0 0 0 1px ${hex}18`; }}
             onMouseLeave={e => { if (!isUnavailable) e.currentTarget.style.boxShadow = `0 1px 32px ${hex}08`; }}
@@ -265,11 +264,10 @@ function TierCard({
                     type="button"
                     disabled={isLoading || isUnavailable}
                     onClick={() => onSelect(tier.id)}
-                    className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isCurrent 
-                            ? "bg-white/5 text-white/40 border border-white/10" 
+                    className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${isCurrent
+                            ? "bg-white/5 text-white/40 border border-white/10"
                             : "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg hover:shadow-emerald-500/25"
-                    }`}
+                        }`}
                 >
                     {isLoading ? "Loading..." : isCurrent ? "Active" : isUnavailable ? "Locked" : "Select Tier"}
                 </button>
@@ -291,9 +289,9 @@ export function VerificationRequestModal({
     website,
     socials,
 }: VerificationRequestModalProps) {
-    const [loading,       setLoading]       = useState(false);
-    const [error,         setError]         = useState<string | null>(null);
-    const [selectedTier,  setSelectedTier]  = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedTier, setSelectedTier] = useState<string | null>(null);
     const [selectedBilling, setSelectedBilling] = useState<{ cycle: BillingCycle; price: number } | null>(null);
 
     // ── Renewal Logic: Auto-select current tier ──
@@ -307,12 +305,12 @@ export function VerificationRequestModal({
     }, [isRenewal, currentTier]);
 
     // Derived tier objects
-    const activeTier    = selectedTier ? TIERS.find(t => t.id === selectedTier) ?? null : null;
+    const activeTier = selectedTier ? TIERS.find(t => t.id === selectedTier) ?? null : null;
     const activePricing = selectedTier ? TIER_PRICES[selectedTier] : undefined;
 
     const handleSelectTier = async (tierId: string) => {
         setError(null);
-        
+
         // ── Builder Tier → redirect to profile completion ───────────────────
         if (tierId === "Builder") {
             onClose();
@@ -336,7 +334,7 @@ export function VerificationRequestModal({
                 });
                 const data = await res.json();
                 if (!res.ok) { setError(data.error || "Something went wrong."); }
-                else         { onSuccess(); }
+                else { onSuccess(); }
             } catch (err: any) {
                 setError(err.message || "Network error.");
             } finally {
@@ -365,19 +363,19 @@ export function VerificationRequestModal({
                         <source src="/box%20navigation.mp4" type="video/mp4" />
                     </video>
                     <div className="relative z-10 p-8 text-center text-white bg-black/50 backdrop-blur-sm">
-                    <button onClick={onClose} className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all">
-                        <X className="w-4 h-4" />
-                    </button>
-                    <div className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mx-auto mb-5">
-                        <Clock className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h2 className="text-lg font-bold mb-2">Review In Progress</h2>
-                    <p className="text-white/35 mb-6 text-sm leading-relaxed">
-                        Your verification request is under review. We'll update your status once it's processed by our team.
-                    </p>
-                    <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-colors border border-white/10 text-sm">
-                        Got it
-                    </button>
+                        <button onClick={onClose} className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all">
+                            <X className="w-4 h-4" />
+                        </button>
+                        <div className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mx-auto mb-5">
+                            <Clock className="w-8 h-8 text-yellow-400" />
+                        </div>
+                        <h2 className="text-lg font-bold mb-2">Review In Progress</h2>
+                        <p className="text-white/35 mb-6 text-sm leading-relaxed">
+                            Your verification request is under review. We'll update your status once it's processed by our team.
+                        </p>
+                        <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-colors border border-white/10 text-sm">
+                            Got it
+                        </button>
                     </div>
                 </div>
             </div>
@@ -398,14 +396,14 @@ export function VerificationRequestModal({
                         <source src="/box%20navigation.mp4" type="video/mp4" />
                     </video>
                     <div className="relative z-10 p-8 text-center text-white bg-black/50 backdrop-blur-sm">
-                    <button onClick={onClose} className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all">
-                        <X className="w-4 h-4" />
-                    </button>
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-                        <ShieldCheck className="w-8 h-8 text-emerald-400" />
-                    </div>
-                    <h2 className="text-lg font-bold mb-2">Already Verified</h2>
-                    <p className="text-white/35 text-sm">Your profile is already fully verified on ChainVolio.</p>
+                        <button onClick={onClose} className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all">
+                            <X className="w-4 h-4" />
+                        </button>
+                        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+                            <ShieldCheck className="w-8 h-8 text-emerald-400" />
+                        </div>
+                        <h2 className="text-lg font-bold mb-2">Already Verified</h2>
+                        <p className="text-white/35 text-sm">Your profile is already fully verified on ChainVolio.</p>
                     </div>
                 </div>
             </div>
@@ -417,17 +415,17 @@ export function VerificationRequestModal({
 
     // Derived render flags
     const showSubscription = !!(activeTier && isSubscriptionTier(selectedTier || "") && !selectedBilling);
-    const showPayment      = !!(activeTier && (!isSubscriptionTier(selectedTier || "") || selectedBilling));
+    const showPayment = !!(activeTier && (!isSubscriptionTier(selectedTier || "") || selectedBilling));
 
     // Compute price for PaymentModal based on billing selection
-    let paymentPrice   = 0;
+    let paymentPrice = 0;
     let paymentBilling: BillingCycle | undefined;
     if (selectedTier) {
         const p = TIER_PRICES[selectedTier];
         if (typeof p === "number") {
             paymentPrice = p;
         } else if (selectedBilling) {
-            paymentPrice   = selectedBilling.price;
+            paymentPrice = selectedBilling.price;
             paymentBilling = selectedBilling.cycle;
         }
     }
@@ -441,8 +439,8 @@ export function VerificationRequestModal({
 
     // ── Main modal ──
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-            <div className={`relative border border-white/15 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 w-full ${modalWidth}`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
+            <div className={`relative border border-white/15 rounded-2xl shadow-2xl overflow-y-auto md:overflow-hidden max-h-[92vh] md:max-h-none transition-all duration-300 w-full ${modalWidth}`}>
                 {/* Video background */}
                 <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none">
                     <source src="/box%20navigation.mp4" type="video/mp4" />
@@ -451,130 +449,130 @@ export function VerificationRequestModal({
 
                 <div className="relative z-10 flex flex-col">
 
-                {/* Header — always visible */}
-                <div className="px-6 pt-5 pb-4 flex items-center justify-between border-b border-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                            <Shield className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-[14px] font-black text-white tracking-tight leading-tight">Verify Identity</h2>
-                                {currentStatus === "verified" && (
-                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-extrabold uppercase">
-                                        <ShieldCheck className="w-2.5 h-2.5" />
-                                        Current: {currentTier}
-                                    </div>
-                                )}
+                    {/* Header — always visible */}
+                    <div className="px-6 pt-5 pb-4 flex items-center justify-between border-b border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <Shield className="w-4 h-4 text-emerald-400" />
                             </div>
-                            <p className="text-[10px] text-white/30 leading-none mt-1">
-                                {showSubscription
-                                    ? `Select billing cycle for ${activeTier?.label}`
-                                    : showPayment
-                                        ? `Complete payment for ${activeTier?.label} verification`
-                                        : currentStatus === "verified" 
-                                            ? "Upgrade your verification to unlock more features"
-                                            : "Choose a verification tier to claim your badge and attestation authority."}
-                            </p>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="text-[14px] font-black text-white tracking-tight leading-tight">Verify Identity</h2>
+                                    {currentStatus === "verified" && (
+                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-extrabold uppercase">
+                                            <ShieldCheck className="w-2.5 h-2.5" />
+                                            Current: {currentTier}
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-[10px] text-white/30 leading-none mt-1">
+                                    {showSubscription
+                                        ? `Select billing cycle for ${activeTier?.label}`
+                                        : showPayment
+                                            ? `Complete payment for ${activeTier?.label} verification`
+                                            : currentStatus === "verified"
+                                                ? "Upgrade your verification to unlock more features"
+                                                : "Choose a verification tier to claim your badge and attestation authority."}
+                                </p>
+                            </div>
                         </div>
+                        <button
+                            onClick={onClose}
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all flex-shrink-0"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all flex-shrink-0"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
 
-                {/* ── Subscription billing picker ── */}
-                {showSubscription && activeTier && (() => {
-                    const p = TIER_PRICES[activeTier.id] as { monthly: number; yearly: number };
-                    return (
-                        <SubscriptionModal
+                    {/* ── Subscription billing picker ── */}
+                    {showSubscription && activeTier && (() => {
+                        const p = TIER_PRICES[activeTier.id] as { monthly: number; yearly: number };
+                        return (
+                            <SubscriptionModal
+                                tierId={activeTier.id}
+                                tierLabel={activeTier.label}
+                                colorKey={activeTier.colorKey}
+                                monthlyPrice={p.monthly}
+                                yearlyPrice={p.yearly}
+                                onBack={() => {
+                                    if (isRenewal) onClose();
+                                    else setSelectedTier(null);
+                                }}
+                                onSelectBilling={(cycle, price) => setSelectedBilling({ cycle, price })}
+                            />
+                        );
+                    })()}
+
+                    {/* ── Payment modal ── */}
+                    {showPayment && activeTier && (
+                        <PaymentModal
                             tierId={activeTier.id}
                             tierLabel={activeTier.label}
+                            price={paymentPrice}
+                            billingCycle={paymentBilling}
                             colorKey={activeTier.colorKey}
-                            monthlyPrice={p.monthly}
-                            yearlyPrice={p.yearly}
+                            walletAddress={walletAddress}
+                            profileName={profileName}
+                            website={website}
+                            socials={socials}
                             onBack={() => {
-                                if (isRenewal) onClose();
-                                else setSelectedTier(null);
+                                // Subscription tiers: back to billing picker; one-time: back to grid
+                                if (isRenewal) {
+                                    setSelectedBilling(null);
+                                } else if (isSubscriptionTier(activeTier.id)) {
+                                    setSelectedBilling(null);
+                                } else {
+                                    setSelectedTier(null);
+                                }
                             }}
-                            onSelectBilling={(cycle, price) => setSelectedBilling({ cycle, price })}
+                            onSuccess={onSuccess}
                         />
-                    );
-                })()}
+                    )}
 
-                {/* ── Payment modal ── */}
-                {showPayment && activeTier && (
-                    <PaymentModal
-                        tierId={activeTier.id}
-                        tierLabel={activeTier.label}
-                        price={paymentPrice}
-                        billingCycle={paymentBilling}
-                        colorKey={activeTier.colorKey}
-                        walletAddress={walletAddress}
-                        profileName={profileName}
-                        website={website}
-                        socials={socials}
-                        onBack={() => {
-                            // Subscription tiers: back to billing picker; one-time: back to grid
-                            if (isRenewal) {
-                                setSelectedBilling(null);
-                            } else if (isSubscriptionTier(activeTier.id)) {
-                                setSelectedBilling(null);
-                            } else {
-                                setSelectedTier(null);
-                            }
-                        }}
-                        onSuccess={onSuccess}
-                    />
-                )}
+                    {/* ── 4-card tier grid ── */}
+                    {!selectedTier && (
+                        <div className="p-6">
+                            {/* Rejected banner */}
+                            {isRejected && (
+                                <div className="mb-4 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-semibold flex items-center gap-2">
+                                    <span className="text-base">⚠️</span>
+                                    Your previous request was rejected. You may select a tier and resubmit.
+                                </div>
+                            )}
 
-                {/* ── 4-card tier grid ── */}
-                {!selectedTier && (
-                    <div className="p-6">
-                        {/* Rejected banner */}
-                        {isRejected && (
-                            <div className="mb-4 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-semibold flex items-center gap-2">
-                                <span className="text-base">⚠️</span>
-                                Your previous request was rejected. You may select a tier and resubmit.
+                            {/* Error */}
+                            {error && (
+                                <div className="mb-4 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-semibold">
+                                    {error}
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-y-6 md:gap-4">
+                                {TIERS.map((tier) => {
+                                    const currentId = REVERSE_TIER_MAP[currentTier || ""] || null;
+                                    const currentRank = TIER_RANK[currentId || ""] || 0;
+                                    const isSelected = currentId === tier.id && currentStatus === "verified";
+                                    const isLowerRank = TIER_RANK[tier.id] < currentRank;
+                                    const isUnavailable = isSelected || isLowerRank;
+
+                                    return (
+                                        <TierCard
+                                            key={tier.id}
+                                            tier={tier}
+                                            onSelect={handleSelectTier}
+                                            isLoading={loading && !selectedTier}
+                                            isUnavailable={isUnavailable}
+                                            isCurrent={isSelected}
+                                        />
+                                    );
+                                })}
                             </div>
-                        )}
 
-                        {/* Error */}
-                        {error && (
-                            <div className="mb-4 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-semibold">
-                                {error}
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-4 gap-4">
-                            {TIERS.map((tier) => {
-                                const currentId = REVERSE_TIER_MAP[currentTier || ""] || null;
-                                const currentRank = TIER_RANK[currentId || ""] || 0;
-                                const isSelected = currentId === tier.id && currentStatus === "verified";
-                                const isLowerRank = TIER_RANK[tier.id] < currentRank;
-                                const isUnavailable = isSelected || isLowerRank;
-
-                                return (
-                                    <TierCard
-                                        key={tier.id}
-                                        tier={tier}
-                                        onSelect={handleSelectTier}
-                                        isLoading={loading && !selectedTier}
-                                        isUnavailable={isUnavailable}
-                                        isCurrent={isSelected}
-                                    />
-                                );
-                            })}
+                            <p className="mt-4 text-center text-[10px] text-white/20">
+                                Each request is reviewed by the ChainVolio team before approval. Prices reflect platform access fees.
+                            </p>
                         </div>
-
-                        <p className="mt-4 text-center text-[10px] text-white/20">
-                            Each request is reviewed by the ChainVolio team before approval. Prices reflect platform access fees.
-                        </p>
-                    </div>
-                )}
+                    )}
 
                 </div> {/* end relative z-10 */}
             </div>
