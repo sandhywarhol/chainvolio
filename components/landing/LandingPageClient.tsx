@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -12,11 +13,13 @@ import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
 
 const SLIDES = [
-    { src: "/homepage/cv%20view.png?v=3", label: "Professional Profile" },
-    { src: "/homepage/dashboard.png?v=3", label: "Recruiter Dashboard" },
-    { src: "/homepage/edit%20profile.png?v=3", label: "Profile Customization" },
-    { src: "/homepage/link%20recruit.png?v=3", label: "Hiring Links" },
-    { src: "/homepage/proof%20of%20work.png?v=3", label: "Verifiable Work" },
+    { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile 2" },
+    { src: "/homepage/image%20slide%202/dashboard%202.png?v=2", label: "Recruiter Dashboard" },
+    { src: "/homepage/image%20slide%202/edit%20profile%202.png?v=2", label: "Profile Customization" },
+    { src: "/homepage/image%20slide%202/proof%20of%20work%202.png?v=2", label: "Verifiable Work" },
+    { src: "/homepage/image%20slide%202/apply.png?v=2", label: "Talent Application" },
+    { src: "/homepage/image%20slide%202/attestation.png?v=2", label: "On-chain Attestations" },
+    { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification Status" },
 ];
 
 const PARTNERS = [
@@ -147,11 +150,19 @@ export function LandingPageClient() {
                         </div>
                     </div>
 
-                    <div className="lg:w-[45%] w-full relative group" style={{ perspective: '2000px' }}>
-                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent), linear-gradient(to right, transparent, black 15%, black 85%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
+                    <div className="lg:w-[45%] w-full relative group lg:-mt-24" style={{ perspective: '2000px' }}>
+                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 95%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 95%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
                             {SLIDES.map((slide, index) => (
                                 <div key={slide.src} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"}`}>
-                                    <img src={slide.src} alt={slide.label} className="w-full h-full object-cover object-top opacity-80" />
+                                    <Image
+                                        src={slide.src}
+                                        alt={slide.label}
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 45vw"
+                                        className="object-cover object-top"
+                                        quality={100}
+                                        priority={index === 0}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -210,13 +221,15 @@ export function LandingPageClient() {
                     </div>
 
                     {/* Simple Mobile Slide */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
-                        <img 
-                            src={SLIDES[currentSlide].src} 
-                            alt={SLIDES[currentSlide].label} 
-                            className="w-full h-full object-cover object-top opacity-60 transition-opacity duration-500" 
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] -mt-12">
+                        <Image
+                            src={SLIDES[currentSlide].src}
+                            alt={SLIDES[currentSlide].label}
+                            fill
+                            className="object-cover object-top transition-opacity duration-500"
+                            quality={100}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
@@ -260,12 +273,12 @@ export function LandingPageClient() {
             </div>
 
             <CustomWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
-            
+
             {toast && (
-                <Toast 
-                    message={toast.message} 
-                    type={toast.type} 
-                    onClose={() => setToast(null)} 
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
                 />
             )}
 
@@ -560,228 +573,228 @@ export function LandingPageClient() {
                                     </div>
                                 </div>
                             )}
-                             {activeModal === 'screening' && (
-                                 <div className="space-y-16 py-4">
-                                     <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">Screening Protocol</h2><p className="text-white/40 text-sm max-w-md">Efficient evaluation of Web3 talent requires a shift from credentials to contributions.</p></div>
-                                     <div className="grid gap-12">
-                                         <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.2em] pt-1">01 Authority</h3><div className="space-y-3"><p className="text-sm text-white/90 font-medium">Prioritize attested history.</p><p className="text-xs text-white/40 leading-relaxed font-light">Focus on records verified by founders or collaborators. These represent social capital anchored in real output.</p></div></section>
-                                         <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start border-t border-white/5 pt-12"><h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.2em] pt-1">02 Substance</h3><div className="space-y-3"><p className="text-sm text-white/90 font-medium">Evaluate work, not titles.</p><p className="text-xs text-white/40 leading-relaxed font-light">Web3 roles are fluid. Look for high-frequency contributions and consistency across multiple milestones.</p></div></section>
-                                     </div>
+                            {activeModal === 'screening' && (
+                                <div className="space-y-16 py-4">
+                                    <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">Screening Protocol</h2><p className="text-white/40 text-sm max-w-md">Efficient evaluation of Web3 talent requires a shift from credentials to contributions.</p></div>
+                                    <div className="grid gap-12">
+                                        <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.2em] pt-1">01 Authority</h3><div className="space-y-3"><p className="text-sm text-white/90 font-medium">Prioritize attested history.</p><p className="text-xs text-white/40 leading-relaxed font-light">Focus on records verified by founders or collaborators. These represent social capital anchored in real output.</p></div></section>
+                                        <section className="grid md:grid-cols-[1fr,2fr] gap-8 items-start border-t border-white/5 pt-12"><h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.2em] pt-1">02 Substance</h3><div className="space-y-3"><p className="text-sm text-white/90 font-medium">Evaluate work, not titles.</p><p className="text-xs text-white/40 leading-relaxed font-light">Web3 roles are fluid. Look for high-frequency contributions and consistency across multiple milestones.</p></div></section>
+                                    </div>
 
-                                     {/* SIGNAL INTERPRETATION FRAMEWORK */}
-                                     <div className="space-y-8 pt-12 border-t border-white/5">
-                                         <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">SIGNAL INTERPRETATION FRAMEWORK</h3>
-                                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                             {/* 01 Authority Signal */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
-                                                 <div className="flex justify-between items-start">
-                                                     <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">01, Authority Signal (Trust Layer)</h4>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div className="space-y-3">
-                                                     <p className="text-[10px] text-white/40 leading-relaxed font-light">Prioritize attested history. Focus on records verified by founders, organizations, or collaborators.</p>
-                                                     <div className="pt-3 border-t border-white/5 space-y-2">
-                                                         <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
-                                                         <ul className="space-y-1">
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Authority rate</li>
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Institutional trust</li>
-                                                         </ul>
-                                                     </div>
-                                                 </div>
-                                             </div>
+                                    {/* SIGNAL INTERPRETATION FRAMEWORK */}
+                                    <div className="space-y-8 pt-12 border-t border-white/5">
+                                        <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">SIGNAL INTERPRETATION FRAMEWORK</h3>
+                                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {/* 01 Authority Signal */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">01, Authority Signal (Trust Layer)</h4>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-white/40 leading-relaxed font-light">Prioritize attested history. Focus on records verified by founders, organizations, or collaborators.</p>
+                                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                                        <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
+                                                        <ul className="space-y-1">
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Authority rate</li>
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Institutional trust</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                             {/* 02 Signal Density */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
-                                                 <div className="flex justify-between items-start">
-                                                     <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">02, Signal Density (Consistency)</h4>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div className="space-y-3">
-                                                     <p className="text-[10px] text-white/40 leading-relaxed font-light">Evaluate consistency of output. Look for multiple proofs and continuous activity over time.</p>
-                                                     <div className="pt-3 border-t border-white/5 space-y-2">
-                                                         <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
-                                                         <ul className="space-y-1">
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Signal density</li>
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Proof count</li>
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Timeline activity</li>
-                                                         </ul>
-                                                     </div>
-                                                 </div>
-                                             </div>
+                                            {/* 02 Signal Density */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">02, Signal Density (Consistency)</h4>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-white/40 leading-relaxed font-light">Evaluate consistency of output. Look for multiple proofs and continuous activity over time.</p>
+                                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                                        <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
+                                                        <ul className="space-y-1">
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Signal density</li>
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Proof count</li>
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Timeline activity</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                             {/* 03 Portfolio Authority */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
-                                                 <div className="flex justify-between items-start">
-                                                     <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">03, Portfolio Authority (Depth)</h4>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div className="space-y-3">
-                                                     <p className="text-[10px] text-white/40 leading-relaxed font-light">Assess quality and credibility of work. Distinguish between attested and non-attested outputs.</p>
-                                                     <div className="pt-3 border-t border-white/5 space-y-2">
-                                                         <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
-                                                         <ul className="space-y-1">
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Portfolio authority</li>
-                                                         </ul>
-                                                     </div>
-                                                 </div>
-                                             </div>
+                                            {/* 03 Portfolio Authority */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">03, Portfolio Authority (Depth)</h4>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-white/40 leading-relaxed font-light">Assess quality and credibility of work. Distinguish between attested and non-attested outputs.</p>
+                                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                                        <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
+                                                        <ul className="space-y-1">
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Portfolio authority</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                             {/* 04 Strategic Fit */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
-                                                 <div className="flex justify-between items-start">
-                                                     <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">04, Strategic Fit (Context Match)</h4>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div className="space-y-3">
-                                                     <p className="text-[10px] text-white/40 leading-relaxed font-light">Match candidate signals with role requirements and contribution relevance.</p>
-                                                     <div className="pt-3 border-t border-white/5 space-y-2">
-                                                         <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
-                                                         <ul className="space-y-1">
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Strategic fit</li>
-                                                         </ul>
-                                                     </div>
-                                                 </div>
-                                             </div>
+                                            {/* 04 Strategic Fit */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">04, Strategic Fit (Context Match)</h4>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-white/40 leading-relaxed font-light">Match candidate signals with role requirements and contribution relevance.</p>
+                                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                                        <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
+                                                        <ul className="space-y-1">
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Strategic fit</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                             {/* 05 Confidence Score */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
-                                                 <div className="flex justify-between items-start">
-                                                     <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">05, Confidence Score (Decision Layer)</h4>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div className="space-y-3">
-                                                     <p className="text-[10px] text-white/40 leading-relaxed font-light">Use combined signals to determine hiring confidence (High / Medium / Low).</p>
-                                                     <div className="pt-3 border-t border-white/5 space-y-2">
-                                                         <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
-                                                         <ul className="space-y-1">
-                                                             <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Signal confidence indicator</li>
-                                                         </ul>
-                                                     </div>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                     </div>
+                                            {/* 05 Confidence Score */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className="text-[10px] font-bold uppercase text-white/90 leading-tight">05, Confidence Score (Decision Layer)</h4>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-[10px] text-white/40 leading-relaxed font-light">Use combined signals to determine hiring confidence (High / Medium / Low).</p>
+                                                    <div className="pt-3 border-t border-white/5 space-y-2">
+                                                        <p className="text-[8px] text-emerald-400/40 uppercase tracking-widest font-black">Map to:</p>
+                                                        <ul className="space-y-1">
+                                                            <li className="text-[9px] text-white/50 flex items-center gap-2"><span className="w-1 h-1 bg-white/10 rounded-full" /> Signal confidence indicator</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                     <div className="pt-8 border-t border-white/5 flex justify-end">
-                                         <Link href="/guides/screening" className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/60 hover:text-emerald-400 flex items-center gap-2 group transition-colors">
-                                             View full guide
-                                             <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                                         </Link>
-                                     </div>
-                                 </div>
-                             )}
-                             {activeModal === 'attestation' && (
-                                 <div className="space-y-16 py-4">
-                                     <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">Proof Standards</h2><p className="text-white/40 text-sm max-w-md">Cryptographic validation of professional experience in a decentralized market.</p></div>
-                                     <div className="grid md:grid-cols-2 gap-16">
-                                         <div className="space-y-8"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Attestation Primitive</h3><p className="text-sm text-white/70 leading-relaxed font-light">An attestation is a work record confirmed by a secondary party.</p></div>
-                                         <div className="space-y-8"><h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.3em]">Recruiter Insights</h3><div className="p-8 bg-white/[0.02] border border-white/5 rounded-sm space-y-8"><div className="flex justify-between items-end border-b border-white/5 pb-4"><div className="space-y-1"><span className="text-[8px] text-white/20 uppercase tracking-widest">Signal Type</span><p className="text-xs text-white/90">Attested Work</p></div></div><p className="text-xs text-white/40 leading-relaxed italic font-light">"Verification reduces screening noise."</p></div></div>
-                                     </div>
+                                    <div className="pt-8 border-t border-white/5 flex justify-end">
+                                        <Link href="/guides/screening" className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/60 hover:text-emerald-400 flex items-center gap-2 group transition-colors">
+                                            View full guide
+                                            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                            {activeModal === 'attestation' && (
+                                <div className="space-y-16 py-4">
+                                    <div className="space-y-4"><h2 className="text-3xl font-bold tracking-tight text-white uppercase">Proof Standards</h2><p className="text-white/40 text-sm max-w-md">Cryptographic validation of professional experience in a decentralized market.</p></div>
+                                    <div className="grid md:grid-cols-2 gap-16">
+                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Attestation Primitive</h3><p className="text-sm text-white/70 leading-relaxed font-light">An attestation is a work record confirmed by a secondary party.</p></div>
+                                        <div className="space-y-8"><h3 className="text-[10px] font-bold text-blue-400/60 uppercase tracking-[0.3em]">Recruiter Insights</h3><div className="p-8 bg-white/[0.02] border border-white/5 rounded-sm space-y-8"><div className="flex justify-between items-end border-b border-white/5 pb-4"><div className="space-y-1"><span className="text-[8px] text-white/20 uppercase tracking-widest">Signal Type</span><p className="text-xs text-white/90">Attested Work</p></div></div><p className="text-xs text-white/40 leading-relaxed italic font-light">"Verification reduces screening noise."</p></div></div>
+                                    </div>
 
-                                     {/* HOW ATTESTATION WORKS */}
-                                     <div className="space-y-8 pt-12 border-t border-white/5">
-                                         <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">HOW ATTESTATION WORKS</h3>
-                                         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-                                             {/* Step 1 */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
-                                                 <div className="flex justify-between items-center">
-                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 01</span>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div>
-                                                     <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Create Proof of Work</h4>
-                                                     <p className="text-[9px] text-white/40 leading-relaxed font-light">Candidate creates a verifiable work record inside ChainVolio.</p>
-                                                 </div>
-                                             </div>
+                                    {/* HOW ATTESTATION WORKS */}
+                                    <div className="space-y-8 pt-12 border-t border-white/5">
+                                        <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">HOW ATTESTATION WORKS</h3>
+                                        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+                                            {/* Step 1 */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 01</span>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Create Proof of Work</h4>
+                                                    <p className="text-[9px] text-white/40 leading-relaxed font-light">Candidate creates a verifiable work record inside ChainVolio.</p>
+                                                </div>
+                                            </div>
 
-                                             {/* Step 2 */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
-                                                 <div className="flex justify-between items-center">
-                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 02</span>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div>
-                                                     <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Generate Link</h4>
-                                                     <p className="text-[9px] text-white/40 leading-relaxed font-light">System generates a unique, shareable verification link.</p>
-                                                 </div>
-                                             </div>
+                                            {/* Step 2 */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 02</span>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Generate Link</h4>
+                                                    <p className="text-[9px] text-white/40 leading-relaxed font-light">System generates a unique, shareable verification link.</p>
+                                                </div>
+                                            </div>
 
-                                             {/* Step 3 */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
-                                                 <div className="flex justify-between items-center">
-                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 03</span>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div>
-                                                     <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Send to Verifier</h4>
-                                                     <p className="text-[9px] text-white/40 leading-relaxed font-light">Link sent to a founder, client, or manager.</p>
-                                                 </div>
-                                             </div>
+                                            {/* Step 3 */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 03</span>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Send to Verifier</h4>
+                                                    <p className="text-[9px] text-white/40 leading-relaxed font-light">Link sent to a founder, client, or manager.</p>
+                                                </div>
+                                            </div>
 
-                                             {/* Step 4 */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
-                                                 <div className="flex justify-between items-center">
-                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 04</span>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div>
-                                                     <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Attestation Issued</h4>
-                                                     <p className="text-[9px] text-white/40 leading-relaxed font-light">Verifier reviews and confirms the work signal.</p>
-                                                 </div>
-                                             </div>
+                                            {/* Step 4 */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 04</span>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Attestation Issued</h4>
+                                                    <p className="text-[9px] text-white/40 leading-relaxed font-light">Verifier reviews and confirms the work signal.</p>
+                                                </div>
+                                            </div>
 
-                                             {/* Step 5 */}
-                                             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
-                                                 <div className="flex justify-between items-center">
-                                                     <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 05</span>
-                                                     <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
-                                                 </div>
-                                                 <div>
-                                                     <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Anchored On-Chain</h4>
-                                                     <p className="text-[9px] text-white/40 leading-relaxed font-light">Permanently recorded on-chain as verifiable proof.</p>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                     </div>
+                                            {/* Step 5 */}
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Step 05</span>
+                                                    <div className="w-1 h-1 bg-emerald-500/40 rounded-full" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[9px] font-black uppercase text-white/90 mb-1">Anchored On-Chain</h4>
+                                                    <p className="text-[9px] text-white/40 leading-relaxed font-light">Permanently recorded on-chain as verifiable proof.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                     {/* SECONDARY SECTIONS */}
-                                     <div className="grid md:grid-cols-2 gap-16 pt-12 border-t border-white/5">
-                                         <div className="space-y-6">
-                                             <h3 className="text-[10px] font-bold text-teal-400/60 uppercase tracking-[0.3em]">VERIFICATION ECONOMICS</h3>
-                                             <div className="space-y-4">
-                                                 <div className="flex gap-4">
-                                                     <span className="text-teal-400/40 font-bold text-[10px]">/</span>
-                                                     <p className="text-[10px] text-white/50 leading-relaxed font-light">Attestations are paid by the verifier (not the candidate), creating a strong signal of trust and commitment.</p>
-                                                 </div>
-                                                 <div className="flex gap-4">
-                                                     <span className="text-teal-400/40 font-bold text-[10px]">/</span>
-                                                     <p className="text-[10px] text-white/50 leading-relaxed font-light">This economic model ensures attestations are meaningful and eliminates inflationary or spam endorsements.</p>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                         <div className="space-y-6">
-                                             <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">WHY IT MATTERS</h3>
-                                             <div className="space-y-4">
-                                                 <div className="flex gap-4">
-                                                     <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
-                                                     <p className="text-[10px] text-white/50 leading-relaxed font-light">Eliminates fake portfolios by anchoring outputs to a cryptographic professional audit trail.</p>
-                                                 </div>
-                                                 <div className="flex gap-4">
-                                                     <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
-                                                     <p className="text-[10px] text-white/50 leading-relaxed font-light">Converts unverified claims into verifiable professional signals, enabling trust without narrative CV dependency.</p>
-                                                 </div>
-                                             </div>
-                                         </div>
-                                     </div>
+                                    {/* SECONDARY SECTIONS */}
+                                    <div className="grid md:grid-cols-2 gap-16 pt-12 border-t border-white/5">
+                                        <div className="space-y-6">
+                                            <h3 className="text-[10px] font-bold text-teal-400/60 uppercase tracking-[0.3em]">VERIFICATION ECONOMICS</h3>
+                                            <div className="space-y-4">
+                                                <div className="flex gap-4">
+                                                    <span className="text-teal-400/40 font-bold text-[10px]">/</span>
+                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">Attestations are paid by the verifier (not the candidate), creating a strong signal of trust and commitment.</p>
+                                                </div>
+                                                <div className="flex gap-4">
+                                                    <span className="text-teal-400/40 font-bold text-[10px]">/</span>
+                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">This economic model ensures attestations are meaningful and eliminates inflationary or spam endorsements.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-6">
+                                            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">WHY IT MATTERS</h3>
+                                            <div className="space-y-4">
+                                                <div className="flex gap-4">
+                                                    <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
+                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">Eliminates fake portfolios by anchoring outputs to a cryptographic professional audit trail.</p>
+                                                </div>
+                                                <div className="flex gap-4">
+                                                    <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
+                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">Converts unverified claims into verifiable professional signals, enabling trust without narrative CV dependency.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                     <div className="pt-8 border-t border-white/5 flex justify-end">
-                                         <Link href="/guides/attestation" className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/60 hover:text-emerald-400 flex items-center gap-2 group transition-colors">
-                                             View full guide
-                                             <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                                         </Link>
-                                     </div>
-                                 </div>
-                             )}
+                                    <div className="pt-8 border-t border-white/5 flex justify-end">
+                                        <Link href="/guides/attestation" className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/60 hover:text-emerald-400 flex items-center gap-2 group transition-colors">
+                                            View full guide
+                                            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
