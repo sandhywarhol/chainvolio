@@ -1300,20 +1300,6 @@ export default function CVPage(props: any) {
                    <div className="h-full bg-gradient-to-r from-[#a855f7] to-fuchsia-400" style={{ width: `${scoreData.score}%` }}></div>
                 </div>
 
-                {scoreData.domain_scores && Object.keys(scoreData.domain_scores).length > 0 && (
-                  (() => {
-                    const entries = Object.entries(scoreData.domain_scores) as [string, number][];
-                    const topDomain = entries.sort((a, b) => b[1] - a[1])[0];
-                    if (!topDomain) return null;
-                    const domainName = topDomain[0].charAt(0).toUpperCase() + topDomain[0].slice(1);
-                    return (
-                      <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700">
-                        <Award className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300">Top Domain: {domainName} ({topDomain[1]})</span>
-                      </div>
-                    );
-                  })()
-                )}
 
                  {/* Confidence Level Display */}
                  <div className="flex flex-col items-center gap-2 mt-4">
@@ -1349,6 +1335,28 @@ export default function CVPage(props: any) {
                           {scoreData.trust_score >= 40 ? 'High-Trust Candidate' : 
                            scoreData.trust_score >= 20 ? 'Balanced Profile' : 'Emerging Reputation'}
                         </span>
+                      </div>
+                    )}
+
+                    {/* Domain Breakdown Display */}
+                    {scoreData.domains && Object.keys(scoreData.domains).length > 0 && (
+                      <div className="flex flex-col items-center mt-3 pt-3 border-t border-white/5 w-full space-y-2">
+                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+                            <Award className="w-3.5 h-3.5 text-cyan-400" />
+                            <span className="text-[10px] uppercase font-black tracking-widest text-cyan-400/90">
+                              Top Domain: {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} ({scoreData.domains[scoreData.top_domain || ""]})
+                            </span>
+                         </div>
+                         
+                         {/* Other Domains List */}
+                         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
+                            {Object.entries(scoreData.domains).map(([name, score]) => (
+                               <div key={name} className="flex items-center gap-2">
+                                  <span className="text-[9px] uppercase font-bold text-slate-500 tracking-tight">{name}</span>
+                                  <span className="text-[10px] font-black text-slate-300">{score}</span>
+                               </div>
+                            ))}
+                         </div>
                       </div>
                     )}
                  </div>
