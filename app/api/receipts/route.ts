@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { calculateScore } from "@/lib/score";
 
 export async function POST(request: Request) {
   if (!supabase) {
@@ -77,6 +78,9 @@ export async function POST(request: Request) {
     }
 
     console.log(`[API] Work Receipt submitted for ${walletAddress}`);
+
+    // Trigger score recalculation
+    calculateScore(walletAddress).catch(console.error);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
@@ -196,6 +200,9 @@ export async function PATCH(request: Request) {
       }
       return errorResponse("ERR_DATABASE_ERROR", updateError.message, 500);
     }
+
+    // Trigger score recalculation
+    calculateScore(walletAddress).catch(console.error);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

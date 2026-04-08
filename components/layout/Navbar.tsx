@@ -31,6 +31,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const [isMobileWhyOpen, setIsMobileWhyOpen] = useState(false);
     const [isMobileHowOpen, setIsMobileHowOpen] = useState(false);
     const [isMobileGuidesOpen, setIsMobileGuidesOpen] = useState(false);
+    const [isMobileDeveloperOpen, setIsMobileDeveloperOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -60,6 +61,11 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         { label: "Sourcing Guide", href: "/guides/sourcing" },
         { label: "Screening Protocol", href: "/guides/screening" },
         { label: "Proof Standards", href: "/guides/attestation" },
+    ];
+    
+    const devItems = [
+        { label: "Overview", href: "/developers" },
+        { label: "API Docs", href: "/api-docs" },
     ];
 
     return (
@@ -100,6 +106,12 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         >
                             Security
                         </Link>
+
+                        <NavDropdown
+                            label="Developer"
+                            href="/api-docs"
+                            items={devItems}
+                        />
 
                         <Link
                             href="/dashboard"
@@ -193,6 +205,17 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
                     <Link href="/security" className="block text-white/40 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Security</Link>
 
+                    <MobileAccordion
+                        label="Developer"
+                        href="/api-docs"
+                        items={devItems}
+                        isOpen={isMobileDeveloperOpen}
+                        onToggle={() => setIsMobileDeveloperOpen(!isMobileDeveloperOpen)}
+                        onCloseMenu={() => setIsMobileMenuOpen(false)}
+                    />
+
+
+
 
                     <Link href="/dashboard" className="block text-emerald-400 hover:text-emerald-300 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
 
@@ -244,8 +267,10 @@ function NavDropdown({ label, href, items, onClick }: {
 
     return (
         <div
-            className="relative flex items-center"
+            className="relative flex items-center group/dropdown"
             ref={dropdownRef}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
         >
             <button
                 onClick={(e) => {

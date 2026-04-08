@@ -578,12 +578,14 @@ export default function CVPage(props: any) {
   const [selectedPortfolio, setSelectedPortfolio] = useState<PortfolioItem | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scoreData, setScoreData] = useState<any>(null);
   const [showAllHiring, setShowAllHiring] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [hasFetchedCerts, setHasFetchedCerts] = useState(false);
   const [isCertsLoading, setIsCertsLoading] = useState(false);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
+  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
 
   const verifiedHiringRecords = useMemo(() => {
     return receipts.filter(r => 
@@ -708,13 +710,18 @@ export default function CVPage(props: any) {
       fetch(`/api/profile?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/receipts?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
-    ]).then(([prof, recs, port]) => {
+      fetch(`/api/v1/wallet/${wallet}/score`).then((r) => r.json()).catch(() => null),
+    ]).then(([prof, recs, port, score]) => {
       setProfile(prof);
       const sortedRecs = Array.isArray(recs)
         ? [...recs].sort((a: any, b: any) => (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0))
         : [];
       setReceipts(sortedRecs);
       setPortfolio(Array.isArray(port) ? port : []);
+      if (score && !score.error) {
+        console.log("Score Data Component Log:", score);
+        setScoreData(score);
+      }
     }).finally(() => setLoading(false));
   }, [wallet]);
 
@@ -800,24 +807,22 @@ export default function CVPage(props: any) {
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
               <div className="absolute bottom-4 left-4 w-2 h-2 bg-slate-300/60 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }}></div>
 
-              <div className="hidden md:flex absolute top-6 right-6 z-30 flex-col gap-5 items-center">
+              <div className="absolute top-6 right-6 z-50 flex flex-col gap-4 items-center pointer-events-auto">
                 {profile.isVerified && (
-                  <VerifiedCheckBadge verificationType={profile.verificationType} />
-                )}
-                {totalYearsExperience > 0 && (
-                  <div className="group/exp cursor-default">
-                    <div className="relative flex items-center justify-center translate-x-[1px]">
-                      <div className="relative text-blue-400/90 transition-all duration-300 group-hover/exp:text-blue-400 flex flex-col items-center justify-center leading-none">
-                        <span className="text-sm font-black">{totalYearsExperience}</span>
-                        <span className="text-[8px] font-black uppercase tracking-tighter">Yrs</span>
-                      </div>
-                      <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/exp:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30 backdrop-blur-sm shadow-xl">
-                          {totalYearsExperience}+ Years Experience
-                        </span>
-                      </div>
-                    </div>
+                  <div className="hidden md:block">
+                    <VerifiedCheckBadge verificationType={profile.verificationType} />
                   </div>
+                )}
+                {scoreData && (
+                  <button 
+                    onClick={() => setIsScoreModalOpen(true)}
+                    className="relative z-50 pointer-events-auto cursor-pointer group/scorebtn flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-[#a855f7]/10 hover:brightness-110 border border-transparent hover:border-[#a855f7]/40 shadow-[0_0_0_rgba(168,85,247,0)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                  >
+                    <span className="text-3xl font-black leading-none text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-blue-500 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover/scorebtn:drop-shadow-[0_0_25px_rgba(168,85,247,0.6)]">
+                      {scoreData.score}
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#a855f7]/80 mt-1">CV Score</span>
+                  </button>
                 )}
               </div>
 
@@ -880,6 +885,9 @@ export default function CVPage(props: any) {
 
                 {/* Info Column */}
                 <div className="flex-1 flex flex-col text-center md:text-left space-y-4 w-full h-full">
+
+
+
                   {/* Looking For Badge */}
                   {profile.lookingFor && (
                     <div className="flex items-center justify-center md:justify-start gap-2">
@@ -918,13 +926,6 @@ export default function CVPage(props: any) {
                         Hire {profile.displayName.split(' ')[0]}
                       </Link>
                     )}
-                    <div className="flex justify-center gap-4">
-                      {totalYearsExperience > 0 && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400">
-                            {totalYearsExperience}+ Years Experience
-                        </span>
-                      )}
-                    </div>
                   </div>
 
                   {/* Profile Identity (Role/Organization) */}
@@ -946,6 +947,8 @@ export default function CVPage(props: any) {
                       isVerified={!!profile.isVerified}
                       verificationType={profile.verificationType}
                     />
+                    
+                    
                     <ProfileCompleteBadge
                       isComplete={isProfileComplete}
                       onClick={() => {
@@ -953,6 +956,15 @@ export default function CVPage(props: any) {
                       }}
                     />
                     <CommunityBadge cvId={profile.cardNumber || 0} />
+                    
+                    {totalYearsExperience > 0 && (
+                      <div className="flex flex-col items-center justify-center translate-y-[2px]">
+                        <span className="flex items-center justify-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
+                          <Clock size={10} strokeWidth={3} />
+                          {totalYearsExperience} Years Experience
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Skills Pills */}
@@ -984,7 +996,8 @@ export default function CVPage(props: any) {
 
                   {/* Social Row */}
                   {(profile.twitter || profile.github || profile.linkedin || profile.instagram || profile.website || profile.discord || profile.telegram || profile.whatsapp || profile.email) ? (
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2 relative z-50">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 relative z-50 border-t border-white/5 mt-2">
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                       {profile.twitter && (
                         <a
                           href={`https://x.com/${profile.twitter.replace('@', '')}`}
@@ -1109,6 +1122,32 @@ export default function CVPage(props: any) {
                           <Mail className="w-3.5 h-3.5" />
                         </button>
                       )}
+                      </div>
+
+                      {/* Right Side: Wallet & ID */}
+                      <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 opacity-60 hover:opacity-100 transition-opacity">
+                        {/* Wallet Section */}
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(wallet);
+                            setToastMessage("Wallet address copied!");
+                          }}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-950/40 border border-slate-700/30 hover:border-purple-500/40 transition-all cursor-pointer backdrop-blur-sm"
+                        >
+                          <Wallet className="w-2.5 h-2.5 text-purple-400" />
+                          <span className="font-mono text-[10px] text-slate-400">
+                            {typeof wallet === 'string' ? `${wallet.slice(0, 4)}...${wallet.slice(-4)}` : '0x...'}
+                          </span>
+                        </button>
+
+                        {/* CV ID */}
+                        {profile.cardNumber && (
+                          <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-tight text-slate-400">
+                            <span className="text-[8px] uppercase font-bold text-slate-600">ID</span>
+                            <span className="font-black text-slate-300">#{String(profile.cardNumber).padStart(5, '0')}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : publicKey?.toBase58() === wallet ? (
                     <div className="pt-2">
@@ -1118,35 +1157,7 @@ export default function CVPage(props: any) {
                 </div>
               </div>
 
-              {/* Card Number & Wallet ID Positioning */}
-              <div className="relative z-30 opacity-60 md:opacity-40 group-hover:opacity-100 transition-opacity duration-500 flex flex-row justify-between items-end w-full pt-6 mt-6 md:mt-8 border-t border-white/5">
-                {/* Wallet Section */}
-                <div className="flex flex-col items-start gap-1.5">
-                  <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 opacity-80">Source Wallet</span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(wallet);
-                      setToastMessage("Wallet address copied!");
-                    }}
-                    className="group/wallet flex items-center justify-center gap-1.5 px-2 md:px-2.5 py-1 md:py-1.5 rounded-lg bg-slate-950/40 border border-slate-700/30 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all cursor-pointer backdrop-blur-sm"
-                  >
-                    <Wallet className="w-3 h-3 text-purple-400/80 group-hover/wallet:text-purple-400" />
-                    <span className="font-mono text-[9px] md:text-xs text-slate-400 group-hover/wallet:text-purple-300 transition-colors">
-                      {typeof wallet === 'string' ? `${wallet.slice(0, 5)}...${wallet.slice(-4)}` : '0x...'}
-                    </span>
-                  </button>
-                </div>
 
-                {/* CV ID Section */}
-                {profile.cardNumber && (
-                  <div className="flex flex-col items-end gap-1.5">
-                    <span className="text-[7px] md:text-[8px] font-bold uppercase tracking-[0.3em] text-slate-500 opacity-60">CV ID</span>
-                    <span className="font-mono text-[10px] md:text-sm tracking-[0.2em] text-white/60 md:text-white/80 font-black">
-                      #{String(profile.cardNumber).padStart(5, '0')}
-                    </span>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Recruiter Trust Disclaimer */}
@@ -1284,6 +1295,98 @@ export default function CVPage(props: any) {
           cert={selectedCert}
           onClose={() => setSelectedCert(null)}
         />
+
+        {isScoreModalOpen && scoreData && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setIsScoreModalOpen(false)}></div>
+            <div className="relative w-full max-w-sm bg-[#0a0a0f] border border-[#a855f7]/30 rounded-2xl shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden animate-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="p-6 border-b border-white/5 relative flex flex-col items-center justify-center text-center">
+                <button 
+                  onClick={() => setIsScoreModalOpen(false)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+                <Star className="w-8 h-8 text-[#a855f7] mb-2 saturate-150 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                <h3 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-1">
+                  ChainVolio Score: {scoreData.score} ({scoreData.level})
+                </h3>
+                
+                {/* Modal main progress */}
+                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-3 mb-2">
+                   <div className="h-full bg-gradient-to-r from-[#a855f7] to-fuchsia-400" style={{ width: `${scoreData.score}%` }}></div>
+                </div>
+
+                {scoreData.domain_scores && Object.keys(scoreData.domain_scores).length > 0 && (
+                  (() => {
+                    const entries = Object.entries(scoreData.domain_scores) as [string, number][];
+                    const topDomain = entries.sort((a, b) => b[1] - a[1])[0];
+                    if (!topDomain) return null;
+                    const domainName = topDomain[0].charAt(0).toUpperCase() + topDomain[0].slice(1);
+                    return (
+                      <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700">
+                        <Award className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300">Top Domain: {domainName} ({topDomain[1]})</span>
+                      </div>
+                    );
+                  })()
+                )}
+
+                {/* Confidence Level Display */}
+                <div className="flex items-center gap-2 mt-3.5">
+                   <div className="flex flex-col items-center">
+                     <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+                       scoreData.confidence_label === 'High' ? 'text-emerald-400' : 
+                       scoreData.confidence_label === 'Medium' ? 'text-amber-400' : 'text-rose-500'
+                     }`}>
+                       Confidence: {scoreData.confidence_label || "Low"} ({Math.round((scoreData.confidence || 0) * 100)}%)
+                     </span>
+                     <p className="text-[8px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Data Reliability Indicator</p>
+                   </div>
+                </div>
+              </div>
+
+              {/* Breakdown */}
+              <div className="p-6 space-y-4 relative bg-gradient-to-b from-transparent to-slate-900/50">
+                {(() => {
+                  const getLabel = (val: number) => val >= 80 ? 'Excellent' : val >= 60 ? 'Strong' : val >= 40 ? 'Moderate' : 'Basic';
+                  const metrics = [
+                    { name: 'Experience', val: scoreData.breakdown.experience },
+                    { name: 'Verification', val: scoreData.breakdown.verification },
+                    { name: 'Consistency', val: scoreData.breakdown.consistency },
+                    { name: 'Skills', val: scoreData.breakdown.skill },
+                    { name: 'Activity', val: scoreData.breakdown.activity }
+                  ];
+                  return metrics.map((m) => (
+                    <div key={m.name} className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-end text-[10px] font-bold uppercase tracking-widest leading-none">
+                        <span className="text-slate-400">{m.name}</span>
+                        <span className="text-white">{getLabel(m.val)}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#a855f7]" style={{ width: `${m.val}%` }}></div>
+                      </div>
+                    </div>
+                  ));
+                })()}
+
+                {/* Trust Signals */}
+                <div className="mt-6 pt-6 border-t border-white/5 space-y-2">
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Verified Contributions
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" /> On-chain Reputation
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Tamper-proof Profile
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {toastMessage && (
           <Toast

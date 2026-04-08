@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { Connection } from "@solana/web3.js";
+import { calculateScore } from "@/lib/score";
 
 export async function POST(request: Request) {
     if (!supabase) {
@@ -307,6 +308,9 @@ export async function POST(request: Request) {
                 .update({ attestation_used: used + 1 })
                 .eq("wallet_address", attesterWallet);
         }
+
+        // Trigger score recalculation for candidate
+        calculateScore(receipt.wallet_address).catch(console.error);
 
         return NextResponse.json({ ok: true });
     } catch (err) {

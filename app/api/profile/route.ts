@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { ALL_SKILLS } from "@/constants/skills";
+import { calculateScore } from "@/lib/score";
 
 // Helper function to handle skill pool registration
 async function syncSkillPool(skillsStr: string) {
@@ -132,6 +133,8 @@ export async function POST(request: Request) {
       await syncSkillPool(body.skills);
     }
 
+    calculateScore(walletAddress).catch(console.error);
+
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error("POST Profile Error:", err);
@@ -196,6 +199,8 @@ export async function PATCH(request: Request) {
     if (body.skills) {
       await syncSkillPool(body.skills);
     }
+
+    calculateScore(walletAddress).catch(console.error);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
