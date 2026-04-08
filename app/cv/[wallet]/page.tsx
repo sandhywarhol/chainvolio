@@ -1346,7 +1346,7 @@ export default function CVPage(props: any) {
                             <div className="flex items-center gap-2">
                                <Award className="w-4 h-4 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
                                <span className="text-sm font-black text-white uppercase tracking-wider">
-                                 {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} — {scoreData.domains[scoreData.top_domain || ""]}
+                                 {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} — {String(scoreData.domains[scoreData.top_domain || ""])}
                                </span>
                             </div>
                             <p className="text-[8px] text-slate-500/60 uppercase font-bold tracking-widest">
@@ -1356,11 +1356,11 @@ export default function CVPage(props: any) {
                          
                          {/* Other Domains List */}
                          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-3">
-                            {Object.entries(scoreData.domains).map(([name, score]) => (
+                            {Object.entries(scoreData.domains).map(([name, score]: [string, any]) => (
                                name !== scoreData.top_domain && (
                                  <div key={name} className="flex items-center gap-2">
                                     <span className="text-[9px] uppercase font-bold text-slate-600 tracking-tight">{name}</span>
-                                    <span className="text-[10px] font-black text-slate-400">{score}</span>
+                                    <span className="text-[10px] font-black text-slate-400">{String(score)}</span>
                                  </div>
                                )
                             ))}
