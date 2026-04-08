@@ -220,8 +220,17 @@ export async function calculateScore(wallet_address: string) {
     }
   }
 
-  // Re-calculate level after decay
+  // --- Final Output & Top Domain ---
+  const entries = Object.entries(domain_scores);
+  const top_domain = entries.length > 0 
+    ? entries.sort((a, b) => b[1] - a[1])[0][0] 
+    : "general";
+
+  // Re-calculate level (including post-decay adjustments)
+  if (final_score >= 80) level = "Elite";
+  else if (final_score >= 60) level = "Advanced";
   else if (final_score >= 40) level = "Intermediate";
+  else level = "Beginner";
 
   // --- Score Reason Logic (Explainability) ---
   const reasons = [];
@@ -247,6 +256,7 @@ export async function calculateScore(wallet_address: string) {
       activity_score: activity,
       level: level,
       domain_scores: domain_scores,
+      top_domain: top_domain,
       activity_status: activity_status,
       confidence: confidence,
       confidence_label: confidence_label,
@@ -261,7 +271,8 @@ export async function calculateScore(wallet_address: string) {
   return {
     wallet: wallet_address,
     score: final_score,
-    domain_scores,
+    domains: domain_scores,
+    top_domain,
     level,
     activity_status,
     confidence,
