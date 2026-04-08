@@ -1338,23 +1338,31 @@ export default function CVPage(props: any) {
                       </div>
                     )}
 
-                    {/* Domain Breakdown Display */}
+                    {/* Primary Expertise Display */}
                     {scoreData.domains && Object.keys(scoreData.domains).length > 0 && (
-                      <div className="flex flex-col items-center mt-3 pt-3 border-t border-white/5 w-full space-y-2">
-                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
-                            <Award className="w-3.5 h-3.5 text-cyan-400" />
-                            <span className="text-[10px] uppercase font-black tracking-widest text-cyan-400/90">
-                              Top Domain: {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} ({scoreData.domains[scoreData.top_domain || ""]})
-                            </span>
+                      <div className="flex flex-col items-center mt-3 pt-3 border-t border-white/5 w-full">
+                         <div className="flex flex-col items-center space-y-1">
+                            <span className="text-[9px] font-black text-cyan-400/60 uppercase tracking-[0.2em]">Primary Expertise</span>
+                            <div className="flex items-center gap-2">
+                               <Award className="w-4 h-4 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
+                               <span className="text-sm font-black text-white uppercase tracking-wider">
+                                 {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} — {scoreData.domains[scoreData.top_domain || ""]}
+                               </span>
+                            </div>
+                            <p className="text-[8px] text-slate-500/60 uppercase font-bold tracking-widest">
+                               Based on verified work and contributions
+                            </p>
                          </div>
                          
                          {/* Other Domains List */}
-                         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
+                         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-3">
                             {Object.entries(scoreData.domains).map(([name, score]) => (
-                               <div key={name} className="flex items-center gap-2">
-                                  <span className="text-[9px] uppercase font-bold text-slate-500 tracking-tight">{name}</span>
-                                  <span className="text-[10px] font-black text-slate-300">{score}</span>
-                               </div>
+                               name !== scoreData.top_domain && (
+                                 <div key={name} className="flex items-center gap-2">
+                                    <span className="text-[9px] uppercase font-bold text-slate-600 tracking-tight">{name}</span>
+                                    <span className="text-[10px] font-black text-slate-400">{score}</span>
+                                 </div>
+                               )
                             ))}
                          </div>
                       </div>
