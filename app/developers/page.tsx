@@ -16,8 +16,8 @@ export default function DevelopersPage() {
             </div>
 
             {/* 1. HERO - The Statement */}
-            <section className="relative z-40 pt-32 pb-16 px-6 md:px-8 max-w-6xl mx-auto w-full">
-                <div className="max-w-4xl">
+            <section className="relative z-40 pt-32 pb-16 px-6 md:px-8 max-w-6xl mx-auto w-full text-center">
+                <div className="max-w-4xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-4">
                         <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-indigo-400">Developer Portal</span>
                     </div>
@@ -26,11 +26,11 @@ export default function DevelopersPage() {
                         One API call.<br />Know who to trust.
                     </h1>
                     
-                    <p className="text-xl md:text-2xl text-white/50 leading-relaxed font-light tracking-tight max-w-2xl mb-8">
+                    <p className="text-xl md:text-2xl text-white/50 leading-relaxed font-light tracking-tight max-w-2xl mb-8 mx-auto">
                         ChainVolio turns fragmented Web3 experience into a <span className="text-white/80 font-medium">verifiable reputation signal</span>. Integrate crystalline trust into your application in minutes.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link 
                             href="/api-docs#get-key" 
                             className="w-full sm:w-auto px-10 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2 group"
