@@ -1333,18 +1333,43 @@ export default function CVPage(props: any) {
                   })()
                 )}
 
-                {/* Confidence Level Display */}
-                <div className="flex items-center gap-2 mt-3.5">
-                   <div className="flex flex-col items-center">
-                     <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
-                       scoreData.confidence_label === 'High' ? 'text-emerald-400' : 
-                       scoreData.confidence_label === 'Medium' ? 'text-amber-400' : 'text-rose-500'
-                     }`}>
-                       Confidence: {scoreData.confidence_label || "Low"} ({Math.round((scoreData.confidence || 0) * 100)}%)
-                     </span>
-                     <p className="text-[8px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Data Reliability Indicator</p>
-                   </div>
-                </div>
+                 {/* Confidence Level Display */}
+                 <div className="flex flex-col items-center gap-2 mt-4">
+                    <div className="flex flex-col items-center">
+                      <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+                        scoreData.confidence_label === 'High' ? 'text-emerald-400' : 
+                        scoreData.confidence_label === 'Medium' ? 'text-amber-400' : 'text-rose-500'
+                      }`}>
+                        Confidence: {scoreData.confidence_label || "Low"} ({Math.round((scoreData.confidence || 0) * 100)}%)
+                      </span>
+                      <p className="text-[8px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Data Reliability Indicator</p>
+                    </div>
+
+                    {/* Trust Score Display */}
+                    {scoreData.trust_score !== undefined && (
+                      <div className="flex flex-col items-center mt-1 pt-3 border-t border-white/5 w-full">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className={`w-3.5 h-3.5 ${
+                            scoreData.trust_score >= 40 ? 'text-emerald-400' : 
+                            scoreData.trust_score >= 20 ? 'text-amber-400' : 'text-rose-500'
+                          }`} />
+                          <span className="text-xs font-black text-white tracking-widest uppercase">
+                            Trust Score: <span className={
+                              scoreData.trust_score >= 40 ? 'text-emerald-400' : 
+                              scoreData.trust_score >= 20 ? 'text-amber-400' : 'text-rose-400'
+                            }>{scoreData.trust_score}</span>
+                          </span>
+                        </div>
+                        <span className={`text-[9px] uppercase font-bold tracking-[0.15em] mt-0.5 ${
+                           scoreData.trust_score >= 40 ? 'text-emerald-500/60' : 
+                           scoreData.trust_score >= 20 ? 'text-amber-500/60' : 'text-rose-500/60'
+                        }`}>
+                          {scoreData.trust_score >= 40 ? 'High-Trust Candidate' : 
+                           scoreData.trust_score >= 20 ? 'Balanced Profile' : 'Emerging Reputation'}
+                        </span>
+                      </div>
+                    )}
+                 </div>
               </div>
 
               {/* Breakdown */}
