@@ -903,29 +903,11 @@ export default function CVPage(props: any) {
                       <h1 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
                         {profile.displayName}
                       </h1>
-
-                      {/* Hire Talent Button - Better Mobile Experience */}
-                      {publicKey?.toBase58() && publicKey?.toBase58() !== wallet && (
-                        <Link
-                          href="/hiring/create"
-                          className="hidden md:flex px-4 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-black uppercase tracking-widest transition-all hover:bg-emerald-400 hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.2)] ml-auto md:ml-2"
-                        >
-                          Hire Talent
-                        </Link>
-                      )}
                     </div>
                   </div>
                   
-                  {/* Mobile-only Action Area */}
+                  {/* Mobile-only Action Area (Hidden) */}
                   <div className="md:hidden flex flex-col gap-3 w-full pt-2">
-                    {publicKey?.toBase58() && publicKey?.toBase58() !== wallet && (
-                      <Link
-                        href="/hiring/create"
-                        className="w-full py-4 rounded-xl bg-emerald-500 text-black text-xs font-black uppercase tracking-widest text-center shadow-lg active:scale-95 transition-all"
-                      >
-                        Hire {profile.displayName.split(' ')[0]}
-                      </Link>
-                    )}
                   </div>
 
                   {/* Profile Identity (Role/Organization) */}
