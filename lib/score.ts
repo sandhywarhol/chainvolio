@@ -44,7 +44,13 @@ export async function calculateScore(wallet_address: string) {
 
     // Verification - verify against unverified vs total
     // ignore unverified contributions in weight scoring if there's manipulation, but here we just do %
-    const verified = receipts.filter((r: any) => r.status === "Attested" || r.attestation_type === "Hiring Proof" || r.tx_signature).length;
+    const verified = receipts.filter((r: any) => 
+      r.status === "Attested" || 
+      r.status === "Verified" || 
+      r.status === "verified" || 
+      r.attestation_type === "Hiring Proof" || 
+      r.tx_signature
+    ).length;
     verification = Math.round((verified / receipts.length) * 100);
 
     // Consistency
@@ -137,17 +143,39 @@ export async function calculateScore(wallet_address: string) {
 
   // --- Verification Multiplier (Anti-Spam) ---
   const total_contributions = receipts ? receipts.length : 0;
+  let verified_contributions = 0;
   let verification_ratio = 0;
+
   if (total_contributions > 0 && receipts) {
-    const verified_contributions = receipts.filter((r: any) => r.status === "Attested" || r.attestation_type === "Hiring Proof" || r.tx_signature).length;
+    // Debug: log filter criteria
+    verified_contributions = receipts.filter((r: any) => 
+      r.status === "Attested" || 
+      r.status === "Verified" || 
+      r.status === "verified" || 
+      r.attestation_type === "Hiring Proof" || 
+      r.tx_signature
+    ).length;
+    
     verification_ratio = verified_contributions / total_contributions;
+  } else if (total_contributions === 0) {
+    console.warn(`[scoring-debug] Wallet ${wallet_address} has 0 receipts. Confidence defaulted to 0.`);
   }
+
   const verification_multiplier = total_contributions === 0 ? 0.5 : 0.5 + (verification_ratio * 0.5);
   
   // Volume-weighted confidence (requires at least 5 contributions for 100% confidence potential)
   const data_factor = Math.min(total_contributions / 5, 1);
   const confidence = total_contributions === 0 ? 0 : Math.round((verification_ratio * data_factor) * 100) / 100;
   
+  // Detailed debug log for troubleshooting Confidence = 0
+  console.log(`[scoring-debug] Calculation for ${wallet_address}:`, {
+    total_contributions,
+    verified_contributions,
+    verification_ratio: verification_ratio.toFixed(2),
+    data_factor: data_factor.toFixed(2),
+    confidence
+  });
+
   let confidence_label = "Low";
   if (confidence >= 0.7) confidence_label = "High";
   else if (confidence >= 0.4) confidence_label = "Medium";
