@@ -8,19 +8,20 @@ const DOMAIN_MAP: Record<string, string[]> = {
 };
 
 
-export async function calculateScore(wallet_address: string) {
+export async function calculateScore(wallet_address: string, preFetchedData?: { profile?: any, receipts?: any[] }) {
   if (!supabaseServer) throw new Error("Supabase internal error");
 
-  const { data: profile } = await supabaseServer
+  // Identification step: Use pre-fetched data if available to avoid redundant DB hits
+  const profile = preFetchedData?.profile || (await supabaseServer
     .from("profiles")
     .select("*")
     .eq("wallet_address", wallet_address)
-    .single();
+    .single()).data;
 
-  const { data: receipts } = await supabaseServer
+  const receipts = preFetchedData?.receipts || (await supabaseServer
     .from("receipts")
     .select("*")
-    .eq("wallet_address", wallet_address);
+    .eq("wallet_address", wallet_address)).data;
 
   let experience = 0;
   let verification = 0;

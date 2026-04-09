@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
   const { data, error } = await supabase
     .from("user_certificates")
-    .select("*")
+    .select("id, title, issuer_name, date_issued, file_url, file_type, created_at")
     .eq("wallet_address", wallet)
     .order("created_at", { ascending: false });
 

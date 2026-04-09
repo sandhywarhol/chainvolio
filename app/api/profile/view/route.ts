@@ -11,19 +11,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ ok: true });
         }
 
-        // 2. Fetch Viewer Profile and Verification Status
-        const { data: viewerProfile } = await supabase
+        // 2. Fetch Viewer Profile and Verification Status in One Hit
+        const { data: viewerData } = await supabase
             .from("profiles")
-            .select("wallet_address")
+            .select(`
+                wallet_address,
+                verification:organization_verifications (
+                    status, type, expires_at
+                )
+            `)
             .eq("wallet_address", viewerWallet)
             .maybeSingle();
 
-        const { data: viewerOrg } = await supabase
-            .from("organization_verifications")
-            .select("status, type, expires_at")
-            .eq("wallet_address", viewerWallet)
-            .maybeSingle();
-
+        const viewerOrg = (viewerData as any)?.verification?.[0] || (viewerData as any)?.verification;
+        
         const now = new Date();
         const expiresAtDate = viewerOrg?.expires_at ? new Date(viewerOrg.expires_at) : null;
         const isExpired = expiresAtDate ? now > expiresAtDate : false;
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
                                viewerOrg?.type?.toLowerCase().includes("dao");
 
         const isVerifiedRecruiter = isVerified && isRecruiterTier;
-        const hasProfile = !!viewerProfile;
+        const hasProfile = !!viewerData;
 
         // --- Avoid Spam ---
         // Check if a notification for THIS viewer → THIS target exists in the last 24h

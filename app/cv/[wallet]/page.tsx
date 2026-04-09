@@ -706,23 +706,40 @@ export default function CVPage(props: any) {
   useEffect(() => {
     if (!wallet) return;
 
+    // --- CRITICAL DATA: Profile (blocks loading screen) ---
+    fetch(`/api/profile?wallet=${wallet}`)
+      .then((r) => r.json())
+      .then((prof) => {
+        setProfile(prof);
+        // Page becomes visible as soon as identity is resolved
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Critical fetch failed (profile):", err);
+        setLoading(false); 
+      });
+
+    // --- NON-CRITICAL DATA: Receipts & Portfolio (fetched in background) ---
     Promise.all([
-      fetch(`/api/profile?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/receipts?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
-      fetch(`/api/v1/wallet/${wallet}/score`).then((r) => r.json()).catch(() => null),
-    ]).then(([prof, recs, port, score]) => {
-      setProfile(prof);
+    ]).then(([recs, port]) => {
       const sortedRecs = Array.isArray(recs)
         ? [...recs].sort((a: any, b: any) => (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0))
         : [];
       setReceipts(sortedRecs);
       setPortfolio(Array.isArray(port) ? port : []);
-      if (score && !score.error) {
-        console.log("Score Data Component Log:", score);
-        setScoreData(score);
-      }
-    }).finally(() => setLoading(false));
+    }).catch(err => console.error("Non-critical fetches failed:", err));
+
+    // --- NON-CRITICAL DATA: Score (fetched in background) ---
+    fetch(`/api/v1/wallet/${wallet}/score`)
+      .then((r) => r.json())
+      .then((score) => {
+        if (score && !score.error) {
+          setScoreData(score);
+        }
+      })
+      .catch((err) => console.error("Score fetch failed:", err));
   }, [wallet]);
 
   const fetchCertificates = async () => {
@@ -747,13 +764,13 @@ export default function CVPage(props: any) {
   }, [wallet]);
 
   const handleExpandCerts = () => {
-      // Logic handled by useEffect now, but kept for interface compatibility
+    // Logic handled by useEffect now, but kept for interface compatibility
   };
 
   if (loading) {
     return (
       <main className="min-h-screen text-white flex items-center justify-center">
-        <p className="text-slate-400">Loading...</p>
+        <p className="text-slate-400 font-medium animate-pulse">Loading ChainVolio...</p>
       </main>
     );
   }
@@ -764,7 +781,7 @@ export default function CVPage(props: any) {
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
       <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
-        {!profile ? (
+        {(!profile && !loading) ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
           <>
@@ -808,9 +825,9 @@ export default function CVPage(props: any) {
               <div className="absolute bottom-4 left-4 w-2 h-2 bg-slate-300/60 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }}></div>
 
               <div className="absolute top-6 right-6 z-50 flex flex-col gap-4 items-center pointer-events-auto">
-                {profile.isVerified && (
+                {profile?.isVerified && (
                   <div className="hidden md:block">
-                    <VerifiedCheckBadge verificationType={profile.verificationType} />
+                    <VerifiedCheckBadge verificationType={profile?.verificationType} />
                   </div>
                 )}
                 {scoreData && (
@@ -831,7 +848,7 @@ export default function CVPage(props: any) {
                 {/* Avatar Column */}
                 <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                   <div className="relative group/avatar">
-                    {profile.avatarUrl ? (
+                    {profile?.avatarUrl ? (
                       <img
                         src={profile.avatarUrl}
                         alt={profile.displayName}
@@ -845,20 +862,20 @@ export default function CVPage(props: any) {
                     
                     {/* Mobile-only Trust Badge Overlay */}
                     <div className="md:hidden absolute -bottom-2 -right-2">
-                       {profile.isVerified && <VerifiedCheckBadge verificationType={profile.verificationType} />}
+                       {profile?.isVerified && <VerifiedCheckBadge verificationType={profile?.verificationType} />}
                     </div>
                   </div>
 
                   {/* Country below avatar - only render if present */}
-                  {(profile.country || profile.timezone || profile.workPreference?.length) ? (
+                  {(profile?.country || profile?.timezone || profile?.workPreference?.length) ? (
                     <div className="flex flex-col items-center md:items-start gap-2 mt-4 text-slate-400">
-                      {profile.country && (
+                      {profile?.country && (
                         <div className="flex items-center gap-1.5">
                           <MapPin className="w-4 h-4" />
                           <span className="text-sm font-medium">{profile.country}</span>
                         </div>
                       )}
-                      {profile.timezone && (
+                      {profile?.timezone && (
                         <div className="flex items-center gap-1.5 text-xs text-slate-500">
                           <Clock className="w-3.5 h-3.5" />
                           <span className="font-mono">{profile.timezone}</span>
@@ -866,7 +883,7 @@ export default function CVPage(props: any) {
                       )}
 
                       {/* Work Preference */}
-                      {profile.workPreference && profile.workPreference.length > 0 && (
+                      {profile?.workPreference && profile.workPreference.length > 0 && (
                         <div className="flex flex-col items-center md:items-start gap-1.5 mt-2">
                           <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Availability</span>
                           <div className="flex flex-wrap items-center md:justify-start gap-1.5 max-w-[200px]">
@@ -889,7 +906,7 @@ export default function CVPage(props: any) {
 
 
                   {/* Looking For Badge */}
-                  {profile.lookingFor && (
+                  {profile?.lookingFor && (
                     <div className="flex items-center justify-center md:justify-start gap-2">
                       <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
                         <Briefcase className="w-3.5 h-3.5" />
@@ -901,7 +918,7 @@ export default function CVPage(props: any) {
                   <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
                     <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
-                        {profile.displayName}
+                        {profile?.displayName}
                       </h1>
                     </div>
                   </div>
@@ -911,12 +928,12 @@ export default function CVPage(props: any) {
                   </div>
 
                   {/* Profile Identity (Role/Organization) */}
-                  {profile.role ? (
+                  {profile?.role ? (
                     <p className="text-sm font-medium text-slate-400 leading-snug">
                       {profile.role}
                       {profile.organization && <span> at {profile.organization}</span>}
                     </p>
-                  ) : profile.organization ? (
+                  ) : profile?.organization ? (
                     <p className="text-sm font-medium text-slate-400 leading-snug">
                       {profile.organization}
                     </p>
@@ -925,9 +942,9 @@ export default function CVPage(props: any) {
                   {/* Badges & Trust Hierarchy */}
                   <div className="flex flex-wrap items-start justify-center md:justify-start gap-4">
                     <TrustBadge
-                      tier={profile.verifierTier || 1}
-                      isVerified={!!profile.isVerified}
-                      verificationType={profile.verificationType}
+                      tier={profile?.verifierTier || 1}
+                      isVerified={!!profile?.isVerified}
+                      verificationType={profile?.verificationType}
                     />
                     
                     
@@ -937,7 +954,7 @@ export default function CVPage(props: any) {
                         setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, work evidence, and contact information.");
                       }}
                     />
-                    <CommunityBadge cvId={profile.cardNumber || 0} />
+                    <CommunityBadge cvId={profile?.cardNumber || 0} />
                     
                     {totalYearsExperience > 0 && (
                       <div className="flex flex-col items-center justify-center translate-y-[2px]">
@@ -950,7 +967,7 @@ export default function CVPage(props: any) {
                   </div>
 
                   {/* Skills Pills */}
-                  {profile.skills ? (
+                  {profile?.skills ? (
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-3">
                       {profile.skills.split(',').map((skill, i) => (
                         <span key={i} className="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-slate-800 border border-slate-700 text-[10px] md:text-xs text-slate-300">
@@ -965,7 +982,7 @@ export default function CVPage(props: any) {
                   ) : null}
 
                   <div className="pt-2">
-                    {profile.bio ? (
+                    {profile?.bio ? (
                       <ExpandableText
                         text={profile.bio}
                         maxLength={350}
@@ -977,10 +994,10 @@ export default function CVPage(props: any) {
                   </div>
 
                   {/* Social Row */}
-                  {(profile.twitter || profile.github || profile.linkedin || profile.instagram || profile.website || profile.discord || profile.telegram || profile.whatsapp || profile.email) ? (
+                  {(profile?.twitter || profile?.github || profile?.linkedin || profile?.instagram || profile?.website || profile?.discord || profile?.telegram || profile?.whatsapp || profile?.email) ? (
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 relative z-50 border-t border-white/5 mt-2">
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                      {profile.twitter && (
+                      {profile?.twitter && (
                         <a
                           href={`https://x.com/${profile.twitter.replace('@', '')}`}
                           target="_blank"
@@ -994,7 +1011,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.github && (
+                      {profile?.github && (
                         <a
                           href={`https://github.com/${profile.github}`}
                           target="_blank"
@@ -1008,7 +1025,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.linkedin && (
+                      {profile?.linkedin && (
                         <a
                           href={profile.linkedin.startsWith('http') ? profile.linkedin : `https://${profile.linkedin}`}
                           target="_blank"
@@ -1022,7 +1039,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.instagram && (
+                      {profile?.instagram && (
                         <a
                           href={`https://instagram.com/${profile.instagram.replace('@', '')}`}
                           target="_blank"
@@ -1037,7 +1054,7 @@ export default function CVPage(props: any) {
                       )}
 
 
-                      {profile.website && (
+                      {profile?.website && (
                         <a
                           href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                           target="_blank"
@@ -1049,7 +1066,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.discord && (
+                      {profile?.discord && (
                         <button
                           onClick={() => {
                             navigator.clipboard.writeText(profile.discord!);
@@ -1064,7 +1081,7 @@ export default function CVPage(props: any) {
                         </button>
                       )}
 
-                      {profile.telegram && (
+                      {profile?.telegram && (
                         <a
                           href={`https://t.me/${profile.telegram.replace('@', '')}`}
                           target="_blank"
@@ -1078,7 +1095,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.whatsapp && (
+                      {profile?.whatsapp && (
                         <a
                           href={`https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}`}
                           target="_blank"
@@ -1092,7 +1109,7 @@ export default function CVPage(props: any) {
                         </a>
                       )}
 
-                      {profile.email && (
+                      {profile?.email && (
                         <button
                           onClick={() => {
                             navigator.clipboard.writeText(profile.email!);
@@ -1123,10 +1140,10 @@ export default function CVPage(props: any) {
                         </button>
 
                         {/* CV ID */}
-                        {profile.cardNumber && (
+                        {profile?.cardNumber && (
                           <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-tight text-slate-400">
                             <span className="text-[8px] uppercase font-bold text-slate-600">ID</span>
-                            <span className="font-black text-slate-300">#{String(profile.cardNumber).padStart(5, '0')}</span>
+                            <span className="font-black text-slate-300">#{String(profile?.cardNumber || 0).padStart(5, '0')}</span>
                           </div>
                         )}
                       </div>

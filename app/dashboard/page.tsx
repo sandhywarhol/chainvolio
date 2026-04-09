@@ -106,48 +106,27 @@ export default function DashboardPage() {
       return;
     }
 
-    const wallet = publicKey.toBase58();
+    const walletAddr = publicKey.toBase58();
     setLoading(true);
 
-    // 1. Fetch Profile - use /api/user/me for verification authority
-    fetch(`/api/user/me?wallet=${wallet}`)
+    // Consolidated Dashboard Data Fetch
+    fetch(`/api/dashboard/stats?wallet=${walletAddr}`)
       .then((r) => r.json())
       .then((data) => {
-        setProfile(data);
+        if (data.error) throw new Error(data.error);
+        
+        setProfile(data.profile);
+        setCollections(data.collections || []);
+        setAttestationCount(data.attestationCount || 0);
+        if (Array.isArray(data.certificates)) {
+          setCertificates(data.certificates);
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-
-    // 2. Fetch Hiring Collections
-    async function fetchCollections() {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("hiring_collections")
-        .select("id, title, slug, created_at")
-        .eq("owner_wallet", wallet)
-        .order("created_at", { ascending: false });
-
-      if (data) setCollections(data);
-    }
-    fetchCollections();
-
-    // 3. Fetch Attestation Count (if verified)
-    async function fetchAttestationCount() {
-      if (!supabase) return;
-      const { count } = await supabase
-        .from("attestations")
-        .select("*", { count: 'exact', head: true })
-        .eq("attester_wallet", wallet);
-
-      setAttestationCount(count || 0);
-    }
-    fetchAttestationCount();
-
-    // 4. Fetch Certificates
-    fetch(`/api/certificates?wallet=${wallet}`)
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setCertificates(data); })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Dashboard fetch error:", err);
+        setLoading(false);
+      });
 
   }, [publicKey, connected]);
 

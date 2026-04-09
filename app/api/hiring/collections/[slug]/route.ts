@@ -10,43 +10,41 @@ export async function GET(
     }
 
     try {
-        const { data: collection, error: fetchError } = await supabase
-            .from("hiring_collections")
-            .select("*")
-            .eq("slug", params.slug)
-            .single();
+    // 1. Fetch Collection details
+    const { data: collection, error: fetchError } = await supabase
+        .from("hiring_collections")
+        .select("*")
+        .eq("slug", params.slug)
+        .maybeSingle();
 
-        if (fetchError || !collection) {
-            return NextResponse.json({ error: "Collection not found" }, { status: 404 });
-        }
+    if (fetchError || !collection) {
+        return NextResponse.json({ error: "Collection not found" }, { status: 404 });
+    }
 
-        // Fetch owner profile for avatar and verified status
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("avatar_url, display_name, headline, professional_role")
-            .eq("wallet_address", collection.owner_wallet)
-            .single();
+    // 2. Fetch Owner Profile and Verification in Parallel (Manual Join)
+    const { owner_wallet } = collection;
+    const [profileRes, verifRes] = await Promise.all([
+        supabase.from("profiles").select("avatar_url, display_name, headline, professional_role").eq("wallet_address", owner_wallet).maybeSingle(),
+        supabase.from("organization_verifications").select("status, type, expires_at").eq("wallet_address", owner_wallet).maybeSingle()
+    ]);
 
-        // 2. Fetch Owner's Verification Tier (Single Source of Truth)
-        const { data: orgData } = await supabase
-            .from("organization_verifications")
-            .select("status, type, expires_at")
-            .eq("wallet_address", collection.owner_wallet)
-            .maybeSingle();
+    const owner_profile = profileRes.data;
+    const owner_verification = verifRes.data;
+    
+    // Calculate verified status
+    const isExpired = owner_verification?.expires_at ? new Date(owner_verification.expires_at) < new Date() : false;
+    const isVerified = owner_verification?.status === 'verified' && !isExpired;
+    const verificationTier = isVerified ? owner_verification?.type : null;
 
-        const isExpired = orgData?.expires_at ? new Date(orgData.expires_at) < new Date() : false;
-        const isVerified = orgData?.status === 'verified' && !isExpired;
-        const verificationTier = isVerified ? orgData?.type : null;
-
-        return NextResponse.json({ 
-            collection,
-            owner_profile: profile ? { 
-                ...profile, 
-                isVerified, 
-                verificationTier,
-                verificationStatus: orgData?.status || 'unverified'
-            } : null
-        });
+    return NextResponse.json({ 
+        collection,
+        owner_profile: owner_profile ? { 
+            ...owner_profile, 
+            isVerified, 
+            verificationTier,
+            verificationStatus: owner_verification?.status || 'unverified'
+        } : null
+    });
     } catch (err: any) {
         return NextResponse.json({ error: err.message || "Server Error" }, { status: 500 });
     }

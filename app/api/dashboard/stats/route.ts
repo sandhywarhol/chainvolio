@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 
-/**
- * GET /api/user/me?wallet=[wallet_address]
- * 
- * Returns the fresh computed verification state for a wallet.
- * This is the SINGLE SOURCE OF TRUTH for user verification/tiers.
- */
 export async function GET(request: Request) {
     if (!supabase) {
         return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
@@ -16,38 +10,42 @@ export async function GET(request: Request) {
     const wallet = searchParams.get("wallet");
 
     if (!wallet) {
-        return NextResponse.json({ error: "Wallet address required" }, { status: 400 });
+        return NextResponse.json({ error: "wallet required" }, { status: 400 });
     }
 
     try {
-        // 1. Fetch Profile (Optimized Payload)
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test")
-            .eq("wallet_address", wallet)
-            .maybeSingle();
+        // 1. Fetch Profile and Verification in Parallel
+        const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes] = await Promise.all([
+            supabase
+                .from("profiles")
+                .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test")
+                .eq("wallet_address", wallet)
+                .maybeSingle(),
+            supabase
+                .from("organization_verifications")
+                .select("id, status, type, expires_at, rejection_reason, verifier_tier, pending_upgrade_type, pending_upgrade_status, verification_source")
+                .eq("wallet_address", wallet)
+                .maybeSingle(),
+            supabase
+                .from("hiring_collections")
+                .select("id, title, slug, created_at")
+                .eq("owner_wallet", wallet)
+                .order("created_at", { ascending: false }),
+            supabase
+                .from("attestations")
+                .select("*", { count: 'exact', head: true })
+                .eq("attester_wallet", wallet),
+            supabase
+                .from("user_certificates")
+                .select("id, title, issuer_name, date_issued, file_url, file_type, created_at")
+                .eq("wallet_address", wallet)
+                .order("created_at", { ascending: false })
+        ]);
 
-        if (profile?.is_test) {
-            return NextResponse.json({ error: "Profile hidden or not found." }, { status: 404 });
-        }
+        const profile = profileRes.data;
+        const orgData = orgRes.data;
 
-        // 2. Fetch Verification Status
-        let { data: orgData } = await supabase
-            .from("organization_verifications")
-            .select("id, status, type, expires_at, rejection_reason, verifier_tier, pending_upgrade_type, pending_upgrade_status, verification_source")
-            .eq("wallet_address", wallet)
-            .maybeSingle();
-
-        // --- Merit-based Builder Calculation (READ-ONLY) ---
-        const powQuery = supabase
-            .from("receipts")
-            .select("role")
-            .eq("wallet_address", wallet)
-            .not("role", "is", null)
-            .neq("role", "");
-
-        const { data: powEntries } = await powQuery;
-        
+        // --- Identity & Completion Logic (Matching user/me) ---
         const hasBio = !!profile?.bio;
         const hasSkills = !!profile?.skills;
         const hasContact = !!(
@@ -66,14 +64,9 @@ export async function GET(request: Request) {
             ? (new Date(orgData.expires_at).getTime() - Date.now() < 3 * 24 * 60 * 60 * 1000) 
             : false;
 
-        // ---------------------------------------------
-
-
-        // 3. Compute Source of Truth
         const verificationTier = isVerified ? orgData?.type : "unverified";
-        const isProfileComplete = completionScore === 100;
         
-        const responseData: any = {
+        const identity: any = {
             walletAddress: wallet,
             isVerified,
             verificationTier,
@@ -87,7 +80,7 @@ export async function GET(request: Request) {
             verifierTier: orgData?.verifier_tier || 1,
             // Profile metrics
             completionPercentage: completionScore,
-            isProfileComplete: isProfileComplete,
+            isProfileComplete: completionScore === 100,
             // Profile fields flattened
             displayName: profile?.display_name || null,
             role: profile?.professional_role || null,
@@ -98,6 +91,8 @@ export async function GET(request: Request) {
             cardNumber: profile?.card_number || null,
             country: profile?.country || null,
             timezone: profile?.timezone || null,
+            isExpiringSoon,
+            // Socials for modal prep
             twitter: profile?.twitter || null,
             github: profile?.github || null,
             linkedin: profile?.linkedin || null,
@@ -107,12 +102,17 @@ export async function GET(request: Request) {
             discord: profile?.discord || null,
             email: profile?.email || null,
             whatsapp: profile?.whatsapp || null,
-            isExpiringSoon,
         };
 
-        return NextResponse.json(responseData);
+        return NextResponse.json({
+            profile: identity,
+            collections: collectionsRes.data || [],
+            attestationCount: attestationsRes.count || 0,
+            certificates: certsRes.data || []
+        });
+
     } catch (err: any) {
-        console.error("api/user/me error:", err);
-        return NextResponse.json({ error: "Server error" }, { status: 500 });
+        console.error("Dashboard Stats API Error:", err);
+        return NextResponse.json({ error: "Server error fetching stats" }, { status: 500 });
     }
 }

@@ -31,7 +31,7 @@ export async function GET(
         // 1. Get collection details
         const { data: collection, error: colError } = await supabase
             .from("hiring_collections")
-            .select("*")
+            .select("id, slug, owner_wallet, title, created_at")
             .eq("slug", slug)
             .single();
 
@@ -67,7 +67,7 @@ export async function GET(
         // 2. Get submissions (Ordered in code to avoid RLS/Index issues)
         const { data: submissions, error: subError } = await supabase
             .from("collection_submissions")
-            .select("*")
+            .select("id, collection_id, candidate_wallet, submitted_at, snapshot_data, role_strength, primary_signal, recruiter_status, recruiter_notes, tx_signature")
             .eq("collection_id", collection.id);
 
         if (subError) {
@@ -87,7 +87,7 @@ export async function GET(
         // 3. Batch fetch profiles
         const { data: profiles, error: profileError } = await supabase
             .from("profiles")
-            .select("*")
+            .select("wallet_address, display_name, avatar_url, bio, card_number")
             .in("wallet_address", wallets);
 
         if (profileError) console.error("[Dashboard API] Profile fetch error:", profileError);

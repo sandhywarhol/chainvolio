@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase
         .from("portfolio_items")
-        .select("*")
+        .select("id, title, description, image_url, thumbnail_url, created_at")
         .eq("wallet_address", wallet)
         .order("display_order", { ascending: true })
         .order("created_at", { ascending: false });

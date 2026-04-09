@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { ALL_SKILLS } from "@/constants/skills";
 import { calculateScore } from "@/lib/score";
+import { syncUserStatus } from "@/lib/sync";
 
 // Helper function to handle skill pool registration
 async function syncSkillPool(skillsStr: string) {
@@ -134,6 +135,7 @@ export async function POST(request: Request) {
     }
 
     calculateScore(walletAddress).catch(console.error);
+    syncUserStatus(walletAddress).catch(console.error);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
@@ -201,6 +203,7 @@ export async function PATCH(request: Request) {
     }
 
     calculateScore(walletAddress).catch(console.error);
+    syncUserStatus(walletAddress).catch(console.error);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
@@ -248,6 +251,7 @@ export async function DELETE(request: Request) {
 
     if (error) return errorResponse("ERR_DATABASE_ERROR", error.message, 500);
 
+    syncUserStatus(walletAddress).catch(console.error);
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     return errorResponse("ERR_SERVER_ERROR", err.message, 500);
@@ -262,10 +266,10 @@ export async function GET(request: Request) {
 
   if (!wallet) return errorResponse("ERR_INVALID_REQUEST", "wallet required", 400);
 
-  // 1. Fetch profile
+  // 1. Fetch profile (Specific fields only)
   const { data, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select("display_name, bio, skills, twitter, github, website, discord, whatsapp, email, country, avatar_url, looking_for, timezone, work_preference, lens, farcaster, tags, telegram, linkedin, instagram, card_number, wallet_address, created_at, professional_role, organization, attestation_used, attestation_reset_date")
     .eq("wallet_address", wallet)
     .single();
 
@@ -282,42 +286,18 @@ export async function GET(request: Request) {
     .eq("wallet_address", wallet)
     .maybeSingle();
 
-  // --- Merit-based Builder Auto-Verification ---
-  const { data: powEntries } = await supabase
+  // --- Merit-based Builder Auto-Verification & Cache Warmup ---
+  const { data: receipts } = await supabase
     .from("receipts")
-    .select("role")
-    .eq("wallet_address", wallet)
-    .not("role", "is", null)
-    .neq("role", "");
+    .select("id, role, description, start_date, end_date, status, attestation_type, tx_signature, created_at, updated_at")
+    .eq("wallet_address", wallet);
 
-  const validPowCount = powEntries?.filter((p: any) => p.role && p.role.trim().length > 2).length || 0;
-  const hasRequiredProfile = !!data?.display_name;
-  const meetsBuilderCriteria = hasRequiredProfile && validPowCount >= 1;
-
-  if (meetsBuilderCriteria) {
-      const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');
-      if (canAutoVerify) {
-          const upsertData = {
-              wallet_address: wallet,
-              type: 'Builder',
-              status: 'verified',
-              name: data?.display_name || wallet,
-          };
-          if (orgData?.id) {
-              await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
-          } else {
-              await supabase.from("organization_verifications").insert(upsertData);
-          }
-          // Re-fetch
-          const { data: newOrgData } = await supabase
-              .from("organization_verifications")
-              .select("status, verifier_tier, type, rejection_reason, expires_at, id")
-              .eq("wallet_address", wallet)
-              .maybeSingle();
-          orgData = newOrgData;
-      }
+  // Reuse pre-fetched data to recalculate score without extra DB hits
+  if (data) {
+     calculateScore(wallet, { profile: data, receipts: receipts || [] }).catch(err => {
+        console.error("Background score update failed:", err.message);
+     });
   }
-  // ---------------------------------------------
 
   const now = new Date();
   const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;

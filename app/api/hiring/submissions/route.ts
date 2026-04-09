@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         // 4. Fetch Deep Candidate Data for Snapshot
         const { data: profile } = await supabase
             .from("profiles")
-            .select("*")
+            .select("display_name, avatar_url, bio, skills")
             .eq("wallet_address", walletAddress)
             .single();
 
