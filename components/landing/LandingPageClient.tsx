@@ -13,13 +13,13 @@ import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
 
 const SLIDES = [
-    { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile 2" },
-    { src: "/homepage/image%20slide%202/dashboard%202.png?v=2", label: "Recruiter Dashboard" },
-    { src: "/homepage/image%20slide%202/edit%20profile%202.png?v=2", label: "Profile Customization" },
-    { src: "/homepage/image%20slide%202/proof%20of%20work%202.png?v=2", label: "Verifiable Work" },
-    { src: "/homepage/image%20slide%202/apply.png?v=2", label: "Talent Application" },
-    { src: "/homepage/image%20slide%202/attestation.png?v=2", label: "On-chain Attestations" },
-    { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification Status" },
+    { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile" },
+    { src: "/homepage/image%20slide%202/dashboard%202.png?v=2", label: "Recruiter dashboard" },
+    { src: "/homepage/image%20slide%202/edit%20profile%202.png?v=2", label: "Profile customization" },
+    { src: "/homepage/image%20slide%202/proof%20of%20work%202.png?v=2", label: "Verifiable work" },
+    { src: "/homepage/image%20slide%202/apply.png?v=2", label: "Talent application" },
+    { src: "/homepage/image%20slide%202/attestation.png?v=2", label: "On-chain attestations" },
+    { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification status" },
 ];
 
 const PARTNERS = [
@@ -170,10 +170,19 @@ export function LandingPageClient() {
                             <button onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
                             <button onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
                         </div>
-                        <div className="flex justify-center gap-2 mt-12 relative z-50">
-                            {SLIDES.map((_, index) => (
-                                <button key={index} onClick={() => setCurrentSlide(index)} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"}`} />
-                            ))}
+                        <div className="flex flex-col items-center mt-8 space-y-4">
+                            <div className="h-6 relative w-full flex justify-center">
+                                {SLIDES.map((slide, index) => (
+                                    <p key={index} className={`absolute text-white/90 text-[11px] font-bold font-display tracking-[0.4em] transition-all duration-700 transform ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+                                        {slide.label}
+                                    </p>
+                                ))}
+                            </div>
+                            <div className="flex justify-center gap-2 relative z-50">
+                                {SLIDES.map((_, index) => (
+                                    <button key={index} onClick={() => setCurrentSlide(index)} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"}`} />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -230,6 +239,14 @@ export function LandingPageClient() {
                             quality={100}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                    </div>
+
+                    <div className="h-4 relative w-full flex justify-center -mt-2">
+                        {SLIDES.map((slide, index) => (
+                            <p key={index} className={`absolute text-white/90 text-[10px] font-bold font-display tracking-[0.3em] transition-all duration-500 transform ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 pointer-events-none"}`}>
+                                {slide.label}
+                            </p>
+                        ))}
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
