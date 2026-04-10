@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     if (!supabase) {
         return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
     }
 
     try {
-        const formData = await request.formData();
+        const formData = (await request.formData()) as any;
         const file = formData.get("file") as File;
         const bucket = formData.get("bucket") as string || "portfolio";
         const path = formData.get("path") as string; // Target path like "wallet/timestamp.webp"

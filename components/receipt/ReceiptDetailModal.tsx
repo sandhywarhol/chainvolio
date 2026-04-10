@@ -38,28 +38,28 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
 
                 <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     {/* Status Hero */}
-                    <div className={`p-4 rounded-xl border text-center ${isAttested
+                    <div className={`p-3 rounded-xl border text-center ${isAttested
                         ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                         : "bg-slate-800/50 border-slate-700 text-slate-400"
                         }`}>
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-center gap-1.5">
                             {receipt.attestationType === "Hiring Proof" ? (
                                 <>
-                                    <ShieldCheck className="w-10 h-10" />
-                                    <p className="font-bold text-lg">Hiring Recorded On-Chain</p>
-                                    <p className="text-xs opacity-80 uppercase tracking-tighter">Institutional Recruitment Decision</p>
+                                    <ShieldCheck className="w-8 h-8" />
+                                    <p className="font-bold text-base">Hiring Recorded On-Chain</p>
+                                    <p className="text-[10px] opacity-80 uppercase tracking-tight">Institutional Recruitment Decision</p>
                                 </>
                             ) : isAttested ? (
                                 <>
-                                    <ShieldCheck className="w-10 h-10" />
-                                    <p className="font-bold text-lg">On-Chain Verified</p>
-                                    <p className="text-xs opacity-80">This work experience has been cryptographically confirmed by a third party.</p>
+                                    <ShieldCheck className="w-8 h-8" />
+                                    <p className="font-bold text-base">On-Chain Verified</p>
+                                    <p className="text-[10px] opacity-80 max-w-[280px]">This experience has been cryptographically confirmed by a third party.</p>
                                 </>
                             ) : (
                                 <>
-                                    <UserCheck className="w-10 h-10 opacity-50" />
-                                    <p className="font-bold text-lg">Self-Claimed</p>
-                                    <p className="text-xs opacity-80">Information provided directly by the candidate.</p>
+                                    <UserCheck className="w-8 h-8 opacity-50" />
+                                    <p className="font-bold text-base">Self-Claimed</p>
+                                    <p className="text-[10px] opacity-80">Information provided directly by the candidate.</p>
                                 </>
                             )}
                         </div>

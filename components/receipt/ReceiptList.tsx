@@ -37,7 +37,9 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
     fetch(`/api/receipts?wallet=${walletAddress}`)
       .then((r) => r.json())
       .then((data) => {
-        setReceipts(Array.isArray(data) ? data : []);
+        // API returns { receipts: [...] }
+        const list = Array.isArray(data) ? data : (data.receipts || []);
+        setReceipts(list);
         // Check for hash link and scroll
         setTimeout(() => {
           const hash = window.location.hash;

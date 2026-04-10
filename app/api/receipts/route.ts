@@ -111,6 +111,7 @@ export async function GET(request: Request) {
         portfolioImages: r.portfolio_images || [],
         status: attestation ? "Attested" : r.status,
         attesterWallet: attestation?.attester_wallet || null,
+        attesterAvatar: profile?.avatar_url || null,
         attesterName: attesterName,
         attesterRole: profile?.professional_role || profile?.headline || attestation?.attester_role || (isHiring ? "Hiring Lead" : null),
         attesterOrg: profile?.organization || attestation?.attester_org || null,

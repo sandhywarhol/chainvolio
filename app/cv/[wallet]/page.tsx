@@ -723,10 +723,11 @@ export default function CVPage(props: any) {
     Promise.all([
       fetch(`/api/receipts?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
-    ]).then(([recs, port]) => {
-      const sortedRecs = Array.isArray(recs)
-        ? [...recs].sort((a: any, b: any) => (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0))
-        : [];
+    ]).then(([recsData, port]) => {
+      const recs = Array.isArray(recsData) ? recsData : (recsData.receipts || []);
+      const sortedRecs = [...recs].sort((a: any, b: any) => 
+        (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0)
+      );
       setReceipts(sortedRecs);
       setPortfolio(Array.isArray(port) ? port : []);
     }).catch(err => console.error("Non-critical fetches failed:", err));

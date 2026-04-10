@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
 
   const { searchParams } = new URL(request.url);
@@ -18,11 +18,11 @@ export async function GET(request: Request) {
   return NextResponse.json(data || []);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
 
   try {
-    const formData = await request.formData();
+    const formData = (await request.formData()) as any;
     const wallet   = formData.get("wallet")   as string;
     const title    = formData.get("title")    as string;
     const issuer   = formData.get("issuer")   as string | null;
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
 
   try {

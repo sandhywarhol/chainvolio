@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { MessageSquarePlus, ChevronDown, ChevronUp, Link as LinkIcon, Image as ImageIcon, X, ExternalLink } from "lucide-react";
+import { formatDateTime } from "@/shared/utils/date";
 
 export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: any, isOwner: boolean, onUpdateAdded?: () => void }) {
     const [expanded, setExpanded] = useState(false);
@@ -249,7 +250,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                                 <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 transition-all group-hover:bg-slate-800/60">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-[10px] text-slate-500 font-mono">
-                                            {new Date(update.createdAt).toLocaleDateString()} · {new Date(update.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {formatDateTime(update.createdAt)}
                                         </span>
                                         {idx === 0 && (
                                             <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-500/10 px-2 mb-1 py-0.5 rounded border border-emerald-500/20">

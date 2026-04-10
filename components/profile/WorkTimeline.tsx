@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { TrendingUp, Briefcase, ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
+import { getShortDate, calculateDuration } from "@/shared/utils/date";
 
 export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], onSelectReceipt: (r: any) => void }) {
     const sortedReceipts = useMemo(() => {
         if (!receipts || receipts.length === 0) return [];
         // Sort chronologically ascending for a left-to-right timeline (oldest to newest based on start date)
-        return receipts.filter(r => r.startDate).map(r => {
-            const date = new Date(r.startDate);
+        return receipts.filter(r => r.startDate || r.start_date).map(r => {
+            const date = new Date(r.startDate || r.start_date);
             return {
                 ...r,
                 sortDate: date.getTime(),
@@ -18,9 +19,6 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
     const [isExpanded, setIsExpanded] = useState(false);
 
     if (!sortedReceipts || sortedReceipts.length === 0) return null;
-
-    const earliestStartDate = Math.min(...sortedReceipts.map(r => new Date(r.startDate).getTime()));
-    const latestEndDate = Math.max(...sortedReceipts.map(r => r.endDate ? new Date(r.endDate).getTime() : new Date().getTime()));
 
     return (
         <div className="w-full mb-3 border-t border-slate-800/50 pt-4 mt-6">
@@ -70,7 +68,7 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                             const isLast = i === sortedReceipts.length - 1;
                                             const isTop = i % 2 === 0;
                                             const isCurrent = i === sortedReceipts.length - 1;
-                                            const year = new Date(r.startDate).getFullYear();
+                                            const year = new Date(r.startDate || r.start_date).getFullYear();
 
                                             const chevronClip = isFirst
                                                 ? 'polygon(0% 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 0% 100%)'
@@ -78,27 +76,9 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                                 ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 8px 50%)'
                                                 : 'polygon(0% 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 0% 100%, 8px 50%)';
 
-                                            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                                            const getShortDate = (d: string) => {
-                                                if (!d) return "Present";
-                                                const date = new Date(d);
-                                                return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-                                            };
-                                            const startStr = getShortDate(r.startDate);
-                                            const endStr = r.endDate ? getShortDate(r.endDate) : "Present";
-                                            
-                                            const start = new Date(r.startDate);
-                                            const end = r.endDate ? new Date(r.endDate) : new Date();
-                                            const totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
-                                            let durationStr = "";
-                                            if (totalMonths >= 12) {
-                                                const years = Math.floor(totalMonths / 12);
-                                                const remainingMonths = totalMonths % 12;
-                                                durationStr = `${years} yr${years !== 1 ? 's' : ''}`;
-                                                if (remainingMonths > 0) durationStr += ` ${remainingMonths} mo${remainingMonths !== 1 ? 's' : ''}`;
-                                            } else {
-                                                durationStr = `${totalMonths} mo${totalMonths !== 1 ? 's' : ''}`;
-                                            }
+                                            const startStr = getShortDate(r.startDate || r.start_date);
+                                            const endStr = getShortDate(r.endDate || r.end_date);
+                                            const durationStr = calculateDuration(r.startDate || r.start_date, r.endDate || r.end_date);
 
                                             return (
                                                 <div key={r.id || i} className={`flex-1 h-full relative z-0 group cursor-pointer ${!isFirst ? '-ml-[8px]' : ''}`} onClick={() => onSelectReceipt(r)}>
@@ -150,17 +130,11 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                     <div className="space-y-8 relative">
                                         <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-800/50" />
                                         {sortedReceipts.slice().reverse().map((r, i) => {
-                                            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                                            const getShortDate = (d: string) => {
-                                                if (!d) return "Present";
-                                                const date = new Date(d);
-                                                return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-                                            };
                                             return (
                                                 <div key={r.id || i} className="relative pl-12" onClick={() => onSelectReceipt(r)}>
                                                     <div className="absolute left-[11px] top-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                                                     <div className="space-y-1">
-                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{getShortDate(r.startDate)}</span>
+                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{getShortDate(r.startDate || r.start_date)}</span>
                                                         <h4 className="text-base font-bold text-emerald-400 leading-tight flex items-center gap-2">
                                                             {r.org} {r.status === "Attested" && <ShieldCheck className="w-3.5 h-3.5" />}
                                                         </h4>
@@ -172,7 +146,7 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                         })}
                                     </div>
                                 </div>
-               </div>
+                            </div>
                         </div>
                     </div>
                 </div>

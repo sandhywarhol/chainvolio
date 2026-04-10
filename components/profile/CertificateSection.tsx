@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Award, ChevronDown, ChevronUp, ExternalLink, FileText, Image as ImageIcon, Trash2, Loader2, Plus, Lock } from "lucide-react";
+import { formatLongDate } from "@/shared/utils/date";
 
 export interface Certificate {
   id: string;
@@ -31,9 +32,7 @@ export function CertificateCard({ cert, isOwner, onDelete, onPreview }: Certific
     onDelete(cert.id);
   };
 
-  const formattedDate = cert.date_issued
-    ? new Date(cert.date_issued).toLocaleDateString("en-US", { year: "numeric", month: "long" })
-    : null;
+  const formattedDate = formatLongDate(cert.date_issued);
 
   return (
     <div 
