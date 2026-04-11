@@ -49,10 +49,20 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
             const targetWallet = wallets.find(w => w.adapter.name === walletName);
             if (targetWallet) {
-                select(targetWallet.adapter.name);
+                await select(targetWallet.adapter.name);
             } else {
-                select(walletName as any);
+                await select(walletName as any);
             }
+
+            // Small delay to ensure selection is processed before connecting
+            setTimeout(() => {
+                connect().catch((err) => {
+                    // Suppress error if it's just a user rejection
+                    if (err.name !== "WalletConnectionError") {
+                        console.error("Connection failed:", err);
+                    }
+                });
+            }, 100);
 
             onClose();
         } catch (err) {

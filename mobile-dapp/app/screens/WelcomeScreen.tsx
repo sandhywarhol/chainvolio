@@ -146,7 +146,7 @@ const WelcomeScreen = ({ navigation }: any) => {
             style={styles.inner}
           >
             <View style={styles.brandArea}>
-               <ExpoImage source={require('../../assets/images/logo.png')} style={styles.mainLogo} contentFit="contain" />
+               <ExpoImage source={require('../../assets/images/logo-white.png')} style={styles.mainLogo} contentFit="contain" />
                <Text style={styles.logoSubText}>THE TRUST LAYER FOR WEB3</Text>
             </View>
 

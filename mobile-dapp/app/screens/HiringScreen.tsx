@@ -1,26 +1,43 @@
 import React, { useState, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
-  RefreshControl,
-  StatusBar,
-  Linking
+  Share,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { getDashboardStats } from '../services/api';
 import { useWallet } from '../context/WalletContext';
-import { getProfile } from '../services/api';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const HiringScreen = () => {
+const { width } = Dimensions.get('window');
+
+const HiringScreen = ({ navigation }: any) => {
   const { walletAddress } = useWallet();
-  const [profile, setProfile] = useState<any>(null);
+  const [collections, setCollections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = async () => {
+    if (!walletAddress) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await getDashboardStats(walletAddress);
+      setCollections(data?.collections || []);
+    } catch (error) {
+      console.error('Hiring fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -28,22 +45,16 @@ const HiringScreen = () => {
     }, [walletAddress])
   );
 
-  const fetchData = async (isRefresh = false) => {
-    if (!walletAddress) return;
-    if (!isRefresh) setLoading(true);
-    
+  const handleShare = async (slug: string) => {
+    const url = `https://chainvolio.com/r/${slug}`;
     try {
-      const prof = await getProfile(walletAddress);
-      setProfile(prof);
+      await Share.share({ message: `Apply for our open position on ChainVolio: ${url}`, url });
     } catch (error) {
-      console.error('Hiring center sync error:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+      console.error(error);
     }
   };
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#10b981" />
@@ -52,169 +63,156 @@ const HiringScreen = () => {
     );
   }
 
-  const isRecruiter = profile?.verificationTier === 'recruiter';
-  const attestationUsed = profile?.attestationUsed || 0;
-  const attestationQuota = profile?.attestationQuota || 0;
-  const usagePercent = attestationQuota > 0 ? (attestationUsed / attestationQuota) * 100 : 0;
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.header}>
-         <View>
-            <Text style={styles.headerTitle}>Hiring Center</Text>
-            <Text style={styles.headerSubtitle}>Verified Talent Sourcing</Text>
-         </View>
-         <TouchableOpacity 
-           style={styles.plusBtn}
-           onPress={() => Linking.openURL('https://chainvolio.xyz/hiring/create')}
-         >
-            <Ionicons name="add" size={24} color="#000" />
-         </TouchableOpacity>
-      </View>
-
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(true); }} tintColor="#10b981" />
-        }
-      >
-        
-        {/* RECRUITER STATUS CARD */}
-        <View style={styles.dashboardCard}>
-           <View style={styles.cardHeader}>
-              <View style={styles.badgeLabel}>
-                 <Ionicons name="shield-checkmark" size={14} color="#10b981" />
-                 <Text style={styles.cardLabel}>OFFICIAL RECRUITER</Text>
-              </View>
-              <View style={[styles.tierBadge, { backgroundColor: isRecruiter ? '#10b98120' : '#222' }]}>
-                 <Text style={[styles.tierText, { color: isRecruiter ? '#10b981' : '#666' }]}>
-                   {isRecruiter ? 'TIER III' : 'LITE'}
-                 </Text>
-              </View>
-           </View>
-           
-           <View style={styles.mainStats}>
-              <View style={styles.statItem}>
-                 <Text style={styles.statVal}>0</Text>
-                 <Text style={styles.statLabel}>TALENT POOLS</Text>
-              </View>
-              <View style={styles.statItem}>
-                 <Text style={styles.statVal}>0</Text>
-                 <Text style={styles.statLabel}>PUBLIC LISTS</Text>
-              </View>
-           </View>
-        </View>
-
-        {/* BENEFIT TRACKER (NEW - MIRRORS DESKTOP) */}
-        <View style={styles.benefitCard}>
-           <View style={styles.benefitHeader}>
-              <Text style={styles.benefitTitle}>MONTHLY ATTESTATION QUOTA</Text>
-              <Text style={styles.benefitVal}>{attestationUsed} / {attestationQuota}</Text>
-           </View>
-           <View style={styles.usageBar}>
-              <View style={[styles.usageFill, { width: `${usagePercent}%` }]} />
-           </View>
-           <View style={styles.benefitFooter}>
-              <Ionicons name="time-outline" size={12} color="#444" />
-              <Text style={styles.resetText}>Resets in 14 days</Text>
-           </View>
-        </View>
-
-        {/* TALENT COLLECTIONS */}
-        <View style={styles.sectionHeader}>
-           <Text style={styles.sectionTitle}>TALENT COLLECTIONS</Text>
-        </View>
-
-        <View style={styles.emptyBox}>
-          <View style={styles.iconCircle}>
-             <Ionicons name="search" size={32} color="#111" />
-          </View>
-          <Text style={styles.emptyTitle}>No active collections</Text>
-          <Text style={styles.emptySubtitle}>
-            Create your first collection on desktop to start trackting talents with verified employment.
-          </Text>
-          
-          <TouchableOpacity 
-             style={styles.actionBtn}
-             onPress={() => Linking.openURL('https://chainvolio.xyz/hiring/create')}
-          >
-             <Text style={styles.actionBtnText}>Go to Desktop Dashboard</Text>
-             <Ionicons name="external-link" size={14} color="#000" />
+    <View style={styles.background}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Hiring Hub</Text>
+          <View style={{ width: 40 }} />
         </View>
 
-        {/* SOURCE TOOLS */}
-        <View style={styles.toolsList}>
-           <Text style={styles.toolsHeader}>INFRASTRUCTURE TOOLS</Text>
-           
-           <TouchableOpacity style={styles.toolRow}>
-              <View style={[styles.toolIcon, { backgroundColor: '#10b98110' }]}>
-                 <MaterialCommunityIcons name="shield-search" size={20} color="#10b981" />
-              </View>
-              <View style={styles.toolInfo}>
-                 <Text style={styles.toolTitle}>Candidate Verification</Text>
-                 <Text style={styles.toolDesc}>Request a proof of work from a builder</Text>
-              </View>
-           </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* ACTION BANNER */}
+          <View style={styles.actionBanner}>
+             <LinearGradient
+               colors={['#10b981', '#059669']}
+               style={styles.bannerGradient}
+               start={{x:0, y:0}}
+               end={{x:1, y:1}}
+             >
+                <View style={styles.bannerInfo}>
+                   <Text style={styles.bannerTitle}>Source Elite Talent</Text>
+                   <Text style={styles.bannerDesc}>Create a verifiable collection link and filter for on-chain proof.</Text>
+                </View>
+                <TouchableOpacity 
+                   style={styles.plusCircle}
+                   onPress={() => navigation.navigate('Create Hiring')}
+                >
+                   <Ionicons name="add" size={28} color="#fff" />
+                </TouchableOpacity>
+             </LinearGradient>
+          </View>
 
-           <TouchableOpacity style={styles.toolRow}>
-              <View style={[styles.toolIcon, { backgroundColor: '#6366f110' }]}>
-                 <Ionicons name="people-outline" size={20} color="#6366f1" />
-              </View>
-              <View style={styles.toolInfo}>
-                 <Text style={styles.toolTitle}>Social Sourcing</Text>
-                 <Text style={styles.toolDesc}>Discover talent via community attestations</Text>
-              </View>
-           </TouchableOpacity>
-        </View>
+          {/* COLLECTIONS LIST */}
+          <View style={styles.sectionHeader}>
+             <Text style={styles.sectionTitle}>YOUR COLLECTIONS</Text>
+             <View style={styles.countBadge}><Text style={styles.countText}>{collections.length}</Text></View>
+          </View>
 
-      </ScrollView>
-    </SafeAreaView>
+          {collections.length === 0 ? (
+            <View style={styles.emptyState}>
+               <MaterialCommunityIcons name="briefcase-search-outline" size={48} color="rgba(255,255,255,0.05)" />
+               <Text style={styles.emptyText}>No active collections found.</Text>
+               <TouchableOpacity 
+                  style={styles.emptyBtn}
+                  onPress={() => navigation.navigate('Create Hiring')}
+               >
+                  <Text style={styles.emptyBtnText}>GENERATE HIRING LINK</Text>
+               </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.grid}>
+               {collections.map((col) => (
+                 <View key={col.id} style={styles.colCard}>
+                    <View style={styles.colTop}>
+                       <View style={styles.colIconBox}>
+                          <Ionicons name="link-outline" size={20} color="#10b981" />
+                       </View>
+                       <View style={styles.colMain}>
+                          <Text style={styles.colTitle} numberOfLines={1}>{col.title}</Text>
+                          <Text style={styles.colDate}>{new Date(col.created_at).toLocaleDateString()}</Text>
+                       </View>
+                    </View>
+                    
+                    <View style={styles.colActions}>
+                       <TouchableOpacity 
+                          style={styles.actionBtn}
+                          onPress={() => handleShare(col.slug)}
+                       >
+                          <Ionicons name="share-social-outline" size={16} color="rgba(255,255,255,0.6)" />
+                          <Text style={styles.actionBtnText}>SHARE</Text>
+                       </TouchableOpacity>
+                       
+                       <TouchableOpacity 
+                          style={[styles.actionBtn, styles.actionBtnMain]}
+                          onPress={() => navigation.navigate('Dashboard')}
+                       >
+                          <Text style={styles.actionBtnTextMain}>DASHBOARD</Text>
+                          <Ionicons name="arrow-forward" size={14} color="#10b981" />
+                       </TouchableOpacity>
+                    </View>
+                 </View>
+               ))}
+            </View>
+          )}
+
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  loadingContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#333', fontSize: 9, marginTop: 16, fontWeight: '900', letterSpacing: 2 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 24, borderBottomWidth: 1, borderBottomColor: '#111' },
-  headerTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
-  headerSubtitle: { color: '#444', fontSize: 12, fontWeight: '600' },
-  plusBtn: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  scrollContent: { padding: 24 },
-  dashboardCard: { backgroundColor: '#050505', borderRadius: 24, borderWidth: 1, borderColor: '#111', padding: 24, marginBottom: 16 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  badgeLabel: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  cardLabel: { color: '#10b981', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  tierBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  tierText: { fontSize: 8, fontWeight: '900' },
-  mainStats: { flexDirection: 'row', gap: 40 },
-  statVal: { color: '#fff', fontSize: 32, fontWeight: 'bold' },
-  statLabel: { color: '#333', fontSize: 9, fontWeight: '900', letterSpacing: 1, marginTop: 4 },
-  benefitCard: { backgroundColor: '#050505', borderRadius: 20, borderWidth: 1, borderColor: '#111', padding: 20, marginBottom: 40 },
-  benefitHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  benefitTitle: { color: '#444', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  benefitVal: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
-  usageBar: { height: 6, backgroundColor: '#111', borderRadius: 3, overflow: 'hidden', marginBottom: 10 },
-  usageFill: { height: '100%', backgroundColor: '#10b981' },
-  benefitFooter: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  resetText: { color: '#444', fontSize: 9, fontWeight: '600' },
-  sectionHeader: { marginBottom: 16 },
-  sectionTitle: { color: '#222', fontSize: 10, fontWeight: '900', letterSpacing: 2 },
-  emptyBox: { alignItems: 'center', paddingVertical: 40, backgroundColor: '#020202', borderRadius: 24, borderWidth: 1, borderColor: '#111', borderStyle: 'dashed' },
-  iconCircle: { width: 70, height: 70, borderRadius: 20, backgroundColor: '#050505', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#111' },
-  emptyTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
-  emptySubtitle: { color: '#444', fontSize: 12, textAlign: 'center', lineHeight: 20, paddingHorizontal: 30, marginBottom: 24 },
-  actionBtn: { backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12 },
-  actionBtnText: { color: '#000', fontSize: 13, fontWeight: '800' },
-  toolsList: { marginTop: 40 },
-  toolsHeader: { color: '#222', fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 20 },
-  toolRow: { flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: '#050505', padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: '#111' },
-  toolIcon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  toolInfo: { flex: 1 },
-  toolTitle: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
-  toolDesc: { color: '#444', fontSize: 12, marginTop: 2 },
+  background: { flex: 1, backgroundColor: '#050505' },
+  container: { flex: 1 },
+  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 20 },
+  header: {
+    height: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
+  headerTitle: { color: '#fff', fontSize: 18, fontFamily: 'SpaceGrotesk-Bold' },
+  scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
+  actionBanner: { height: 120, borderRadius: 24, overflow: 'hidden', marginBottom: 40 },
+  bannerGradient: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, justifyContent: 'space-between' },
+  bannerInfo: { flex: 1, paddingRight: 20 },
+  bannerTitle: { color: '#fff', fontSize: 18, fontFamily: 'SpaceGrotesk-Bold' },
+  bannerDesc: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontFamily: 'Inter-Bold', marginTop: 4, lineHeight: 16 },
+  plusCircle: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 },
+  sectionTitle: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 2 },
+  countBadge: { paddingHorizontal: 6, py: 2, borderRadius: 10, backgroundColor: 'rgba(16,185,129,0.1)', borderWidth: 0.5, borderColor: 'rgba(16,185,129,0.2)' },
+  countText: { color: '#10b981', fontSize: 9, fontFamily: 'Inter-Bold' },
+  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60, gap: 12 },
+  emptyText: { color: 'rgba(255,255,255,0.15)', fontSize: 14, fontFamily: 'Inter-Bold' },
+  emptyBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  emptyBtnText: { color: 'rgba(255,255,255,0.4)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 1 },
+  grid: { gap: 16 },
+  colCard: { 
+    backgroundColor: 'rgba(255,255,255,0.02)', 
+    borderRadius: 22, 
+    borderWidth: 0.5, 
+    borderColor: 'rgba(255,255,255,0.05)',
+    padding: 20
+  },
+  colTop: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 20 },
+  colIconBox: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(16,185,129,0.05)', alignItems: 'center', justifyContent: 'center' },
+  colMain: { flex: 1 },
+  colTitle: { color: '#fff', fontSize: 15, fontFamily: 'Inter-Bold' },
+  colDate: { color: 'rgba(255,255,255,0.2)', fontSize: 11, fontFamily: 'Inter-Bold', marginTop: 2 },
+  colActions: { flexDirection: 'row', gap: 12 },
+  actionBtn: { 
+    flex: 1, 
+    height: 48, 
+    borderRadius: 14, 
+    borderWidth: 0.5, 
+    borderColor: 'rgba(255,255,255,0.08)', 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: 8 
+  },
+  actionBtnMain: { borderColor: 'rgba(16,185,129,0.3)', backgroundColor: 'rgba(16,185,129,0.03)' },
+  actionBtnText: { color: 'rgba(255,255,255,0.6)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 0.5 },
+  actionBtnTextMain: { color: '#10b981', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 0.5 },
 });
 
 export default HiringScreen;

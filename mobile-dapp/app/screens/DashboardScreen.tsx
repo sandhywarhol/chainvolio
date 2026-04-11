@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -7,33 +7,37 @@ import {
   TouchableOpacity, 
   ActivityIndicator,
   Image,
-  Dimensions
+  Dimensions,
+  Animated,
+  Easing,
+  StatusBar
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useWallet } from '../context/WalletContext';
-import { getProfile, getWalletReceipts, getWalletScore } from '../services/api';
+import { getProfile, getWalletReceipts, getDashboardStats } from '../services/api';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const DashboardScreen = ({ navigation }: any) => {
   const { walletAddress } = useWallet();
   const [profile, setProfile] = useState<any>(null);
   const [receipts, setReceipts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isImpactExpanded, setIsImpactExpanded] = useState(false);
+  const [isImpactExpanded, setIsImpactExpanded] = useState(true);
   const [isHiringExpanded, setIsHiringExpanded] = useState(false);
+  const pulseAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const fetchData = async () => {
       if (!walletAddress) return;
       try {
-        const [prof, recs] = await Promise.all([
-          getProfile(walletAddress),
-          getWalletReceipts(walletAddress)
-        ]);
-        setProfile(prof);
-        setReceipts(recs);
+        const stats = await getDashboardStats(walletAddress);
+        const recs = await getWalletReceipts(walletAddress);
+        
+        setProfile(stats.profile);
+        setReceipts(recs?.receipts || []);
       } catch (error) {
         console.error('Dashboard fetch error:', error);
       } finally {
@@ -41,12 +45,25 @@ const DashboardScreen = ({ navigation }: any) => {
       }
     };
     fetchData();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1, duration: 8000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0, duration: 8000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    ).start();
   }, [walletAddress]);
+
+  const glowOpacity = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.03, 0.08]
+  });
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#10b981" />
+        <Text style={styles.loadingText}>RESOLVING PROFESSIONAL LOG...</Text>
       </View>
     );
   }
@@ -54,59 +71,74 @@ const DashboardScreen = ({ navigation }: any) => {
   const completion = profile?.completionPercentage || 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        
-        {/* Header Management Row */}
-        <View style={styles.header}>
-           <View>
-             <Text style={styles.greeting}>Dashboard</Text>
-             <Text style={styles.subGreeting}>Manage your professional identity</Text>
-           </View>
-           <TouchableOpacity style={styles.editBtn} onPress={() => navigation.navigate('Setup')}>
-             <Ionicons name="create-outline" size={18} color="#fff" />
-           </TouchableOpacity>
-        </View>
+    <View style={styles.background}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* AMBIENT LIGHT SOURCES */}
+      <Animated.View style={[styles.glowTop, { opacity: glowOpacity }]} />
+      <Animated.View style={[styles.glowBottom, { opacity: glowOpacity }]} />
 
-        {/* Profile Completion Card */}
-        {completion < 100 && (
-          <View style={styles.completionCard}>
-             <View style={styles.completionHeader}>
-                <View style={styles.completionTitleRow}>
-                   <View style={styles.pulseDot} />
-                   <Text style={styles.completionTitle}>PROFILE COMPLETION</Text>
-                </View>
-                <Text style={styles.completionPercent}>{completion}%</Text>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          
+          {/* Header Management Row */}
+          <View style={styles.header}>
+             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                <Ionicons name="chevron-back" size={24} color="#fff" />
+             </TouchableOpacity>
+             <View style={styles.headerTextCol}>
+               <Text style={styles.greeting}>Management</Text>
+               <Text style={styles.subGreeting}>Verifiable Identity Operations</Text>
              </View>
-             <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${completion}%` }]} />
-             </View>
-             <Text style={styles.completionHint}>
-               Add a <Text style={styles.whiteText}>bio</Text>, <Text style={styles.whiteText}>skills</Text>, and <Text style={styles.whiteText}>proofs</Text> to reach 100% visibility.
-             </Text>
+             <TouchableOpacity style={styles.editBtn} onPress={() => navigation.navigate('Profile')}>
+               <Ionicons name="person-outline" size={18} color="#fff" />
+             </TouchableOpacity>
           </View>
-        )}
 
-        {/* Verified Identity Impact (Accordion-like) */}
-        {profile?.isVerified && (
+          {/* Profile Completion Card */}
+          {completion < 100 && (
+            <View style={styles.completionCard}>
+               <LinearGradient
+                  colors={['rgba(16,185,129,0.05)', 'transparent']}
+                  style={styles.cardGradient}
+               >
+                 <View style={styles.completionHeader}>
+                    <View style={styles.completionTitleRow}>
+                       <View style={styles.pulseDot} />
+                       <Text style={styles.completionTitle}>PROFILE COMPLETION</Text>
+                    </View>
+                    <Text style={styles.completionPercent}>{completion}%</Text>
+                 </View>
+                 <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: `${completion}%` }]} />
+                 </View>
+                 <Text style={styles.completionHint}>
+                   Complete your <Text style={styles.whiteText}>professional bio</Text> and <Text style={styles.whiteText}>skills</Text> to optimize recruiter discovery.
+                 </Text>
+               </LinearGradient>
+            </View>
+          )}
+
+          {/* Verified Identity Impact */}
           <View style={styles.managementSection}>
              <TouchableOpacity 
                style={styles.sectionHeader}
                onPress={() => setIsImpactExpanded(!isImpactExpanded)}
+               activeOpacity={0.7}
              >
                 <View style={styles.sectionTitleRow}>
-                   <View style={[styles.iconBox, { backgroundColor: '#10b98120' }]}>
+                   <View style={[styles.iconBox, { backgroundColor: 'rgba(16,185,129,0.1)' }]}>
                       <Ionicons name="shield-checkmark" size={20} color="#10b981" />
                    </View>
                    <View>
-                      <Text style={styles.sectionMainTitle}>Verified Identity Impact</Text>
-                      <Text style={styles.sectionSubTitle}>Trust signals and performance metrics</Text>
+                      <Text style={styles.sectionMainTitle}>Identity Impact</Text>
+                      <Text style={styles.sectionSubTitle}>Trust signals and on-chain metrics</Text>
                    </View>
                 </View>
                 <Ionicons 
                   name={isImpactExpanded ? "chevron-up" : "chevron-down"} 
                   size={16} 
-                  color="#666" 
+                  color="rgba(255,255,255,0.3)" 
                 />
              </TouchableOpacity>
 
@@ -114,147 +146,193 @@ const DashboardScreen = ({ navigation }: any) => {
                <View style={styles.expandedContent}>
                   <View style={styles.statsGrid}>
                      <View style={styles.statBox}>
-                        <Text style={styles.statLabel}>MONTHLY BENEFITS</Text>
+                        <Text style={styles.statLabel}>MONTHLY QUOTA</Text>
                         <Text style={styles.statVal}>
-                           {profile.attestationUsed || 0} <Text style={styles.dimText}>/</Text> {profile.attestationQuota || 0}
+                           {profile?.attestationUsed || 0} <Text style={styles.dimText}>/</Text> {profile?.attestationQuota || 12}
                         </Text>
-                        <Text style={styles.statSub}>Attestations used</Text>
+                        <Text style={styles.statSub}>Attestations issued</Text>
                      </View>
                      <View style={styles.statBox}>
-                        <Text style={styles.statLabel}>IMPACT TIER</Text>
+                        <Text style={styles.statLabel}>VERIFIER TIER</Text>
                         <Text style={[styles.statVal, { color: '#10b981' }]}>
-                           {profile.verifierTier === 4 ? 'IV' : 'I'}
+                           {profile?.verifierTier === 4 ? 'Level IV' : 'Level I'}
                         </Text>
+                        <Text style={styles.statSub}>Institutional Trust</Text>
                      </View>
                   </View>
                </View>
              )}
           </View>
-        )}
 
-        {/* Hiring Center */}
-        <View style={styles.managementSection}>
-           <TouchableOpacity 
-             style={styles.sectionHeader}
-             onPress={() => setIsHiringExpanded(!isHiringExpanded)}
-           >
-              <View style={styles.sectionTitleRow}>
-                 <View style={[styles.iconBox, { backgroundColor: '#3b82f620' }]}>
-                    <Ionicons name="briefcase" size={20} color="#3b82f6" />
-                 </View>
-                 <View>
-                    <Text style={styles.sectionMainTitle}>Hiring Center</Text>
-                    <Text style={styles.sectionSubTitle}>Manage talent collections and hiring links</Text>
-                 </View>
-              </View>
-              <Ionicons 
-                name={isHiringExpanded ? "chevron-up" : "chevron-down"} 
-                size={16} 
-                color="#666" 
-              />
-           </TouchableOpacity>
+          {/* Hiring Center */}
+          <View style={styles.managementSection}>
+             <TouchableOpacity 
+               style={styles.sectionHeader}
+               onPress={() => setIsHiringExpanded(!isHiringExpanded)}
+               activeOpacity={0.7}
+             >
+                <View style={styles.sectionTitleRow}>
+                   <View style={[styles.iconBox, { backgroundColor: 'rgba(99,102,241,0.1)' }]}>
+                      <Ionicons name="briefcase" size={20} color="#6366f1" />
+                   </View>
+                   <View>
+                      <Text style={styles.sectionMainTitle}>Hiring Operations</Text>
+                      <Text style={styles.sectionSubTitle}>Manage collections and pipeline</Text>
+                   </View>
+                </View>
+                <Ionicons 
+                  name={isHiringExpanded ? "chevron-up" : "chevron-down"} 
+                  size={16} 
+                  color="rgba(255,255,255,0.3)" 
+                />
+             </TouchableOpacity>
 
-           {isHiringExpanded && (
-              <View style={styles.expandedContent}>
-                 <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Ready to Source Talent?</Text>
-                    <TouchableOpacity style={styles.actionBtn}>
-                       <Text style={styles.actionBtnText}>Create Hiring Collection</Text>
-                    </TouchableOpacity>
-                 </View>
-              </View>
-           )}
-        </View>
+             {isHiringExpanded && (
+                <View style={styles.expandedContent}>
+                   <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>Source Talent with Integrity</Text>
+                      <Text style={styles.emptySub}>Create collections to receive immutable snapshots of candidate portfolios.</Text>
+                      <TouchableOpacity 
+                        style={styles.actionBtn}
+                        onPress={() => navigation.navigate('Create Hiring')}
+                      >
+                         <LinearGradient
+                            colors={['#6366f1', '#4f46e5']}
+                            style={styles.actionBtnGradient}
+                         >
+                            <Text style={styles.actionBtnText}>Initialize Collection</Text>
+                            <Ionicons name="add" size={18} color="#fff" />
+                         </LinearGradient>
+                      </TouchableOpacity>
+                   </View>
+                </View>
+             )}
+          </View>
 
-        {/* Proof of Work Section */}
-        <View style={styles.workSection}>
-           <View style={styles.workHeader}>
-              <Text style={styles.workTitle}>Proof of Work</Text>
-              <TouchableOpacity style={styles.addProofBtn}>
-                 <Text style={styles.addProofText}>+ Add Proof</Text>
-              </TouchableOpacity>
-           </View>
+          {/* Proof of Work Section */}
+          <View style={styles.workSection}>
+             <View style={styles.workHeader}>
+                <Text style={styles.workTitle}>Professional Evidence</Text>
+                <TouchableOpacity 
+                  style={styles.addProofBtn}
+                  onPress={() => navigation.navigate('Add Proof')}
+                >
+                   <Text style={styles.addProofText}>+ Add Work</Text>
+                </TouchableOpacity>
+             </View>
 
-           {receipts.length > 0 ? (
-             receipts.map((r, i) => (
-               <View key={i} style={styles.receiptCard}>
-                  <View style={styles.receiptHeader}>
-                     <Text style={styles.receiptRole}>{r.role}</Text>
-                     <View style={[styles.statusBadge, { backgroundColor: r.status === 'Attested' ? '#10b98120' : '#333' }]}>
-                        <Text style={[styles.statusText, { color: r.status === 'Attested' ? '#10b981' : '#666' }]}>
-                           {r.status === 'Attested' ? '✓ ATTESTED' : 'PENDING'}
-                        </Text>
-                     </View>
-                  </View>
-                  <Text style={styles.receiptOrg}>{r.org}</Text>
-                  <View style={styles.receiptMeta}>
-                     <Text style={styles.receiptDate}>Jan 2024</Text>
-                     <TouchableOpacity>
-                        <Ionicons name="create-outline" size={16} color="#666" />
-                     </TouchableOpacity>
-                  </View>
+             {receipts.length > 0 ? (
+               receipts.slice(0, 5).map((r, i) => (
+                 <TouchableOpacity key={i} style={styles.receiptCard} activeOpacity={0.7} onPress={() => navigation.navigate('CV')}>
+                    <View style={styles.receiptHeader}>
+                       <Text style={styles.receiptRole} numberOfLines={1}>{r.role}</Text>
+                       <View style={[styles.statusBadge, { backgroundColor: r.status === 'Attested' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)' }]}>
+                          <Text style={[styles.statusText, { color: r.status === 'Attested' ? '#10b981' : 'rgba(255,255,255,0.3)' }]}>
+                             {r.status === 'Attested' ? 'ON-CHAIN' : 'SELF-CLAIMED'}
+                          </Text>
+                       </View>
+                    </View>
+                    <Text style={styles.receiptOrg}>{r.org}</Text>
+                    <View style={styles.receiptMeta}>
+                       <View style={styles.dateBox}>
+                          <Ionicons name="calendar-outline" size={12} color="rgba(255,255,255,0.2)" />
+                          <Text style={styles.receiptDate}>{r.startDate || '2024'} — {r.endDate || 'Present'}</Text>
+                       </View>
+                       <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.1)" />
+                    </View>
+                 </TouchableOpacity>
+               ))
+             ) : (
+               <View style={styles.emptyWorkBox}>
+                  <Ionicons name="document-text-outline" size={32} color="rgba(255,255,255,0.05)" />
+                  <Text style={styles.emptySectionText}>No professional records resolved.</Text>
                </View>
-             ))
-           ) : (
-             <Text style={styles.emptySectionText}>No proofs added yet.</Text>
-           )}
-        </View>
+             )}
+          </View>
 
-      </ScrollView>
-    </SafeAreaView>
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
+  background: { flex: 1, backgroundColor: '#050505' },
+  container: { flex: 1 },
+  glowTop: {
+    position: 'absolute',
+    top: -width * 0.4,
+    right: -width * 0.4,
+    width: width,
+    height: width,
+    backgroundColor: '#6366f1',
+    borderRadius: width / 2,
+  },
+  glowBottom: {
+    position: 'absolute',
+    bottom: -width * 0.4,
+    left: -width * 0.4,
+    width: width,
+    height: width,
+    backgroundColor: '#10b981',
+    borderRadius: width / 2,
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050505',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 20 },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 25,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 35,
     marginTop: 10,
+    gap: 15
   },
+  backBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  headerTextCol: { flex: 1 },
   greeting: {
     color: '#fff',
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
   subGreeting: {
-    color: '#666',
-    fontSize: 14,
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 11,
+    fontFamily: 'Inter-Bold',
     marginTop: 2,
   },
   editBtn: {
-    backgroundColor: '#333',
-    padding: 10,
-    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)'
   },
   completionCard: {
-    backgroundColor: '#0a0a0a',
+    backgroundColor: 'rgba(255,255,255,0.01)',
     borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 24,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 24,
+    marginBottom: 30,
+    overflow: 'hidden'
   },
+  cardGradient: { padding: 20 },
   completionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 15,
   },
   completionTitleRow: {
     flexDirection: 'row',
@@ -268,40 +346,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
   },
   completionTitle: {
-    color: '#666',
-    fontSize: 10,
-    fontWeight: 'bold',
-    letterSpacing: 1,
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 9,
+    fontFamily: 'Inter-Bold',
+    letterSpacing: 1.5,
   },
   completionPercent: {
     color: '#10b981',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
   progressBar: {
-    height: 6,
-    backgroundColor: '#222',
-    borderRadius: 3,
-    marginBottom: 12,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 2,
+    marginBottom: 15,
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#10b981',
-    borderRadius: 3,
+    borderRadius: 2,
   },
   completionHint: {
-    color: '#444',
+    color: 'rgba(255,255,255,0.25)',
     fontSize: 10,
-    lineHeight: 14,
+    fontFamily: 'Inter-Bold',
+    lineHeight: 16,
   },
   whiteText: {
-    color: '#888',
+    color: 'rgba(255,255,255,0.6)',
   },
   managementSection: {
-    backgroundColor: '#050505',
+    backgroundColor: 'rgba(255,255,255,0.02)',
     borderWidth: 1,
-    borderColor: '#111',
-    borderRadius: 16,
+    borderColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
     marginBottom: 12,
     overflow: 'hidden',
   },
@@ -309,36 +388,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 18,
   },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 15,
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sectionMainTitle: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
   sectionSubTitle: {
-    color: '#555',
-    fontSize: 9,
-    marginTop: 1,
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    marginTop: 2,
   },
   expandedContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: 18,
+    paddingBottom: 22,
     borderTopWidth: 1,
-    borderTopColor: '#111',
-    paddingTop: 16,
+    borderTopColor: 'rgba(255,255,255,0.03)',
+    paddingTop: 20,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -346,30 +426,32 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: 'rgba(255,255,255,0.01)',
     borderWidth: 1,
-    borderColor: '#222',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
+    borderColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'flex-start',
   },
   statLabel: {
-    color: '#444',
+    color: 'rgba(255,255,255,0.2)',
     fontSize: 8,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontFamily: 'Inter-Bold',
+    letterSpacing: 1,
+    marginBottom: 6,
   },
   statVal: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
   dimText: {
-    color: '#333',
+    color: 'rgba(255,255,255,0.1)',
   },
   statSub: {
-    color: '#333',
-    fontSize: 8,
+    color: 'rgba(255,255,255,0.2)',
+    fontSize: 9,
+    fontFamily: 'Inter-Bold',
     marginTop: 2,
   },
   emptyContainer: {
@@ -378,55 +460,70 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 12,
+    fontSize: 15,
+    fontFamily: 'SpaceGrotesk-Bold',
+    marginBottom: 8,
+  },
+  emptySub: {
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 11,
+    fontFamily: 'Inter-Bold',
+    textAlign: 'center',
+    lineHeight: 16,
+    marginBottom: 20,
+    paddingHorizontal: 10
   },
   actionBtn: {
-    backgroundColor: '#3b82f620',
-    borderWidth: 1,
-    borderColor: '#3b82f640',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    width: '100%',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  actionBtnGradient: {
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10
   },
   actionBtnText: {
-    color: '#3b82f6',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 13,
+    fontFamily: 'Inter-Bold',
   },
   workSection: {
-    marginTop: 30,
+    marginTop: 40,
   },
   workHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   workTitle: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
   addProofBtn: {
-    backgroundColor: '#10b981',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    backgroundColor: 'rgba(16,185,129,0.1)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.2)'
   },
   addProofText: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: '#10b981',
+    fontSize: 11,
+    fontFamily: 'Inter-Bold',
   },
   receiptCard: {
-    backgroundColor: '#070707',
-    borderWidth: 1,
-    borderColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 10,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 12,
   },
   receiptHeader: {
     flexDirection: 'row',
@@ -437,36 +534,48 @@ const styles = StyleSheet.create({
   receiptRole: {
     color: '#fff',
     fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Inter-Bold',
+    flex: 1,
+    marginRight: 10
   },
   statusBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   statusText: {
     fontSize: 8,
-    fontWeight: 'black',
+    fontFamily: 'Inter-Bold',
+    fontWeight: '900',
+    letterSpacing: 0.5
   },
   receiptOrg: {
-    color: '#666',
+    color: 'rgba(16,185,129,0.7)',
     fontSize: 13,
-    marginBottom: 12,
+    fontFamily: 'Inter-Bold',
+    marginBottom: 15,
   },
   receiptMeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(255,255,255,0.03)'
   },
+  dateBox: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   receiptDate: {
-    color: '#333',
+    color: 'rgba(255,255,255,0.2)',
     fontSize: 11,
+    fontFamily: 'Inter-Bold',
   },
+  emptyWorkBox: { alignItems: 'center', paddingVertical: 40, gap: 12 },
   emptySectionText: {
-    color: '#444',
+    color: 'rgba(255,255,255,0.1)',
+    fontSize: 12,
+    fontFamily: 'Inter-Bold',
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 20,
   }
 });
 

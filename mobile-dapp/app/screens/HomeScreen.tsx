@@ -1,382 +1,363 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
-  TouchableOpacity, 
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Dimensions,
   StatusBar,
-  ScrollView,
-  Image,
-  ImageBackground,
-  Alert
+  Animated,
+  Easing,
+  Platform,
+  FlatList
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useWallet } from '../context/WalletContext';
+import { Image as ExpoImage } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+const SLIDES = [
+  { id: '1', src: require('../../assets/images/slides/cv_view_2.png'), label: 'Professional Profile Hub' },
+  { id: '2', src: require('../../assets/images/slides/dashboard_2.png'), label: 'Recruiter Dashboard' },
+  { id: '3', src: require('../../assets/images/slides/edit_profile_2.png'), label: 'Profile Customization' },
+  { id: '4', src: require('../../assets/images/slides/proof_of_work_2.png'), label: 'Verifiable Proof of Work' },
+  { id: '5', src: require('../../assets/images/slides/apply.png'), label: 'Talent Application Pipeline' },
+  { id: '6', src: require('../../assets/images/slides/attestation.png'), label: 'On-chain Attestation Infrastructure' },
+  { id: '7', src: require('../../assets/images/slides/status.png'), label: 'Verification Status Tracking' },
+];
+
+const MOCKUP_WIDTH = width * 0.88;
+
+const NAV_BUTTONS = [
+  { id: '1', label: 'Add Proof', icon: 'add-circle-outline', route: 'Add Proof' },
+  { id: '2', label: 'My CV', icon: 'document-text-outline', route: 'CV' },
+  { id: '3', label: 'Credential', icon: 'ribbon-outline', route: 'Add Credential' },
+  { id: '4', label: 'Timeline', icon: 'time-outline', route: 'Timeline' },
+  { id: '5', label: 'CV Score', icon: 'stats-chart-outline', route: 'CV Score' },
+  { id: '6', label: 'Hiring', icon: 'briefcase-outline', route: 'Hiring' },
+];
 
 const HomeScreen = ({ navigation }: any) => {
   const { isConnected, walletAddress, disconnect } = useWallet();
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const flatListRef = useRef<FlatList>(null);
+  const pulseAnim = useRef(new Animated.Value(0)).current;
 
-  const handleWalletPress = () => {
-    Alert.alert(
-      "Wallet Actions",
-      `Connected as ${walletAddress?.slice(0, 8)}...`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Disconnect Wallet", 
-          style: "destructive", 
-          onPress: () => disconnect() 
-        }
-      ]
-    );
+  useEffect(() => {
+    // Elegant Carousel logic
+    const slideInterval = setInterval(() => {
+      let nextIndex = (currentIndex + 1) % SLIDES.length;
+      setCurrentIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+    }, 6000);
+
+    // Ambient Pulse logic
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1, duration: 4000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0, duration: 4000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    ).start();
+
+    return () => clearInterval(slideInterval);
+  }, [currentIndex]);
+
+  const glowOpacity = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.02, 0.05]
+  });
+
+  const glowScale = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.1]
+  });
+
+  const handleWalletActions = () => {
+    if (!isConnected) {
+      navigation.navigate('Welcome');
+      return;
+    }
+    disconnect();
   };
 
+  const renderSlide = ({ item }: { item: any }) => (
+    <View style={styles.mockupFrame}>
+      <ExpoImage source={item.src} style={styles.mockupImg} contentFit="cover" />
+      <LinearGradient
+        colors={['transparent', 'rgba(5,5,5,0.6)']}
+        style={styles.mockupOverlay}
+      />
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      
-      {/* TOP NAVIGATION BAR (DAPP STYLE) */}
-      <View style={styles.topNav}>
-        <View style={styles.logoRow}>
-          <View style={styles.logoCircle}>
-            <Ionicons name="apps" size={12} color="#000" />
+    <View style={styles.background}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+
+        {/* AMBIENT LIGHT SOURCES */}
+        <Animated.View style={[styles.glowTop, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
+        <Animated.View style={[styles.glowBottom, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
+        <View style={styles.glowCenter} />
+
+        {/* HEADER */}
+        <View style={styles.topNav}>
+          <View style={styles.logoGroup}>
+            <View style={styles.logoWrapper}>
+              <ExpoImage
+                source={require('../../assets/images/logo-white.png')}
+                style={styles.mainLogo}
+                contentFit="contain"
+              />
+            </View>
+            <Text style={styles.brandTitle}>ChainVolio</Text>
           </View>
-          <Text style={styles.brandName}>ChainVolio</Text>
-        </View>
-        
-        <View style={styles.navActions}>
-          {isConnected ? (
-            <TouchableOpacity 
-              style={styles.walletPill}
-              onPress={handleWalletPress}
+          <TouchableOpacity
+            style={styles.walletToggle}
+            onPress={handleWalletActions}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={['#151515', '#080808']}
+              style={styles.walletGradient}
             >
-              <Text style={styles.walletText}>
-                {walletAddress?.slice(0, 4)}...{walletAddress?.slice(-4)}
+              <View style={styles.activeDot} />
+              <Text style={styles.walletToggleText}>
+                {isConnected ? `${walletAddress?.slice(0, 4)}...${walletAddress?.slice(-4)}` : 'Connect'}
               </Text>
-              <View style={styles.activeIndicator} />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity 
-              style={styles.loginBtn}
-              onPress={() => navigation.navigate('Welcome')}
-            >
-              <Text style={styles.loginText}>Connect</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="search" size={20} color="#666" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="notifications-outline" size={20} color="#666" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        
-        {/* HERO SECTION */}
-        <View style={styles.heroBox}>
-          <View style={styles.heroGlow} />
-          <Text style={styles.heroLabel}>WEB3 PROFESSIONAL INFRASTRUCTURE</Text>
-          <Text style={styles.title}>Verifiable professional identity for Web3 careers.</Text>
-          <Text style={styles.subtitle}>
-            Build a work history that can't be faked. Verifiable achievements and peer attestations secured on-chain.
-          </Text>
-          
-          <View style={styles.ctaGroup}>
-             <TouchableOpacity 
-               style={[styles.btn, styles.primaryBtn]}
-               onPress={() => navigation.navigate(isConnected ? 'Profile' : 'Welcome')}
-             >
-                <Text style={styles.btnText}>Build My Identity</Text>
-                <Ionicons name="shield-checkmark" size={18} color="#000" />
-             </TouchableOpacity>
-             
-             <TouchableOpacity 
-               style={[styles.btn, styles.secondaryBtn]}
-               onPress={() => navigation.navigate('CV')}
-             >
-                <Text style={styles.btnTextSecondary}>Explore Portfolio</Text>
-             </TouchableOpacity>
+        <View style={styles.mainContent}>
+          {/* HERO SECTION */}
+          <View style={styles.heroSection}>
+            <Text style={styles.mainTitle}>Verifiable professional identity for Web3 careers.</Text>
+          </View>
+
+          {/* CAROUSEL MOCKUP */}
+          <View style={styles.carouselContainer}>
+            <FlatList
+              ref={flatListRef}
+              data={SLIDES}
+              renderItem={renderSlide}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={false}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.flatListContent}
+            />
+            <View style={styles.dotRow}>
+              {SLIDES.map((_, i) => (
+                <View key={i} style={[styles.dot, currentIndex === i && styles.activeDotLine]} />
+              ))}
+            </View>
+            <Text style={styles.carouselLabel}>
+              {SLIDES[currentIndex].label.toUpperCase()}
+            </Text>
+          </View>
+
+          {/* ACTION GRID */}
+          <View style={styles.gridSection}>
+            <View style={styles.grid}>
+              {NAV_BUTTONS.map((btn) => (
+                <TouchableOpacity
+                  key={btn.id}
+                  style={styles.gridBtn}
+                  onPress={() => navigation.navigate(btn.route)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.btnIconBox}>
+                    <LinearGradient
+                      colors={['rgba(255,255,255,0.06)', 'transparent']}
+                      style={styles.iconGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Ionicons name={btn.icon as any} size={20} color="rgba(255,255,255,0.85)" />
+                    </LinearGradient>
+                  </View>
+                  <Text style={styles.gridBtnLabel}>{btn.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
 
-        {/* MOCKUP PREVIEW */}
-        <View style={styles.previewBox}>
-           <View style={styles.previewInner}>
-              <View style={styles.previewHeader}>
-                 <View style={styles.dotsRow}>
-                    <View style={[styles.dot, { backgroundColor: '#ff5f56' }]} />
-                    <View style={[styles.dot, { backgroundColor: '#ffbd2e' }]} />
-                    <View style={[styles.dot, { backgroundColor: '#27c93f' }]} />
-                 </View>
-                 <Text style={styles.previewUrl}>chainvolio.xyz/cv/baraka</Text>
-              </View>
-              <View style={styles.previewContent}>
-                 <View style={styles.skeletonHero} />
-                 <View style={styles.skeletonRow} />
-                 <View style={styles.skeletonGrid}>
-                    <View style={styles.skeletonCard} />
-                    <View style={styles.skeletonCard} />
-                 </View>
-              </View>
-           </View>
-        </View>
-
-        <View style={styles.footer}>
-           <Text style={styles.footerLabel}>THE TRUST LAYER FOR WEB3</Text>
-           <View style={styles.socialRow}>
-              <Ionicons name="logo-twitter" size={20} color="#333" />
-              <Ionicons name="logo-github" size={20} color="#333" />
-              <Ionicons name="logo-discord" size={20} color="#333" />
-           </View>
-        </View>
-
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
+  background: { flex: 1, backgroundColor: '#050505' },
+  container: { flex: 1 },
+  glowTop: {
+    position: 'absolute',
+    top: -height * 0.15,
+    right: -width * 0.2,
+    width: width * 1.2,
+    height: width * 1.2,
+    backgroundColor: '#6366f1',
+    borderRadius: width,
+  },
+  glowBottom: {
+    position: 'absolute',
+    bottom: -height * 0.15,
+    left: -width * 0.2,
+    width: width * 1.2,
+    height: width * 1.2,
+    backgroundColor: '#10b981',
+    borderRadius: width,
+  },
+  glowCenter: {
+    position: 'absolute',
+    top: height * 0.3,
+    left: '25%',
+    width: width * 0.5,
+    height: width * 0.5,
+    backgroundColor: 'rgba(99, 102, 241, 0.02)',
+    borderRadius: width,
   },
   topNav: {
-    height: 64,
+    height: 100,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#111',
+    paddingHorizontal: 25,
+    paddingTop: Platform.OS === 'android' ? 35 : 0
   },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  logoCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    backgroundColor: '#fff',
+  logoGroup: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  logoWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandName: {
+  mainLogo: { width: 22, height: 22 },
+  brandTitle: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: -0.5,
+    letterSpacing: -1,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
-  navActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  walletToggle: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.15)',
   },
-  walletPill: {
+  walletGradient: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#111',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#222',
   },
-  walletText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    fontFamily: 'monospace',
-  },
-  activeIndicator: {
+  activeDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#10b981',
+    shadowColor: '#10b981',
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
   },
-  loginBtn: {
-    backgroundColor: '#10b981',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
+  walletToggleText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 11,
+    letterSpacing: 0.5,
+    fontFamily: 'Inter-Bold',
   },
-  loginText: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  iconBtn: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
+  mainContent: {
+    flex: 1,
     justifyContent: 'center',
-  },
-  scrollContent: {
     paddingBottom: 40,
   },
-  heroBox: {
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    position: 'relative',
+  heroSection: {
+    paddingHorizontal: 35,
+    marginTop: 65,
+    marginBottom: 35
   },
-  heroGlow: {
-    position: 'absolute',
-    top: -100,
-    width: width * 1.5,
-    height: width * 1.5,
-    borderRadius: width * 0.75,
-    backgroundColor: 'rgba(16, 185, 129, 0.03)',
-    zIndex: -1,
-  },
-  heroLabel: {
-    color: '#10b981',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginBottom: 20,
-  },
-  title: {
+  mainTitle: {
     color: '#fff',
-    fontSize: 34,
-    fontWeight: '800',
+    fontSize: 28,
+    lineHeight: 36,
     textAlign: 'center',
-    lineHeight: 42,
-    marginBottom: 20,
+    letterSpacing: -1,
+    fontFamily: 'SpaceGrotesk-Bold',
   },
-  subtitle: {
-    color: '#666',
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 10,
-    marginBottom: 40,
-  },
-  ctaGroup: {
-    width: '100%',
-    gap: 12,
-    marginBottom: 60,
-  },
-  btn: {
-    height: 56,
-    borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  primaryBtn: {
-    backgroundColor: '#fff',
-  },
-  secondaryBtn: {
-    backgroundColor: '#111',
-    borderWidth: 1,
-    borderColor: '#222',
-  },
-  btnText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  btnTextSecondary: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  previewBox: {
-    paddingHorizontal: 24,
-    marginBottom: 60,
-  },
-  previewInner: {
-    width: '100%',
-    backgroundColor: '#050505',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#111',
+  carouselContainer: { alignItems: 'center', marginBottom: 40 },
+  flatListContent: { paddingHorizontal: (width - MOCKUP_WIDTH) / 2 },
+  mockupFrame: {
+    width: MOCKUP_WIDTH,
+    height: height * 0.25,
+    marginHorizontal: (width - MOCKUP_WIDTH) / 2,
     overflow: 'hidden',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
   },
-  previewHeader: {
-    height: 32,
-    backgroundColor: '#0a0a0a',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#111',
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  previewUrl: {
-    flex: 1,
-    textAlign: 'center',
-    color: '#333',
-    fontSize: 9,
-    fontWeight: '600',
-    paddingRight: 24,
-  },
-  previewContent: {
-    padding: 24,
-    gap: 16,
-  },
-  skeletonHero: {
-    height: 100,
-    backgroundColor: '#0a0a0a',
-    borderRadius: 12,
-  },
-  skeletonRow: {
-    height: 12,
-    width: '60%',
-    backgroundColor: '#0a0a0a',
-    borderRadius: 6,
-  },
-  skeletonGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  skeletonCard: {
-    flex: 1,
-    height: 60,
-    backgroundColor: '#0a0a0a',
-    borderRadius: 12,
-  },
-  footer: {
-    alignItems: 'center',
-    paddingTop: 40,
-    borderTopWidth: 1,
-    borderTopColor: '#111',
-    marginHorizontal: 24,
-  },
-  footerLabel: {
-    color: '#222',
+  mockupImg: { width: '100%', height: '100%' },
+  mockupOverlay: { ...StyleSheet.absoluteFillObject },
+  carouselLabel: {
+    color: 'rgba(255,255,255,0.25)',
     fontSize: 9,
     fontWeight: '900',
     letterSpacing: 4,
-    marginBottom: 20,
+    marginTop: 20,
+    textAlign: 'center',
+    fontFamily: 'Inter-Bold',
   },
-  socialRow: {
-    flexDirection: 'row',
-    gap: 24,
-    marginBottom: 20,
+  dotRow: { flexDirection: 'row', gap: 6, marginTop: 24 },
+  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.08)' },
+  activeDotLine: { backgroundColor: '#6366f1', width: 14 },
+  gridSection: { paddingHorizontal: 25 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 14 },
+  gridBtn: {
+    width: (width - 50 - 28) / 3,
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  btnIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.01)',
+  },
+  iconGradient: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gridBtnLabel: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 10,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    fontFamily: 'Inter-Bold',
   }
 });
 
+
+
+
+
 export default HomeScreen;
+
+
+
+
+

@@ -116,3 +116,108 @@ export const createReceipt = async (receiptData: any) => {
     throw error;
   }
 };
+
+export const getCertificates = async (walletAddress: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/certificates?wallet=${walletAddress}`);
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching certificates:', error);
+    throw error;
+  }
+};
+
+export const createCertificate = async (formData: FormData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/certificates`, {
+      method: 'POST',
+      body: formData, // Fetch automatically sets multipart/form-data for FormData
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || `API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating certificate:', error);
+    throw error;
+  }
+};
+
+export const createHiringCollection = async (hiringData: any) => {
+  try {
+    const response = await fetch(`${BASE_URL}/hiring/collections`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(hiringData),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || `API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating hiring collection:', error);
+    throw error;
+  }
+};
+
+export const deleteCertificate = async (id: string, walletAddress: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/certificates?id=${id}&wallet=${walletAddress}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || `API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting certificate:', error);
+    throw error;
+  }
+};
+export const uploadAvatar = async (uri: string, walletAddress: string) => {
+  try {
+    const formData = new FormData();
+    const fileName = `${walletAddress}-${Date.now()}.jpg`;
+    
+    // @ts-ignore
+    formData.append('file', {
+      uri: uri,
+      name: fileName,
+      type: 'image/jpeg',
+    });
+    formData.append('bucket', 'avatars');
+    formData.append('path', fileName);
+
+    const response = await fetch(`${BASE_URL}/storage/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Storage upload failed');
+    }
+
+    const data = await response.json();
+    return data.url; // Returns the permanent cloud URL
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+};
+
+export default {
+  getUserMe,
+  getProfile,
+  updateProfile,
+  getDashboardStats,
+  uploadAvatar
+};

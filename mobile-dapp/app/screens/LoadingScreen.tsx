@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, StatusBar, Image } from 'react-native';
 import { useWallet } from '../context/WalletContext';
 import { getUserMe } from '../services/api';
 
@@ -29,14 +29,23 @@ const LoadingScreen = ({ navigation }: any) => {
       // 2. Synchronization Handshake
       const timeout = setTimeout(() => {
         if (isMounted) {
-          console.log('LOADING SCREEN: Handshake Timeout - Proceeding to Setup');
-          navigation.replace('Setup');
+          console.log('LOADING SCREEN: Handshake Slow - Still attempting to resolve...');
+          // We don't force Setup here anymore, just log it. 
+          // The try/catch block will handle the navigation when the API finally returns or fails.
         }
       }, 7000);
+
+      const finalTimeout = setTimeout(() => {
+        if (isMounted) {
+            console.log('LOADING SCREEN: Handshake Critical Timeout - Proceeding to Setup');
+            navigation.replace('Setup');
+        }
+      }, 15000);
 
       try {
         const userData = await getUserMe(activeWallet);
         clearTimeout(timeout);
+        clearTimeout(finalTimeout);
         
         if (!isMounted) return;
 
@@ -54,6 +63,7 @@ const LoadingScreen = ({ navigation }: any) => {
         }
       } catch (error) {
         clearTimeout(timeout);
+        clearTimeout(finalTimeout);
         console.error('LOADING SCREEN: Profile check error:', error);
         if (isMounted) {
           // If we hit an error (e.g. 404 or network error), treat as new user
@@ -74,6 +84,11 @@ const LoadingScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.content}>
+        <Image 
+          source={require('../../assets/images/logo-white.png')} 
+          style={{ width: 140, height: 40, marginBottom: 10 }} 
+          resizeMode="contain" 
+        />
         <ActivityIndicator size="large" color="#10b981" />
         <Text style={styles.text}>Synchronizing with ChainVolio...</Text>
         <Text style={styles.subtext}>Connecting to Trust Layer</Text>
