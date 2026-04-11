@@ -93,9 +93,54 @@ export function getVerificationLabel(type?: string): string {
     return "Verified Entity";
 }
 
+/**
+ * Returns Tailwind CSS color classes and metadata for a verification tier.
+ */
+export function getBadgeStyles(verificationType?: string) {
+    const type = (verificationType || "").toLowerCase();
+
+    if (type.includes("public") || type.includes("figure")) return {
+        color: "text-pink-400 bg-pink-500/10 border-pink-500/20",
+        iconText: "text-pink-400",
+        border: "border-pink-500/50",
+        bgBase: "bg-pink-500",
+        hex: "#ec4899",
+        bars: 2,
+        tierLabel: "Verified Public Figure",
+    };
+    if (type.includes("community") || type.includes("dao")) return {
+        color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+        iconText: "text-blue-400",
+        border: "border-blue-500/50",
+        bgBase: "bg-blue-500",
+        hex: "#3b82f6",
+        bars: 3,
+        tierLabel: "Verified Community",
+    };
+    if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
+        color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+        iconText: "text-amber-400",
+        border: "border-amber-500/50",
+        bgBase: "bg-amber-500",
+        hex: "#f59e0b",
+        bars: 4,
+        tierLabel: "Verified Organization",
+    };
+    // Default → Builder (Emerald)
+    return {
+        color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+        iconText: "text-emerald-400",
+        border: "border-emerald-500/50",
+        bgBase: "bg-emerald-500",
+        hex: "#10b981",
+        bars: 1,
+        tierLabel: "Verified Builder",
+    };
+}
+
+
 /** Returns true if the tier/type is authorized for recruiter features. */
 export function isRecruiterTier(tier?: string): boolean {
     const t = (tier || "").toLowerCase();
     return t.includes("company") || t.includes("organization") || t.includes("org") || t.includes("community") || t.includes("dao");
 }
-

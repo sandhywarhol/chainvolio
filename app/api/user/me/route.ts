@@ -21,32 +21,46 @@ export async function GET(request: Request) {
 
     try {
         // 1. Fetch Profile (Optimized Payload)
-        const { data: profile } = await supabase
+        const { data: profile, error: profileErr } = await supabase
             .from("profiles")
             .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test")
             .eq("wallet_address", wallet)
             .maybeSingle();
+
+        if (profileErr) {
+            console.error("Supabase Profile Error:", profileErr);
+            throw profileErr;
+        }
 
         if (profile?.is_test) {
             return NextResponse.json({ error: "Profile hidden or not found." }, { status: 404 });
         }
 
         // 2. Fetch Verification Status
-        let { data: orgData } = await supabase
+        let { data: orgData, error: orgErr } = await supabase
             .from("organization_verifications")
             .select("id, status, type, expires_at, rejection_reason, verifier_tier, pending_upgrade_type, pending_upgrade_status, verification_source")
             .eq("wallet_address", wallet)
             .maybeSingle();
 
+        if (orgErr) {
+            console.error("Supabase Org Error:", orgErr);
+            throw orgErr;
+        }
+
         // --- Merit-based Builder Calculation (READ-ONLY) ---
-        const powQuery = supabase
+        const { data: powEntries, error: powErr } = await supabase
             .from("receipts")
             .select("role")
             .eq("wallet_address", wallet)
             .not("role", "is", null)
             .neq("role", "");
 
-        const { data: powEntries } = await powQuery;
+        if (powErr) {
+            console.error("Supabase PoW Error:", powErr);
+            // Don't throw here, just treat as 0
+        }
+
         
         const hasBio = !!profile?.bio;
         const hasSkills = !!profile?.skills;

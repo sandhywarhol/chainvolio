@@ -121,6 +121,9 @@ export async function GET(request: Request) {
         verificationTier: isAttesterVerified ? orgData?.type : null,
         attestationId: attestation?.id || null,
         txSignature: attestation?.tx_signature || null,
+        attesterAt: attestation?.attester_at || null,
+        confidence: attestation?.confidence_level || "Confirmed",
+        attesterComment: attestation?.comment || null,
         updates: r.receipt_updates || [],
         attestations: enrichedAttestations
       };

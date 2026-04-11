@@ -3,7 +3,7 @@
 import { X, ShieldCheck, UserCheck, Calendar, Globe, MapPin, ExternalLink, Link as LinkIcon, Briefcase, FileText } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { getVerificationLabel } from "@/lib/paymentConfig";
+import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
 
 
 interface ReceiptDetailModalProps {
@@ -15,6 +15,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
     if (!receipt) return null;
 
     const isAttested = receipt.status === "Attested";
+    const badge = getBadgeStyles(receipt.attesterVerificationType);
 
     return (
         <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
@@ -98,37 +99,39 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                                     {receipt.attestationType === "Hiring Proof" ? "Verified Recruiter" : "Confirmed By"}
                                 </h4>
-                                <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    {receipt.attesterAvatar ? (
-                                        <img src={receipt.attesterAvatar} className="w-10 h-10 rounded-full border border-slate-600" />
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm">👤</div>
-                                    )}
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex flex-col">
-                                                <Link 
-                                                    href={`/cv/${receipt.attesterWallet}`}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="text-sm font-bold text-white hover:text-emerald-400 transition-colors flex items-center gap-1.5"
-                                                >
-                                                    {receipt.attestationType === "Hiring Proof" && receipt.attesterName === "Anonymous" 
-                                                        ? "Verified Recruiter" 
-                                                        : receipt.attesterName}
-                                                    <ExternalLink className="w-3 h-3 opacity-30" />
-                                                </Link>
-                                            </div>
+                                <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 backdrop-blur-md">
+                                    <div className="flex-shrink-0 relative">
+                                        {receipt.attesterAvatar ? (
+                                            <img src={receipt.attesterAvatar} className="w-12 h-12 rounded-full border border-emerald-500/20 object-cover shadow-lg" />
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow-lg">👤</div>
+                                        )}
+                                        <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
+                                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                            <Link 
+                                                href={`/cv/${receipt.attesterWallet}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="text-base font-black text-white hover:text-emerald-400 transition-colors flex items-center gap-1.5 leading-none"
+                                            >
+                                                {receipt.attestationType === "Hiring Proof" && receipt.attesterName === "Anonymous" 
+                                                    ? "Verified Recruiter" 
+                                                    : receipt.attesterName}
+                                                <ExternalLink className="w-3.5 h-3.5 opacity-30" />
+                                            </Link>
                                             {receipt.isAttesterVerified && (
-                                                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-tight">
+                                                <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${badge.color}`}>
                                                     <ShieldCheck className="w-3 h-3" />
-                                                    {getVerificationLabel(receipt.attesterVerificationType)}
+                                                    {badge.tierLabel}
                                                 </div>
                                             )}
-
                                         </div>
-                                        <p className="text-xs text-slate-400">
+                                        <p className="text-xs text-slate-400 font-medium">
                                             {receipt.attesterRole}
-                                            {receipt.attesterOrg && ` at ${receipt.attesterOrg}`}
+                                            {receipt.attesterOrg && <span className="text-slate-600"> • {receipt.attesterOrg}</span>}
                                         </p>
                                     </div>
                                 </div>

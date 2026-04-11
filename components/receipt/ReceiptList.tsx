@@ -5,6 +5,7 @@ import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
 import { WorkTimeline } from "@/components/profile/WorkTimeline";
+import { getBadgeStyles } from "@/lib/paymentConfig";
 
 type Receipt = {
   id: string;
@@ -19,6 +20,12 @@ type Receipt = {
   evidenceLinks?: { label: string; url: string }[];
   status: string;
   attesterWallet?: string;
+  attesterName?: string;
+  attesterAvatar?: string;
+  attesterVerificationType?: string;
+  verificationTier?: string;
+  isOfficial?: boolean;
+  isAttesterVerified?: boolean;
   createdAt: string;
   updates?: any[];
 };
@@ -82,14 +89,33 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
 
                 <p className="text-emerald-400 text-base font-bold">{r.org}</p>
 
-                {r.status === "Attested" && r.attesterWallet && (
-                  <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">
-                    <span>🛡 Verified by </span>
-                    <span className="font-mono bg-emerald-900/30 px-1 rounded">
-                      {r.attesterWallet.slice(0, 6)}...{r.attesterWallet.slice(-4)}
-                    </span>
-                  </p>
-                )}
+                {r.status === "Attested" && r.attesterWallet && (() => {
+                  const badge = getBadgeStyles(r.attesterVerificationType);
+                  return (
+                    <div className="mt-3 p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-3">
+                      {r.attesterAvatar ? (
+                        <img src={r.attesterAvatar} className="w-8 h-8 rounded-full border border-emerald-500/20 object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">👤</div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white truncate max-w-[120px]">
+                            {r.attesterName || "Verified Attester"}
+                          </span>
+                          {r.isOfficial && (
+                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-tighter ${badge.color}`}>
+                              Official
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[9px] text-slate-500 font-mono truncate">
+                          {r.attesterWallet.slice(0, 6)}...{r.attesterWallet.slice(-4)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <ExpandableText
                   text={r.description}

@@ -70,6 +70,8 @@ type Receipt = {
   attesterSignature?: string;
   attesterOrg?: string;
   isAttesterVerified?: boolean;
+  isOfficial?: boolean;
+  verificationTier?: string;
   attesterTier?: number;
   attesterVerificationType?: string;
   attestationId?: string;
@@ -162,7 +164,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-pink-500",
     hex: "#ec4899",
     bars: 2,
-    tierLabel: "Public Figure",
+    tierLabel: "Verified Public Figure",
   };
   if (type.includes("community") || type.includes("dao")) return {
     color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
@@ -171,7 +173,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-blue-500",
     hex: "#3b82f6",
     bars: 3,
-    tierLabel: "Community / DAO",
+    tierLabel: "Verified Community",
   };
   if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
     color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -180,7 +182,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-amber-500",
     hex: "#f59e0b",
     bars: 4,
-    tierLabel: "Company / Organization",
+    tierLabel: "Verified Organization",
   };
   // Default → Builder (Emerald)
   return {
@@ -190,7 +192,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-emerald-500",
     hex: "#10b981",
     bars: 1,
-    tierLabel: "Builder",
+    tierLabel: "Verified Builder",
   };
 };
 
@@ -218,11 +220,15 @@ function TrustBadge({ isVerified, verificationType, className = "" }: { tier?: n
       </span>
 
       {/* Attestation power strips */}
-      <div className="flex gap-[3px]">
+      <div className="flex gap-[3.5px] mt-0.5">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className={`h-[2px] w-3 rounded-full transition-all ${i < s.bars ? `${s.bgBase} opacity-70` : 'bg-white/10'}`}
+            className="h-[2px] w-3.5 rounded-full transition-all"
+            style={{ 
+              backgroundColor: i < (s.bars || 1) ? s.hex : 'rgba(255,255,255,0.08)',
+              opacity: i < (s.bars || 1) ? 0.8 : 0.3
+            }}
           />
         ))}
       </div>
@@ -384,42 +390,43 @@ function WorkRecordCard({
                   )}
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center items-start gap-4">
-                  <div className="flex-shrink-0 relative group/attester">
+                  <div className="flex-shrink-0 relative">
                     {r.attesterAvatar ? (
                       <img
                         src={r.attesterAvatar}
                         alt={r.attesterName}
-                        className="w-10 h-10 rounded-full object-cover border border-emerald-500/20 shadow-lg"
+                        className="w-12 h-12 rounded-full object-cover border border-emerald-500/20 shadow-lg"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-slate-800 border border-emerald-500/20 flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
+                      <div className="w-12 h-12 rounded-full bg-slate-800 border border-emerald-500/20 flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
                         {r.attesterName?.[0] || '?'}
                       </div>
                     )}
                     <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
-                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0 max-w-full">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
-                      <p className="text-xs font-bold text-white leading-none">
-                        {r.attesterName || "Community Attester"}
-                      </p>
-                      <TrustBadge
-                        tier={r.attesterTier || 1}
-                        isVerified={!!r.isAttesterVerified}
-                        verificationType={r.attesterVerificationType}
-                      />
-                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] text-slate-500 font-normal break-words whitespace-normal leading-tight">
-                        {r.attesterRole && <span className="break-words">{r.attesterRole}</span>}
-                        {r.attesterOrg && <span className="break-words">at {r.attesterOrg}</span>}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <p className="text-sm font-bold text-white leading-none flex-1 truncate">
+                          {r.attesterName || "Community Attester"}
+                        </p>
+                        <TrustBadge
+                          isVerified={!!r.isOfficial || !!r.isAttesterVerified}
+                          verificationType={r.verificationTier || r.attesterVerificationType}
+                        />
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-slate-400 font-medium">
+                        {r.attesterRole && <span>{r.attesterRole}</span>}
+                        {r.attesterOrg && <span>• {r.attesterOrg}</span>}
+                        <span className="text-slate-600 ml-1 font-mono">
+                          ({typeof r.attesterWallet === 'string' ? `${r.attesterWallet.slice(0, 6)}...${r.attesterWallet.slice(-4)}` : '0x...'})
+                        </span>
                       </div>
                     </div>
-                    <p className="text-[10px] font-mono text-slate-500 break-words whitespace-normal mt-1 leading-tight">
-                      {typeof r.attesterWallet === 'string' ? `${r.attesterWallet.slice(0, 8)}...${r.attesterWallet.slice(-6)}` : '0x...'}
-                      {r.attesterAt && <span className="ml-2 opacity-50">· {new Date(r.attesterAt).toLocaleDateString()}</span>}
-                    </p>
                   </div>
                 </div>
               </div>
