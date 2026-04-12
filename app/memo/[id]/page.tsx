@@ -105,7 +105,7 @@ export default function MemoPage() {
     const isVerified = attester_verification?.status === "verified";
     const tierType = isVerified ? attester_verification?.type : "unverified";
     const s = getBadgeStyles(tierType);
-    const displayLabel = isVerified ? getVerificationLabel(tierType) : "Regular Attestation";
+    const displayLabel = isVerified ? getVerificationLabel(tierType) : "Regular";
 
     const currentTier = {
         label: displayLabel,
