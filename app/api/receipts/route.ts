@@ -160,7 +160,7 @@ export async function POST(request: Request) {
         const { verifySignature } = await import("@/lib/crypto");
         const { isValid, error: sigError } = await verifySignature(
             walletAddress,
-            "update_profile",
+            "submit_work",
             nonce || "",
             timestamp || 0,
             signature || ""
@@ -218,7 +218,7 @@ export async function PATCH(request: Request) {
         const { verifySignature } = await import("@/lib/crypto");
         const { isValid, error: sigError } = await verifySignature(
             walletAddress,
-            "update_profile",
+            "update_work",
             nonce || "",
             timestamp || 0,
             signature || ""
