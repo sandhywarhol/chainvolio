@@ -150,8 +150,8 @@ function getEvidenceIcon(label: string) {
 const TIER_DATA: Record<number, { label: string; color: string; bars: number; weight: number }> = {
   1: { label: "Builder",              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
   2: { label: "Public",              color: "text-pink-400 bg-pink-500/10 border-pink-500/20",         bars: 2, weight: 3 },
-  3: { label: "Community/DAO",       color: "text-blue-400 bg-blue-500/10 border-blue-500/20",         bars: 3, weight: 6 },
-  4: { label: "Company/Org",         color: "text-amber-400 bg-amber-500/10 border-amber-500/20",      bars: 4, weight: 10 },
+  3: { label: "Community / DAO",       color: "text-blue-400 bg-blue-500/10 border-blue-500/20",         bars: 3, weight: 6 },
+  4: { label: "Company / Org",         color: "text-amber-400 bg-amber-500/10 border-amber-500/20",      bars: 4, weight: 10 },
 };
 
 const getBadgeStyles = (verificationType?: string) => {
@@ -173,7 +173,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-blue-500",
     hex: "#3b82f6",
     bars: 3,
-    tierLabel: "Community/DAO",
+    tierLabel: "Community / DAO",
   };
   if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
     color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -182,7 +182,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-amber-500",
     hex: "#f59e0b",
     bars: 4,
-    tierLabel: "Company/Org",
+    tierLabel: "Company / Org",
   };
   // Default → Builder (Emerald)
   return {
@@ -205,8 +205,8 @@ function TrustBadge({ isVerified, verificationType, className = "" }: { tier?: n
   const TIER_TOOLTIPS: Record<string, { title: string; desc: string }> = {
     "Builder":               { title: "Verified Builder",              desc: "Individual with verified on-chain career records and proof of work." },
     "Public":                { title: "Verified Public Figure",         desc: "Recognized individual with verified identity and proven contribution record." },
-    "Community/DAO":         { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
-    "Company/Org":           { title: "Verified Company / Organization", desc: "Institutional entity with verified registration and professional standing." },
+    "Community / DAO":       { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
+    "Company / Org":         { title: "Verified Company / Organization", desc: "Institutional entity with verified registration and professional standing." },
   };
 
   const tooltip = TIER_TOOLTIPS[s.tierLabel] || TIER_TOOLTIPS["Builder"];

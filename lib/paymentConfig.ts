@@ -88,8 +88,8 @@ export function getVerificationLabel(type?: string): string {
     const t = (type || "").toLowerCase();
     if (t.includes("builder")) return "Builder";
     if (t.includes("figure") || t.includes("public")) return "Public";
-    if (t.includes("community") || t.includes("dao")) return "Community/DAO";
-    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Company/Org";
+    if (t.includes("community") || t.includes("dao")) return "Community / DAO";
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Company / Org";
     return "Verified";
 }
 
@@ -115,7 +115,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-blue-500",
         hex: "#3b82f6",
         bars: 3,
-        tierLabel: "Community/DAO",
+        tierLabel: "Community / DAO",
     };
     if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
         color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -124,7 +124,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-amber-500",
         hex: "#f59e0b",
         bars: 4,
-        tierLabel: "Company/Org",
+        tierLabel: "Company / Org",
     };
     // Default → Builder (Emerald)
     return {
