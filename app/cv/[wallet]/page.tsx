@@ -331,9 +331,10 @@ function WorkRecordCard({
                         <p className="text-sm font-bold text-white leading-none flex-1 truncate">
                           {r.attesterName || "Community Attester"}
                         </p>
-                        <TrustBadge
+                        <RoleBadge
                           isVerified={!!r.isOfficial || !!r.isAttesterVerified}
-                          verificationType={r.verificationTier || r.attesterVerificationType}
+                          type={r.verificationTier || r.attesterVerificationType}
+                          className="scale-90 origin-right"
                         />
                       </div>
                       
