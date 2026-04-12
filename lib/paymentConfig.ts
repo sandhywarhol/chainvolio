@@ -76,7 +76,7 @@ export function getAttestationQuota(tier: string): number {
     if (t.includes("figure") || t.includes("public")) return 20;
     if (t.includes("community") || t.includes("dao")) return 40;
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return 80;
-    if (t === "unverified" || t === "") return 1; 
+    if (t === "unverified" || t === "") return 5; 
     return 0; // default for unknown
 }
 
