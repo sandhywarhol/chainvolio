@@ -6,7 +6,7 @@ import Link from "next/link";
 import QRCode from "react-qr-code";
 import { format } from "date-fns";
 import { ShieldCheck, Globe, FileText, ExternalLink, Copy, Check, Share2, Printer, Award, User, Building } from "lucide-react";
-import { getVerificationLabel } from "@/lib/paymentConfig";
+import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -103,19 +103,17 @@ export default function MemoPage() {
     const issuerRole = data.issuer_role || attester_profile?.professional_role || attester_profile?.headline || attestation.attester_role || (isHiring ? "Hiring Lead" : "Verifier");
 
     const isVerified = attester_verification?.status === "verified";
-    const tier = isVerified ? (attester_verification?.verifier_tier || 1) : 1;
+    const tierType = isVerified ? attester_verification?.type : "unverified";
+    const s = getBadgeStyles(tierType);
+    const displayLabel = isVerified ? getVerificationLabel(tierType) : "Regular Attestation";
 
-    // Tier classification model
-    const TIER_DATA: Record<number, { label: string; icon: boolean; color: string; bars: number; weight: number }> = {
-        1: { label: "Verified Individual", icon: false, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
-        2: { label: "Verified Builder", icon: true, color: "text-pink-400 bg-pink-400/10 border-pink-400/20", bars: 2, weight: 3 },
-        3: { label: "Verified Public Figure", icon: true, color: "text-blue-400 bg-blue-400/10 border-blue-400/20", bars: 3, weight: 6 },
-        4: { label: "Verified Organization", icon: true, color: "text-amber-400 bg-amber-400/10 border-amber-400/20", bars: 4, weight: 10 },
+    const currentTier = {
+        label: displayLabel,
+        color: s.color,
+        bars: s.bars,
+        iconText: s.iconText,
+        bgBase: s.bgBase
     };
-
-
-    const currentTier = TIER_DATA[tier as keyof typeof TIER_DATA] || TIER_DATA[1];
-    const displayLabel = isVerified ? getVerificationLabel(attester_verification?.type) : currentTier.label;
 
     const avatarUrl = attester_profile?.avatar_url;
 
