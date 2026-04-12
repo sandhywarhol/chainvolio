@@ -86,7 +86,7 @@ export default function AttestPage() {
 
                     setAttesterProfile(data);
                     setAttesterName(data.displayName || "");
-                    setAttesterRole(fullRole);
+                    setAttesterRole(fullRole || "ChainVolio Builder");
                     setAttesterOrg(data.organization || "");
                     setIsExternal(false);
                 } else {
