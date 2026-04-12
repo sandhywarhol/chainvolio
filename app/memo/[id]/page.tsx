@@ -107,10 +107,12 @@ export default function MemoPage() {
     const s = getBadgeStyles(tierType);
     const displayLabel = isVerified ? getVerificationLabel(tierType) : "Regular";
 
+    const tier = attester_verification?.tier || (isVerified ? 1 : 0);
     const currentTier = {
         label: displayLabel,
         color: s.color,
         bars: s.bars,
+        icon: s.icon,
         iconText: s.iconText,
         bgBase: s.bgBase
     };
@@ -398,9 +400,13 @@ export default function MemoPage() {
                                                         {currentTier.icon && <ShieldCheck size={10} />} {displayLabel}
                                                     </span>
 
-                                                    <div className={`text-[8px] leading-none tracking-[-0.1em] transition-opacity duration-300 ${currentTier.color} opacity-60`}>
-                                                        {"▬".repeat(currentTier.bars)}
-                                                    </div>
+                                                    {currentTier.bars > 0 && (
+                                                        <div className="flex gap-1 transition-all duration-300 opacity-60">
+                                                            {Array.from({ length: currentTier.bars }).map((_, i) => (
+                                                                <div key={i} className={`h-[2px] w-4 rounded-full ${currentTier.color.split(' ')[0] === 'text-pink-400' ? 'bg-pink-400' : currentTier.color.split(' ')[0] === 'text-blue-400' ? 'bg-blue-400' : currentTier.color.split(' ')[0] === 'text-amber-400' ? 'bg-amber-400' : 'bg-emerald-500'}`} />
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

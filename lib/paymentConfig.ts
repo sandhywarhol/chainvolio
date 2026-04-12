@@ -95,10 +95,21 @@ export function getVerificationLabel(type?: string): string {
     return "Verified";
 }
 
+export interface BadgeStyle {
+    color: string;
+    iconText: string;
+    border: string;
+    bgBase: string;
+    hex: string;
+    bars: number;
+    icon: boolean;
+    tierLabel: string;
+}
+
 /**
  * Returns Tailwind CSS color classes and metadata for a verification tier.
  */
-export function getBadgeStyles(verificationType?: string) {
+export function getBadgeStyles(verificationType?: string): BadgeStyle {
     const type = (verificationType || "").toLowerCase();
 
     if (type.includes("public") || type.includes("figure")) return {
@@ -108,6 +119,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-pink-500",
         hex: "#ec4899",
         bars: 2,
+        icon: true,
         tierLabel: "Public",
     };
     if (type.includes("community") || type.includes("dao")) return {
@@ -117,6 +129,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-blue-500",
         hex: "#3b82f6",
         bars: 3,
+        icon: true,
         tierLabel: "Community / DAO",
     };
     if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
@@ -126,6 +139,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-amber-500",
         hex: "#f59e0b",
         bars: 4,
+        icon: true,
         tierLabel: "Company / Org",
     };
     if (type.includes("builder")) return {
@@ -135,6 +149,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-emerald-500",
         hex: "#10b981",
         bars: 1,
+        icon: true,
         tierLabel: "Builder",
     };
     
@@ -146,6 +161,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-slate-500",
         hex: "#94a3b8",
         bars: 0,
+        icon: false,
         tierLabel: "Regular",
     };
 }

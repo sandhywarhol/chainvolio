@@ -44,9 +44,12 @@ export function computeReputation(profile: any, receipts: any[]) {
         });
         consistency = Math.min(100, Math.floor(totalMonths * 4));
 
-        // Activity
-        const txCount = receipts.filter((r: any) => r.tx_signature).length;
-        activity = Math.min(100, txCount * 25);
+    // Activity
+    // TODO: Consider splitting Activity into:
+    // 1. Behavioral Activity (off-chain interactions like profile edits, applications)
+    // 2. On-Chain Activity (transaction-based proofs)
+    const txCount = receipts.filter((r: any) => r.tx_signature).length;
+    activity = Math.min(100, txCount * 25);
     }
 
     // Skill

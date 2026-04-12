@@ -33,18 +33,20 @@ export function RoleBadge({ type, isVerified = true, className = "", showTooltip
       </span>
 
       {/* Attestation power strips */}
-      <div className="flex gap-[3.5px] mt-0.5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-[2px] w-3.5 rounded-full transition-all"
-            style={{ 
-              backgroundColor: i < s.bars ? s.hex : 'rgba(255,255,255,0.08)',
-              opacity: i < s.bars ? 0.8 : 0.3
-            }}
-          />
-        ))}
-      </div>
+      {s.bars > 0 && (
+        <div className="flex gap-[3.5px] mt-0.5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-[2px] w-3.5 rounded-full transition-all"
+              style={{ 
+                backgroundColor: i < s.bars ? s.hex : 'rgba(255,255,255,0.08)',
+                opacity: i < s.bars ? 0.8 : 0.3
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Hover tooltip */}
       {showTooltip && (

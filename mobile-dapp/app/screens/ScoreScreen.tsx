@@ -119,7 +119,7 @@ const ScoreScreen = ({ navigation }: any) => {
                   { name: 'Verification', val: scoreData?.breakdown?.verification || 0, color: '#10b981' },
                   { name: 'Consistency', val: scoreData?.breakdown?.consistency || 0, color: '#eb4899' },
                   { name: 'Skills', val: scoreData?.breakdown?.skill || 0, color: '#06b6d4' },
-                  { name: 'Activity', val: scoreData?.breakdown?.activity || 0, color: '#f59e0b' },
+                  { name: 'On-Chain Activity', val: scoreData?.breakdown?.activity || 0, color: '#f59e0b' },
                 ].map((item, idx) => (
                   <View key={idx} style={styles.metricItem}>
                     <View style={styles.metricHeader}>

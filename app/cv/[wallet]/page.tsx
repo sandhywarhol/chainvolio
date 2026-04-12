@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
-import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getBadgeStyles } from "@/lib/paymentConfig";
 
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
@@ -1315,17 +1315,28 @@ export default function CVPage(props: any) {
                     { name: 'Verification', val: scoreData.breakdown.verification },
                     { name: 'Consistency', val: scoreData.breakdown.consistency },
                     { name: 'Skills', val: scoreData.breakdown.skill },
-                    { name: 'Activity', val: scoreData.breakdown.activity }
+                    { name: 'On-Chain Activity', val: scoreData.breakdown.activity, help: 'Based on the number of work records anchored on-chain. Each verified transaction increases your score (max at 4 records).' }
                   ];
                   return metrics.map((m) => (
                     <div key={m.name} className="flex flex-col gap-1.5">
                       <div className="flex justify-between items-end text-[10px] font-bold uppercase tracking-widest leading-none">
-                        <span className="text-slate-400">{m.name}</span>
+                        <div className="flex items-center gap-1.5 group/m relative">
+                          <span className="text-slate-400">{m.name}</span>
+                          {m.help && <Info className="w-3 h-3 text-slate-500 cursor-help" />}
+                          {m.help && (
+                            <div className="absolute left-0 bottom-full mb-2 w-48 p-2 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-medium normal-case tracking-tight text-slate-300 opacity-0 group-hover/m:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
+                              {m.help}
+                            </div>
+                          )}
+                        </div>
                         <span className="text-white">{getLabel(m.val)}</span>
                       </div>
                       <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div className="h-full bg-[#a855f7]" style={{ width: `${m.val}%` }}></div>
                       </div>
+                      {m.name === 'On-Chain Activity' && m.val < 40 && (
+                        <p className="text-[9px] text-slate-500 font-medium italic">Increase your score by anchoring your work records on-chain.</p>
+                      )}
                     </div>
                   ));
                 })()}
