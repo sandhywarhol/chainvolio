@@ -168,7 +168,7 @@ export async function POST(request: Request) {
 
         if (profile) {
             let used = profile.attestation_used || 0;
-            let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : now;
+            let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : new Date(0);
 
             // Monthly Reset Logic
             if (now > resetDate) {
@@ -189,14 +189,14 @@ export async function POST(request: Request) {
             // enforcement
             if (used >= quota) {
                 return NextResponse.json({ 
-                    error: `Monthly attestation limit reached (${quota}/${quota}). Please upgrade your verification tier to increase your quota.` 
+                    error: `Monthly attestation limit reached for ${verificationTier} tier (${used}/${quota}). Please upgrade your verification tier to increase your quota.` 
                 }, { status: 403 });
             }
         } else {
             // No profile = unverified user without tracking capacity yet
             if (quota <= 0) {
                 return NextResponse.json({ 
-                    error: "Verification is required to give attestations in the network." 
+                    error: `Verification is required to give attestations. Your current tier is detected as: ${verificationTier}` 
                 }, { status: 403 });
             }
         }
@@ -240,7 +240,7 @@ export async function POST(request: Request) {
 
             if (!raError && reciprocalAttestations && reciprocalAttestations.length > 0) {
                 return NextResponse.json({ 
-                    error: "Reciprocal attestation (coworker-swap) is currently not allowed to maintain trust integrity across the network." 
+                    error: `Reciprocal attestation (coworker-swap) detected. The candidate has previously attested your work, so you cannot attest them back to maintain trust integrity.` 
                 }, { status: 403 });
             }
         }
