@@ -100,7 +100,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                         <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">👤</div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-1 w-full">
                           <span className="text-xs font-bold text-white truncate max-w-[120px]">
                             {r.attesterName || "Verified Attester"}
                           </span>
