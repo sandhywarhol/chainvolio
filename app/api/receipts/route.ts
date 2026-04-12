@@ -115,7 +115,6 @@ export async function GET(request: Request) {
         attesterName: attesterName,
         attesterRole: profile?.professional_role || profile?.headline || attestation?.attester_role || (isHiring ? "Hiring Lead" : null),
         attesterOrg: profile?.organization || attestation?.attester_org || null,
-        isExternal: r.is_external,
         attestationType: attestation?.attestation_type || (isHiring ? "Hiring Proof" : "Direct Verification"),
         isOfficial: isAttesterVerified,
         verificationTier: isAttesterVerified ? orgData?.type : null,
@@ -183,7 +182,6 @@ export async function POST(request: Request) {
             evidence_links: evidenceLinks || [],
             impact: impact || [],
             portfolio_images: portfolioImages || [],
-            is_external: !!isExternal,
             status: 'Self-Declared'
         }).select().single();
 
