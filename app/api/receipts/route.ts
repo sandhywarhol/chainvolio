@@ -182,7 +182,7 @@ export async function POST(request: Request) {
             evidence_links: evidenceLinks || [],
             impact: impact || [],
             portfolio_images: portfolioImages || [],
-            status: 'Self-Declared'
+            status: 'Submitted'
         }).select().single();
 
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });

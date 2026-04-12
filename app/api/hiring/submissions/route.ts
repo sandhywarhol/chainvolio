@@ -184,7 +184,7 @@ export async function POST(request: Request) {
             .from("receipts")
             .update({ status: "Submitted" })
             .eq("wallet_address", walletAddress)
-            .in("status", ["Draft", "Self-Declared", "Candidate Claim", null]);
+            .in("status", ["Draft", "Submitted", "Candidate Claim", null]);
 
         return NextResponse.json({ ok: true, message: "Application submitted successfully" });
     } catch (err: any) {
