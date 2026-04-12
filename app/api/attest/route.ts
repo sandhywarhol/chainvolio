@@ -120,6 +120,25 @@ export async function POST(request: Request) {
             );
         }
 
+        // --- Receipt Verification ---
+        const { data: receipt, error: fetchError } = await supabase
+            .from("receipts")
+            .select("status, wallet_address, role, org")
+            .eq("id", receiptId)
+            .single();
+
+        if (fetchError || !receipt) {
+            return NextResponse.json({ error: "Work record not found." }, { status: 404 });
+        }
+
+        if ((receipt as any).status === "Locked") {
+            return NextResponse.json({ error: "Work record is archived and immutable." }, { status: 403 });
+        }
+
+        if ((receipt as any).wallet_address === attesterWallet) {
+            return NextResponse.json({ error: "You cannot attest your own work." }, { status: 403 });
+        }
+
         // --- Identity & Quota Enforcement ---
         let finalAttesterName = attesterName;
         let finalAttesterRole = attesterRole;
@@ -239,24 +258,6 @@ export async function POST(request: Request) {
         }
         // ----------------------------------------
 
-        // 0. Verify Receipt state
-        const { data: receipt, error: fetchError } = await supabase
-            .from("receipts")
-            .select("status, wallet_address, role, org")
-            .eq("id", receiptId)
-            .single();
-
-        if (fetchError || !receipt) {
-            return NextResponse.json({ error: "Work record not found." }, { status: 404 });
-        }
-
-        if (receipt.status === "Locked") {
-            return NextResponse.json({ error: "Work record is archived and immutable." }, { status: 403 });
-        }
-
-        if (receipt.wallet_address === attesterWallet) {
-            return NextResponse.json({ error: "You cannot attest your own work." }, { status: 403 });
-        }
 
         // 1. Check for Anti-Reciprocity (prevent A -> B if B -> A exists)
         // Find all receipts owned by attesterWallet
