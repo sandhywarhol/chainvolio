@@ -327,14 +327,14 @@ function WorkRecordCard({
 
                   <div className="flex-1 min-w-0 max-w-full">
                     <div className="flex flex-col gap-1.5">
-                      <div className="flex flex-col gap-1.5 w-full mt-1">
-                        <p className="text-sm font-bold text-white leading-none truncate">
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <p className="text-sm font-bold text-white leading-none flex-1 truncate">
                           {r.attesterName || "Community Attester"}
                         </p>
                         <RoleBadge
                           isVerified={!!r.isOfficial || !!r.isAttesterVerified}
                           type={r.verificationTier || r.attesterVerificationType}
-                          className="scale-90 origin-left -ml-1"
+                          className="scale-90 origin-right"
                         />
                       </div>
                       
