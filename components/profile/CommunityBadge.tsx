@@ -58,14 +58,13 @@ export function CommunityBadge({ cvId, className = "" }: CommunityBadgeProps) {
       </div>
       
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/badge:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/badge:opacity-100 transition-all duration-300 delay-150 pointer-events-none z-[100] translate-y-1 group-hover/badge:translate-y-0">
         <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl">
           <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">{tierData.label}</p>
           <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
             {tierData.tooltip}
           </p>
         </div>
-        {/* Arrow pointer */}
         <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900"></div>
       </div>
     </div>

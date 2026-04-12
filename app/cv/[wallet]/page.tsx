@@ -234,10 +234,10 @@ function TrustBadge({ isVerified, verificationType, className = "" }: { tier?: n
       </div>
 
       {/* Hover tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-52 opacity-0 group-hover/trust:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 opacity-0 group-hover/trust:opacity-100 transition-all duration-300 delay-150 pointer-events-none z-[100] translate-y-1 group-hover/trust:translate-y-0">
         <div className="bg-slate-900 border border-white/10 p-3 rounded-xl shadow-2xl backdrop-blur-xl">
           <p className={`text-[10px] font-black mb-1.5 uppercase tracking-widest leading-none ${s.iconText}`}>{tooltip.title}</p>
-          <p className="text-[9px] text-slate-400 leading-relaxed">{tooltip.desc}</p>
+          <p className="text-[9px] text-slate-400 leading-relaxed text-left">{tooltip.desc}</p>
           <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between gap-3">
             <span className="text-[8px] text-slate-500 uppercase font-black tracking-tight whitespace-nowrap">Attestation Power</span>
             <div className="flex gap-[3px]">
@@ -280,14 +280,38 @@ function ProfileCompleteBadge({
       </div>
 
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/complete:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/complete:opacity-100 transition-all duration-300 delay-150 pointer-events-none z-[100] translate-y-1 group-hover/complete:translate-y-0">
         <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-center">
           <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">Ready</p>
           <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
             Candidate has fulfilled all requirements: Bio, Skills, Experience, and Contact details.
           </p>
         </div>
-        {/* Arrow pointer */}
+        <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900"></div>
+      </div>
+    </div>
+  );
+}
+
+// ── ExperienceBadge: total years of exp with tooltip ──
+function ExperienceBadge({ years, className = "" }: { years: number; className?: string }) {
+  if (years <= 0) return null;
+
+  return (
+    <div className={`relative group/exp flex items-center ${className}`}>
+      <div className="flex items-center justify-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
+        <Clock size={10} strokeWidth={3} />
+        <span>{years}Y Exp</span>
+      </div>
+
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/exp:opacity-100 transition-all duration-300 delay-150 pointer-events-none z-[100] translate-y-1 group-hover/exp:translate-y-0">
+        <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-center">
+          <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">Experience</p>
+          <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
+            Total years of professional experience based on verified work.
+          </p>
+        </div>
         <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900"></div>
       </div>
     </div>
@@ -964,14 +988,7 @@ export default function CVPage(props: any) {
                     />
                     <CommunityBadge cvId={profile?.cardNumber || 0} />
                     
-                    {totalYearsExperience > 0 && (
-                      <div className="flex flex-col items-center justify-center translate-y-[2px]">
-                        <span className="flex items-center justify-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
-                          <Clock size={10} strokeWidth={3} />
-                          {totalYearsExperience}Y Exp
-                        </span>
-                      </div>
-                    )}
+                    <ExperienceBadge years={totalYearsExperience} className="translate-y-[2px]" />
                   </div>
 
                   {/* Skills Pills */}
