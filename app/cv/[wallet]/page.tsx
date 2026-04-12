@@ -149,9 +149,9 @@ function getEvidenceIcon(label: string) {
 // ── Tier definitions: 4 tiers, each with label, color, and attestation bar count ──
 const TIER_DATA: Record<number, { label: string; color: string; bars: number; weight: number }> = {
   1: { label: "Builder",              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
-  2: { label: "Public Figure",         color: "text-pink-400 bg-pink-500/10 border-pink-500/20",         bars: 2, weight: 3 },
-  3: { label: "Community / DAO",       color: "text-blue-400 bg-blue-500/10 border-blue-500/20",         bars: 3, weight: 6 },
-  4: { label: "Company / Organization",color: "text-amber-400 bg-amber-500/10 border-amber-500/20",      bars: 4, weight: 10 },
+  2: { label: "Public",              color: "text-pink-400 bg-pink-500/10 border-pink-500/20",         bars: 2, weight: 3 },
+  3: { label: "DAO",                 color: "text-blue-400 bg-blue-500/10 border-blue-500/20",         bars: 3, weight: 6 },
+  4: { label: "Company",             color: "text-amber-400 bg-amber-500/10 border-amber-500/20",      bars: 4, weight: 10 },
 };
 
 const getBadgeStyles = (verificationType?: string) => {
@@ -164,7 +164,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-pink-500",
     hex: "#ec4899",
     bars: 2,
-    tierLabel: "Verified Public Figure",
+    tierLabel: "Public",
   };
   if (type.includes("community") || type.includes("dao")) return {
     color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
@@ -173,7 +173,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-blue-500",
     hex: "#3b82f6",
     bars: 3,
-    tierLabel: "Verified Community",
+    tierLabel: "DAO",
   };
   if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
     color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -182,7 +182,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-amber-500",
     hex: "#f59e0b",
     bars: 4,
-    tierLabel: "Verified Organization",
+    tierLabel: "Company",
   };
   // Default → Builder (Emerald)
   return {
@@ -192,7 +192,7 @@ const getBadgeStyles = (verificationType?: string) => {
     bgBase: "bg-emerald-500",
     hex: "#10b981",
     bars: 1,
-    tierLabel: "Verified Builder",
+    tierLabel: "Builder",
   };
 };
 
@@ -204,9 +204,9 @@ function TrustBadge({ isVerified, verificationType, className = "" }: { tier?: n
 
   const TIER_TOOLTIPS: Record<string, { title: string; desc: string }> = {
     "Builder":               { title: "Verified Builder",              desc: "Individual with verified on-chain career records and proof of work." },
-    "Public Figure":         { title: "Verified Public Figure",         desc: "Recognized individual with verified identity and proven contribution record." },
-    "Community / DAO":       { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
-    "Company / Organization":{ title: "Verified Company / Organization", desc: "Institutional entity with verified registration and professional standing." },
+    "Public":                { title: "Verified Public Figure",         desc: "Recognized individual with verified identity and proven contribution record." },
+    "DAO":                   { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
+    "Company":               { title: "Verified Company / Organization", desc: "Institutional entity with verified registration and professional standing." },
   };
 
   const tooltip = TIER_TOOLTIPS[s.tierLabel] || TIER_TOOLTIPS["Builder"];
@@ -267,7 +267,7 @@ function ProfileCompleteBadge({
   if (!isComplete) return null;
 
   const usedStyle = getBadgeStyles("builder");
-  const labelText = "Profile Complete";
+  const labelText = "Ready";
 
   return (
     <div
@@ -282,7 +282,7 @@ function ProfileCompleteBadge({
       {/* Tooltip */}
       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 opacity-0 group-hover/complete:opacity-100 transition-opacity duration-300 pointer-events-none z-[100]">
         <div className="bg-slate-900 border border-white/10 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-center">
-          <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">Profile Complete</p>
+          <p className="text-[10px] font-black text-white mb-1 uppercase tracking-widest leading-none">Ready</p>
           <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
             Candidate has fulfilled all requirements: Bio, Skills, Experience, and Contact details.
           </p>
@@ -968,7 +968,7 @@ export default function CVPage(props: any) {
                       <div className="flex flex-col items-center justify-center translate-y-[2px]">
                         <span className="flex items-center justify-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
                           <Clock size={10} strokeWidth={3} />
-                          {totalYearsExperience} Years Experience
+                          {totalYearsExperience}Y Exp
                         </span>
                       </div>
                     )}

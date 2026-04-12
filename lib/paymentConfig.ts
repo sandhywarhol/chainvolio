@@ -86,11 +86,11 @@ export function getAttestationQuota(tier: string): number {
  */
 export function getVerificationLabel(type?: string): string {
     const t = (type || "").toLowerCase();
-    if (t.includes("builder")) return "Verified Builder";
-    if (t.includes("figure") || t.includes("public")) return "Verified Public Figure";
-    if (t.includes("community") || t.includes("dao")) return "Verified Community";
-    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Verified Organization";
-    return "Verified Entity";
+    if (t.includes("builder")) return "Builder";
+    if (t.includes("figure") || t.includes("public")) return "Public";
+    if (t.includes("community") || t.includes("dao")) return "DAO";
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Company";
+    return "Verified";
 }
 
 /**
@@ -106,7 +106,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-pink-500",
         hex: "#ec4899",
         bars: 2,
-        tierLabel: "Verified Public Figure",
+        tierLabel: "Public",
     };
     if (type.includes("community") || type.includes("dao")) return {
         color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
@@ -115,7 +115,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-blue-500",
         hex: "#3b82f6",
         bars: 3,
-        tierLabel: "Verified Community",
+        tierLabel: "DAO",
     };
     if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
         color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
@@ -124,7 +124,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-amber-500",
         hex: "#f59e0b",
         bars: 4,
-        tierLabel: "Verified Organization",
+        tierLabel: "Company",
     };
     // Default → Builder (Emerald)
     return {
@@ -134,7 +134,7 @@ export function getBadgeStyles(verificationType?: string) {
         bgBase: "bg-emerald-500",
         hex: "#10b981",
         bars: 1,
-        tierLabel: "Verified Builder",
+        tierLabel: "Builder",
     };
 }
 

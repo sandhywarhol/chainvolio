@@ -26,7 +26,7 @@ export function CommunityBadge({ cvId, className = "" }: CommunityBadgeProps) {
       icon: Star,
       containerClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
       iconClass: "text-amber-500 fill-amber-500/20",
-      badgeLabel: "Genesis 100"
+      badgeLabel: "Genesis"
     };
   } else if (cvId <= 500) {
     tierData = {
