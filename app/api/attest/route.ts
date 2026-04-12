@@ -159,13 +159,37 @@ export async function POST(request: Request) {
             } else {
                 finalAttesterRole = profile.headline || profile.professional_role || "Builder";
             }
+        } else if (!isVerified) {
+            // Unverified users or those without a profile get the "Regular" label
+            verificationTier = "unverified";
+            // If they provided a name/role manually, we keep it but it will be labeled as "Regular" in the UI
         }
 
         // 2. Attestation Quota Check
         const quota = getAttestationQuota(verificationTier);
 
+        // a. Per-Target Monthly Limit Check for Unverified Users
+        if (verificationTier === "unverified") {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+            // Check if this attester has attested to ANY of this candidate's receipts in the last 30 days
+            const { data: existingTargetAttests } = await supabase
+                .from("attestations")
+                .select("id, receipts!inner(wallet_address)")
+                .eq("attester_wallet", attesterWallet)
+                .eq("receipts.wallet_address", (receipt as any).wallet_address)
+                .gte("memo_issued_at", thirtyDaysAgo.toISOString())
+                .limit(1);
 
+            if (existingTargetAttests && existingTargetAttests.length > 0) {
+                return NextResponse.json({ 
+                    error: "Unverified wallets are limited to 1 attestation per candidate every 30 days. Please upgrade your account for higher limits." 
+                }, { status: 429 });
+            }
+        }
+
+        // b. Total Monthly Quota Check
         if (profile) {
             let used = profile.attestation_used || 0;
             let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : new Date(0);
@@ -193,10 +217,23 @@ export async function POST(request: Request) {
                 }, { status: 403 });
             }
         } else {
-            // No profile = unverified user without tracking capacity yet
+            // Check quota for users without a profile
             if (quota <= 0) {
                 return NextResponse.json({ 
                     error: `Verification is required to give attestations. Your current tier is detected as: ${verificationTier}` 
+                }, { status: 403 });
+            }
+            
+            // For users without a profile, we also check their global history to enforce the quota of 1
+            const { count } = await supabase
+                .from("attestations")
+                .select("id", { count: 'exact', head: true })
+                .eq("attester_wallet", attesterWallet)
+                .gte("memo_issued_at", new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+            if ((count || 0) >= quota) {
+                 return NextResponse.json({ 
+                    error: `Unverified wallets are limited to ${quota} total attestation per 30 days. Register a profile to increase your quota.` 
                 }, { status: 403 });
             }
         }

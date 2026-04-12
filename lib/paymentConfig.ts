@@ -71,12 +71,13 @@ export const ATTESTATION_QUOTAS: Record<string, number> = {
 };
 
 export function getAttestationQuota(tier: string): number {
-    const t = tier.toLowerCase();
+    const t = (tier || "").toLowerCase();
     if (t.includes("builder")) return 10;
     if (t.includes("figure") || t.includes("public")) return 20;
     if (t.includes("community") || t.includes("dao")) return 40;
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return 80;
-    return 0; // default for unverified or unknown
+    if (t === "unverified" || t === "") return 1; 
+    return 0; // default for unknown
 }
 
 
@@ -90,6 +91,7 @@ export function getVerificationLabel(type?: string): string {
     if (t.includes("figure") || t.includes("public")) return "Public";
     if (t.includes("community") || t.includes("dao")) return "Community / DAO";
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return "Company / Org";
+    if (t === "unverified" || t === "") return "Regular";
     return "Verified";
 }
 
@@ -126,8 +128,7 @@ export function getBadgeStyles(verificationType?: string) {
         bars: 4,
         tierLabel: "Company / Org",
     };
-    // Default → Builder (Emerald)
-    return {
+    if (type.includes("builder")) return {
         color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
         iconText: "text-emerald-400",
         border: "border-emerald-500/50",
@@ -135,6 +136,17 @@ export function getBadgeStyles(verificationType?: string) {
         hex: "#10b981",
         bars: 1,
         tierLabel: "Builder",
+    };
+    
+    // Default / Unverified → Regular (Slate/Gray)
+    return {
+        color: "text-slate-400 bg-slate-500/10 border-slate-500/20",
+        iconText: "text-slate-400",
+        border: "border-slate-500/50",
+        bgBase: "bg-slate-500",
+        hex: "#94a3b8",
+        bars: 0,
+        tierLabel: "Regular",
     };
 }
 

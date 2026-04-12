@@ -11,11 +11,11 @@ interface RoleBadgeProps {
 }
 
 export function RoleBadge({ type, isVerified = true, className = "", showTooltip = true }: RoleBadgeProps) {
-  if (!isVerified) return null;
-
-  const s = getBadgeStyles(type);
+  // We now allow "unverified" users to show a "Regular" badge
+  const s = getBadgeStyles(isVerified ? type : "unverified");
 
   const TIER_TOOLTIPS: Record<string, { title: string; desc: string }> = {
+    "Regular":               { title: "Regular Attestation",           desc: "Community member with an unverified profile. Low attestation power." },
     "Builder":               { title: "Verified Builder",              desc: "Individual with verified on-chain career records and proof of work." },
     "Public":                { title: "Verified Public Figure",         desc: "Recognized individual with verified identity and proven contribution record." },
     "Community / DAO":       { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
