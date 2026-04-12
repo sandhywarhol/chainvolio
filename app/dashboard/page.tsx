@@ -13,6 +13,7 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
+import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
@@ -229,27 +230,25 @@ export default function DashboardPage() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                       <h1 className="text-2xl md:text-3xl font-bold">{profile?.displayName}</h1>
-                      <div className={`px-2 py-1 rounded-lg border text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${
-                        profile?.isVerified ? (
-                          profile?.verifierTier === 4 ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
-                          profile?.verifierTier === 3 ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
-                          profile?.verifierTier === 2 ? "bg-pink-500/10 border-pink-500/20 text-pink-400" :
-                          "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                        ) : profile?.isExpired ? (
-                          "bg-red-500/10 border-red-500/20 text-red-500"
-                        ) : (
-                          "bg-slate-500/10 border-slate-500/20 text-slate-500 opacity-60"
-                        )
-                      }`}>
-                        <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5" />
-                        <span>
-                          {profile?.isVerified 
-                            ? getVerificationLabel(profile?.verificationTier) 
-                            : profile?.isExpired 
-                              ? "Expired" 
-                              : "Unverified"}
-                        </span>
-                      </div>
+                      <RoleBadge 
+                        type={profile?.verificationTier} 
+                        isVerified={!!profile?.isVerified} 
+                        className="scale-90 md:scale-100 origin-center"
+                      />
+
+                      {!profile?.isVerified && profile?.isExpired && (
+                        <div className="px-2 py-1 rounded-lg border border-red-500/20 bg-red-500/10 text-red-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                          < ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5" />
+                          <span>Expired</span>
+                        </div>
+                      )}
+
+                      {!profile?.isVerified && !profile?.isExpired && (
+                        <div className="px-2 py-1 rounded-lg border border-slate-500/20 bg-slate-500/10 text-slate-500 opacity-60 text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                          < ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5" />
+                          <span>Unverified</span>
+                        </div>
+                      )}
 
 
                       {(profile?.isExpired || profile?.isExpiringSoon) && (
@@ -536,7 +535,7 @@ export default function DashboardPage() {
                       : profile?.verifierTier === 2 ? "text-pink-400"
                       : "text-emerald-400"
                     }`}>
-                      {getVerificationLabel(profile?.verificationTier)} — Active Official Status
+                      {getVerificationLabel(profile?.verificationTier)} — Active Verified Identity
                     </p>
 
                     {profile?.expiresAt && (
@@ -549,7 +548,7 @@ export default function DashboardPage() {
                   {profile?.isExpiringSoon && (
                     <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
                       <AlertTriangle className="w-3.5 h-3.5" />
-                      <span>Subscription expires soon — renew now to maintain your official status</span>
+                      <span>Subscription expires soon — renew now to maintain your verified identity</span>
                     </div>
                   )}
 

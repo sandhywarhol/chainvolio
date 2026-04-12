@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
-import { getVerificationLabel, isRecruiterTier } from "@/lib/paymentConfig";
+import { getVerificationLabel, isRecruiterTier, getBadgeStyles } from "@/lib/paymentConfig";
 
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
@@ -16,6 +16,7 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
+import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
 
@@ -144,113 +145,6 @@ function getEvidenceIcon(label: string) {
   };
   const Icon = icons[label] || LinkIcon;
   return <Icon className="w-3 h-3" />;
-}
-
-// ── Tier definitions: 4 tiers, each with label, color, and attestation bar count ──
-const TIER_DATA: Record<number, { label: string; color: string; bars: number; weight: number }> = {
-  1: { label: "Builder",              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", bars: 1, weight: 1 },
-  2: { label: "Public",              color: "text-pink-400 bg-pink-500/10 border-pink-500/20",         bars: 2, weight: 3 },
-  3: { label: "Community / DAO",       color: "text-blue-400 bg-blue-500/10 border-blue-500/20",         bars: 3, weight: 6 },
-  4: { label: "Company / Org",         color: "text-amber-400 bg-amber-500/10 border-amber-500/20",      bars: 4, weight: 10 },
-};
-
-const getBadgeStyles = (verificationType?: string) => {
-  const type = (verificationType || "").toLowerCase();
-
-  if (type.includes("public") || type.includes("figure")) return {
-    color: "text-pink-400 bg-pink-500/10 border-pink-500/20",
-    iconText: "text-pink-400",
-    border: "border-pink-500/50",
-    bgBase: "bg-pink-500",
-    hex: "#ec4899",
-    bars: 2,
-    tierLabel: "Public",
-  };
-  if (type.includes("community") || type.includes("dao")) return {
-    color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-    iconText: "text-blue-400",
-    border: "border-blue-500/50",
-    bgBase: "bg-blue-500",
-    hex: "#3b82f6",
-    bars: 3,
-    tierLabel: "Community / DAO",
-  };
-  if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
-    color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-    iconText: "text-amber-400",
-    border: "border-amber-500/50",
-    bgBase: "bg-amber-500",
-    hex: "#f59e0b",
-    bars: 4,
-    tierLabel: "Company / Org",
-  };
-  // Default → Builder (Emerald)
-  return {
-    color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-    iconText: "text-emerald-400",
-    border: "border-emerald-500/50",
-    bgBase: "bg-emerald-500",
-    hex: "#10b981",
-    bars: 1,
-    tierLabel: "Builder",
-  };
-};
-
-// ── TrustBadge: verified tier label + attestation power strips ──
-function TrustBadge({ isVerified, verificationType, className = "" }: { tier?: number; isVerified: boolean; verificationType?: string; className?: string }) {
-  if (!isVerified) return null;
-
-  const s = getBadgeStyles(verificationType);
-
-  const TIER_TOOLTIPS: Record<string, { title: string; desc: string }> = {
-    "Builder":               { title: "Verified Builder",              desc: "Individual with verified on-chain career records and proof of work." },
-    "Public":                { title: "Verified Public Figure",         desc: "Recognized individual with verified identity and proven contribution record." },
-    "Community / DAO":       { title: "Verified Community / DAO",       desc: "Official community representative with established governance history." },
-    "Company / Org":         { title: "Verified Company / Organization", desc: "Institutional entity with verified registration and professional standing." },
-  };
-
-  const tooltip = TIER_TOOLTIPS[s.tierLabel] || TIER_TOOLTIPS["Builder"];
-
-  return (
-    <div className={`relative group/trust flex flex-col items-center gap-1 ${className}`}>
-      {/* Tier label badge */}
-      <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${s.color} transition-all duration-300 hover:scale-105 cursor-default shadow-sm`}>
-        <ShieldCheck size={10} strokeWidth={3} />
-        {s.tierLabel}
-      </span>
-
-      {/* Attestation power strips */}
-      <div className="flex gap-[3.5px] mt-0.5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-[2px] w-3.5 rounded-full transition-all"
-            style={{ 
-              backgroundColor: i < (s.bars || 1) ? s.hex : 'rgba(255,255,255,0.08)',
-              opacity: i < (s.bars || 1) ? 0.8 : 0.3
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Hover tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 opacity-0 group-hover/trust:opacity-100 transition-all duration-300 delay-150 pointer-events-none z-[100] translate-y-1 group-hover/trust:translate-y-0">
-        <div className="bg-slate-900 border border-white/10 p-3 rounded-xl shadow-2xl backdrop-blur-xl">
-          <p className={`text-[10px] font-black mb-1.5 uppercase tracking-widest leading-none ${s.iconText}`}>{tooltip.title}</p>
-          <p className="text-[9px] text-slate-400 leading-relaxed text-left">{tooltip.desc}</p>
-          <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between gap-3">
-            <span className="text-[8px] text-slate-500 uppercase font-black tracking-tight whitespace-nowrap">Attestation Power</span>
-            <div className="flex gap-[3px]">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className={`h-[3px] w-3 rounded-full ${i < s.bars ? `${s.bgBase} opacity-90` : 'bg-white/10'}`} />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 border-x-[6px] border-x-transparent border-t-[6px] border-t-slate-900" />
-      </div>
-    </div>
-  );
 }
 
 function ProfileCompleteBadge({ 
@@ -973,10 +867,9 @@ export default function CVPage(props: any) {
 
                   {/* Badges & Trust Hierarchy */}
                   <div className="flex flex-wrap items-start justify-center md:justify-start gap-4">
-                    <TrustBadge
-                      tier={profile?.verifierTier || 1}
-                      isVerified={!!profile?.isVerified}
-                      verificationType={profile?.verificationType}
+                    <RoleBadge 
+                      isVerified={!!profile?.isVerified} 
+                      type={profile?.verificationTier} 
                     />
                     
                     
