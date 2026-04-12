@@ -112,7 +112,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                         </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                        <div className="flex flex-col gap-1.5 mb-1">
                                             <Link 
                                                 href={`/cv/${receipt.attesterWallet}`}
                                                 onClick={(e) => e.stopPropagation()}
@@ -127,7 +127,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                                 isVerified={!!receipt.isAttesterVerified} 
                                                 type={receipt.attesterVerificationType || receipt.verificationTier} 
                                                 showTooltip={true}
-                                                className="scale-90 origin-left"
+                                                className="scale-90 origin-left -ml-1"
                                             />
                                         </div>
                                         <p className="text-xs text-slate-400 font-medium">
