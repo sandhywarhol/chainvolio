@@ -1304,7 +1304,7 @@ export default function CVPage(props: any) {
         />
 
         {isScoreModalOpen && scoreData && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setIsScoreModalOpen(false)}></div>
             <div className="relative w-full max-w-sm bg-[#0a0a0f] border border-[#a855f7]/30 rounded-2xl shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden animate-in zoom-in-95 duration-200">
               {/* Header */}
