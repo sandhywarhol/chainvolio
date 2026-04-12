@@ -4,6 +4,7 @@ import { X, ShieldCheck, UserCheck, Calendar, Globe, MapPin, ExternalLink, Link 
 import Link from "next/link";
 import { format } from "date-fns";
 import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
+import { RoleBadge } from "@/components/profile/RoleBadge";
 
 
 interface ReceiptDetailModalProps {
@@ -122,12 +123,12 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                                     : receipt.attesterName}
                                                 <ExternalLink className="w-3.5 h-3.5 opacity-30" />
                                             </Link>
-                                            {receipt.isAttesterVerified && (
-                                                <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${badge.color}`}>
-                                                    <ShieldCheck className="w-3 h-3" />
-                                                    {badge.tierLabel}
-                                                </div>
-                                            )}
+                                            <RoleBadge 
+                                                isVerified={!!receipt.isAttesterVerified} 
+                                                type={receipt.attesterVerificationType || receipt.verificationTier} 
+                                                showTooltip={true}
+                                                className="scale-90 origin-left"
+                                            />
                                         </div>
                                         <p className="text-xs text-slate-400 font-medium">
                                             {receipt.attesterRole}

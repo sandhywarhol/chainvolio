@@ -6,6 +6,7 @@ import { ExpandableText } from "@/components/ui/ExpandableText";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
 import { WorkTimeline } from "@/components/profile/WorkTimeline";
 import { getBadgeStyles } from "@/lib/paymentConfig";
+import { RoleBadge } from "@/components/profile/RoleBadge";
 
 type Receipt = {
   id: string;
@@ -103,11 +104,12 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                           <span className="text-xs font-bold text-white truncate max-w-[120px]">
                             {r.attesterName || "Verified Attester"}
                           </span>
-                          {r.isOfficial && (
-                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-tighter ${badge.color}`}>
-                              Official
-                            </span>
-                          )}
+                          <RoleBadge 
+                            isVerified={!!r.isOfficial} 
+                            type={r.verificationTier || r.attesterVerificationType} 
+                            showTooltip={true}
+                            className="scale-75 origin-left -ml-1"
+                          />
                         </div>
                         <p className="text-[9px] text-slate-500 font-mono truncate">
                           {r.attesterWallet.slice(0, 6)}...{r.attesterWallet.slice(-4)}
