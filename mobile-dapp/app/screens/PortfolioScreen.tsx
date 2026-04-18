@@ -18,6 +18,7 @@ import { getWalletReceipts } from '../services/api';
 import { useWallet } from '../context/WalletContext';
 import { getShortDate } from '../utils/date';
 import { LinearGradient } from 'expo-linear-gradient';
+import ProofOfWorkCard from '../components/Profile/ProofOfWorkCard';
 
 const { width } = Dimensions.get('window');
 
@@ -49,7 +50,7 @@ const PortfolioScreen = ({ navigation }: any) => {
   );
 
   const handleCopyLink = async (id: string) => {
-    const url = `https://chainvolio.com/attest/${id}`;
+    const url = `https://chainvolio.xyz/attest/${id}`;
     try {
       await Share.share({
         message: `Verify my career milestone on ChainVolio: ${url}`,
@@ -109,39 +110,11 @@ const PortfolioScreen = ({ navigation }: any) => {
           ) : (
             <View style={styles.receiptGrid}>
                {receipts.map((r, i) => (
-                 <View key={r.id || i} style={styles.receiptCard}>
-                    <View style={styles.cardHeader}>
-                       <Text style={styles.orgText}>{r.org}</Text>
-                       {r.status === 'Attested' ? (
-                         <View style={styles.verifiedTag}>
-                            <Ionicons name="shield-checkmark" size={10} color="#10b981" />
-                            <Text style={styles.verifiedText}>VERIFIED</Text>
-                         </View>
-                       ) : (
-                        <TouchableOpacity 
-                          style={styles.requestButton}
-                          onPress={() => handleCopyLink(r.id)}
-                        >
-                           <Ionicons name="link-outline" size={12} color="#6366f1" />
-                           <Text style={styles.requestText}>ASK VERIFICATION</Text>
-                        </TouchableOpacity>
-                       )}
-                    </View>
-                    
-                    <Text style={styles.roleText}>{r.role}</Text>
-                    
-                    <View style={styles.cardFooter}>
-                       <Text style={styles.dateText}>
-                          {getShortDate(r.startDate || r.start_date)} — {getShortDate(r.endDate || r.end_date)}
-                       </Text>
-                       <TouchableOpacity onPress={() => navigation.navigate('Timeline')}>
-                          <View style={styles.detailsLink}>
-                             <Text style={styles.detailsText}>VIEW DETAILS</Text>
-                             <Ionicons name="chevron-forward" size={12} color="rgba(255,255,255,0.4)" />
-                          </View>
-                       </TouchableOpacity>
-                    </View>
-                 </View>
+                 <ProofOfWorkCard 
+                    key={r.id || i} 
+                    work={r} 
+                    onPress={() => handleCopyLink(r.id)} 
+                 />
                ))}
             </View>
           )}

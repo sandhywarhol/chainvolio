@@ -576,14 +576,83 @@ export default function AttestPage() {
                             </div>
                         )}
 
+                        {/* Quota display */}
+                        {attesterProfile && (() => {
+                          const used = attesterProfile.attestationUsed ?? 0;
+                          const quota = attesterProfile.attestationQuota ?? 2;
+                          const remaining = Math.max(0, quota - used);
+                          const pct = Math.min(100, (used / quota) * 100);
+                          const isLimitReached = used >= quota;
+                          const isNearLimit = !isLimitReached && pct >= 80;
+
+                          if (isLimitReached) return (
+                            <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold text-rose-400">You've reached your limit.</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">Attestation Usage: {used} / {quota} this month</p>
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border bg-rose-500/10 border-rose-500/30 text-rose-400">Limit Reached</span>
+                                </div>
+                                <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-full bg-rose-500 rounded-full w-full" />
+                                </div>
+                                <p className="text-xs text-slate-400 leading-relaxed">Upgrade for unlimited access and keep endorsing talent.</p>
+                                <Link
+                                    href="/dashboard"
+                                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
+                                >
+                                    Upgrade Now
+                                </Link>
+                            </div>
+                          );
+
+                          return (
+                            <div className={`p-3 rounded-xl border space-y-2.5 ${
+                              isNearLimit
+                                ? "bg-amber-500/5 border-amber-500/20"
+                                : "bg-slate-800/30 border-slate-700/50"
+                            }`}>
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Attestation Usage</p>
+                                        <p className="text-sm font-bold text-white">
+                                            {used} <span className="text-slate-500">/</span> {quota}
+                                            <span className="ml-2 text-xs font-medium text-slate-400">this month</span>
+                                        </p>
+                                    </div>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
+                                        isNearLimit
+                                          ? "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                                          : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                                    }`}>
+                                        {isNearLimit ? "Almost Full" : "Available"}
+                                    </span>
+                                </div>
+                                <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full transition-all duration-500 ${
+                                            isNearLimit ? "bg-amber-500" : "bg-emerald-500/60"
+                                        }`}
+                                        style={{ width: `${pct}%` }}
+                                    />
+                                </div>
+                                {isNearLimit && (
+                                    <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit — {remaining} left this month</p>
+                                )}
+                            </div>
+                          );
+                        })()}
+
                         {/* Submit */}
                         <button onClick={handleAttest}
-                            disabled={attesting || !attesterName.trim() || !attesterRole.trim()}
+                            disabled={attesting || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
                             className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2">
                             {attesting ? (
                                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing…</>
                             ) : "Confirm Attestation On-Chain"}
                         </button>
+
                     </div>
                 )}
             </section>

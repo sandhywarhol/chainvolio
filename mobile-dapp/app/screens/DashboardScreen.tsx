@@ -17,6 +17,7 @@ import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useWallet } from '../context/WalletContext';
 import { getProfile, getWalletReceipts, getDashboardStats } from '../services/api';
+import ProofOfWorkCard from '../components/Profile/ProofOfWorkCard';
 
 const { width, height } = Dimensions.get('window');
 
@@ -223,24 +224,11 @@ const DashboardScreen = ({ navigation }: any) => {
 
              {receipts.length > 0 ? (
                receipts.slice(0, 5).map((r, i) => (
-                 <TouchableOpacity key={i} style={styles.receiptCard} activeOpacity={0.7} onPress={() => navigation.navigate('CV')}>
-                    <View style={styles.receiptHeader}>
-                       <Text style={styles.receiptRole} numberOfLines={1}>{r.role}</Text>
-                       <View style={[styles.statusBadge, { backgroundColor: r.status === 'Attested' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)' }]}>
-                          <Text style={[styles.statusText, { color: r.status === 'Attested' ? '#10b981' : 'rgba(255,255,255,0.3)' }]}>
-                             {r.status === 'Attested' ? 'ON-CHAIN' : 'SELF-CLAIMED'}
-                          </Text>
-                       </View>
-                    </View>
-                    <Text style={styles.receiptOrg}>{r.org}</Text>
-                    <View style={styles.receiptMeta}>
-                       <View style={styles.dateBox}>
-                          <Ionicons name="calendar-outline" size={12} color="rgba(255,255,255,0.2)" />
-                          <Text style={styles.receiptDate}>{r.startDate || '2024'} — {r.endDate || 'Present'}</Text>
-                       </View>
-                       <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.1)" />
-                    </View>
-                 </TouchableOpacity>
+                 <ProofOfWorkCard 
+                    key={i} 
+                    work={r} 
+                    onPress={() => navigation.navigate('CV')} 
+                 />
                ))
              ) : (
                <View style={styles.emptyWorkBox}>

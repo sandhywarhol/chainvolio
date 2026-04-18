@@ -3,6 +3,7 @@ import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { ALL_SKILLS } from "@/constants/skills";
 import { calculateScore } from "@/lib/score";
 import { syncUserStatus } from "@/lib/sync";
+import { getAttestationQuota } from "@/lib/paymentConfig";
 
 // Helper function to handle skill pool registration
 async function syncSkillPool(skillsStr: string) {
@@ -312,7 +313,6 @@ export async function GET(request: Request) {
     : "unverified";
 
   // 4. Quota Info (Benefit System)
-  const { getAttestationQuota } = await import("@/lib/paymentConfig");
   const attestationQuota = getAttestationQuota(verificationTier);
 
   return NextResponse.json({
@@ -353,8 +353,9 @@ export async function GET(request: Request) {
     rejectionReason: orgData?.rejection_reason || null,
     // Attestation Quota (Benefit System)
     attestationQuota,
-    attestationUsed: data.attestation_used || 0,
+    attestationUsed: (data.attestation_reset_date && new Date(data.attestation_reset_date) < now) ? 0 : (data.attestation_used || 0),
+    attestationRemaining: Math.max(0, attestationQuota - ((data.attestation_reset_date && new Date(data.attestation_reset_date) < now) ? 0 : (data.attestation_used || 0))),
     attestationResetDate: data.attestation_reset_date || null,
-    canAttest: (data.attestation_used || 0) < attestationQuota,
+    canAttest: ((data.attestation_reset_date && new Date(data.attestation_reset_date) < now) ? 0 : (data.attestation_used || 0)) < attestationQuota,
   });
 }

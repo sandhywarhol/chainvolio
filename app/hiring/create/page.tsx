@@ -5,6 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase } from "@/lib/supabase/client";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
+import { getHiringLimit } from "@/lib/paymentConfig";
 import {
     Loader2,
     Plus,
@@ -43,6 +44,11 @@ export default function CreateCollection() {
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const [isAutoFilled, setIsAutoFilled] = useState(false);
 
+    // Tier enforcement state
+    const [userTier, setUserTier] = useState<string>("unverified");
+    const [collectionCount, setCollectionCount] = useState<number>(0);
+    const [tierLoading, setTierLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -70,6 +76,29 @@ export default function CreateCollection() {
             verifiedOnly: false
         }
     });
+
+    // Fetch user tier + collection count on wallet connect
+    useEffect(() => {
+        if (!publicKey) { setUserTier("unverified"); setCollectionCount(0); return; }
+        setTierLoading(true);
+        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data) setUserTier(data.verificationTier || "unverified");
+            })
+            .catch(() => {})
+            .finally(async () => {
+                // Count existing collections
+                if (supabase && publicKey) {
+                    const { count } = await supabase
+                        .from("hiring_collections")
+                        .select("*", { count: "exact", head: true })
+                        .eq("owner_wallet", publicKey.toBase58());
+                    setCollectionCount(count ?? 0);
+                }
+                setTierLoading(false);
+            });
+    }, [publicKey]);
 
     // Auto-populate profile data
     useEffect(() => {
@@ -124,7 +153,6 @@ export default function CreateCollection() {
         { id: "nft", label: "NFT Portfolio", icon: Palette, desc: "Created assets" },
     ];
 
-    // ...
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!publicKey || !signMessage) {
@@ -153,12 +181,24 @@ export default function CreateCollection() {
             });
 
             const responseData = await res.json();
-            const slug = responseData?.data?.slug || responseData?.slug;
 
+            if (!res.ok) {
+                const errorCode = responseData?.error?.code;
+                const errorMsg = responseData?.error?.message || "An error occurred while creating the collection.";
+                if (errorCode === "ERR_HIRING_LIMIT_REACHED") {
+                    setToast({ message: "You've reached your hiring limit. Upgrade for unlimited access.", type: "error" });
+                    setCollectionCount(hiringLimit ?? 0); // reflect in UI immediately
+                } else {
+                    setToast({ message: errorMsg, type: "error" });
+                }
+                return;
+            }
+
+            const slug = responseData?.data?.slug || responseData?.slug;
             if (slug) {
                 setCreatedSlug(slug);
+                setCollectionCount(prev => prev + 1);
             } else {
-                console.error("API returned success but no slug:", responseData);
                 setToast({ message: "Creation failed: API did not return a valid collection link.", type: "error" });
             }
         } catch (err) {
@@ -176,6 +216,18 @@ export default function CreateCollection() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
+
+    // Derive hiring access state — delegates all tier logic to getHiringLimit() (single source of truth)
+    const hiringLimit = getHiringLimit(userTier);        // null=unlimited, n=capped
+    const remaining = hiringLimit === null ? Infinity : Math.max(0, hiringLimit - collectionCount);
+    type HiringAccess = "loading" | "limit_reached" | "capped_available" | "unlimited";
+    const getHiringAccess = (): HiringAccess => {
+        if (tierLoading) return "loading";
+        if (hiringLimit === null) return "unlimited";              // Community/DAO, Company/Org
+        if (collectionCount >= hiringLimit) return "limit_reached"; // any capped tier exhausted
+        return "capped_available";                                 // capped but still has slots
+    };
+    const hiringAccess = getHiringAccess();
 
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30">
@@ -196,24 +248,69 @@ export default function CreateCollection() {
                         </header>
 
                         <form onSubmit={handleSubmit} className="space-y-8">
-                            {/* Upgrade Notice for Unverified Users */}
+                        {/* Tier-based hiring gate */}
+                        {hiringAccess === "limit_reached" ? (
+                            // Limit reached: any capped tier exhausted
+                            <div className="mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl bg-rose-500/5 border border-rose-500/20 text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+                                <div className="w-14 h-14 mx-auto rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                                    <Lock className="w-6 h-6 text-rose-400" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-base font-bold text-white">You've reached your hiring limit.</h3>
+                                    <p className="text-sm text-slate-400 max-w-sm mx-auto">
+                                        Upgrade for unlimited access and keep building your talent pipeline.
+                                    </p>
+                                </div>
+                                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold">
+                                    <span className="text-slate-400">Hiring Usage:</span>
+                                    <span className="text-rose-400">{collectionCount} / {hiringLimit} used</span>
+                                </div>
+                                <Link
+                                    href="/dashboard"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
+                                >
+                                    <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                                </Link>
+                            </div>
+                        ) : (
+                            // Available: capped with slots remaining, or unlimited
                             <div className="mb-8 p-5 md:p-6 rounded-2xl md:rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
                                 <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
                                     <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                         <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="text-sm font-bold text-white">Verification Status</h4>
-                                        <p className="text-[11px] md:text-xs text-slate-400 max-w-md">Verify your organization to unlock <span className="text-emerald-400 font-bold uppercase tracking-widest text-[9px] md:text-[10px] ml-1">Trusted Hiring Signal</span>.</p>
+                                        <h4 className="text-sm font-bold text-white">Verification Status</h4>                                        {hiringAccess === "capped_available" ? (
+                                            <div className="flex flex-col gap-1.5">
+                                                <p className="text-[11px] md:text-xs text-slate-400">
+                                                    {remaining === 0
+                                                        ? <>Explore your <span className="text-emerald-400 font-bold">{hiringLimit} hiring opportunities.</span> Upgrade for unlimited talent access.</>
+                                                        : <>You have <span className={`font-bold ${remaining <= Math.ceil((hiringLimit ?? 1) * 0.2) ? 'text-amber-400' : 'text-emerald-400'}`}>{remaining} hiring {remaining === 1 ? 'slot' : 'slots'} remaining.</span> Upgrade for unlimited access.</>}
+                                                </p>
+                                                <div className="flex items-center gap-2 text-[10px] font-bold">
+                                                    <span className="text-slate-500">Hiring Usage:</span>
+                                                    <span className={`${remaining <= Math.ceil((hiringLimit ?? 1) * 0.2) ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                                        {collectionCount} / {hiringLimit} used
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        ) : (
+                                            <div className="space-y-1">
+                                                <p className="text-[11px] md:text-xs text-slate-400 max-w-md">Verify your organization to unlock <span className="text-emerald-400 font-bold uppercase tracking-widest text-[9px] md:text-[10px] ml-1">Trusted Hiring Signal</span>.</p>
+                                                <p className="text-[10px] text-slate-500">Upgrade to unlock unlimited hiring and better talent access.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                <Link 
-                                    href="/dashboard" 
+                                <Link
+                                    href="/dashboard"
                                     className="w-full md:w-auto px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 text-center"
                                 >
-                                    Get Verified
+                                    {hiringAccess === "capped_available" ? "Upgrade for Unlimited" : "Get Verified"}
                                 </Link>
                             </div>
+                        )}
 
                             {/* Main Info Card */}
                             <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
@@ -641,7 +738,7 @@ export default function CreateCollection() {
                             <div className="pt-6">
                                 <button
                                     type="submit"
-                                    disabled={loading || !formData.title}
+                                    disabled={loading || !formData.title || hiringAccess === "limit_reached"}
                                     className="w-full py-4 bg-white text-black hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl text-lg transform hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5" /> Generate Hiring Link</>}
@@ -666,7 +763,7 @@ export default function CreateCollection() {
                             Your recruitment portal for <span className="text-emerald-400 font-bold">{formData.title}</span> is ready to accept verified CVs.
                         </p>
 
-                        <div className="bg-[#121214] border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4 mb-10 max-w-xl mx-auto shadow-2xl">
+                        <div className="bg-[#121214] border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4 mb-8 max-w-xl mx-auto shadow-2xl">
                             <div className="flex-1 w-full bg-black/40 rounded-lg px-4 py-3 font-mono text-sm text-emerald-500 truncate border border-emerald-500/10">
                                 {`${window.location.origin}/r/${createdSlug}`}
                             </div>
@@ -678,6 +775,22 @@ export default function CreateCollection() {
                             </button>
                         </div>
 
+                        {/* Post-creation conversion trigger — all limit-reached users */}
+                        {hiringAccess === "limit_reached" && (
+                            <div className="mb-8 max-w-xl mx-auto p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-left space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                <p className="text-sm font-bold text-amber-400">You've reached your hiring limit.</p>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    Upgrade now to create unlimited hiring collections and access high-quality on-chain candidates.
+                                </p>
+                                <Link
+                                    href="/dashboard"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
+                                >
+                                    <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                                </Link>
+                            </div>
+                        )}
+
                         <div className="flex flex-col md:flex-row gap-4 justify-center">
                             <Link
                                 href={`/hiring/${createdSlug}/dashboard`}
@@ -685,12 +798,14 @@ export default function CreateCollection() {
                             >
                                 Open Dashboard <ArrowRight className="w-5 h-5" />
                             </Link>
-                            <button
-                                onClick={() => setCreatedSlug(null)}
-                                className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-all"
-                            >
-                                Create Another
-                            </button>
+                            {hiringAccess !== "limit_reached" && (
+                                <button
+                                    onClick={() => setCreatedSlug(null)}
+                                    className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-all"
+                                >
+                                    Create Another
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { Connection } from "@solana/web3.js";
 import { calculateScore } from "@/lib/score";
+import { getAttestationQuota, getVerificationLabel } from "@/lib/paymentConfig";
 
 export async function POST(request: Request) {
     if (!supabase) {
@@ -168,8 +169,6 @@ export async function POST(request: Request) {
         }
 
         // 1. Resolve Identity
-        const { getVerificationLabel, getAttestationQuota } = await import("@/lib/paymentConfig");
-        
         if (profile && isExternal === false) {
             finalAttesterName = profile.display_name;
             finalAttesterOrg = profile.organization || null;
@@ -186,6 +185,7 @@ export async function POST(request: Request) {
 
         // 2. Attestation Quota Check
         const quota = getAttestationQuota(verificationTier);
+        console.log(`[attest-api] wallet=${attesterWallet} tier=${verificationTier} quota=${quota} used=${profile?.attestation_used ?? 0}`);
 
         // a. Per-Target Monthly Limit Check for Unverified Users
         if (verificationTier === "unverified") {
@@ -212,7 +212,6 @@ export async function POST(request: Request) {
         if (profile) {
             let used = profile.attestation_used || 0;
             let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : new Date(0);
-
             // Monthly Reset Logic
             if (now > resetDate) {
                 used = 0;
@@ -340,11 +339,19 @@ export async function POST(request: Request) {
 
         // Update user attestation count
         if (profile) {
-            const used = profile.attestation_used || 0;
             await supabase
                 .from("profiles")
-                .update({ attestation_used: used + 1 })
+                .update({ attestation_used: (profile.attestation_used || 0) + 1 })
                 .eq("wallet_address", attesterWallet);
+        } else {
+            await supabase.from("profiles").upsert({
+                wallet_address: attesterWallet,
+                display_name: finalAttesterName,
+                professional_role: finalAttesterRole,
+                organization: finalAttesterOrg,
+                attestation_used: 1,
+                attestation_reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            }, { onConflict: 'wallet_address' });
         }
 
         // Trigger score recalculation for candidate

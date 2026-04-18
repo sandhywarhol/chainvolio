@@ -97,7 +97,7 @@ const MainTabs = () => {
       <Tab.Screen 
         name="Profile" 
         component={ProfileStack} 
-        options={{ title: 'Identity' }}
+        options={{ title: 'Profile' }}
       />
     </Tab.Navigator>
   );

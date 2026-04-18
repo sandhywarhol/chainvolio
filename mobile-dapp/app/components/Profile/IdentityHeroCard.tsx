@@ -158,10 +158,26 @@ const IdentityHeroCard = ({ profile, scoreData, onScorePress }: HeroCardProps) =
 
         {/* Social Icons Row */}
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn}><Ionicons name="logo-twitter" size={18} color="#666" /></TouchableOpacity>
-          <TouchableOpacity style={styles.socialBtn}><Ionicons name="logo-github" size={18} color="#666" /></TouchableOpacity>
-          <TouchableOpacity style={styles.socialBtn}><Ionicons name="logo-linkedin" size={18} color="#666" /></TouchableOpacity>
-          <TouchableOpacity style={styles.socialBtn}><Ionicons name="globe-outline" size={18} color="#666" /></TouchableOpacity>
+          {[
+            { key: 'twitter', icon: 'logo-twitter' },
+            { key: 'github', icon: 'logo-github' },
+            { key: 'linkedin', icon: 'logo-linkedin' },
+            { key: 'telegram', icon: 'send', provider: 'Ionicons' },
+            { key: 'discord', icon: 'logo-discord' },
+            { key: 'instagram', icon: 'logo-instagram' },
+            { key: 'website', icon: 'globe-outline' }
+          ].map((s) => {
+            if (!profile?.[s.key]) return null;
+            return (
+              <TouchableOpacity key={s.key} style={styles.socialBtn}>
+                {s.provider === 'MaterialCommunityIcons' ? (
+                  <MaterialCommunityIcons name={s.icon as any} size={18} color="rgba(255,255,255,0.6)" />
+                ) : (
+                  <Ionicons name={s.icon as any} size={18} color="rgba(255,255,255,0.6)" />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 

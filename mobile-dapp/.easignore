@@ -1,0 +1,7 @@
+# Ignore node_modules for EAS builds (it installs them in the cloud)
+node_modules/
+.expo/
+dist/
+build/
+android/
+ios/

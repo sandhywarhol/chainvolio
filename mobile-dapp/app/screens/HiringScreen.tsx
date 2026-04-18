@@ -46,7 +46,7 @@ const HiringScreen = ({ navigation }: any) => {
   );
 
   const handleShare = async (slug: string) => {
-    const url = `https://chainvolio.com/r/${slug}`;
+    const url = `https://chainvolio.xyz/r/${slug}`;
     try {
       await Share.share({ message: `Apply for our open position on ChainVolio: ${url}`, url });
     } catch (error) {

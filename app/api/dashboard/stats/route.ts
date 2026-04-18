@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { getAttestationQuota } from "@/lib/paymentConfig";
 
 export async function GET(request: Request) {
     if (!supabase) {
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
         const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes] = await Promise.all([
             supabase
                 .from("profiles")
-                .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test")
+                .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test, attestation_used, attestation_reset_date")
                 .eq("wallet_address", wallet)
                 .maybeSingle(),
             supabase
@@ -102,6 +103,10 @@ export async function GET(request: Request) {
             discord: profile?.discord || null,
             email: profile?.email || null,
             whatsapp: profile?.whatsapp || null,
+            // Attestation Quota (all users)
+            attestationQuota: getAttestationQuota(verificationTier),
+            attestationUsed: (profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0),
+            attestationResetDate: profile?.attestation_reset_date || null,
         };
 
         return NextResponse.json({

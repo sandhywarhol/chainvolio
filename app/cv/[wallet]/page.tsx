@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp, Info } from "lucide-react";
-import { getVerificationLabel, isRecruiterTier, getBadgeStyles } from "@/lib/paymentConfig";
+import { getVerificationLabel, isRecruiterTier, getBadgeStyles, normalizeTier } from "@/lib/paymentConfig";
 
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
@@ -19,6 +19,8 @@ import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
+import { CompanyCV } from "@/components/cv/CompanyCV";
+import { CommunityCV } from "@/components/cv/CommunityCV";
 
 type Profile = {
   displayName: string;
@@ -701,6 +703,37 @@ export default function CVPage(props: any) {
       </main>
     );
   }
+
+  // ── Role-based CV routing ──────────────────────────────────────────────────
+  // Delegates tier detection to normalizeTier() — the shared SSOT from paymentConfig.
+  // IndividualCV (the existing render below) is left completely untouched.
+  if (profile) {
+    const tier = normalizeTier(profile.verificationType || profile.verificationTier);
+    const isCompany  = tier.includes("company")  || tier.includes("org");
+    const isCommunity = tier.includes("community") || tier.includes("dao");
+
+    if (isCompany || isCommunity) {
+      const sharedProps = { profile, receipts, scoreData, wallet };
+      return (
+        <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+          <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
+          <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
+            {isCompany
+              ? <CompanyCV   {...sharedProps} />
+              : <CommunityCV {...sharedProps} />
+            }
+            <footer className="mt-auto text-center border-t border-slate-800 pt-8 pb-4 mt-12">
+              <p className="text-slate-600 text-xs max-w-md mx-auto">
+                ChainVolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by ChainVolio itself.
+              </p>
+            </footer>
+          </section>
+          <Footer />
+        </main>
+      );
+    }
+  }
+  // ── End role routing — IndividualCV renders below ──────────────────────────
 
   return (
     <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">

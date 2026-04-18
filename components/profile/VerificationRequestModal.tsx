@@ -4,7 +4,18 @@ import { useState, useEffect } from "react";
 import { X, CheckCircle, Clock, ShieldCheck, Users, Building, Code2, Star, Lock, Shield } from "lucide-react";
 import { PaymentModal } from "@/components/profile/PaymentModal";
 import { SubscriptionModal, BillingCycle } from "@/components/profile/SubscriptionModal";
-import { IS_SOL_TEST, SOL_TEST_PRICES } from "@/lib/paymentConfig";
+import { IS_SOL_TEST, SOL_TEST_PRICES, getAttestationQuota } from "@/lib/paymentConfig";
+
+/**
+ * Maps internal TIERS[].id values to the tier string accepted by getAttestationQuota().
+ * This is the bridge between the modal's internal naming and the shared paymentConfig logic.
+ */
+const TIER_ID_TO_QUOTA_KEY: Record<string, string> = {
+    "Builder":   "Builder",
+    "Figure":    "Public Figure",
+    "Community": "Community / DAO",
+    "Company":   "Company / Organization",
+};
 
 type VerificationRequestModalProps = {
     walletAddress: string;
@@ -38,9 +49,8 @@ const TIERS = [
         price: "Free",
         billing: "Earn via profile",
         authority: "Builder Contributor",
-        attestationLimit: 10,
-        button: "Earn Verification",
         attestationPower: 1,
+        button: "Earn Verification",
         benefits: [
             "Verified Builder Badge",
             "Profile becomes more trusted by organizations",
@@ -55,10 +65,9 @@ const TIERS = [
         desc: "Founders, KOLs & notable ecosystem individuals.",
         price: "Free",
         billing: "Manual review",
-        authority: "High Influence",
-        attestationLimit: 20,
-        button: "Request Verification",
+        authority: "Elevated Influence",
         attestationPower: 2,
+        button: "Request Verification",
         benefits: [
             "Verified Public Figure Badge",
             "Higher credibility when giving attestations",
@@ -71,12 +80,11 @@ const TIERS = [
         Icon: Users,
         label: "Community / DAO",
         desc: "DAOs, Web3 communities & decentralized groups.",
-        price: "29 USDC",
+        price: "4 USDC",
         billing: "/ month",
         authority: "Collective Authority",
-        attestationLimit: 40,
-        button: "Start Verification",
         attestationPower: 3,
+        button: "Start Verification",
         benefits: [
             "Verified Community Identity",
             "Community jobs are marked as trusted opportunities",
@@ -89,13 +97,12 @@ const TIERS = [
         Icon: Building,
         label: "Company / Org",
         desc: "Startups, agencies, studios & official organizations.",
-        price: "99 USDC",
+        price: "9 USDC",
         billing: "/ month",
         authority: "Institutional Authority",
-        attestationLimit: 80,
-        button: "Start Verification",
         attestationPower: 4,
         popular: true,
+        button: "Start Verification",
         benefits: [
             "Verified Organization Badge",
             "Job listings appear as trusted hiring sources",
@@ -121,9 +128,15 @@ const TIER_PRICES: Record<string, TierPricing> = IS_SOL_TEST
     : {
         Builder: 10,
         Figure: null,
-        Community: { monthly: 29, yearly: 290 },
-        Company: { monthly: 99, yearly: 990 },
+        Community: { monthly: 4, yearly: 40 },
+        Company: { monthly: 9, yearly: 90 },
     };
+
+/** Previous (anchor) prices shown as strikethrough for value anchoring. */
+const TIER_ANCHOR_PRICES: Record<string, { monthly?: number; yearly?: number }> = {
+    Community: { monthly: 9,  yearly: 90  },
+    Company:   { monthly: 19, yearly: 190 },
+};
 
 const isSubscriptionTier = (id: string) =>
     TIER_PRICES[id] !== null && typeof TIER_PRICES[id] === "object";
@@ -236,6 +249,14 @@ function TierCard({
                 {/* Price */}
                 <div>
                     <div className="flex items-baseline gap-2">
+                        {(() => {
+                            const anchor = !IS_SOL_TEST ? TIER_ANCHOR_PRICES[tier.id] : null;
+                            return anchor?.monthly ? (
+                                <span className="text-[13px] line-through text-white/20 font-medium">
+                                    {anchor.monthly} USDC
+                                </span>
+                            ) : null;
+                        })()}
                         <span className="text-[24px] font-black leading-none text-white tracking-tight">{tier.price}</span>
                         {tier.id === "Figure" && (
                             <span className="text-[10px] text-white/40 font-medium">(Invite only)</span>
@@ -253,7 +274,7 @@ function TierCard({
                     <div className="flex flex-col gap-1">
                         <span className="text-[12px] font-black text-white leading-tight">{tier.authority}</span>
                         <span className="text-[10px] text-white/50 font-medium tracking-tight">
-                            {tier.attestationLimit} attestations / month
+                            {getAttestationQuota(TIER_ID_TO_QUOTA_KEY[tier.id])} attestations / month
                         </span>
                     </div>
                     <PowerStrips count={tier.attestationPower} colorKey={tier.colorKey} />

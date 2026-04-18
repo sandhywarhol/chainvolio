@@ -21,13 +21,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useWallet } from '../context/WalletContext';
-import { getDashboardStats, updateProfile, uploadAvatar } from '../services/api';
+import { getDashboardStats, updateProfile, uploadAvatar, getWalletScore } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
 const ProfileScreen = ({ navigation }: any) => {
   const { walletAddress, disconnect } = useWallet();
   const [profile, setProfile] = useState<any>(null);
+  const [scoreData, setScoreData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const pulseAnim = useRef(new Animated.Value(0)).current;
@@ -79,9 +80,13 @@ const ProfileScreen = ({ navigation }: any) => {
     if (!isRefresh) setLoading(true);
     
     try {
-      const stats = await getDashboardStats(walletAddress);
+      const [stats, score] = await Promise.all([
+        getDashboardStats(walletAddress),
+        getWalletScore(walletAddress)
+      ]);
       const prof = stats.profile;
       setProfile(prof);
+      setScoreData(score);
       
       if (prof) {
         setForm({
@@ -210,143 +215,82 @@ const ProfileScreen = ({ navigation }: any) => {
             />
           }
         >
-          {!isEditing ? (
-            /* SHOWCASE MODE (VIEW) */
-            <View style={styles.showcaseContent}>
-              <View style={styles.showcaseHero}>
-                 <View style={styles.heroAvatarFrame}>
-                    {form.avatarUrl ? (
-                        <Image source={{ uri: form.avatarUrl }} style={styles.heroAvatar} />
-                    ) : (
-                        <View style={styles.avatarPlaceholderLarge}>
-                            <Text style={styles.avatarLetterLarge}>{form.displayName?.[0] || '?'}</Text>
-                        </View>
-                    )}
-                 </View>
-                 <Text style={styles.heroName}>{form.displayName || 'Anonymous Identity'}</Text>
-                 <Text style={styles.heroRole}>{form.role || 'Full-Stack Professional'} <Text style={styles.heroOrg}>at {form.organization || 'Web3 ecosystem'}</Text></Text>
-                 
-                 <View style={styles.showcaseSocialRow}>
-                    {['twitter', 'github', 'linkedin', 'telegram', 'website'].map((key) => (
-                       form[key] ? (
-                          <View key={key} style={styles.socialIconMini}>
-                             <Ionicons 
-                               name={key === 'website' ? 'globe-outline' : key === 'telegram' ? 'send' : `logo-${key}`} 
-                               size={16} 
-                               color="rgba(255,255,255,0.6)" 
-                             />
-                          </View>
-                       ) : null
-                    ))}
-                 </View>
-              </View>
+          <View style={styles.editorContent}>
+             <View style={styles.avatarSection}>
+                <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage} disabled={isUploading}>
+                   {isUploading ? <ActivityIndicator size="small" color="#10b981" /> : (
+                     form.avatarUrl ? <Image source={{ uri: form.avatarUrl }} style={styles.avatarImg} /> : (
+                       <View style={styles.avatarPlaceholder}><Text style={styles.avatarLetter}>{form.displayName?.[0] || '?'}</Text></View>
+                     )
+                   )}
+                   <View style={styles.editBadge}><Ionicons name="camera" size={14} color="#000" /></View>
+                </TouchableOpacity>
+                <View style={styles.headerInfo}>
+                   <Text style={styles.walletAddr}>{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</Text>
+                   <Text style={styles.identityLabel}>IDENTITY MANAGEMENT</Text>
+                </View>
+             </View>
 
-              <View style={styles.showcaseBioBox}>
-                 <Text style={styles.bioText}>{form.bio || 'Building the future of on-chain professional proof. Join my decentralized network.'}</Text>
-              </View>
-
-              <View style={styles.showcaseGrid}>
-                 <View style={styles.showcaseStatFull}>
-                    <Text style={styles.showcaseStatLabel}>CORE SKILLS</Text>
-                    <Text style={styles.showcaseStatValLarge}>{form.skills || 'Solana, Rust, React, UI/UX'}</Text>
-                 </View>
-                 
-                 <View style={{ flexDirection: 'row', gap: 15 }}>
-                   <View style={styles.showcaseStat}>
-                      <Text style={styles.showcaseStatLabel}>COUNTRY</Text>
-                      <Text style={styles.showcaseStatVal}>{form.country || 'Global Citizen'}</Text>
-                   </View>
-                   <View style={styles.showcaseStat}>
-                      <Text style={styles.showcaseStatLabel}>TIMEZONE</Text>
-                      <Text style={styles.showcaseStatVal}>{form.timezone || 'Flexible (UTC)'}</Text>
-                   </View>
-                 </View>
-              </View>
-
-              <View style={styles.prefSection}>
-                 <Text style={styles.prefLabel}>CAREER FOCUS</Text>
-                 <Text style={styles.prefText}>{form.lookingFor || 'Exploring high-impact opportunities in DAO governance and DeFi protocol design.'}</Text>
-                 <View style={styles.tagGridMini}>
-                    {(form.workPreference || ["Contract", "Freelance"]).map((p: string) => (
-                       <View key={p} style={styles.prefTag}><Text style={styles.prefTagText}>{p.toUpperCase()}</Text></View>
-                    ))}
-                 </View>
-              </View>
-
-              <TouchableOpacity style={styles.customizeBtn} onPress={() => setIsEditing(true)}>
-                 <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)']} style={styles.customizeGradient}>
-                    <Ionicons name="settings-outline" size={18} color="#fff" />
-                    <Text style={styles.customizeText}>Customize Identity Hub</Text>
-                 </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            /* EDITOR MODE (FULL PARITY) */
-            <View>
-              <View style={styles.avatarSection}>
-                 <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage} disabled={isUploading}>
-                    {isUploading ? <ActivityIndicator size="small" color="#10b981" /> : (
-                      form.avatarUrl ? <Image source={{ uri: form.avatarUrl }} style={styles.avatarImg} /> : (
-                        <View style={styles.avatarPlaceholder}><Text style={styles.avatarLetter}>{form.displayName?.[0] || '?'}</Text></View>
-                      )
-                    )}
-                    <View style={styles.editBadge}><Ionicons name="camera" size={14} color="#000" /></View>
-                 </TouchableOpacity>
-                 <Text style={styles.walletAddr}>{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</Text>
-              </View>
-
-              <View style={styles.formSection}>
-                <Text style={styles.groupLabel}>CORE IDENTITY</Text>
+             <View style={styles.formSection}>
+                <Text style={styles.groupLabel}>PERSONAL INFORMATION</Text>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>DISPLAY NAME</Text>
                     <TextInput style={styles.input} value={form.displayName} onChangeText={v => handleUpdateField('displayName', v)} placeholder="Pseudonym or Real Name" placeholderTextColor="rgba(255,255,255,0.1)" />
-                </View>
-                <View style={[styles.gridContainer, { gap: 15 }]}>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>PROFESSIONAL ROLE</Text>
-                      <TextInput style={styles.input} value={form.role} onChangeText={v => handleUpdateField('role', v)} placeholder="Lead Dev" placeholderTextColor="rgba(255,255,255,0.1)" />
-                   </View>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>ORGANIZATION</Text>
-                      <TextInput style={styles.input} value={form.organization} onChangeText={v => handleUpdateField('organization', v)} placeholder="Trust Org" placeholderTextColor="rgba(255,255,255,0.1)" />
-                   </View>
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>PROFESSIONAL BIO</Text>
                     <TextInput style={[styles.input, { height: 100, textAlignVertical: 'top' }]} value={form.bio} onChangeText={v => handleUpdateField('bio', v)} multiline placeholder="Career highlights..." placeholderTextColor="rgba(255,255,255,0.1)" />
                 </View>
+              </View>
+
+              <View style={styles.formSection}>
+                <Text style={styles.groupLabel}>PROFESSIONAL INFORMATION</Text>
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>CURRENT ROLE</Text>
+                    <TextInput style={styles.input} value={form.role} onChangeText={v => handleUpdateField('role', v)} placeholder="Lead Dev" placeholderTextColor="rgba(255,255,255,0.1)" />
+                </View>
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>ORGANIZATION</Text>
+                    <TextInput style={styles.input} value={form.organization} onChangeText={v => handleUpdateField('organization', v)} placeholder="Trust Org" placeholderTextColor="rgba(255,255,255,0.1)" />
+                </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>CORE SKILLS</Text>
                     <TextInput style={styles.input} value={form.skills} onChangeText={v => handleUpdateField('skills', v)} placeholder="Rust, Next.js, Solana..." placeholderTextColor="rgba(255,255,255,0.1)" />
                 </View>
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>COUNTRY</Text>
+                    <TextInput style={styles.input} value={form.country} onChangeText={v => handleUpdateField('country', v)} placeholder="Global" placeholderTextColor="rgba(255,255,255,0.05)" />
+                </View>
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>TIMEZONE</Text>
+                    <TextInput style={styles.input} value={form.timezone} onChangeText={v => handleUpdateField('timezone', v)} placeholder="UTC" placeholderTextColor="rgba(255,255,255,0.05)" />
+                </View>
               </View>
 
               <View style={styles.formSection}>
-                <Text style={styles.groupLabel}>SOCIAL FOOTPRINT</Text>
-                <View style={styles.gridContainer}>
-                   {[
-                      { key: 'twitter', label: 'X / TWITTER', placeholder: '@user' },
-                      { key: 'github', label: 'GITHUB', placeholder: 'user' },
-                      { key: 'linkedin', label: 'LINKEDIN', placeholder: 'user' },
-                      { key: 'telegram', label: 'TELEGRAM', placeholder: '@user' },
-                      { key: 'discord', label: 'DISCORD', placeholder: 'user' },
-                      { key: 'instagram', label: 'INSTAGRAM', placeholder: '@user' },
-                   ].map(s => (
-                     <View key={s.key} style={styles.inputStackHalf}>
-                       <Text style={styles.fieldLabel}>{s.label}</Text>
-                       <TextInput style={styles.input} value={form[s.key]} onChangeText={v => handleUpdateField(s.key, v)} placeholder={s.placeholder} placeholderTextColor="rgba(255,255,255,0.05)" />
-                     </View>
-                   ))}
+                <Text style={styles.groupLabel}>CONTACT & SOCIAL</Text>
+                {/* Social Footprint Grid Simplified to Full Width */}
+                {[
+                  { key: 'twitter', label: 'X / TWITTER', placeholder: '@user' },
+                  { key: 'github', label: 'GITHUB', placeholder: 'user' },
+                  { key: 'linkedin', label: 'LINKEDIN', placeholder: 'user' },
+                  { key: 'telegram', label: 'TELEGRAM', placeholder: '@user' },
+                  { key: 'discord', label: 'DISCORD', placeholder: 'user' },
+                  { key: 'instagram', label: 'INSTAGRAM', placeholder: '@user' },
+                ].map(s => (
+                  <View key={s.key} style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>{s.label}</Text>
+                    <TextInput style={styles.input} value={form[s.key]} onChangeText={v => handleUpdateField(s.key, v)} placeholder={s.placeholder} placeholderTextColor="rgba(255,255,255,0.05)" />
+                  </View>
+                ))}
+                
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>WHATSAPP</Text>
+                    <TextInput style={styles.input} value={form.whatsapp} onChangeText={v => handleUpdateField('whatsapp', v)} placeholder="+..." placeholderTextColor="rgba(255,255,255,0.05)" />
                 </View>
-                <View style={styles.gridContainer}>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>WHATSAPP</Text>
-                      <TextInput style={styles.input} value={form.whatsapp} onChangeText={v => handleUpdateField('whatsapp', v)} placeholder="+..." placeholderTextColor="rgba(255,255,255,0.05)" />
-                   </View>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>EMAIL</Text>
-                      <TextInput style={styles.input} value={form.email} onChangeText={v => handleUpdateField('email', v)} placeholder="me@..." placeholderTextColor="rgba(255,255,255,0.05)" />
-                   </View>
+                <View style={styles.inputStack}>
+                    <Text style={styles.fieldLabel}>EMAIL</Text>
+                    <TextInput style={styles.input} value={form.email} onChangeText={v => handleUpdateField('email', v)} placeholder="me@..." placeholderTextColor="rgba(255,255,255,0.05)" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>WEBSITE</Text>
@@ -355,17 +299,7 @@ const ProfileScreen = ({ navigation }: any) => {
               </View>
 
               <View style={styles.formSection}>
-                <Text style={styles.groupLabel}>CAREER LOGISTICS</Text>
-                <View style={[styles.gridContainer, { gap: 15 }]}>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>COUNTRY</Text>
-                      <TextInput style={styles.input} value={form.country} onChangeText={v => handleUpdateField('country', v)} placeholder="Global" placeholderTextColor="rgba(255,255,255,0.05)" />
-                   </View>
-                   <View style={styles.inputStackHalf}>
-                      <Text style={styles.fieldLabel}>TIMEZONE</Text>
-                      <TextInput style={styles.input} value={form.timezone} onChangeText={v => handleUpdateField('timezone', v)} placeholder="UTC" placeholderTextColor="rgba(255,255,255,0.05)" />
-                   </View>
-                </View>
+                <Text style={styles.groupLabel}>CAREER GOALS</Text>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>LOOKING FOR</Text>
                     <TextInput style={styles.input} value={form.lookingFor} onChangeText={v => handleUpdateField('lookingFor', v.slice(0, 160))} placeholder="Open to roles..." placeholderTextColor="rgba(255,255,255,0.05)" />
@@ -386,18 +320,21 @@ const ProfileScreen = ({ navigation }: any) => {
               <TouchableOpacity style={styles.saveBtn} onPress={handleUpdateProfile}>
                  <LinearGradient colors={['#10b981', '#059669']} style={styles.saveGradient}><Text style={styles.saveBtnText}>Save Changes</Text></LinearGradient>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setIsEditing(false)}><Text style={styles.cancelBtnText}>Discard Changes</Text></TouchableOpacity>
-            </View>
-          )}
+              
+              <TouchableOpacity style={styles.disconnectBtn} onPress={() => {
+                Alert.alert('Disconnect', 'Are you sure you want to exit your professional hub?', [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Disconnect', onPress: () => { disconnect(); navigation.replace('Welcome'); } }
+                ]);
+              }}>
+                 <Ionicons name="log-out-outline" size={18} color="rgba(255,59,48,0.6)" />
+                 <Text style={styles.disconnectText}>Disconnect Session</Text>
+              </TouchableOpacity>
+          </View>
 
           <View style={{ height: 100 }} />
         </ScrollView>
       </SafeAreaView>
-
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      </SafeAreaView>
-
     </View>
   );
 };
@@ -437,93 +374,9 @@ const styles = StyleSheet.create({
   headerSub: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontFamily: 'Inter-Bold', marginTop: 2 },
   editModeBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   editModeBtnActive: { backgroundColor: 'rgba(16,185,129,0.1)', borderColor: 'rgba(16,185,129,0.2)' },
+  headerInfo: { marginLeft: 20, flex: 1 },
+  identityLabel: { color: '#10b981', fontSize: 8, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 4 },
   
-  /* SHOWCASE STYLES */
-  showcaseContent: { marginTop: 20 },
-  showcaseHero: { alignItems: 'center', marginBottom: 35 },
-  heroAvatarFrame: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.1)',
-    padding: 5,
-    marginBottom: 20
-  },
-  heroAvatar: { width: '100%', height: '100%', borderRadius: 65 },
-  avatarPlaceholderLarge: { width: '100%', height: '100%', borderRadius: 65, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center' },
-  avatarLetterLarge: { color: '#fff', fontSize: 48, fontFamily: 'SpaceGrotesk-Bold' },
-  heroName: { color: '#fff', fontSize: 28, fontFamily: 'SpaceGrotesk-Bold' },
-  heroRole: { color: 'rgba(255,255,255,0.4)', fontSize: 13, fontFamily: 'Inter-Bold', marginTop: 4 },
-  heroOrg: { color: '#10b981' },
-  showcaseBadges: { flexDirection: 'row', marginTop: 15 },
-  trustPill: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 6, 
-    backgroundColor: 'rgba(16,185,129,0.08)', 
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.2)'
-  },
-  trustText: { color: '#10b981', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 1 },
-  
-  showcaseBioBox: { 
-    backgroundColor: 'rgba(255,255,255,0.01)', 
-    padding: 20, 
-    borderRadius: 20, 
-    borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)',
-    marginBottom: 25
-  },
-  bioText: { color: 'rgba(255,255,255,0.5)', fontSize: 14, fontFamily: 'Inter-Bold', lineHeight: 22, textAlign: 'center' },
-  
-  showcaseStats: { flexDirection: 'row', gap: 15, marginBottom: 30 },
-  showcaseStat: { 
-    flex: 1, 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
-    padding: 18, 
-    borderRadius: 18, 
-    borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)' 
-  },
-  showcaseStatLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 1, marginBottom: 6 },
-  showcaseStatVal: { color: '#fff', fontSize: 14, fontFamily: 'SpaceGrotesk-Bold' },
-  
-  customizeBtn: { borderRadius: 18, overflow: 'hidden', marginBottom: 15 },
-  customizeGradient: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  customizeText: { color: '#fff', fontSize: 14, fontFamily: 'SpaceGrotesk-Bold' },
-  
-  showcaseSocialRow: { flexDirection: 'row', gap: 10, marginTop: 15 },
-  socialIconMini: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  
-  showcaseGrid: { marginBottom: 25 },
-  showcaseStatFull: { 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
-    padding: 20, 
-    borderRadius: 20, 
-    borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)',
-    marginBottom: 15
-  },
-  showcaseStatValLarge: { color: '#10b981', fontSize: 16, fontFamily: 'SpaceGrotesk-Bold' },
-  
-  prefSection: { 
-    backgroundColor: 'rgba(16,185,129,0.03)', 
-    padding: 20, 
-    borderRadius: 20, 
-    borderWidth: 1, 
-    borderColor: 'rgba(16,185,129,0.1)',
-    marginBottom: 30
-  },
-  prefLabel: { color: '#10b981', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 2, marginBottom: 10 },
-  prefText: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontFamily: 'Inter-Bold', lineHeight: 20, marginBottom: 15 },
-  tagGridMini: { flexDirection: 'row', gap: 8 },
-  prefTag: { backgroundColor: 'rgba(16,185,129,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-  prefTagText: { color: '#10b981', fontSize: 8, fontFamily: 'Inter-Bold' },
 
   /* EDITOR STYLES */
   avatarSection: { alignItems: 'center', marginVertical: 30 },
@@ -558,7 +411,6 @@ const styles = StyleSheet.create({
   formSection: { marginBottom: 40 },
   groupLabel: { color: '#10b981', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginBottom: 25 },
   inputStack: { marginBottom: 20 },
-  inputStackHalf: { marginBottom: 20, width: '48%' },
   fieldLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 1, marginBottom: 10 },
   input: { 
     backgroundColor: 'rgba(255,255,255,0.02)', 
@@ -572,7 +424,6 @@ const styles = StyleSheet.create({
   },
   charCount: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'Inter-Bold', textAlign: 'right', marginTop: 4 },
   
-  gridContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 15, justifyContent: 'space-between' },
   tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tag: { 
     paddingHorizontal: 14, 
@@ -594,7 +445,25 @@ const styles = StyleSheet.create({
   saveBtnText: { color: '#000', fontSize: 16, fontFamily: 'SpaceGrotesk-Bold' },
   
   cancelBtn: { marginTop: 12, height: 50, alignItems: 'center', justifyContent: 'center' },
-  cancelBtnText: { color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: 'Inter-Bold' }
+  cancelBtnText: { color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: 'Inter-Bold' },
+  disconnectBtn: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,59,48,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,59,48,0.15)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  disconnectText: {
+    color: 'rgba(255,59,48,0.6)',
+    fontSize: 13,
+    fontFamily: 'Inter-Bold',
+  }
 });
 
 export default ProfileScreen;

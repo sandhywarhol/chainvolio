@@ -139,7 +139,7 @@ const WorkVerificationModal = ({ isVisible, onClose, work }: WorkVerificationMod
                     <View style={styles.attesterHeaderRow}>
                       <TouchableOpacity 
                         style={styles.attesterLink}
-                        onPress={() => work.attesterWallet && Linking.openURL(`https://chainvolio.com/cv/${work.attesterWallet}`)}
+                        onPress={() => work.attesterWallet && Linking.openURL(`https://chainvolio.xyz/cv/${work.attesterWallet}`)}
                       >
                          <Text style={styles.attesterName}>
                             {work.attestationType === "Hiring Proof" && work.attesterName === "Anonymous" 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
-import { isRecruiterTier } from "@/lib/paymentConfig";
+import { isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 
 const errorResponse = (code: string, message: string, status: number = 400) => {
     return NextResponse.json({
@@ -41,15 +41,7 @@ export async function POST(request: Request) {
             return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
         }
 
-        // Set transaction context for RLS
-        await supabase.rpc('set_app_wallet', { wallet_addr: ownerWallet });
-
-        // Generate a clean slug
-        const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-        const randomHash = Math.random().toString(36).substring(2, 7);
-        const slug = `${baseSlug}-${randomHash}`;
-
-        // --- Trusted Hiring Signal Logic (Benefit System) ---
+        // --- Tier Resolution ---
         const { data: orgData } = await supabase
             .from("organization_verifications")
             .select("status, type, expires_at")
@@ -59,8 +51,41 @@ export async function POST(request: Request) {
         const now = new Date();
         const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
         const isExpired = expiresAtDate ? now > expiresAtDate : false;
-        const isVerified = orgData?.status === 'verified' && !isExpired;
+        const isVerified = orgData?.status === "verified" && !isExpired;
+        const verificationTier = isVerified ? (orgData?.type || "unverified") : "unverified";
 
+        // --- Hiring Tier Gate ---
+        const hiringLimit = getHiringLimit(verificationTier);
+        console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} limit=${hiringLimit}`);
+
+        // Capped tiers (non-unlimited): check existing collection count
+        if (hiringLimit !== null) {
+            const { count: existingCount } = await supabase
+                .from("hiring_collections")
+                .select("*", { count: "exact", head: true })
+                .eq("owner_wallet", ownerWallet);
+
+            const used = existingCount ?? 0;
+            console.log(`[hiring-api] collections used=${used} limit=${hiringLimit}`);
+
+            if (used >= hiringLimit) {
+                return errorResponse(
+                    "ERR_HIRING_LIMIT_REACHED",
+                    "You've reached your hiring limit. Upgrade for unlimited access.",
+                    403
+                );
+            }
+        }
+
+        // Set transaction context for RLS
+        await supabase.rpc('set_app_wallet', { wallet_addr: ownerWallet });
+
+        // Generate a clean slug
+        const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        const randomHash = Math.random().toString(36).substring(2, 7);
+        const slug = `${baseSlug}-${randomHash}`;
+
+        // --- Trusted Hiring Signal Logic (Benefit System) ---
         const updatedMetadata = { ...metadata };
         if (isVerified && isRecruiterTier(orgData?.type)) {
             updatedMetadata.isTrusted = true;

@@ -53,31 +53,37 @@ export const USDC_DECIMALS     = 6;
 
 export const USDC_PROD_PRICES: Record<string, { monthly?: bigint; yearly?: bigint; oneTime?: bigint }> = {
     Builder:   { oneTime: BigInt("10000000")  },   // 10 USDC
-    Community: { monthly: BigInt("29000000"),  yearly: BigInt("290000000")  },  // 29 / 290 USDC
-    Company:   { monthly: BigInt("99000000"), yearly: BigInt("990000000") },  // 99 / 990 USDC
+    Community: { monthly: BigInt("4000000"),  yearly: BigInt("40000000")  },  // 4 / 40 USDC
+    Company:   { monthly: BigInt("9000000"), yearly: BigInt("90000000") },  // 9 / 90 USDC
 };
 
 export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: number; oneTime?: number }> = {
     Builder:   { oneTime: 10 },
-    Community: { monthly: 29,  yearly: 290  },
-    Company:   { monthly: 99,  yearly: 990  },
-};
-export const ATTESTATION_QUOTAS: Record<string, number> = {
-    "Builder":               10,
-    "Public Figure":         20,
-    "Community / DAO":       40,
-    "Company / Organization": 80,
-    "unverified":           0, // Or whatever limit for free users
+    Community: { monthly: 4,  yearly: 40  },
+    Company:   { monthly: 9,  yearly: 90  },
 };
 
-export function getAttestationQuota(tier: string): number {
-    const t = (tier || "").toLowerCase();
-    if (t.includes("builder")) return 10;
-    if (t.includes("figure") || t.includes("public")) return 20;
-    if (t.includes("community") || t.includes("dao")) return 40;
-    if (t.includes("company") || t.includes("organization") || t.includes("org")) return 80;
-    if (t === "unverified" || t === "") return 5; 
-    return 0; // default for unknown
+
+/**
+ * Canonical tier normalizer — all tier comparisons in this file MUST go through this.
+ * Accepts raw DB type strings and returns a lowercase normalized version.
+ */
+export function normalizeTier(tier?: string): string {
+    return (tier || "").toLowerCase().trim();
+}
+
+/**
+ * Monthly attestation quota by verification tier.
+ * This is the SINGLE SOURCE OF TRUTH for all quota decisions.
+ * Growth-mode quotas: unverified=2, builder=5, public figure=10, community/dao=20, company/org=40
+ */
+export function getAttestationQuota(tier?: string): number {
+    const t = normalizeTier(tier);
+    if (t.includes("builder")) return 5;
+    if (t.includes("figure") || t.includes("public")) return 10;
+    if (t.includes("community") || t.includes("dao")) return 20;
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return 40;
+    return 2; // default for unverified or unknown — always safe fallback
 }
 
 
@@ -85,8 +91,12 @@ export function getAttestationQuota(tier: string): number {
  * Returns the official display label for a verification tier.
  * Maps DB types/tiers to the "Verified X" format.
  */
+/**
+ * Returns the official display label for a verification tier.
+ * Maps DB types/tiers to the human-readable "Verified X" format.
+ */
 export function getVerificationLabel(type?: string): string {
-    const t = (type || "").toLowerCase();
+    const t = normalizeTier(type);
     if (t.includes("builder")) return "Builder";
     if (t.includes("figure") || t.includes("public")) return "Public";
     if (t.includes("community") || t.includes("dao")) return "Community / DAO";
@@ -109,8 +119,11 @@ export interface BadgeStyle {
 /**
  * Returns Tailwind CSS color classes and metadata for a verification tier.
  */
+/**
+ * Returns Tailwind CSS color classes and metadata for a verification tier.
+ */
 export function getBadgeStyles(verificationType?: string): BadgeStyle {
-    const type = (verificationType || "").toLowerCase();
+    const type = normalizeTier(verificationType);
 
     if (type.includes("public") || type.includes("figure")) return {
         color: "text-pink-400 bg-pink-500/10 border-pink-500/20",
@@ -152,7 +165,7 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
         icon: true,
         tierLabel: "Builder",
     };
-    
+
     // Default / Unverified → Regular (Slate/Gray)
     return {
         color: "text-slate-400 bg-slate-500/10 border-slate-500/20",
@@ -167,8 +180,27 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
 }
 
 
-/** Returns true if the tier/type is authorized for recruiter features. */
+/** Returns true if the tier/type is authorized for recruiter features (community/DAO or company/org). */
 export function isRecruiterTier(tier?: string): boolean {
-    const t = (tier || "").toLowerCase();
+    const t = normalizeTier(tier);
     return t.includes("company") || t.includes("organization") || t.includes("org") || t.includes("community") || t.includes("dao");
 }
+
+/**
+ * Returns the maximum number of hiring collections a tier can create.
+ * This is the SINGLE SOURCE OF TRUTH for all hiring limit decisions.
+ * Growth-mode limits:
+ *   null  = unlimited (Community/DAO, Company/Org)
+ *   10    = Public Figure
+ *   5     = Builder
+ *   2     = Unverified
+ */
+export function getHiringLimit(tier?: string): number | null {
+    const t = normalizeTier(tier);
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return null;
+    if (t.includes("community") || t.includes("dao")) return null;
+    if (t.includes("figure") || t.includes("public")) return 10;
+    if (t.includes("builder")) return 5;
+    return 2; // unverified — safest fallback
+}
+

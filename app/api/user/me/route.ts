@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+import { getAttestationQuota } from "@/lib/paymentConfig";
 
 /**
  * GET /api/user/me?wallet=[wallet_address]
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
         // 1. Fetch Profile (Optimized Payload)
         const { data: profile, error: profileErr } = await supabase
             .from("profiles")
-            .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test")
+            .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test, attestation_used, attestation_reset_date")
             .eq("wallet_address", wallet)
             .maybeSingle();
 
@@ -86,6 +87,8 @@ export async function GET(request: Request) {
         // 3. Compute Source of Truth
         const verificationTier = isVerified ? orgData?.type : "unverified";
         const isProfileComplete = completionScore === 100;
+
+        const attestationQuota = getAttestationQuota(verificationTier);
         
         const responseData: any = {
             walletAddress: wallet,
@@ -122,6 +125,12 @@ export async function GET(request: Request) {
             email: profile?.email || null,
             whatsapp: profile?.whatsapp || null,
             isExpiringSoon,
+            // Attestation Quota
+            attestationQuota,
+            attestationUsed: (profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0),
+            attestationRemaining: Math.max(0, attestationQuota - ((profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0))),
+            attestationResetDate: profile?.attestation_reset_date || null,
+            canAttest: ((profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0)) < attestationQuota,
         };
 
         return NextResponse.json(responseData);

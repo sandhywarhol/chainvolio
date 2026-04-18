@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile-dapp",
+    "name": "ChainVolio",
     "slug": "mobile-dapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.mobiledapp"
+      "package": "com.chainvolio.app"
     },
     "web": {
       "output": "static",
@@ -45,6 +45,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "bbc9b23f-21a8-4496-a97c-6840c1b1628a"
+      }
     }
   }
 }

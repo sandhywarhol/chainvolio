@@ -17,7 +17,7 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
-import { getVerificationLabel, isRecruiterTier } from "@/lib/paymentConfig";
+import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { format } from "date-fns";
 
 
@@ -603,6 +603,91 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* ── ATTESTATION USAGE (All Users) ── */}
+        <div className="mb-6 pb-6 border-b border-slate-800/60">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Attestation Usage</h2>
+            <span className="text-[10px] text-slate-600 font-mono">Resets monthly</span>
+          </div>
+
+          {(() => {
+            const used = profile?.attestationUsed ?? 0;
+            const quota = profile?.attestationQuota ?? 2;
+            const remaining = Math.max(0, quota - used);
+            const pct = Math.min(100, (used / quota) * 100);
+            const isLimitReached = used >= quota;
+            const isNearLimit = !isLimitReached && pct >= 80;
+
+            if (isLimitReached) return (
+              <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-rose-400">You've reached your limit.</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Attestation Usage: {used} / {quota} this month</p>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border bg-rose-500/10 border-rose-500/30 text-rose-400">Limit Reached</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-rose-500 rounded-full w-full" />
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">Upgrade for unlimited access and keep endorsing talent.</p>
+                <button
+                  onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                  className="w-full py-2.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                </button>
+              </div>
+            );
+
+            return (
+              <div className={`p-4 rounded-2xl border space-y-3 relative group ${
+                isNearLimit ? "bg-amber-500/5 border-amber-500/20" : "bg-white/[0.02] border-white/5"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Attestation Usage</p>
+                    <p className="text-sm font-bold text-white">
+                      {used}
+                      <span className="text-slate-500 font-normal"> / {quota}</span>
+                      <span className="text-xs text-slate-500 font-normal ml-1.5">this month</span>
+                    </p>
+                  </div>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
+                    isNearLimit
+                      ? "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                      : profile?.isVerified
+                        ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                        : "text-slate-400 bg-slate-500/10 border-slate-500/20"
+                  }`}>
+                    {isNearLimit ? "Almost Full" : profile?.isVerified ? getVerificationLabel(profile?.verificationTier) : "Regular"}
+                  </span>
+                </div>
+
+                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${
+                      isNearLimit ? "bg-amber-500" :
+                      profile?.isVerified ? "bg-gradient-to-r from-emerald-500/60 to-emerald-400" : "bg-slate-600"
+                    }`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                {isNearLimit && (
+                  <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit — {remaining} left this month</p>
+                )}
+
+                {profile?.attestationResetDate && (
+                  <p className="text-[9px] text-slate-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                    Resets {format(new Date(profile.attestationResetDate), 'MMM d, yyyy')}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
         <div className="mb-6 pb-6 border-b border-slate-800/60 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden">
           <div
             onClick={() => setIsHiringExpanded(!isHiringExpanded)}
@@ -621,9 +706,29 @@ export default function DashboardPage() {
                     </span>
                   )}
                 </div>
-                {!isHiringExpanded && (
-                  <p className="text-[10px] text-slate-500 mt-0.5">Manage your talent collections and hiring links</p>
-                )}
+                {!isHiringExpanded && (() => {
+                  const hiringLimit = getHiringLimit(profile?.verificationTier);
+                  if (hiringLimit === null) {
+                    return <p className="text-[10px] text-slate-500 mt-0.5"><span className="text-emerald-400 font-bold">Unlimited hiring access enabled</span></p>;
+                  }
+                  // Capped tier: show usage
+                  const used = collections.length;
+                  const remaining = Math.max(0, hiringLimit - used);
+                  const isAtLimit = used >= hiringLimit;
+                  return (
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Hiring Usage:{" "}
+                      <span className={`font-bold ${
+                        isAtLimit ? "text-rose-400" : remaining <= 1 ? "text-amber-400" : "text-slate-400"
+                      }`}>
+                        {used} / {hiringLimit} used
+                      </span>
+                      {!isAtLimit && remaining <= 1 && (
+                        <span className="text-amber-400/80 ml-1">— last slot</span>
+                      )}
+                    </p>
+                  );
+                })()}
               </div>
             </div>
             <div className="flex items-center gap-4">
