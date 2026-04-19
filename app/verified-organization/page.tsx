@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, CheckCircle, TrendingUp, Lock, Award, Building, Users, Globe, Briefcase } from "lucide-react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function VerifiedOrganizationPage() {
     const { connected, publicKey } = useWallet();
@@ -32,6 +33,14 @@ export default function VerifiedOrganizationPage() {
 
     // Only show the "Verify your organization" button to "new" (unverified) users
     const showVerifyCTA = !isVerified;
+
+    if (isVerified === null && connected) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            </div>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative overflow-x-hidden">

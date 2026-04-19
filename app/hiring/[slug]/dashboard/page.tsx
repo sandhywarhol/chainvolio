@@ -653,14 +653,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     };
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b] text-white">
-            <div className="flex flex-col items-center gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-                <p className="text-slate-400 font-medium">Preparing recruiter insights...</p>
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
             </div>
-        </div>
-    );
+        );
+    }
 
     if (needsAuth) return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">

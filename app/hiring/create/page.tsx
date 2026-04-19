@@ -229,6 +229,14 @@ export default function CreateCollection() {
     };
     const hiringAccess = getHiringAccess();
 
+    if (tierLoading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            </div>
+        );
+    }
+
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30">
             <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">

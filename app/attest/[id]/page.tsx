@@ -9,6 +9,7 @@ import {
 } from "@solana/web3.js";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ReceiptDetails = {
@@ -251,14 +252,13 @@ export default function AttestPage() {
     };
 
     // ─── Loading ──────────────────────────────────────────────────────────────
-    if (loading) return (
-        <main className="min-h-screen flex items-center justify-center text-white">
-            <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-slate-400 text-sm">Loading…</p>
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
             </div>
-        </main>
-    );
+        );
+    }
 
     if (error && !receipt) return (
         <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">

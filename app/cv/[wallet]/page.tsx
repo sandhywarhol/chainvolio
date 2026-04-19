@@ -20,6 +20,7 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
 import { TrustIssuerCV } from "@/components/cv/TrustIssuerCV";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 type Profile = {
   displayName: string;
@@ -739,11 +740,7 @@ export default function CVPage(props: any) {
   };
 
   if (loading) {
-    return (
-      <main className="min-h-screen text-white flex items-center justify-center">
-        <p className="text-slate-400 font-medium animate-pulse">Loading ChainVolio...</p>
-      </main>
-    );
+    return <LoadingScreen message="Fetching verified identity..." />;
   }
 
   // ── Role-based CV routing ──────────────────────────────────────────────────

@@ -16,6 +16,7 @@ import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { format } from "date-fns";
@@ -160,6 +161,9 @@ export default function DashboardPage() {
     );
   }
 
+  if (loading) {
+    return <LoadingScreen message="Aggregating professional reputation..." />;
+  }
   const walletAddress = publicKey.toBase58();
 
   return (
@@ -170,7 +174,7 @@ export default function DashboardPage() {
 
       <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
         {loading ? (
-          <p className="text-slate-400">Loading...</p>
+          <LoadingScreen message="Aggregating professional reputation..." />
         ) : !profile?.displayName ? (
           <div className="mb-8 p-4 rounded-lg bg-slate-800 border border-slate-700">
             <p className="mb-4">No profile yet. Create one first.</p>

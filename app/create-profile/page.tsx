@@ -8,7 +8,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
-import { Instagram, Linkedin, Twitter, Github, Globe, MessageSquare, Send, Phone, Mail } from "lucide-react";
+import { Instagram, Linkedin, Twitter, Github, Globe, MessageSquare, Send, Phone, Mail, Loader2 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 
 export default function CreateProfilePage() {
@@ -174,6 +174,14 @@ export default function CreateProfilePage() {
       setLoading(false);
     }
   };
+
+  if (loading && !form.displayName) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+      </div>
+    );
+  }
 
   if (!connected || !publicKey) {
     return (

@@ -4,27 +4,7 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
-import {
-    Loader2,
-    Send,
-    CheckCircle,
-    ExternalLink,
-    AlertCircle,
-    ShieldCheck,
-    CalendarDays,
-    Twitter,
-    Github,
-    MessageSquare,
-    Building2,
-    User,
-    BadgeCheck,
-    Clock,
-    DollarSign,
-    Briefcase,
-    Globe,
-    Eye,
-    Filter
-} from "lucide-react";
+import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Twitter, Github, MessageSquare, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter } from "lucide-react";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
 
@@ -141,8 +121,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black text-white">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-white/20" />
             </div>
         );
     }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -132,8 +132,10 @@ export function LandingPageClient() {
                                 The trust layer for Web3 careers.
                             </p>
                         </div>
-                        <div className="flex flex-col sm:flex-row items-center justify-start gap-6">
-                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 hiring-glossy-button text-white font-semibold text-base whitespace-nowrap">Build Your Reputation</Link>
+                        <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
+                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]">
+                                Build Your Reputation
+                            </Link>
                             <button
                                 onClick={() => {
                                     if (!connected) {
@@ -143,9 +145,9 @@ export function LandingPageClient() {
 
                                     router.push("/hiring/create");
                                 }}
-                                className="w-full sm:w-auto px-8 py-3.5 solana-glossy-button text-white font-semibold text-base whitespace-nowrap"
+                                className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
                             >
-                                Discover Talent
+                                Discover Talent <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
@@ -250,7 +252,7 @@ export function LandingPageClient() {
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
-                        <Link href="/create-profile" className="w-full py-4 hiring-glossy-button text-white font-bold text-base text-center rounded-xl shadow-lg">
+                        <Link href="/create-profile" className="w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all">
                             Build Your Reputation
                         </Link>
                         <button
@@ -261,9 +263,9 @@ export function LandingPageClient() {
                                 }
                                 router.push("/hiring/create");
                             }}
-                            className="w-full py-4 solana-glossy-button text-white font-bold text-base rounded-xl shadow-lg"
+                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
                         >
-                            Discover Talent
+                            Discover Talent <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
 

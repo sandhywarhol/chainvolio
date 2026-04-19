@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import QRCode from "react-qr-code";
 import { format } from "date-fns";
-import { ShieldCheck, Globe, FileText, ExternalLink, Copy, Check, Share2, Printer, Award, User, Building } from "lucide-react";
+import { ShieldCheck, Globe, FileText, ExternalLink, Copy, Check, Share2, Printer, Award, User, Building, Loader2 } from "lucide-react";
 import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
 
 
@@ -73,11 +73,13 @@ export default function MemoPage() {
             .finally(() => setLoad(false));
     }, [id]);
 
-    if (loading) return (
-        <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#0a0a0c]" : "bg-gray-50"}`}>
-            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-    );
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-white/10" />
+            </div>
+        );
+    }
 
     if (error || !data) return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
