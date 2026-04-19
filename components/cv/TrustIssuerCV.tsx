@@ -19,6 +19,10 @@ import {
   ArrowRight,
   X,
   ExternalLink,
+  Github,
+  Linkedin,
+  Mail,
+  MessageSquare,
 } from "lucide-react";
 import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
 import { Toast } from "@/components/ui/Toast";
@@ -257,6 +261,26 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                   𝕏 Twitter
                 </a>
               )}
+              {profile.linkedin && (
+                <a href={profile.linkedin} target="_blank" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                  <Linkedin className="w-3.5 h-3.5" /> LinkedIn
+                </a>
+              )}
+              {profile.github && (
+                <a href={`https://github.com/${profile.github.replace("@", "")}`} target="_blank" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                  <Github className="w-3.5 h-3.5" /> GitHub
+                </a>
+              )}
+              {profile.discord && (
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer" onClick={() => { navigator.clipboard.writeText(profile.discord || ""); setToastMessage("Discord ID Copied!"); }}>
+                  <MessageSquare className="w-3.5 h-3.5" /> {profile.discord}
+                </div>
+              )}
+              {profile.email && (
+                <a href={`mailto:${profile.email}`} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                  <Mail className="w-3.5 h-3.5" /> Email
+                </a>
+              )}
               <div className="flex-1" />
               <button 
                 onClick={() => { navigator.clipboard.writeText(wallet); setToastMessage("Copied!"); }}
@@ -471,20 +495,21 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                     <p className="text-slate-400 font-bold text-sm">No hiring records found.</p>
                   </div>
                 ) : (
-                  collections.map((c: any) => {
+                   collections.map((c: any) => {
                      const status = c.metadata?.status || "Active";
                      const isActive = status.toLowerCase() === "active";
                      const isHired = status.toLowerCase() === "hired";
+                     const isClosed = status.toLowerCase() === "closed" || status.toLowerCase() === "removed";
                      
                      let statusColor = "text-slate-400 bg-slate-500/10 border-slate-500/20";
                      if (isActive) statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
                      if (isHired) statusColor = "text-purple-400 bg-purple-500/10 border-purple-500/20";
                      
-                     return (
-                       <div key={c.id} className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3">
+                     const cardContent = (
+                       <div className={`p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3 ${!isClosed ? 'hover:border-purple-500/30 hover:bg-white/[0.04] transition-all cursor-pointer group' : ''}`}>
                          <div className="flex items-start justify-between">
                            <div>
-                             <h4 className="text-sm font-black text-white">{c.title}</h4>
+                             <h4 className={`text-sm font-black ${!isClosed ? 'text-white group-hover:text-purple-400 transition-colors' : 'text-slate-300'}`}>{c.title}</h4>
                              <div className="flex items-center gap-2 mt-2">
                                <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-md border ${statusColor}`}>
                                  {status}
@@ -495,10 +520,22 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                                </span>
                              </div>
                            </div>
+                           {!isClosed && (
+                             <div className="p-2 aspect-square rounded-xl bg-white/5 border border-white/10 group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all flex items-center justify-center">
+                               <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400 transition-colors" />
+                             </div>
+                           )}
                          </div>
-                         <a href={`/hiring/${c.slug}`} className="w-full mt-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all text-center">
-                           View Details <ExternalLink className="w-3 h-3" />
-                         </a>
+                       </div>
+                     );
+
+                     return !isClosed ? (
+                       <a key={c.id} href={`/r/${c.slug}`} target="_blank" rel="noopener noreferrer" className="block focus:outline-none">
+                         {cardContent}
+                       </a>
+                     ) : (
+                       <div key={c.id} className="opacity-60 grayscale cursor-not-allowed">
+                         {cardContent}
                        </div>
                      );
                   })

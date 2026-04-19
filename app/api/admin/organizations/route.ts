@@ -62,6 +62,30 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
+        // Fetch card numbers and display names separately to avoid PostgREST foreign key matching errors
+        const wallets = data?.map(d => d.wallet_address) || [];
+        let profilesMap: Record<string, { card_number: number, display_name: string }> = {};
+        if (wallets.length > 0) {
+            const { data: profilesData } = await supabase
+                .from("profiles")
+                .select("wallet_address, card_number, display_name")
+                .in("wallet_address", wallets);
+            
+            if (profilesData) {
+                profilesMap = Object.fromEntries(
+                    profilesData.map(p => [p.wallet_address, { card_number: p.card_number, display_name: p.display_name }])
+                );
+            }
+        }
+
+        const enrichedData = data?.map(d => ({
+            ...d,
+            profiles: { 
+                card_number: profilesMap[d.wallet_address]?.card_number || null,
+                display_name: profilesMap[d.wallet_address]?.display_name || null 
+            }
+        })) || [];
+
         // --- Analytics Helper ---
         // 1. Total User Count (Active profiles only)
         let totalCountQuery = supabase
@@ -98,7 +122,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ 
             ok: true, 
-            data,
+            data: enrichedData,
             analytics: {
                 totalUsers: totalUsers || 0,
                 topCountries

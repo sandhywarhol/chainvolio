@@ -46,6 +46,7 @@ type OrgRequest = {
     tx_signature?: string;
     amount_paid?: number;
     expires_at?: string;
+    profiles?: { card_number: number, display_name: string };
 };
 
 
@@ -757,8 +758,10 @@ export default function AdminVerificationPage() {
                         <table className="w-full text-left">
                             <thead className="bg-white/[0.01] border-b border-white/5 font-mono text-[10px] text-slate-500 uppercase tracking-widest">
                                 <tr>
+                                    <th className="px-8 py-4 font-normal">CV ID</th>
                                     <th className="px-8 py-4 font-normal">Applicant</th>
                                     <th className="px-8 py-4 font-normal">Requested Tier</th>
+                                    <th className="px-8 py-4 font-normal">Sub Expires</th>
                                     <th className="px-8 py-4 font-normal">Wallet</th>
                                     <th className="px-8 py-4 font-normal">Amount</th>
                                     <th className="px-8 py-4 font-normal">Tx Signature</th>
@@ -769,12 +772,12 @@ export default function AdminVerificationPage() {
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={7} className="px-8 py-20 text-center text-slate-500 italic">Loading requests…</td>
+                                        <td colSpan={9} className="px-8 py-20 text-center text-slate-500 italic">Loading requests…</td>
 
                                     </tr>
                                 ) : filteredRequests.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-8 py-20 text-center text-slate-500 italic">
+                                        <td colSpan={9} className="px-8 py-20 text-center text-slate-500 italic">
 
                                             {statusFilter !== "all" || searchTerm ? "No results found for your search/filters." :
                                              activeTab === "pending" ? "No pending requests. Good work, Admin." : "No reviewed requests yet."}
@@ -784,15 +787,51 @@ export default function AdminVerificationPage() {
 
                                     <tr key={req.id} className="group hover:bg-white/[0.01] transition-colors">
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-base font-bold leading-tight">{req.name}</span>
-                                                <span className="text-[10px] text-slate-500 italic font-medium">
+                                            {req.profiles?.card_number ? (
+                                                <span className="text-[11px] font-mono font-bold text-slate-400 bg-slate-900 border border-slate-800 px-2 py-1 rounded">
+                                                    #{req.profiles.card_number}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-slate-600 italic">—</span>
+                                            )}
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col items-start gap-1">
+                                                <span className="text-base font-bold leading-tight max-w-[200px] truncate" title={req.profiles?.display_name || req.name}>{req.profiles?.display_name || req.name}</span>
+                                                <span className="text-[10px] text-slate-500 italic font-medium mb-1">
                                                     Submitted {format(new Date(req.created_at), 'MMM d, p')}
                                                 </span>
+                                                <a 
+                                                    href={`/cv/${req.wallet_address}`} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-purple-500/10 border border-white/10 hover:border-purple-500/30 text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-purple-400 transition-all"
+                                                >
+                                                    <ExternalLink className="w-2.5 h-2.5" /> View CV
+                                                </a>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <TierBadge type={req.type} />
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            {(req.type.toLowerCase().includes("company") || req.type.toLowerCase().includes("community") || req.type.toLowerCase().includes("org") || req.type.toLowerCase().includes("dao")) && req.status === "verified" && req.expires_at ? (
+                                                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 whitespace-nowrap inline-flex items-center gap-1">
+                                                    <Clock8 className="w-3 h-3" />
+                                                    {(() => {
+                                                        const diff = new Date(req.expires_at).getTime() - Date.now();
+                                                        if (diff <= 0) return "Expired";
+                                                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                                        if (days > 30) return `${Math.floor(days/30)} months left`;
+                                                        if (days > 0) return `${days} days left`;
+                                                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                                                        if (hours > 0) return `${hours} hrs left`;
+                                                        return "Expiring soon";
+                                                    })()}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-slate-600 italic">—</span>
+                                            )}
                                         </td>
                                         <td className="px-8 py-6">
                                             <div
