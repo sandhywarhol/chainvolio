@@ -45,6 +45,7 @@ type Profile = {
   linkedin?: string;
   location?: string;
   cardNumber?: number;
+  headline?: string;
 };
 
 type Receipt = {
