@@ -11,27 +11,46 @@ export async function GET(request: Request) {
 
     try {
         // Fetch attestations issued by this wallet
-        const { data, error } = await supabase
+        const { data: attestations, error } = await supabase
             .from("attestations")
             .select(`
                 *,
-                receipt:receipts (
-                    id,
-                    role,
-                    org,
-                    wallet_address,
-                    profile:profiles (
-                        display_name,
-                        avatar_url
-                    )
-                )
+                receipt:receipts (*)
             `)
             .eq("attester_wallet", wallet)
             .order("created_at", { ascending: false });
 
         if (error) throw error;
+        
+        if (!attestations || attestations.length === 0) {
+            return NextResponse.json({ ok: true, data: [] });
+        }
 
-        return NextResponse.json({ ok: true, data });
+        // Manual join for recipient profiles
+        const recipientWallets = Array.from(new Set(
+            attestations.map((a: any) => a.receipt?.wallet_address).filter(Boolean)
+        ));
+
+        let profileMap: Record<string, any> = {};
+
+        if (recipientWallets.length > 0) {
+            const { data: profiles } = await supabase
+                .from("profiles")
+                .select("wallet_address, display_name, avatar_url")
+                .in("wallet_address", recipientWallets);
+                
+            profiles?.forEach(p => { profileMap[p.wallet_address] = p; });
+        }
+
+        // Attach profile to each receipt
+        const enrichedData = attestations.map((a: any) => {
+            if (a.receipt) {
+                a.receipt.profile = profileMap[a.receipt.wallet_address] || null;
+            }
+            return a;
+        });
+
+        return NextResponse.json({ ok: true, data: enrichedData });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

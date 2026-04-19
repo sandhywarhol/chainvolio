@@ -19,8 +19,7 @@ import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
-import { CompanyCV } from "@/components/cv/CompanyCV";
-import { CommunityCV } from "@/components/cv/CommunityCV";
+import { TrustIssuerCV } from "@/components/cv/TrustIssuerCV";
 
 type Profile = {
   displayName: string;
@@ -495,6 +494,22 @@ function WorkRecordCard({
   );
 }
 
+type Endorsement = {
+    id: string;
+    attester_wallet: string;
+    receipt: {
+        id: string;
+        role: string;
+        org: string;
+        wallet_address: string;
+        profile: {
+            display_name: string;
+            avatar_url: string;
+        };
+    };
+    created_at: string;
+};
+
 export default function CVPage(props: any) {
   const params = useParams();
   const { publicKey } = useWallet();
@@ -631,6 +646,9 @@ export default function CVPage(props: any) {
     
   }, [wallet, publicKey, viewerProfile]);
 
+  const [collections, setCollections] = useState<any[]>([]);
+  const [endorsements, setEndorsements] = useState<any[]>([]);
+
   useEffect(() => {
     if (!wallet) return;
 
@@ -651,13 +669,37 @@ export default function CVPage(props: any) {
     Promise.all([
       fetch(`/api/receipts?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
-    ]).then(([recsData, port]) => {
+      fetch(`/api/hiring/collections?wallet=${wallet}`).then((r) => r.json()),
+      fetch(`/api/organizations/attestations?wallet=${wallet}`).then((r) => r.json()),
+    ]).then(([recsData, port, collectionsData, endorsementsData]) => {
       const recs = Array.isArray(recsData) ? recsData : (recsData.receipts || []);
       const sortedRecs = [...recs].sort((a: any, b: any) => 
         (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0)
       );
       setReceipts(sortedRecs);
       setPortfolio(Array.isArray(port) ? port : []);
+      
+      if (collectionsData?.ok && Array.isArray(collectionsData.data)) {
+        setCollections(collectionsData.data);
+      }
+
+      if (endorsementsData?.ok && Array.isArray(endorsementsData.data)) {
+        const mappedEndorsements = endorsementsData.data.map((e: any) => ({
+             ...e.receipt,
+             startDate: e.receipt?.start_date,
+             endDate: e.receipt?.end_date,
+             workType: e.receipt?.work_type,
+             compensationType: e.receipt?.compensation_type,
+             evidenceLinks: e.receipt?.evidence_links || [],
+             portfolioImages: e.receipt?.portfolio_images || [],
+             impact: e.receipt?.impact || [],
+             status: "Attested",
+             attesterWallet: e.attester_wallet,
+             createdAt: e.created_at,
+             profile: e.receipt?.profile || { display_name: "Anonymous Builder", avatar_url: null }
+        }));
+        setEndorsements(mappedEndorsements);
+      }
     }).catch(err => console.error("Non-critical fetches failed:", err));
 
     // --- NON-CRITICAL DATA: Score (fetched in background) ---
@@ -713,15 +755,18 @@ export default function CVPage(props: any) {
     const isCommunity = tier.includes("community") || tier.includes("dao");
 
     if (isCompany || isCommunity) {
-      const sharedProps = { profile, receipts, scoreData, wallet };
       return (
         <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
           <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
           <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
-            {isCompany
-              ? <CompanyCV   {...sharedProps} />
-              : <CommunityCV {...sharedProps} />
-            }
+            <TrustIssuerCV
+               profile={profile}
+               receipts={endorsements} // Uses issued endorsements for impact
+               scoreData={scoreData}
+               wallet={wallet}
+               collections={collections}
+               isCommunity={isCommunity}
+            />
             <footer className="mt-auto text-center border-t border-slate-800 pt-8 pb-4 mt-12">
               <p className="text-slate-600 text-xs max-w-md mx-auto">
                 ChainVolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by ChainVolio itself.

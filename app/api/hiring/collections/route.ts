@@ -9,6 +9,37 @@ const errorResponse = (code: string, message: string, status: number = 400) => {
     }, { status });
 };
 
+export async function GET(request: Request) {
+    if (!supabase) {
+        return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);
+    }
+
+    try {
+        const { searchParams } = new URL(request.url);
+        const wallet = searchParams.get("wallet");
+
+        if (!wallet) {
+            return errorResponse("ERR_INVALID_REQUEST", "Wallet is required", 400);
+        }
+
+        const { data, error } = await supabase
+            .from("hiring_collections")
+            .select("*")
+            .eq("owner_wallet", wallet)
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Collection Fetch Error:", error);
+            return errorResponse("ERR_DATABASE_ERROR", error.message, 500);
+        }
+
+        return NextResponse.json({ ok: true, data });
+    } catch (err: any) {
+        console.error("Critical API Error:", err);
+        return errorResponse("ERR_SERVER_ERROR", err.message || "Server Error", 500);
+    }
+}
+
 export async function POST(request: Request) {
     if (!supabase) {
         return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);

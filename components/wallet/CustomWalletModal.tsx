@@ -22,14 +22,13 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         setIsMobile(checkMobile);
 
-        // Requirement 2: Phantom Detection
-        const isPhantom = !!(window as any).solana?.isPhantom;
-        setPhantomAvailable(isPhantom);
+        // More reliable detection using adapter readyState
+        const phantom = wallets.find(w => w.adapter.name === "Phantom");
+        const solflare = wallets.find(w => w.adapter.name === "Solflare");
 
-        // Requirement 3: Solflare Detection
-        const isSolflare = !!((window as any).solflare || (window as any).solana?.isSolflare);
-        setSolflareAvailable(isSolflare);
-    }, [isOpen]);
+        setPhantomAvailable(phantom?.readyState === "Installed" || !!(window as any).solana?.isPhantom);
+        setSolflareAvailable(solflare?.readyState === "Installed" || !!(window as any).solflare);
+    }, [isOpen, wallets]);
 
     if (!isOpen) return null;
 
@@ -49,21 +48,19 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
             const targetWallet = wallets.find(w => w.adapter.name === walletName);
             if (targetWallet) {
-                await select(targetWallet.adapter.name);
-            } else {
-                await select(walletName as any);
-            }
-
-            // Small delay to ensure selection is processed before connecting
-            setTimeout(() => {
-                connect().catch((err) => {
-                    // Suppress error if it's just a user rejection
-                    if (err.name !== "WalletConnectionError") {
+                select(targetWallet.adapter.name);
+                
+                // Call connect immediately to preserve user gesture context
+                // Most modern adapters handle the selection sync-ly enough for this to work
+                try {
+                    await connect();
+                } catch (err: any) {
+                    if (err.name !== "WalletConnectionError" && err.name !== "WalletWindowClosedError") {
                         console.error("Connection failed:", err);
                     }
-                });
-            }, 100);
-
+                }
+            }
+            
             onClose();
         } catch (err) {
             console.error("Selection failed:", err);
