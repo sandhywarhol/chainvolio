@@ -137,15 +137,16 @@ if (data.score > 75 && data.confidence > 0.8) {
       <Navbar />
 
       {/* Ambient Background Glows */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-[10%] -left-[5%] w-[45%] h-[45%] bg-purple-500/[0.03] blur-[150px] rounded-full" />
-          <div className="absolute bottom-[15%] -right-[5%] w-[40%] h-[40%] bg-blue-500/[0.03] blur-[150px] rounded-full" />
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-600/[0.07] blur-[120px] rounded-full animate-pulse" />
+          <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/[0.07] blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-emerald-600/[0.07] blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '4s' }} />
       </div>
       
       <div className="flex-1 flex overflow-hidden relative z-10 pt-20">
         <div className="max-w-6xl mx-auto w-full flex overflow-hidden px-6">
           {/* Navigation Sidebar */}
-          <aside className="hidden lg:block w-1/4 space-y-8 overflow-y-auto h-full py-12 pr-8 custom-scrollbar">
+          <aside className="hidden lg:block w-1/4 space-y-8 overflow-y-auto h-full py-12 pr-8 scrollbar-hide">
             <nav className="space-y-2">
               <p className="text-caption text-white/20 mb-6 flex items-center gap-2">
                   <Search className="w-3 h-3" /> Introduction
@@ -181,7 +182,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           </aside>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto h-full px-8 lg:px-12 py-12 space-y-32 custom-scrollbar scroll-smooth">
+          <div className="flex-1 overflow-y-auto h-full px-8 lg:px-12 py-12 space-y-32 scrollbar-hide scroll-smooth">
           {/* Header */}
           <header id="introduction" className="space-y-8 scroll-mt-[120px]">
             <div className="flex items-center gap-3 px-4 py-1.5 bg-purple-500/[0.03] border border-purple-500/10 rounded-full w-fit">
