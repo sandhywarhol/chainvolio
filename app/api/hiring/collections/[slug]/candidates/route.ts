@@ -55,11 +55,13 @@ export async function GET(
         );
 
         if (!isValid) {
+            console.error(`[Dashboard API] Signature verification failed for wallet ${wallet}. Error: ${sigError}`);
             return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
         }
 
         // Check ownership
         if (collection.owner_wallet !== wallet) {
+            console.error(`[Dashboard API] Unauthorized: Wallet ${wallet} is not owner ${collection.owner_wallet} for slug ${slug}`);
             return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403 });
         }
         // ----------------------------

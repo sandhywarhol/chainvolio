@@ -65,7 +65,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     useEffect(() => {
-        if (!connected || !publicKey) return;
+        if (!connected || !publicKey) {
+            setLoading(false);
+            setNeedsAuth(false);
+            setData(null);
+            setError(null);
+            return;
+        }
 
         async function initDashboard() {
             setLoading(true);
@@ -184,6 +190,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
                     sessionStorage.removeItem(canonicalKey);
                     sessionStorage.removeItem(`${canonicalKey}_active`);
+                    setError(result.error || "Signature verification failed.");
                     setNeedsAuth(true);
                 } else {
                     setError(result.error || "Failed to load dashboard.");
@@ -661,6 +668,27 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         );
     }
 
+    if (!connected || !publicKey) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
+            <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
+                <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
+                    <Users className="w-10 h-10 text-indigo-500" />
+                </div>
+                <div className="space-y-3">
+                    <h1 className="text-2xl font-bold">Connect Wallet</h1>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                        Please connect your recruiter wallet to access the hiring dashboard.
+                    </p>
+                </div>
+                {/* We'll assume WalletMultiButton is already themed or use a standard one if it was here, 
+                    but since it's not imported, I'll use a placeholder or check imports */}
+                <div className="flex justify-center">
+                   <p className="text-xs text-slate-500 italic">Please use the wallet connect button in the header or sidebar.</p>
+                </div>
+            </div>
+        </div>
+    );
+
     if (needsAuth) return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
             <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
@@ -672,6 +700,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     <p className="text-slate-400 text-sm leading-relaxed">
                         To protect sensitive candidate data, please authorize restricted access with your recruiter wallet signature.
                     </p>
+                    {error && (
+                        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold">
+                             {error}
+                        </div>
+                    )}
                 </div>
                 <button 
                     onClick={handleAuthorize}
@@ -679,6 +712,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 >
                     <ShieldCheck className="w-4 h-4" /> Authorize Session
                 </button>
+                <div className="pt-2">
+                    <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey.toBase58().slice(0,4)}...{publicKey.toBase58().slice(-4)}</p>
+                </div>
             </div>
         </div>
     );

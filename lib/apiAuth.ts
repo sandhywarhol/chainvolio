@@ -6,7 +6,8 @@ export async function validateApiKey(request: Request) {
   const host = request.headers.get("host");
   
   // Allow internal requests from the same origin to bypass API key check
-  if (!apiKey && (origin?.includes(host || "") || !origin)) {
+  // We check for Origin and verify it matches Host to prevent simple spoofing
+  if (!apiKey && origin && origin.includes(host || "")) {
     return { valid: true, isInternal: true };
   }
 
