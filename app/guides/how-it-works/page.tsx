@@ -37,9 +37,9 @@ export default function HowItWorksPage() {
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-emerald-600/[0.07] blur-[120px] rounded-full animate-pulse" />
-          <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/[0.07] blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-          <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-purple-600/[0.07] blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '4s' }} />
+          <div className="absolute top-[20%] -left-[10%] w-[40%] h-[40%] bg-purple-500/5 blur-[120px] rounded-full" />
+          <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+          <div className="absolute bottom-[10%] left-[20%] w-[30%] h-[30%] bg-blue-500/5 blur-[120px] rounded-full" />
       </div>
 
       <Navbar />
