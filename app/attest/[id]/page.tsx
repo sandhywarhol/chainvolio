@@ -638,7 +638,7 @@ export default function AttestPage() {
                                     />
                                 </div>
                                 {isNearLimit && (
-                                    <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit — {remaining} left this month</p>
+                                    <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit - {remaining} left this month</p>
                                 )}
                             </div>
                           );

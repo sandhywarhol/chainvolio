@@ -23,18 +23,17 @@ export function RoleBadge({ type, isVerified = true, className = "", showTooltip
   };
 
   const tooltip = TIER_TOOLTIPS[s.tierLabel] || TIER_TOOLTIPS["Builder"];
-
   return (
-    <div className={`relative group/trust flex flex-col items-center ${className}`}>
+    <div className={`relative group/trust inline-flex flex-col items-center ${className}`}>
       {/* Tier label badge */}
-      <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${s.color} transition-all duration-300 hover:scale-105 cursor-default shadow-sm`}>
-        <ShieldCheck size={10} strokeWidth={3} />
+      <span className={`inline-flex items-center justify-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest ${s.color} transition-all duration-300 hover:scale-105 cursor-default shadow-sm`}>
+        <ShieldCheck size={12} strokeWidth={3} />
         {s.tierLabel}
       </span>
 
-      {/* Attestation power strips */}
+      {/* Attestation power strips - positioned absolutely so they don't shift the label's center */}
       {s.bars > 0 && (
-        <div className="flex gap-[3.5px] mt-0.5">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 flex gap-[3.5px] mt-1.5">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}

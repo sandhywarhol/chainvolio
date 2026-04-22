@@ -158,7 +158,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 {!submitted ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="text-center mb-16">
-                            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight text-white">
                                 {collection.title}
                             </h1>
                             <div className="flex flex-col items-center gap-6">
@@ -550,7 +550,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         <div className="w-24 h-24 bg-emerald-500/20 border-2 border-emerald-500/40 rounded-full flex items-center justify-center mx-auto mb-8">
                             <CheckCircle className="w-12 h-12 text-emerald-400" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight bg-gradient-to-br from-white to-emerald-400 bg-clip-text text-transparent">Submission Successful</h1>
+                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-white">Submission Successful</h1>
                         <p className="text-slate-400 mb-12 text-lg">
                             The hiring team at <span className="text-white font-bold">{collection.title}</span> has received your verified credentials.
                         </p>

@@ -22,7 +22,7 @@ type SubscriptionModalProps = {
     monthlyPrice:  number;
     yearlyPrice:   number;
     onBack:        () => void;
-    /** Called when user clicks Subscribe — parent will open PaymentModal */
+    /** Called when user clicks Subscribe - parent will open PaymentModal */
     onSelectBilling: (cycle: BillingCycle, price: number) => void;
 };
 

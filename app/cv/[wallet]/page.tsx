@@ -167,11 +167,11 @@ function ProfileCompleteBadge({
 
   return (
     <div
-      className={`relative group/complete flex items-start ${className}`}
+      className={`relative group/complete inline-flex ${className}`}
       onClick={onClick}
     >
-      <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${usedStyle.color} transition-all duration-300 hover:scale-105 cursor-pointer`}>
-        <BadgeCheck className={`w-[10px] h-[10px] ${usedStyle.iconText}`} strokeWidth={3} />
+      <div className={`inline-flex items-center justify-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest ${usedStyle.color} transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm`}>
+        <BadgeCheck className={`w-3.5 h-3.5 ${usedStyle.iconText}`} strokeWidth={3} />
         <span>{labelText}</span>
       </div>
 
@@ -194,9 +194,9 @@ function ExperienceBadge({ years, className = "" }: { years: number; className?:
   if (years <= 0) return null;
 
   return (
-    <div className={`relative group/exp flex items-center ${className}`}>
-      <div className="flex items-center justify-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
-        <Clock size={10} strokeWidth={3} />
+    <div className={`relative group/exp inline-flex ${className}`}>
+      <div className="inline-flex items-center justify-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30 shadow-sm cursor-default transition-all duration-300 hover:scale-105">
+        <Clock size={12} strokeWidth={3} />
         <span>{years}Y Exp</span>
       </div>
 
@@ -744,7 +744,7 @@ export default function CVPage(props: any) {
   }
 
   // ── Role-based CV routing ──────────────────────────────────────────────────
-  // Delegates tier detection to normalizeTier() — the shared SSOT from paymentConfig.
+  // Delegates tier detection to normalizeTier() - the shared SSOT from paymentConfig.
   // IndividualCV (the existing render below) is left completely untouched.
   if (profile) {
     const tier = normalizeTier(profile.verificationType || profile.verificationTier);
@@ -775,7 +775,7 @@ export default function CVPage(props: any) {
       );
     }
   }
-  // ── End role routing — IndividualCV renders below ──────────────────────────
+  // ── End role routing - IndividualCV renders below ──────────────────────────
 
   return (
     <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
@@ -919,7 +919,7 @@ export default function CVPage(props: any) {
 
                   <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
                     <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate max-w-full">
+                      <h1 className="text-2xl md:text-4xl font-bold text-white truncate max-w-full">
                         {profile?.displayName}
                       </h1>
                     </div>
@@ -942,12 +942,11 @@ export default function CVPage(props: any) {
                   ) : null}
 
                   {/* Badges & Trust Hierarchy */}
-                  <div className="flex flex-wrap items-start justify-center md:justify-start gap-4">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
                     <RoleBadge 
                       isVerified={!!profile?.isVerified} 
                       type={profile?.verificationTier} 
                     />
-                    
                     
                     <ProfileCompleteBadge
                       isComplete={isProfileComplete}
@@ -955,9 +954,10 @@ export default function CVPage(props: any) {
                         setToastMessage("This candidate has fulfilled all profile requirements, including professional background, skills, work evidence, and contact information.");
                       }}
                     />
+                    
                     <CommunityBadge cvId={profile?.cardNumber || 0} />
                     
-                    <ExperienceBadge years={totalYearsExperience} className="translate-y-[2px]" />
+                    <ExperienceBadge years={totalYearsExperience} />
                   </div>
 
                   {/* Skills Pills */}
@@ -1171,6 +1171,21 @@ export default function CVPage(props: any) {
               />
             )}
 
+            {/* Profile Incomplete Prompt */}
+            {publicKey?.toBase58() === wallet && !isProfileComplete && (
+               <div className="mt-8 mb-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-center justify-between gap-4">
+                 <div className="flex items-center gap-3">
+                   <Info className="w-5 h-5 text-amber-500 shrink-0" />
+                   <p className="text-xs text-slate-400 leading-relaxed">
+                     Complete your profile to increase visibility to recruiters.
+                   </p>
+                 </div>
+                 <Link href="/create-profile" className="text-[10px] font-black text-amber-500 hover:text-amber-400 transition-colors uppercase tracking-widest whitespace-nowrap px-3 py-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5">
+                   Improve CV
+                 </Link>
+               </div>
+            )}
+
             {/* Verified Credentials Section */}
             <div className="mt-6 mb-8 pt-4 border-t border-slate-800/50">
               <CertificateSection 
@@ -1184,7 +1199,18 @@ export default function CVPage(props: any) {
 
             <h2 className="text-xl font-semibold mt-6 mb-4">Proof of Work</h2>
             {contributionReceipts.length === 0 ? (
-              <p className="text-slate-500">No work records submitted yet.</p>
+              <div className="p-12 border border-dashed border-slate-700/50 rounded-2xl text-center bg-slate-900/20">
+                <FileText className="w-8 h-8 text-slate-600 mx-auto mb-3 opacity-50" />
+                <p className="text-slate-400 mb-4 font-medium">No proof of work added yet</p>
+                {publicKey?.toBase58() === wallet && (
+                  <Link 
+                    href="/create-profile" 
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-xl border border-emerald-500/20 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+                  >
+                    + Add Proof
+                  </Link>
+                )}
+              </div>
             ) : (
               <div className="space-y-6">
                 {contributionReceipts.map((r, i) => (
@@ -1302,7 +1328,7 @@ export default function CVPage(props: any) {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
                 <Star className="w-8 h-8 text-[#a855f7] mb-2 saturate-150 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-                <h3 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-1">
+                <h3 className="text-xl font-black text-white mb-1">
                   ChainVolio Score: {scoreData.score} ({scoreData.level})
                 </h3>
                 
@@ -1357,7 +1383,7 @@ export default function CVPage(props: any) {
                             <div className="flex items-center gap-2">
                                <Award className="w-4 h-4 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
                                <span className="text-sm font-black text-white uppercase tracking-wider">
-                                 {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} — {String(scoreData.domains[scoreData.top_domain || ""])}
+                                 {scoreData.top_domain?.charAt(0).toUpperCase() + scoreData.top_domain?.slice(1)} - {String(scoreData.domains[scoreData.top_domain || ""])}
                                </span>
                             </div>
                             <p className="text-[8px] text-slate-500/60 uppercase font-bold tracking-widest">

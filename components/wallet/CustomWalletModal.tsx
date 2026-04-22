@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { X, ExternalLink, ShieldCheck, AlertCircle } from "lucide-react";
+import nacl from "tweetnacl";
+import bs58 from "bs58";
 
 interface CustomWalletModalProps {
     isOpen: boolean;
@@ -14,7 +16,6 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-
     useEffect(() => {
         if (typeof window === "undefined") return;
 
@@ -34,14 +35,35 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleConnect = async (walletName: string) => {
         try {
-            // Mobile Deep Linking Logic
+            // Mobile Deep Linking Logic (Requirement 1 & 2)
             if (isMobile && !phantomAvailable && !solflareAvailable) {
                 const currentUrl = window.location.href;
+                
+                // Generate ephemeral keypair for this session to handle the response
+                const keypair = nacl.box.keyPair();
+                localStorage.setItem("cv_dapp_secret_key", bs58.encode(keypair.secretKey));
+                const dappPublicKey = bs58.encode(keypair.publicKey);
+
+                const params = new URLSearchParams({
+                    app_url: window.location.origin,
+                    dapp_encryption_public_key: dappPublicKey,
+                    redirect_link: currentUrl,
+                    cluster: "mainnet-beta"
+                });
+
                 if (walletName === "Phantom") {
-                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
+                    window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
                     return;
                 } else if (walletName === "Solflare") {
-                    window.location.href = `https://solflare.com/ul/v1/browse/${encodeURIComponent(currentUrl)}`;
+                    // Solflare uses 'redirect' instead of 'redirect_link' occasionally in some versions, 
+                    // but 'v1/connect' usually follows Phantom's spec. We'll follow the user's specific requirement.
+                    const solflareParams = new URLSearchParams({
+                        app_url: window.location.origin,
+                        dapp_encryption_public_key: dappPublicKey,
+                        redirect: currentUrl,
+                        cluster: "mainnet-beta"
+                    });
+                    window.location.href = `https://solflare.com/ul/v1/connect?${solflareParams.toString()}`;
                     return;
                 }
             }

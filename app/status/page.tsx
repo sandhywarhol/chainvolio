@@ -36,10 +36,10 @@ export default function StatusPage() {
                 {/* Hero Section */}
                 <section className="relative z-40 pt-32 pb-12 px-8 max-w-[1240px] mx-auto w-full text-center">
                     <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-4">
-                        <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-emerald-400/60">Transparency</span>
+                        <span className="text-caption text-emerald-400/80">Transparency</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tighter text-white leading-[0.85] mb-8">
+                    <h1 className="text-h1 mb-8">
                         System Status
                     </h1>
 
@@ -48,7 +48,7 @@ export default function StatusPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                         </span>
-                        <span className="text-xl font-bold text-white tracking-tight uppercase tracking-wider">Operational <span className="text-emerald-500/80 font-normal ml-1">(Pre-Launch)</span></span>
+                        <span className="text-h3 !text-white flex items-center">Operational <span className="text-emerald-500/80 font-normal ml-2 text-sm">(Pre-Launch)</span></span>
                     </div>
                 </section>
 
@@ -59,9 +59,9 @@ export default function StatusPage() {
                     <div className="space-y-3">
                         {components.map((comp, i) => (
                             <div key={i} className="flex items-center justify-between p-5 bg-white/[0.02] border border-white/5 rounded-sm hover:border-white/10 transition-colors group">
-                                <span className="text-sm font-bold text-white uppercase tracking-widest">{comp.name}</span>
+                                <span className="text-caption text-white/60 group-hover:text-white transition-colors">{comp.name}</span>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{comp.status}</span>
+                                    <span className="text-caption text-emerald-500">{comp.status}</span>
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                                 </div>
                             </div>
@@ -69,13 +69,13 @@ export default function StatusPage() {
                     </div>
 
                     <div className="mt-8 p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex flex-col gap-2">
-                        <p className="text-sm font-bold text-emerald-400 uppercase tracking-wider">All core systems are operational.</p>
-                        <p className="text-sm text-slate-400 leading-relaxed">
+                        <p className="text-caption text-emerald-400">All core systems are operational.</p>
+                        <p className="text-body text-white/50">
                             ChainVolio's identity, proof, and hiring infrastructure are fully functional and secured.
                         </p>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">
+                    <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-caption opacity-40">
                         <span>Build 0.1.0-Alpha</span>
                         <span>Last Updated: {currentTime}</span>
                     </div>

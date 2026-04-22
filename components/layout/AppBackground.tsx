@@ -16,7 +16,7 @@ export function AppBackground() {
             <div className="fixed inset-0 z-0 bg-black" />
 
             {/* ════════════════════════════════════════
-                VIDEO BACKGROUND — homepage & CV only
+                VIDEO BACKGROUND - homepage & CV only
             ════════════════════════════════════════ */}
             {useVideo && (
                 <>
@@ -38,11 +38,11 @@ export function AppBackground() {
             )}
 
             {/* ════════════════════════════════════════
-                ORB BACKGROUND — all other pages
+                ORB BACKGROUND - all other pages
             ════════════════════════════════════════ */}
             {!useVideo && (
                 <>
-                    {/* PURPLE: dominant center bloom — top, slightly left */}
+                    {/* PURPLE: dominant center bloom - top, slightly left */}
                     <div
                         className="fixed z-[1] why-orb-center pointer-events-none"
                         style={{
@@ -140,7 +140,7 @@ export function AppBackground() {
                         }}
                     />
 
-                    {/* Heavy black overlay — crush mid-tones, keep dark */}
+                    {/* Heavy black overlay - crush mid-tones, keep dark */}
                     <div
                         className="fixed inset-0 z-[2] pointer-events-none"
                         style={{ background: 'rgba(0,0,0,0.72)' }}
@@ -164,7 +164,7 @@ export function AppBackground() {
                 </>
             )}
 
-            {/* Carbon fiber mesh — very subtle, all pages */}
+            {/* Carbon fiber mesh - very subtle, all pages */}
             <div className="fixed inset-0 z-[5] pointer-events-none">
                 <div
                     className="absolute inset-0 opacity-[0.012]"

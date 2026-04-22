@@ -372,7 +372,7 @@ export function PaymentModal({
                         </div>
                     </div>
 
-                    {/* Live transaction flow — highlights the active step */}
+                    {/* Live transaction flow - highlights the active step */}
                     <div className="p-4 rounded-xl bg-black/20 border border-white/5 space-y-1.5">
                         <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-2.5">Transaction Flow</p>
                         {([

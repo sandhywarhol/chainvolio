@@ -65,7 +65,7 @@ export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: numb
 
 
 /**
- * Canonical tier normalizer — all tier comparisons in this file MUST go through this.
+ * Canonical tier normalizer - all tier comparisons in this file MUST go through this.
  * Accepts raw DB type strings and returns a lowercase normalized version.
  */
 export function normalizeTier(tier?: string): string {
@@ -83,7 +83,7 @@ export function getAttestationQuota(tier?: string): number {
     if (t.includes("figure") || t.includes("public")) return 10;
     if (t.includes("community") || t.includes("dao")) return 20;
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return 40;
-    return 2; // default for unverified or unknown — always safe fallback
+    return 2; // default for unverified or unknown - always safe fallback
 }
 
 
@@ -201,6 +201,6 @@ export function getHiringLimit(tier?: string): number | null {
     if (t.includes("community") || t.includes("dao")) return null;
     if (t.includes("figure") || t.includes("public")) return 10;
     if (t.includes("builder")) return 5;
-    return 2; // unverified — safest fallback
+    return 2; // unverified - safest fallback
 }
 

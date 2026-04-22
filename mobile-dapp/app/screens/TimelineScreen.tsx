@@ -102,7 +102,7 @@ const TimelineScreen = ({ navigation }: any) => {
                        </View>
                        
                        <View style={styles.contentCard}>
-                          <Text style={styles.dateLabel}>{startStr} — {endStr}</Text>
+                          <Text style={styles.dateLabel}>{startStr} - {endStr}</Text>
                           <Text style={styles.durationLabel}>{duration}</Text>
                           
                           <View style={styles.mainInfo}>

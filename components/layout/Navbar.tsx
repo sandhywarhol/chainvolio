@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ShieldCheck } from "lucide-react";
+import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, Code, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
@@ -28,11 +29,13 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const { publicKey } = useWallet();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isMobileWhyOpen, setIsMobileWhyOpen] = useState(false);
-    const [isMobileHowOpen, setIsMobileHowOpen] = useState(false);
-    const [isMobileGuidesOpen, setIsMobileGuidesOpen] = useState(false);
-    const [isMobileDeveloperOpen, setIsMobileDeveloperOpen] = useState(false);
+    const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides' | 'developer'>('main');
     const [scrolled, setScrolled] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -41,6 +44,22 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => { document.body.style.overflow = 'unset'; };
+    }, [isMobileMenuOpen]);
+
+    useEffect(() => {
+        if (!isMobileMenuOpen) {
+            // Reset to main panel when closed
+            setTimeout(() => setActiveMobilePanel('main'), 500);
+        }
+    }, [isMobileMenuOpen]);
 
     const isActive = (path: string) => pathname === path;
 
@@ -51,16 +70,11 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         { label: "About Us", href: "/about" },
     ];
 
-    const howItems = [
-        { label: "Workflow & Features", href: "/?modal=how", onClick: onHowItWorksClick },
-        { label: "For Recruiters", href: "/?modal=recruiters", onClick: onRecruitersClick },
-        { label: "For Talent", href: "/?modal=talent", onClick: onTalentClick },
-    ];
-
     const guidesItems = [
+        { label: "How It Works", href: "/guides/how-it-works", onClick: onHowItWorksClick },
         { label: "Sourcing Guide", href: "/guides/sourcing" },
-        { label: "Screening Protocol", href: "/guides/screening" },
-        { label: "Proof Standards", href: "/guides/attestation" },
+        { label: "Screening Protocol", href: "/guides/screening", onClick: onScreeningClick },
+        { label: "Attestation / Proof Standards", href: "/guides/attestation", onClick: onAttestationClick },
     ];
     
     const devItems = [
@@ -69,7 +83,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-[99999] transition-all duration-500 border-b ${scrolled
+        <nav className={`fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
                 ? "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
                 : "border-white/0 bg-transparent py-5"
             }`}>
@@ -88,11 +102,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={whyItems}
                         />
 
-                        <NavDropdown
-                            label="How It Works"
-                            href="/?modal=how"
-                            items={howItems}
-                        />
 
                         <NavDropdown
                             label="Guides"
@@ -163,85 +172,184 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     <NotificationBell />
 
                     {/* Mobile Menu Toggle */}
-                    <button
-                        className="md:hidden text-white/60 hover:text-white transition-colors"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
+                    {!isMobileMenuOpen && (
+                        <button
+                            className="md:hidden text-white/60 hover:text-white transition-colors relative z-[100002]"
+                            onClick={() => {
+                                const newState = !isMobileMenuOpen;
+                                setIsMobileMenuOpen(newState);
+                                if (newState) setActiveMobilePanel('main');
+                            }}
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* Mobile Navigation */}
-            <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-white/5 bg-black/40 backdrop-blur-xl ${isMobileMenuOpen ? 'max-h-[80vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
+            {/* Mobile Navigation Modal */}
+            {mounted && createPortal(
+                <div className={`fixed inset-0 z-[100001] md:hidden transition-all duration-500 w-full max-w-full overflow-x-hidden ${
+                    isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
                 }`}>
-                <div className="px-6 md:px-8 py-6 space-y-4 text-sm font-bold">
-                    <MobileAccordion
-                        label="Products"
-                        href="/why"
-                        items={whyItems}
-                        isOpen={isMobileWhyOpen}
-                        onToggle={() => setIsMobileWhyOpen(!isMobileWhyOpen)}
-                        onCloseMenu={() => setIsMobileMenuOpen(false)}
-                    />
-
-                    <MobileAccordion
-                        label="How It Works"
-                        href="/?modal=how"
-                        items={howItems}
-                        isOpen={isMobileHowOpen}
-                        onToggle={() => setIsMobileHowOpen(!isMobileHowOpen)}
-                        onCloseMenu={() => setIsMobileMenuOpen(false)}
-                    />
-
-                    <MobileAccordion
-                        label="Guides"
-                        href="/guides"
-                        items={guidesItems}
-                        isOpen={isMobileGuidesOpen}
-                        onToggle={() => setIsMobileGuidesOpen(!isMobileGuidesOpen)}
-                        onCloseMenu={() => setIsMobileMenuOpen(false)}
-                    />
-
-                    <Link href="/security" className="block text-white/40 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Security</Link>
-
-                    <MobileAccordion
-                        label="Developer"
-                        href="/api-docs"
-                        items={devItems}
-                        isOpen={isMobileDeveloperOpen}
-                        onToggle={() => setIsMobileDeveloperOpen(!isMobileDeveloperOpen)}
-                        onCloseMenu={() => setIsMobileMenuOpen(false)}
-                    />
-
-
-
-
-                    <Link href="/dashboard" className="block text-emerald-400 hover:text-emerald-300 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-
-                    <Link
-                        href="/verified-organization"
-                        className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+                    {/* Backdrop */}
+                    <div 
+                        className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500 z-[100001] ${
+                            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+                        }`}
                         onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>
-                            {isVerified
-                                ? getVerificationLabel(verificationTier)
-                                : "Organization"
-                            }
-                        </span>
+                    />
 
-                    </Link>
+                    {/* Menu Content */}
+                    <div className={`fixed inset-0 w-full max-w-full h-[100dvh] bg-[#050505] shadow-2xl transition-transform duration-500 ease-out z-[100002] overflow-x-hidden overflow-y-auto touch-pan-y ${
+                        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}>
+                        {/* Noise texture overlay */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
-                    <div className="pt-6 pb-4 border-t border-white/5 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Account</span>
-                        <div className="w-full scale-100 origin-left">
-                            <WalletMultiButton />
+                        <div className="relative flex flex-col h-full overflow-x-hidden overflow-y-auto z-10 max-w-full">
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-6 border-b border-white/[0.05] bg-black/20">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
+                                        <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-5 h-5 object-contain" />
+                                    </div>
+                                    <span className="font-black text-white tracking-tight uppercase text-xs">Navigation</span>
+                                </div>
+                                <button 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-2 rounded-xl bg-white/[0.05] text-white/50 hover:text-white transition-colors"
+                                >
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 relative overflow-y-auto overflow-x-hidden -webkit-overflow-scrolling-touch">
+                                {/* Main Panel */}
+                                <div className={`absolute inset-0 px-6 py-10 transition-all duration-300 w-full max-w-full overflow-x-hidden touch-pan-y ${
+                                    activeMobilePanel === 'main' ? 'translate-x-0 opacity-100 visible' : 'translate-x-0 opacity-100 visible'
+                                } ${activeMobilePanel !== 'main' ? 'translate-x-[-20%] opacity-0 invisible' : ''}`}>
+                                    <div className="space-y-10">
+                                        {/* SECTION 1: MAIN NAVIGATION */}
+                                        <div className="space-y-4">
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Explore Platform</p>
+                                            <div className="flex flex-col gap-2">
+                                                <MobileNavLink 
+                                                    icon={<Layers className="w-5 h-5 text-emerald-400" />} 
+                                                    label="Products" 
+                                                    hasSubmenu
+                                                    onClick={() => setActiveMobilePanel('products')} 
+                                                />
+                                                <MobileNavLink 
+                                                    icon={<BookOpen className="w-5 h-5 text-purple-400" />} 
+                                                    label="Guides" 
+                                                    hasSubmenu
+                                                    onClick={() => setActiveMobilePanel('guides')} 
+                                                />
+                                                <MobileNavLink 
+                                                    href="/security" 
+                                                    icon={<Shield className="w-5 h-5 text-rose-400" />} 
+                                                    label="Security" 
+                                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                                />
+                                                <MobileNavLink 
+                                                    icon={<Code className="w-5 h-5 text-cyan-400" />} 
+                                                    label="Developer" 
+                                                    hasSubmenu
+                                                    onClick={() => setActiveMobilePanel('developer')} 
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* SECTION 2: USER ACTIONS */}
+                                        <div className="space-y-4">
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">User Hub</p>
+                                            <div className="flex flex-col gap-2">
+                                                <MobileNavLink 
+                                                    href="/dashboard" 
+                                                    icon={<LayoutGrid className="w-5 h-5" />} 
+                                                    label="Dashboard" 
+                                                    color="text-emerald-400"
+                                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                                />
+                                                {publicKey && (
+                                                    <MobileNavLink 
+                                                        href={`/cv/${publicKey.toBase58()}`} 
+                                                        icon={<User className="w-5 h-5" />} 
+                                                        label="View Your CV" 
+                                                        onClick={() => setIsMobileMenuOpen(false)} 
+                                                    />
+                                                )}
+                                                <MobileNavLink 
+                                                    href="/verified-organization" 
+                                                    icon={<Briefcase className="w-5 h-5" />} 
+                                                    label={isVerified ? getVerificationLabel(verificationTier) : "Hiring Center"} 
+                                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* SECTION 3: ACCOUNT */}
+                                        <div className="space-y-4 pt-4">
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Account</p>
+                                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex flex-col gap-5 relative overflow-x-hidden overflow-y-auto group/acc">
+                                                {/* Subtle accent glow */}
+                                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none group-hover/acc:bg-emerald-500/20 transition-colors" />
+                                                
+                                                <div className="flex items-center justify-between relative z-10">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center border border-white/10 shadow-lg">
+                                                            <Wallet className="w-6 h-6 text-emerald-400" />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-[0.15em] mb-0.5">Primary Wallet</span>
+                                                            <span className="text-sm font-black text-white/90 font-mono tracking-tight">
+                                                                {publicKey ? `${publicKey.toBase58().slice(0, 5)}...${publicKey.toBase58().slice(-5)}` : "Not Connected"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full relative z-10 scale-100 active:scale-[0.98] transition-transform">
+                                                    <WalletMultiButton />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Sub-Panels */}
+                                <MobileSubPanel 
+                                    title="Products" 
+                                    isOpen={activeMobilePanel === 'products'}
+                                    items={whyItems}
+                                    onBack={() => setActiveMobilePanel('main')}
+                                    onClose={() => setIsMobileMenuOpen(false)}
+                                />
+                                <MobileSubPanel 
+                                    title="Guides" 
+                                    isOpen={activeMobilePanel === 'guides'}
+                                    items={guidesItems}
+                                    onBack={() => setActiveMobilePanel('main')}
+                                    onClose={() => setIsMobileMenuOpen(false)}
+                                />
+                                <MobileSubPanel 
+                                    title="Developer" 
+                                    isOpen={activeMobilePanel === 'developer'}
+                                    items={devItems}
+                                    onBack={() => setActiveMobilePanel('main')}
+                                    onClose={() => setIsMobileMenuOpen(false)}
+                                />
+                            </div>
+
+                            {/* Footer Info */}
+                            <div className="p-6 mt-auto border-t border-white/5 bg-black/20">
+                                <p className="text-[9px] text-slate-600 font-black uppercase tracking-[0.3em] text-center">ChainVolio v2.4.0 • Mainnet</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div>,
+                document.body
+            )}
         </nav>
     );
 }
@@ -319,64 +427,96 @@ function NavDropdown({ label, href, items, onClick }: {
     );
 }
 
-function MobileAccordion({ label, href, items, isOpen, onToggle, onCloseMenu, onClick }: {
-    label: string,
-    href: string,
-    items: { label: string, href: string, onClick?: () => void }[],
-    isOpen: boolean,
-    onToggle: () => void,
-    onCloseMenu: () => void,
-    onClick?: () => void
+function MobileSubPanel({ 
+    title, 
+    isOpen, 
+    items, 
+    onBack, 
+    onClose,
+    onSpecialClick 
+}: { 
+    title: string;
+    isOpen: boolean;
+    items: { label: string, href: string, onClick?: () => void }[];
+    onBack: () => void;
+    onClose: () => void;
+    onSpecialClick?: () => void;
 }) {
     return (
-        <div className="space-y-2">
-            <div className="flex items-center justify-between w-full">
-                {onClick ? (
-                    <button
-                        onClick={() => { onClick(); onCloseMenu(); }}
-                        className="text-white/40 hover:text-white transition-colors"
+        <div className={`absolute inset-0 bg-[#050505] z-50 transition-all duration-300 ease-in-out w-full max-w-full overflow-x-hidden overflow-y-auto touch-pan-y ${
+            isOpen ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'
+        }`}>
+            {/* Noise texture overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+            <div className="relative flex flex-col h-full z-10">
+                {/* Panel Header */}
+                <div className="flex items-center gap-4 p-6 border-b border-white/[0.05] bg-black/20">
+                    <button 
+                        onClick={onBack}
+                        className="p-2 rounded-xl bg-white/[0.05] text-white/50 hover:text-white transition-colors"
                     >
-                        {label}
+                        <ChevronLeft className="w-5 h-5" />
                     </button>
-                ) : (
-                    <Link
-                        href={href}
-                        className="text-white/40 hover:text-white transition-colors"
-                        onClick={onCloseMenu}
-                    >
-                        {label}
-                    </Link>
-                )}
-                <button
-                    onClick={onToggle}
-                    className="text-white/40 p-2"
-                    aria-label={`Toggle ${label} menu`}
-                >
-                    <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
-            </div>
-            <div className={`pl-4 space-y-3 overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-56 opacity-100' : 'max-h-0 opacity-0'}`}>
-                {items.map((item) => (
-                    item.onClick ? (
-                        <button
+                    <span className="text-xs font-black text-white uppercase tracking-[0.2em]">Explore {title}</span>
+                </div>
+
+                {/* List Area */}
+                <div className="flex-1 overflow-y-auto px-6 py-8 space-y-3 custom-scrollbar max-w-full overflow-x-hidden">
+                    {items.map((item) => (
+                        <Link 
                             key={item.label}
-                            onClick={() => { item.onClick!(); onCloseMenu(); }}
-                            className="block w-full text-left text-white/20 hover:text-white transition-colors py-1"
-                        >
-                            {item.label}
-                        </button>
-                    ) : (
-                        <Link
-                            key={item.href}
                             href={item.href}
-                            className="block text-white/20 hover:text-white transition-colors py-1"
-                            onClick={onCloseMenu}
+                            onClick={() => {
+                                if (item.onClick) item.onClick();
+                                if (item.label.includes('Workflow') && onSpecialClick) onSpecialClick();
+                                onClose();
+                            }}
+                            className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] active:bg-white/[0.08] active:scale-[0.98] transition-all duration-200"
                         >
-                            {item.label}
+                            <span className="text-sm font-bold text-white/80 tracking-wide">{item.label}</span>
+                            <ChevronRight className="w-4 h-4 text-slate-700" />
                         </Link>
-                    )
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
+    );
+}
+
+function MobileNavLink({ href, icon, label, onClick, color = "text-white/60", hasSubmenu = false }: {
+    href?: string;
+    icon: React.ReactNode;
+    label: string;
+    onClick: () => void;
+    color?: string;
+    hasSubmenu?: boolean;
+}) {
+    const content = (
+        <div className="flex items-center justify-between p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] active:bg-white/[0.08] active:scale-[0.98] transition-all duration-200 max-w-full break-words">
+            <div className="flex items-center gap-4">
+                <div className={`p-2.5 rounded-2xl bg-white/[0.05] transition-colors group-active:bg-white/10 ${color}`}>
+                    {icon}
+                </div>
+                <span className={`text-sm font-black tracking-wide transition-colors ${color === 'text-white/60' ? 'text-white/80 group-active:text-white' : color}`}>
+                    {label}
+                </span>
+            </div>
+            <ChevronRight className={`w-4 h-4 transition-colors ${hasSubmenu ? 'text-emerald-500' : 'text-slate-700'}`} />
+        </div>
+    );
+
+    if (hasSubmenu) {
+        return (
+            <button onClick={onClick} className="w-full text-left group">
+                {content}
+            </button>
+        );
+    }
+
+    return (
+        <Link href={href || "#"} onClick={onClick} className="group">
+            {content}
+        </Link>
     );
 }

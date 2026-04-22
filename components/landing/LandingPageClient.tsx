@@ -24,12 +24,6 @@ const SLIDES = [
 
 const PARTNERS = [
     { src: "/logos/solana.png", name: "Solana", scale: 0.7 },
-    { src: "/logos/bitcoin.png", name: "Bitcoin" },
-    { src: "/logos/etherium.png", name: "Ethereum" },
-    { src: "/logos/arbitrum.png", name: "Arbitrum" },
-    { src: "/logos/optimism.png", name: "Optimism" },
-    { src: "/logos/base.png", name: "Base", scale: 0.75 },
-    { src: "/logos/polygon.png", name: "Polygon", scale: 0.75 },
     { src: "/logos/magic%20eden.png", name: "Magic Eden" },
     { src: "/logos/tensor.png", name: "Tensor", scale: 0.75 },
     { src: "/logos/pyth.png", name: "Pyth", scale: 1.2 },
@@ -39,7 +33,6 @@ const PARTNERS = [
     { src: "/logos/infura.png", name: "Infura", scale: 0.7 },
     { src: "/logos/chainlink.png", name: "Chainlink" },
     { src: "/logos/the%20graph.png", name: "The Graph" },
-    { src: "/logos/zora.png", name: "Zora" },
     { src: "/logos/open%20sea.png", name: "OpenSea", scale: 0.75 },
     { src: "/logos/discord.png", name: "Discord", scale: 0.7 },
     { src: "/logos/github.png", name: "GitHub" },
@@ -75,10 +68,14 @@ export function LandingPageClient() {
 
     useEffect(() => {
         const modal = searchParams.get('modal');
-        if (modal === 'how' || modal === 'recruiters' || modal === 'talent' || modal === 'ask' || modal === 'screening' || modal === 'attestation') {
+        if (modal === 'how') {
+            router.push('/guides/how-it-works');
+            return;
+        }
+        if (modal === 'recruiters' || modal === 'talent' || modal === 'ask' || modal === 'screening' || modal === 'attestation') {
             setActiveModal(modal as any);
         }
-    }, [searchParams]);
+    }, [searchParams, router]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -100,42 +97,57 @@ export function LandingPageClient() {
     }, [publicKey, connected]);
 
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
-            <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+        <div className="min-h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white">
+            <Navbar
+                isVerified={!!profile?.isVerified}
+                verifierTier={profile?.verifierTier}
+                verificationTier={profile?.verificationTier}
+                onHowItWorksClick={() => router.push('/guides/how-it-works')}
+                onRecruitersClick={() => setActiveModal('recruiters')}
+                onTalentClick={() => setActiveModal('talent')}
+                onAskClick={() => setActiveModal('ask')}
+                onScreeningClick={() => setActiveModal('screening')}
+                onAttestationClick={() => setActiveModal('attestation')}
+            />
 
-            {/* DESKTOP LAYOUT (HIDDEN ON MOBILE) */}
-            <div className="hidden md:flex flex-col flex-1 relative">
-                <Navbar
-                    isVerified={!!profile?.isVerified}
-                    verifierTier={profile?.verifierTier}
-                    verificationTier={profile?.verificationTier}
-                    onHowItWorksClick={() => setActiveModal('how')}
-                    onRecruitersClick={() => setActiveModal('recruiters')}
-                    onTalentClick={() => setActiveModal('talent')}
-                    onAskClick={() => setActiveModal('ask')}
-                    onScreeningClick={() => setActiveModal('screening')}
-                    onAttestationClick={() => setActiveModal('attestation')}
-                />
+            <main className="flex-1 flex flex-col relative">
+                <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+                {/* DESKTOP LAYOUT (HIDDEN ON MOBILE) */}
+                <div className="hidden md:flex flex-col flex-1 relative">
 
                 <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
-                    <div className="text-left max-w-3xl lg:w-[52%]">
-                        <h1 className="text-4xl md:text-5xl lg:text-[56px] font-extrabold font-display leading-[1.1] tracking-tight mb-8 text-white">
-                            Verifiable professional<br />
-                            identity for Web3 careers.
+                    <div className="text-left max-w-4xl lg:w-[70%]">
+                        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
+                            <img src="/logos/solana logo.png" alt="Solana" className="w-3.5 h-3.5 object-contain" />
+                            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
+                        </div>
+                        <h1 className="text-5xl md:text-6xl lg:text-[72px] font-extrabold font-display leading-[1.05] tracking-tight mb-8 text-white">
+                            Verifiable identity<br />
+                            for Web3.
                         </h1>
-                        <div className="mb-16 space-y-8">
+                        <div className="mb-16">
                             <p className="text-white/80 text-lg md:text-xl font-medium font-display leading-relaxed max-w-xl tracking-normal">
-                                Build a work history that can't be faked.<br />
-                                Verifiable achievements & attestations secured on-chain.
-                            </p>
-                            <p className="text-white/30 text-[11px] font-display tracking-[0.4em] uppercase font-bold">
-                                The trust layer for Web3 careers.
+                                Build a work history that can’t be faked.<br />
+                                Backed by on-chain proof and attestations.
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-                            <Link href="/create-profile" className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]">
-                                Build Your Reputation
-                            </Link>
+                            {connected && publicKey ? (
+                                <Link
+                                    href={`/cv/${publicKey.toBase58()}`}
+                                    className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
+                                >
+                                    View Your CV
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={() => setIsWalletModalOpen(true)}
+                                    className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
+                                >
+                                    Build Your Reputation
+                                </button>
+                            )}
                             <button
                                 onClick={() => {
                                     if (!connected) {
@@ -206,28 +218,21 @@ export function LandingPageClient() {
                 <Footer />
             </div>
 
-            {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
-            <div className="block md:hidden">
-                <Navbar
-                    isVerified={!!profile?.isVerified}
-                    verifierTier={profile?.verifierTier}
-                    verificationTier={profile?.verificationTier}
-                    onHowItWorksClick={() => setActiveModal('how')}
-                    onRecruitersClick={() => setActiveModal('recruiters')}
-                    onTalentClick={() => setActiveModal('talent')}
-                    onAskClick={() => setActiveModal('ask')}
-                    onScreeningClick={() => setActiveModal('screening')}
-                    onAttestationClick={() => setActiveModal('attestation')}
-                />
+                {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
+                <div className="block md:hidden">
 
                 <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
-                    <div className="space-y-8">
-                        <h1 className="text-3xl sm:text-[34px] font-black leading-[1.15] tracking-tight text-white px-2">
-                            Verifiable professional<br />
-                            identity for Web3.
+                    <div className="flex flex-col items-center">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8">
+                            <img src="/logos/solana logo.png" alt="Solana" className="w-3 h-3 object-contain" />
+                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
+                        </div>
+                        <h1 className="text-4xl sm:text-[42px] font-black leading-[1.1] tracking-tight text-white px-2">
+                            Verifiable identity<br />
+                            for Web3.
                         </h1>
-                        <p className="text-white/70 text-base font-medium leading-relaxed px-4">
-                            Build a work history that can't be faked. Verifiable achievements secured on-chain.
+                        <p className="text-white/70 text-base font-medium leading-relaxed px-4 mt-8">
+                            Build a work history that can’t be faked. Backed by on-chain proof and attestations.
                         </p>
                     </div>
 
@@ -252,9 +257,21 @@ export function LandingPageClient() {
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
-                        <Link href="/create-profile" className="w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all">
-                            Build Your Reputation
-                        </Link>
+                        {connected && publicKey ? (
+                            <Link
+                                href={`/cv/${publicKey.toBase58()}`}
+                                className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+                            >
+                                View Your CV
+                            </Link>
+                        ) : (
+                            <button
+                                onClick={() => setIsWalletModalOpen(true)}
+                                className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+                            >
+                                Build Your Reputation
+                            </button>
+                        )}
                         <button
                             onClick={() => {
                                 if (!connected) {
@@ -269,18 +286,13 @@ export function LandingPageClient() {
                         </button>
                     </div>
 
-                    <div className="pt-8">
-                        <p className="text-white/20 text-[10px] font-bold tracking-[0.4em] uppercase">
-                            The trust layer for Web3
-                        </p>
-                    </div>
                 </section>
 
                 <div className="w-full py-6 overflow-hidden relative">
                     <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-16 items-center flex-shrink-0 pr-16">
-                                {PARTNERS.slice(0, 10).map((partner) => (
+                                {PARTNERS.map((partner) => (
                                     <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={(partner.scale ?? 1) * 0.8} />
                                 ))}
                             </div>
@@ -307,68 +319,6 @@ export function LandingPageClient() {
                         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>
                         <div className="relative z-10 p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[80vh] overflow-y-auto custom-scrollbar">
                             <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">×</button>
-                            {activeModal === 'how' && (
-                                <div className="space-y-16 py-4">
-                                    <div className="space-y-4">
-                                        <h2 className="text-3xl font-bold tracking-tight text-white uppercase">How It Works</h2>
-                                        <p className="text-white/40 text-sm max-w-xl leading-relaxed">
-                                            ChainVolio is Web3-native professional trust infrastructure architected to anchor career milestones directly to a public, verifiable professional ledger.
-                                        </p>
-                                    </div>
-                                    <div className="grid md:grid-cols-2 gap-12 pt-8">
-                                        <div className="space-y-8">
-                                            <h3 className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-[0.3em]">The Workflow</h3>
-                                            <div className="space-y-6">
-                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
-                                                    <span className="text-lg font-light text-white/20">01</span>
-                                                    <div>
-                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Identity</h4>
-                                                        <p className="text-[11px] text-white/50 leading-relaxed">Establish a non-custodial professional identity via self-sovereign wallet authentication.</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
-                                                    <span className="text-lg font-light text-white/20">02</span>
-                                                    <div>
-                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Build</h4>
-                                                        <p className="text-[11px] text-white/50 leading-relaxed">Structure your professional claims and document milestones for cryptographic anchoring.</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
-                                                    <span className="text-lg font-light text-white/20">03</span>
-                                                    <div>
-                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Verify</h4>
-                                                        <p className="text-[11px] text-white/50 leading-relaxed">Anchor achievements through gas-backed peer attestations and on-chain professional proof.</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-6 border-l border-white/10 pl-6 py-1">
-                                                    <span className="text-lg font-light text-white/20">04</span>
-                                                    <div>
-                                                        <h4 className="text-[10px] font-bold uppercase text-white/90 mb-1">Share</h4>
-                                                        <p className="text-[11px] text-white/50 leading-relaxed">Deploy your portable, auditable record to a publicly verifiable professional trust layer.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-8">
-                                            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Core Features</h3>
-                                            <div className="grid grid-cols-1 gap-4">
-                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                                                    <h4 className="text-[10px) font-bold uppercase text-white/70 mb-2">Solana Verification</h4>
-                                                    <p className="text-[11px] text-white/40 leading-relaxed">Professional entries are anchored as immutable, network-secured blockchain transactions.</p>
-                                                </div>
-                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                                                    <h4 className="text-[10px] font-bold uppercase text-white/70 mb-2">Public Hub</h4>
-                                                    <p className="text-[11px] text-white/40 leading-relaxed">A unified, wallet-bound professional ledger with public auditability.</p>
-                                                </div>
-                                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                                                    <h4 className="text-[10px) font-bold uppercase text-white/70 mb-2">Infrastructure Model</h4>
-                                                    <p className="text-[11px] text-white/40 leading-relaxed">Neutral infrastructure with no subscription fees. Built for ecosystem integrity.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                             {activeModal === 'recruiters' && (
                                 <div className="space-y-16 py-4">
                                     <div className="space-y-4">
@@ -818,6 +768,7 @@ export function LandingPageClient() {
                     </div>
                 </div>
             )}
-        </main>
+            </main>
+        </div>
     );
 }

@@ -431,7 +431,7 @@ export function VerificationRequestModal({
         );
     }
 
-    // ── Rejected — allow resubmission ──
+    // ── Rejected - allow resubmission ──
     const isRejected = currentStatus === "rejected";
 
     // Derived render flags
@@ -470,7 +470,7 @@ export function VerificationRequestModal({
 
                 <div className="relative z-10 flex flex-col">
 
-                    {/* Header — always visible */}
+                    {/* Header - always visible */}
                     <div className="px-6 pt-5 pb-4 flex items-center justify-between border-b border-white/5">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">

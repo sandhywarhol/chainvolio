@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -6,7 +6,7 @@ import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Navbar } from "@/components/layout/Navbar";
 import { useEffect, useState } from "react";
 import { Footer } from "@/components/layout/Footer";
-import { Shield, CheckCircle, TrendingUp, Lock, Award, Building, Users, Globe, Briefcase, Zap, Magnet, RefreshCw, ArrowRight } from "lucide-react";
+import { Shield, CheckCircle, TrendingUp, Lock, Award, Building, Users, Globe, Briefcase } from "lucide-react";
 import Link from "next/link";
 
 export default function VerifiedOrganizationPage() {
@@ -34,9 +34,7 @@ export default function VerifiedOrganizationPage() {
     const showVerifyCTA = !isVerified;
 
     return (
-        <div className="min-h-screen relative">
-            <Navbar />
-            <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative">
+        <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative overflow-x-hidden">
             {/* Video Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <video
@@ -50,6 +48,7 @@ export default function VerifiedOrganizationPage() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
             </div>
+            <Navbar />
 
             {/* HERO SECTION */}
             <section className="relative z-10 pt-32 pb-20 px-8 max-w-[1240px] mx-auto w-full">
@@ -66,7 +65,7 @@ export default function VerifiedOrganizationPage() {
                     </h1>
 
                     <p className="text-xl text-white/50 leading-relaxed font-light tracking-tight">
-                        Issue high-trust attestations and strengthen your organization's credibility on-chain. Verified organizations issue credentials with higher weight, making candidate profiles more credible and evaluated faster.
+                        Issue high-trust attestations and strengthen your organizationΓÇÖs credibility on-chain. Verified organizations issue credentials with higher weight, making candidate profiles more credible and evaluated faster.
                     </p>
 
                     <div className="pt-4">
@@ -97,71 +96,54 @@ export default function VerifiedOrganizationPage() {
                 </div>
             </section>
 
-            {/* WHY UPGRADE SECTION */}
+            {/* BENEFITS SECTION */}
             <section className="relative z-10 py-24 px-8 max-w-[1240px] mx-auto w-full border-t border-white/5">
-                <div className="mb-16 max-w-2xl">
-                    <h2 className="text-4xl font-bold tracking-tight mb-6">Why Upgrade to Verified</h2>
-                    <p className="text-white/40 font-light text-lg">
-                        Verification transforms your organization from a participant into a trusted issuer within the ChainVolio network.
-                    </p>
+                <div className="mb-16">
+                    <h2 className="text-3xl font-bold tracking-tight mb-4">Why Become Verified?</h2>
+                    <p className="text-white/40 font-light">Elevate your organization's role in the global trust network.</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {[
                         {
-                            icon: <Shield className="w-6 h-6 text-emerald-400" />,
-                            title: "Become a Trusted Issuer",
-                            items: ["Your attestations carry more weight", "Your profile signals credibility instantly", "You stand out from regular users"]
+                            icon: <Award className="w-6 h-6 text-emerald-400" />,
+                            title: "Higher Trust Attestations",
+                            desc: "Attestations issued by verified organizations carry higher trust weight and are displayed more prominently on candidate cards."
                         },
                         {
-                            icon: <Zap className="w-6 h-6 text-blue-400" />,
-                            title: "Increase Your Attestation Capacity",
-                            items: ["Free users are limited, verified users scale", "Give more attestations per month", "Support more talent and expand your reach"]
-                        },
-                        {
-                            icon: <Magnet className="w-6 h-6 text-purple-400" />,
-                            title: "Build a Stronger Talent Magnet",
-                            items: ["More candidates seek your endorsement", "Your organization becomes a hub of trust", "Attract higher-quality talent"]
+                            icon: <CheckCircle className="w-6 h-6 text-emerald-400" />,
+                            title: "Official Organizational Identity",
+                            desc: "Your wallet is recognized as an official entity, clearly differentiated from personal wallets on all ChainVolio dashboards."
                         },
                         {
                             icon: <TrendingUp className="w-6 h-6 text-emerald-400" />,
-                            title: "Amplify Your Hiring Power",
-                            items: ["Create and manage opportunities", "Showcase hiring activity publicly", "Turn hiring into a visible trust signal"]
+                            title: "Stronger Hiring Signal",
+                            desc: "Candidates endorsed by your organization gain stronger credibility, reducing friction in their hiring and partnership journeys."
                         },
                         {
-                            icon: <RefreshCw className="w-6 h-6 text-blue-400" />,
-                            title: "Accelerate Your Reputation Growth",
-                            items: ["More attestations -> more visibility -> more trust", "Build a compounding reputation", "Establish long-term credibility"]
+                            icon: <Lock className="w-6 h-6 text-emerald-400" />,
+                            title: "Anti-Impersonation",
+                            desc: "Only verified organizations can issue organization-level attestations, preventing fake company claims on candidate profiles."
                         },
                         {
-                            icon: <Lock className="w-6 h-6 text-purple-400" />,
-                            title: "Ensure Network Quality",
-                            items: ["Payment is not just a fee, but a commitment", "Ensures serious participation", "Reduces spam", "Maintains high-quality trust signals"]
+                            icon: <Briefcase className="w-6 h-6 text-emerald-400" />,
+                            title: "Early Portal Access",
+                            desc: "Get early access to future enterprise features, including organization-wide dashboards, analytics, and bulk attestations."
+                        },
+                        {
+                            icon: <Users className="w-6 h-6 text-emerald-400" />,
+                            title: "Governance Privileges",
+                            desc: "Participate in staking-based trust systems or future governance models that shape the ChainVolio ecosystem standard."
                         }
                     ].map((benefit, i) => (
-                        <div key={i} className="p-10 rounded-[40px] bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group overflow-hidden relative">
-                            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-emerald-500/10 transition-all">
+                        <div key={i} className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group">
+                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 {benefit.icon}
                             </div>
-                            <h3 className="text-xl font-bold mb-6 tracking-tight">{benefit.title}</h3>
-                            <ul className="space-y-3">
-                                {benefit.items.map((item, j) => (
-                                    <li key={j} className="flex gap-3 text-sm text-white/40 font-light leading-relaxed group-hover:text-white/60 transition-colors">
-                                        <span className="text-emerald-500 opacity-50">•</span>
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
+                            <h3 className="text-lg font-bold mb-3">{benefit.title}</h3>
+                            <p className="text-sm text-white/40 leading-relaxed font-light">{benefit.desc}</p>
                         </div>
                     ))}
-                </div>
-
-                <div className="mt-20 p-12 rounded-[40px] bg-emerald-500/[0.03] border border-emerald-500/10 text-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <p className="text-2xl md:text-3xl font-light text-white italic tracking-tight relative z-10">
-                        "Companies don't pay to give attestations - they pay to become <span className="text-emerald-400 font-bold not-italic">trusted issuers</span>."
-                    </p>
                 </div>
             </section>
 
@@ -207,30 +189,13 @@ export default function VerifiedOrganizationPage() {
                 </div>
             </section>
 
-            {/* CTA SECTION */}
-            <section id="apply" className="relative z-10 py-32 px-8 max-w-[1000px] mx-auto w-full text-center">
-                <div className="space-y-12">
-                    <div className="space-y-6">
-                        <h2 className="text-5xl font-bold tracking-tighter">Upgrade your organization and <br /> start scaling trust today.</h2>
-                        <p className="text-xl text-white/40 font-light italic max-w-xl mx-auto border-l-2 border-emerald-500/20 pl-6 text-left">
-                            Secure the future of professional trust by verifying your identity directly on-chain.
-                        </p>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                        <Link 
-                            href="/dashboard?tab=organization" 
-                            className="px-10 py-5 bg-white text-slate-950 font-black rounded-2xl hover:bg-emerald-50 transition-all shadow-2xl shadow-white/10 uppercase tracking-widest text-xs flex items-center gap-3"
-                        >
-                            Upgrade to Verified <ArrowRight className="w-4 h-4" />
-                        </Link>
-                        <Link 
-                            href="/guides/how-it-works" 
-                            className="px-10 py-5 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest flex items-center gap-3"
-                        >
-                            Learn More
-                        </Link>
-                    </div>
+            {/* REGISTRATION FORM SECTION / FOOTER CTA */}
+            <section id="apply" className="relative z-10 py-32 px-8 max-w-[800px] mx-auto w-full text-center">
+                <div className="space-y-8">
+                    <h2 className="text-5xl font-bold tracking-tighter">Ready to join the network?</h2>
+                    <p className="text-xl text-white/40 font-light italic">
+                        Secure the future of professional trust <br /> by verifying your identity directly on-chain.
+                    </p>
                 </div>
             </section>
 
@@ -239,7 +204,6 @@ export default function VerifiedOrganizationPage() {
             </div>
 
             <CustomWalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-            </main>
-        </div>
+        </main>
     );
 }

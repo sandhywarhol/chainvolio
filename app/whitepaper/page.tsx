@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function WhitepaperPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-[#050505]">
             {/* Very subtle noise texture */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -63,7 +63,7 @@ export default function WhitepaperPage() {
                 </div>
 
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-white tracking-tight text-teal-400">On-Chain Layer</h2>
+                    <h2 className="text-xl font-bold text-white tracking-tight">On-Chain Layer</h2>
                     <div className="space-y-4 text-white/60 font-light leading-relaxed text-sm md:text-base">
                         <p>ChainVolio uses the Solana SPL Memo Program. It does not deploy a custom smart contract and does not allocate program-derived accounts for storage.</p>
                         <p>When an attestation is submitted:</p>
@@ -84,7 +84,7 @@ export default function WhitepaperPage() {
                 </div>
 
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-white tracking-tight text-teal-400">Off-Chain Layer</h2>
+                    <h2 className="text-xl font-bold text-white tracking-tight">Off-Chain Layer</h2>
                     <div className="space-y-4 text-white/60 font-light leading-relaxed text-sm md:text-base">
                         <p>The full structured attestation payload is stored in the ChainVolio database. This includes: Ratings, Performance metrics, Text comments, Role descriptions, and Contributor names.</p>
                         <p>The canonical attestation data exists off-chain. However, the off-chain data is cryptographically bound to the on-chain hash.</p>
@@ -98,56 +98,10 @@ export default function WhitepaperPage() {
                 <div className="space-y-6">
                     <h2 className="text-2xl font-bold text-white tracking-tight">Verification Model</h2>
                     <div className="space-y-4 text-white/60 font-light leading-relaxed text-sm md:text-base">
-                        <p>ChainVolio provides two levels of verification:</p>
-                        <div className="space-y-6 mt-4">
-                            <div>
-                                <h3 className="font-bold text-white mb-2">Level 1: On-Chain Proof</h3>
-                                <p>Anyone can verify that:</p>
-                                <ul className="list-disc pl-5 space-y-1 mt-2">
-                                    <li>A specific wallet signed an attestation</li>
-                                    <li>The action occurred at an exact timestamp</li>
-                                    <li>The attestation references a specific CV snapshot</li>
-                                    <li>The transaction exists on Solana</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-white mb-2">Level 2: Content Integrity Validation</h3>
-                                <p>Given the full attestation payload:</p>
-                                <ul className="list-disc pl-5 space-y-1 mt-2">
-                                    <li>A third party can recompute the SHA-256 hash</li>
-                                    <li>Compare it against the on-chain content_hash</li>
-                                    <li>Confirm the payload has not been altered</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <p className="mt-6">Without access to the off-chain payload, the blockchain provides proof of existence and authorship, but not full content reconstruction. This is a deliberate architectural choice balancing cost, scalability, and integrity.</p>
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-white tracking-tight">Current Decentralization Model</h2>
-                    <div className="space-y-4 text-white/60 font-light leading-relaxed text-sm md:text-base">
-                        <p>ChainVolio is hybrid, not fully decentralized.</p>
-                        <div className="grid md:grid-cols-2 gap-8 my-6">
-                            <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-md">
-                                <h3 className="font-bold text-emerald-400 mb-2">What survives if infrastructure is shut down:</h3>
-                                <ul className="list-disc pl-5 space-y-1 text-sm">
-                                    <li>Immutable proof that Wallet X issued an attestation</li>
-                                    <li>Timestamp</li>
-                                    <li>Transaction record</li>
-                                    <li>Content hash</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-md">
-                                <h3 className="font-bold text-red-400 mb-2">What does not survive:</h3>
-                                <ul className="list-disc pl-5 space-y-1 text-sm">
-                                    <li>Full attestation content</li>
-                                    <li>CV snapshot text</li>
-                                    <li>Structured rating data</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <p>Data availability currently depends on the centralized server. However, data integrity does not. This distinction is critical.</p>
+                        <p>ChainVolio uses a two-stage verification process:</p>
+                        <p><span className="text-white font-bold">1. Signature Proof:</span> Verification that the attestation was authored by the claiming wallet address using cryptographic signatures.</p>
+                        <p><span className="text-white font-bold">2. Integrity Proof:</span> Verification that the data retrieved from the ChainVolio database matches the SHA-256 hash anchored on the Solana blockchain.</p>
+                        <p>The system is designed to allow third-party tools to verify any attestation independently by hashing the data and comparing it to the on-chain record.</p>
                     </div>
                 </div>
 

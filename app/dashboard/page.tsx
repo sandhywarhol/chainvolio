@@ -268,7 +268,7 @@ export default function DashboardPage() {
                           }`}
                         >
                            <RefreshCw className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                           <span>{profile?.isExpired ? "Expired — Renew" : "Renew"}</span>
+                           <span>{profile?.isExpired ? "Expired - Renew" : "Renew"}</span>
                         </button>
                       )}
                     </div>
@@ -539,7 +539,7 @@ export default function DashboardPage() {
                       : profile?.verifierTier === 2 ? "text-pink-400"
                       : "text-emerald-400"
                     }`}>
-                      {getVerificationLabel(profile?.verificationTier)} — Active Verified Identity
+                      {getVerificationLabel(profile?.verificationTier)} - Active Verified Identity
                     </p>
 
                     {profile?.expiresAt && (
@@ -552,7 +552,7 @@ export default function DashboardPage() {
                   {profile?.isExpiringSoon && (
                     <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
                       <AlertTriangle className="w-3.5 h-3.5" />
-                      <span>Subscription expires soon — renew now to maintain your verified identity</span>
+                      <span>Subscription expires soon - renew now to maintain your verified identity</span>
                     </div>
                   )}
 
@@ -679,7 +679,7 @@ export default function DashboardPage() {
                 </div>
 
                 {isNearLimit && (
-                  <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit — {remaining} left this month</p>
+                  <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit - {remaining} left this month</p>
                 )}
 
                 {profile?.attestationResetDate && (
@@ -728,7 +728,7 @@ export default function DashboardPage() {
                         {used} / {hiringLimit} used
                       </span>
                       {!isAtLimit && remaining <= 1 && (
-                        <span className="text-amber-400/80 ml-1">— last slot</span>
+                        <span className="text-amber-400/80 ml-1">- last slot</span>
                       )}
                     </p>
                   );

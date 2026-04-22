@@ -792,7 +792,7 @@ export default function AdminVerificationPage() {
                                                     #{req.profiles.card_number}
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-slate-600 italic">—</span>
+                                                <span className="text-xs text-slate-600 italic">-</span>
                                             )}
                                         </td>
                                         <td className="px-8 py-6">
@@ -830,7 +830,7 @@ export default function AdminVerificationPage() {
                                                     })()}
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-slate-600 italic">—</span>
+                                                <span className="text-xs text-slate-600 italic">-</span>
                                             )}
                                         </td>
                                         <td className="px-8 py-6">
@@ -856,7 +856,7 @@ export default function AdminVerificationPage() {
                                                     {req.amount_paid > 0 ? `${req.amount_paid} USDC` : "Free"}
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-slate-600 italic">—</span>
+                                                <span className="text-xs text-slate-600 italic">-</span>
                                             )}
                                         </td>
                                         {/* Tx Signature */}
@@ -875,7 +875,7 @@ export default function AdminVerificationPage() {
                                                     </span>
                                                 </a>
                                             ) : (
-                                                <span className="text-xs text-slate-600 italic">—</span>
+                                                <span className="text-xs text-slate-600 italic">-</span>
                                             )}
                                         </td>
                                         <td className="px-8 py-6">
@@ -887,7 +887,7 @@ export default function AdminVerificationPage() {
                                                     </span>
                                                 </a>
                                             ) : (
-                                                <span className="text-xs text-slate-600 italic">—</span>
+                                                <span className="text-xs text-slate-600 italic">-</span>
                                             )}
                                         </td>
 

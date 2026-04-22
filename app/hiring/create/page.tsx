@@ -217,7 +217,7 @@ export default function CreateCollection() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // Derive hiring access state — delegates all tier logic to getHiringLimit() (single source of truth)
+    // Derive hiring access state - delegates all tier logic to getHiringLimit() (single source of truth)
     const hiringLimit = getHiringLimit(userTier);        // null=unlimited, n=capped
     const remaining = hiringLimit === null ? Infinity : Math.max(0, hiringLimit - collectionCount);
     type HiringAccess = "loading" | "limit_reached" | "capped_available" | "unlimited";
@@ -251,7 +251,7 @@ export default function CreateCollection() {
                 {!createdSlug ? (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="mb-10 text-center">
-                            <h1 className="text-3xl font-bold mb-3 tracking-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">Define Your Ideal Candidate</h1>
+                            <h1 className="text-3xl font-bold mb-3 tracking-tight text-white">Define Your Ideal Candidate</h1>
                             <p className="text-slate-400 text-lg max-w-xl mx-auto">Customize what you want to evaluate. Collect verifiable on-chain portfolios tailored to your specific role.</p>
                         </header>
 
@@ -783,7 +783,7 @@ export default function CreateCollection() {
                             </button>
                         </div>
 
-                        {/* Post-creation conversion trigger — all limit-reached users */}
+                        {/* Post-creation conversion trigger - all limit-reached users */}
                         {hiringAccess === "limit_reached" && (
                             <div className="mb-8 max-w-xl mx-auto p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-left space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <p className="text-sm font-bold text-amber-400">You've reached your hiring limit.</p>

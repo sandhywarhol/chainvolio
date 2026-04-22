@@ -2,45 +2,59 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { ArrowRight, ShieldAlert, Cpu, CheckCircle2, Zap, Target, Gauge, MousePointer2 } from "lucide-react";
+import { 
+    ArrowRight, 
+    ShieldAlert, 
+    Cpu, 
+    CheckCircle2, 
+    Zap, 
+    Target, 
+    Gauge, 
+    MousePointer2,
+    AlertCircle,
+    Terminal,
+    ArrowUpRight
+} from "lucide-react";
 import Link from "next/link";
 
 export default function DevelopersPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white font-sans">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white font-sans bg-[#050505]">
             <Navbar />
 
-            {/* Subtle background atmosphere - Matching Why page minimalism */}
-            <div className="absolute top-0 left-0 right-0 h-[800px] overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-white/[0.03] blur-[120px] rounded-full" />
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[10%] -left-[5%] w-[45%] h-[45%] bg-indigo-500/[0.03] blur-[150px] rounded-full" />
+                <div className="absolute bottom-[15%] -right-[5%] w-[40%] h-[40%] bg-teal-500/[0.03] blur-[150px] rounded-full" />
             </div>
 
             {/* 1. HERO - The Statement */}
             <section className="relative z-40 pt-32 pb-16 px-6 md:px-8 max-w-6xl mx-auto w-full text-center">
                 <div className="max-w-4xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-4">
-                        <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-indigo-400">Developer Portal</span>
+                        <Cpu className="w-3 h-3 text-indigo-400" />
+                        <span className="text-caption text-indigo-400/80">Developer Portal</span>
                     </div>
                     
-                    <h1 className="text-6xl md:text-[80px] font-bold font-display tracking-tighter text-white leading-[0.85] mb-6">
-                        One API call.<br />Know who to trust.
+                    <h1 className="text-h1 mb-6">
+                        One API Call.<br /><span className="text-white">Know Who to Trust.</span>
                     </h1>
                     
-                    <p className="text-xl md:text-2xl text-white/50 leading-relaxed font-light tracking-tight max-w-2xl mb-8 mx-auto">
+                    <p className="text-body text-xl italic mb-8 max-w-2xl mx-auto">
                         ChainVolio turns fragmented Web3 experience into a <span className="text-white/80 font-medium">verifiable reputation signal</span>. Integrate crystalline trust into your application in minutes.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link 
                             href="/api-docs#get-key" 
-                            className="w-full sm:w-auto px-10 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2 group"
+                            className="w-full sm:w-auto px-10 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2 group text-caption !text-slate-950"
                         >
                             Get API Key
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                         <Link 
                             href="/api-docs" 
-                            className="w-full sm:w-auto px-10 py-4 bg-white/[0.03] text-white/60 font-bold rounded-xl border border-white/10 hover:bg-white/[0.08] hover:text-white transition-all flex items-center justify-center"
+                            className="w-full sm:w-auto px-10 py-4 bg-white/[0.03] text-white/60 font-bold rounded-xl border border-white/10 hover:bg-white/[0.08] hover:text-white transition-all flex items-center justify-center text-caption"
                         >
                             View Docs
                         </Link>
@@ -49,68 +63,90 @@ export default function DevelopersPage() {
             </section>
 
             {/* 2. PROBLEM SECTION - The Tension */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full">
+            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full border-t border-white/[0.03]">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-red-500/60 mb-2 block">The Context</span>
-                        <h2 className="text-4xl md:text-5xl font-bold font-display text-white tracking-tighter mb-6 max-w-md">
-                            Hiring and trust in Web3 is broken.
+                        <div className="flex items-center gap-3 mb-6">
+                            <AlertCircle className="w-5 h-5 text-red-500/60" />
+                            <span className="text-caption text-red-500/60 font-bold">The Context</span>
+                        </div>
+                        <h2 className="text-h1 !text-4xl text-left md:text-5xl mb-8 max-w-md">
+                            Hiring and Trust in Web3 Is Broken.
                         </h2>
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {[
                                 { title: "Claims vs Reality", desc: "Anyone can claim experience. Proving it requires deep technical audit of fragmented on-chain data." },
                                 { title: "Zero Reliability", desc: "Legacy profiles lack cryptographic guarantees. Social trust is easily manipulated." },
-                                { title: "Manual Inefficiency", desc: "Evaluating professional background manually is slow, expensive, and scales poorly." }
+                                { title: "Manual Inefficiency", desc: "Evaluating professional background manually is slow and scales poorly." }
                             ].map((point, i) => (
-                                <div key={i} className="flex gap-4">
-                                    <div className="mt-1 flex-shrink-0">
-                                        <ShieldAlert className="w-5 h-5 text-red-500/40" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-lg font-bold text-white/90 mb-1">{point.title}</h4>
-                                        <p className="text-sm text-white/40 leading-relaxed font-light max-w-sm">{point.desc}</p>
+                                <div key={i} className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] group hover:bg-red-500/[0.02] hover:border-red-500/10 transition-all">
+                                    <div className="flex gap-4">
+                                        <div className="mt-1 flex-shrink-0">
+                                            <ShieldAlert className="w-5 h-5 text-red-500/40 group-hover:text-red-500/60 transition-colors" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-caption text-white font-bold mb-1">{point.title}</h4>
+                                            <p className="text-body group-hover:text-white/50">{point.desc}</p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="relative">
-                        <div className="absolute -inset-10 bg-red-500/5 blur-[80px] rounded-full" />
-                        <div className="relative p-8 bg-slate-900/40 border border-white/5 rounded-[40px] space-y-4">
-                            <div className="h-2 w-24 bg-red-500/20 rounded-full" />
-                            <div className="h-2 w-48 bg-white/5 rounded-full" />
-                            <div className="h-2 w-32 bg-white/5 rounded-full" />
-                            <div className="pt-8 text-[11px] font-mono text-red-500/40 uppercase tracking-widest">Legacy Validation: Error-Prone</div>
+                    <div className="relative group">
+                        <div className="absolute -inset-10 bg-red-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative p-12 bg-[#050505] border border-white/[0.05] rounded-[40px] space-y-6 shadow-2xl">
+                            <div className="flex gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500/20" />
+                                <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
+                                <div className="w-3 h-3 rounded-full bg-green-500/20" />
+                            </div>
+                            <div className="space-y-4">
+                                <div className="h-2 w-24 bg-red-500/20 rounded-full animate-pulse" />
+                                <div className="h-2 w-48 bg-white/[0.03] rounded-full" />
+                                <div className="h-2 w-32 bg-white/[0.03] rounded-full" />
+                                <div className="h-2 w-56 bg-white/[0.03] rounded-full" />
+                            </div>
+                            <div className="pt-8 flex items-center justify-between">
+                                <span className="text-caption !text-[8px] opacity-40 font-mono">LEGACY_STATE: ERROR</span>
+                                <ShieldAlert className="w-5 h-5 text-red-500/20" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* 3. SOLUTION - The Resolution */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full text-center">
-                <div className="max-w-3xl mx-auto space-y-4">
-                    <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-teal-400 mb-2 block">The Solution</span>
-                    <h2 className="text-4xl md:text-6xl font-bold font-display text-white tracking-tighter">ChainVolio fixes this.</h2>
-                    <p className="text-xl md:text-2xl text-white/50 font-light leading-relaxed tracking-tight">
-                        We transform fragmented work history into a <span className="text-white/80">verifiable score</span> layered with confidence and trust metrics. We do the audit, so you can do the building.
+            <section className="relative z-40 py-24 px-6 md:px-8 max-w-6xl mx-auto w-full text-center border-t border-white/[0.03]">
+                <div className="max-w-3xl mx-auto space-y-6 group">
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                        <Zap className="w-5 h-5 text-teal-400" />
+                        <span className="text-caption text-teal-400">The Solution</span>
+                    </div>
+                    <h2 className="text-h1 !text-4xl md:!text-[64px]">ChainVolio Fixes This.</h2>
+                    <p className="text-body text-xl italic opacity-60">
+                        "We transform fragmented work history into a verifiable score layered with confidence and trust metrics. We do the audit, so you can do the building."
                     </p>
                 </div>
             </section>
 
             {/* 4. BEFORE vs AFTER - Direct Comparison */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full">
-                <div className="grid md:grid-cols-2 gap-6">
+            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full border-t border-white/[0.03]">
+                <div className="grid md:grid-cols-2 gap-8">
                     {/* Before */}
-                    <div className="p-8 bg-white/[0.01] border border-white/5 rounded-[32px] space-y-4">
-                        <h3 className="text-sm font-bold text-white/20 uppercase tracking-[0.3em]">The Old Way</h3>
-                        <div className="space-y-4">
+                    <div className="p-10 bg-white/[0.01] border border-white/[0.03] rounded-[40px] space-y-8 group">
+                        <div className="flex items-center gap-3">
+                            <ShieldAlert className="w-5 h-5 text-white/20" />
+                            <h3 className="text-caption text-white/20">The Old Way</h3>
+                        </div>
+                        <div className="space-y-6">
                             {[
                                 "Read CV manually (subjective)",
                                 "Verify signatures manually (slow)",
-                                "Uncertain levels of trust (risky)"
+                                "Uncertain trust (reactive)"
                             ].map((text, i) => (
-                                <div key={i} className="flex items-center gap-3 text-white/30 text-lg font-light">
-                                    <div className="w-1 h-1 rounded-full bg-white/10" />
+                                <div key={i} className="flex items-center gap-4 text-body italic opacity-40">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white/5" />
                                     {text}
                                 </div>
                             ))}
@@ -118,19 +154,24 @@ export default function DevelopersPage() {
                     </div>
 
                     {/* After */}
-                    <div className="p-8 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-[32px] space-y-4 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Zap className="w-24 h-24 text-indigo-400" />
+                    <div className="p-10 bg-indigo-500/[0.02] border border-indigo-500/10 rounded-[40px] space-y-8 relative overflow-hidden group shadow-[0_20px_50px_rgba(79,70,229,0.05)]">
+                        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Zap className="w-32 h-32 text-indigo-400" />
                         </div>
-                        <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-[0.3em]">The ChainVolio Way</h3>
-                        <div className="space-y-4 relative z-10">
+                        <div className="flex items-center gap-3 relative z-10">
+                            <Zap className="w-5 h-5 text-indigo-400" />
+                            <h3 className="text-caption text-indigo-400">The ChainVolio Way</h3>
+                        </div>
+                        <div className="space-y-6 relative z-10">
                             {[
                                 "Call single API endpoint",
                                 "Get scored data instantly",
-                                "Make high-confidence decisions"
+                                "High-confidence decisions"
                             ].map((text, i) => (
-                                <div key={i} className="flex items-center gap-3 text-white/90 text-lg font-medium">
-                                    <CheckCircle2 className="w-5 h-5 text-indigo-400" />
+                                <div key={i} className="flex items-center gap-4 text-body font-bold group/item">
+                                    <div className="p-1 rounded-full bg-indigo-500/20 text-indigo-400 group-hover/item:bg-indigo-50 group-hover/item:text-white transition-all">
+                                        <CheckCircle2 className="w-4 h-4" />
+                                    </div>
                                     {text}
                                 </div>
                             ))}
@@ -140,79 +181,99 @@ export default function DevelopersPage() {
             </section>
 
             {/* 5. DIFFERENTIATION - Value Metrics */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full">
-                <div className="text-center mb-8">
-                    <h2 className="text-4xl md:text-5xl font-bold font-display text-white tracking-tighter">More than just a score.</h2>
+            <section className="relative z-40 py-24 px-6 md:px-8 max-w-6xl mx-auto w-full border-t border-white/[0.03]">
+                <div className="text-center mb-16">
+                    <h2 className="text-h1 !text-4xl md:!text-[56px]">More Than Just a Score.</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                     {[
-                        { icon: <Target className="w-8 h-8 text-purple-400" />, title: "Reputation Score", text: "Quantitative performance measurement based on verifiable on-chain output." },
-                        { icon: <Gauge className="w-8 h-8 text-blue-400" />, title: "Confidence Level", text: "Measurement of data reliability and verification depth. Know when the score is absolute." },
-                        { icon: <Zap className="w-8 h-8 text-teal-400" />, title: "Trust Score", text: "A decision-ready metric optimized for immediate application logic." }
+                        { icon: <Target className="w-8 h-8 text-indigo-400" />, title: "Reputation Score", text: "Quantitative performance measurement based on verifiable on-chain output." },
+                        { icon: <Gauge className="w-8 h-8 text-teal-400" />, title: "Confidence Level", text: "Measurement of data reliability and verification depth. Know when to trust." },
+                        { icon: <Zap className="w-8 h-8 text-purple-400" />, title: "Trust Score", text: "A decision-ready metric optimized for immediate application logic." }
                     ].map((item, i) => (
-                        <div key={i} className="space-y-3 group">
-                            <div className="transition-transform group-hover:scale-110 duration-500">{item.icon}</div>
-                            <h4 className="text-lg font-bold text-white tracking-tight">{item.title}</h4>
-                            <p className="text-sm text-white/30 font-light leading-relaxed">{item.text}</p>
+                        <div key={i} className="p-8 rounded-[32px] bg-white/[0.01] border border-white/[0.03] group hover:border-indigo-500/20 transition-all duration-500">
+                            <div className="p-4 rounded-2xl bg-white/[0.02] w-fit mb-8 group-hover:bg-indigo-500/10 transition-colors">
+                                {item.icon}
+                            </div>
+                            <h4 className="text-caption text-white font-bold mb-4">{item.title}</h4>
+                            <p className="text-body group-hover:text-white/50">{item.text}</p>
                         </div>
                     ))}
                 </div>
             </section>
 
             {/* 6. SIMPLE FLOW - Visualization */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-4xl mx-auto w-full text-center">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-8 bg-white/[0.02] border border-white/5 rounded-full hidden md:flex">
-                    <div className="text-xs font-bold uppercase tracking-widest text-white/40">User Wallet</div>
+            <section className="relative z-40 py-20 px-6 md:px-8 max-w-[1240px] mx-auto w-full text-center border-t border-white/[0.03]">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-10 bg-white/[0.01] border border-white/[0.03] rounded-[40px] hidden md:flex shadow-2xl">
+                    <div className="flex flex-col items-center gap-4 group">
+                         <div className="p-3 rounded-xl bg-white/[0.03] group-hover:bg-white/10 transition-colors">
+                            <MousePointer2 className="w-5 h-5 text-white/40" />
+                         </div>
+                         <span className="text-caption text-white/20">User Wallet</span>
+                    </div>
                     <ArrowRight className="w-4 h-4 text-white/10" />
-                    <div className="text-xs font-bold uppercase tracking-widest text-white">ChainVolio API</div>
+                    <div className="flex flex-col items-center gap-4 group">
+                         <div className="p-3 rounded-xl bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
+                            <Cpu className="w-5 h-5 text-indigo-400" />
+                         </div>
+                         <span className="text-caption text-white/60">ChainVolio API</span>
+                    </div>
                     <ArrowRight className="w-4 h-4 text-white/10" />
-                    <div className="text-xs font-bold uppercase tracking-widest text-teal-400">Verifiable Signal</div>
+                    <div className="flex flex-col items-center gap-4 group">
+                         <div className="p-3 rounded-xl bg-teal-500/10 group-hover:bg-teal-500/20 transition-colors">
+                            <Zap className="w-5 h-5 text-teal-400" />
+                         </div>
+                         <span className="text-caption text-teal-400">Verifiable Signal</span>
+                    </div>
                     <ArrowRight className="w-4 h-4 text-white/10" />
-                    <div className="text-xs font-bold uppercase tracking-widest text-white/40">Your Application</div>
-                </div>
-                {/* Mobile version */}
-                <div className="md:hidden space-y-4">
-                    {["User Wallet", "ChainVolio API", "Verifiable Signal", "Your Application"].map((text, i) => (
-                        <div key={i} className={`p-4 border border-white/5 rounded-xl ${i===2 ? 'text-teal-400' : 'text-white/40'}`}>
-                            {text}
-                        </div>
-                    ))}
+                    <div className="flex flex-col items-center gap-4 group">
+                         <div className="p-3 rounded-xl bg-white/[0.03] group-hover:bg-white/10 transition-colors">
+                            <Target className="w-5 h-5 text-white/40" />
+                         </div>
+                         <span className="text-caption text-white/20">Application Logic</span>
+                    </div>
                 </div>
             </section>
 
             {/* 7. REAL USE - Implementation */}
-            <section className="relative z-40 py-20 px-6 md:px-8 max-w-3xl mx-auto w-full overflow-hidden">
-                <div className="absolute inset-0 bg-white/[0.02] blur-[100px] pointer-events-none" />
-                <div className="relative text-center space-y-6">
-                    <div className="space-y-2">
-                        <span className="text-[11px] uppercase tracking-[0.4em] font-medium text-indigo-400">Integration</span>
-                        <h3 className="text-3xl font-bold font-display text-white tracking-tight">One line of logic.</h3>
+            <section className="relative z-40 py-24 px-6 md:px-8 max-w-4xl mx-auto w-full">
+                <div className="p-12 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-[48px] relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 via-transparent to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className="relative z-10 text-center space-y-12">
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                <Terminal className="w-5 h-5 text-indigo-400" />
+                                <span className="text-caption text-indigo-400/80">Integration</span>
+                            </div>
+                            <h3 className="text-h1 !text-4xl md:!text-5xl">One Line of Logic.</h3>
+                        </div>
+                        <div className="p-8 md:p-12 bg-[#050505] border border-white/[0.05] rounded-[32px] font-mono text-xl md:text-3xl text-indigo-300 text-left relative group/code overflow-hidden shadow-2xl">
+                             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
+                            <span className="text-white/20 italic">if (</span>
+                            <span className="text-indigo-400 font-bold">trust_score</span>
+                            <span className="text-white/20"> &gt; </span>
+                            <span className="text-teal-400 font-black">70</span>
+                            <span className="text-white/20">) </span>
+                            <span className="text-indigo-400 font-bold">approveUser()</span>
+                        </div>
+                        <p className="text-body text-lg italic opacity-40">
+                            "Focus your development resources on your core product. We provide the truth layer that powers it."
+                        </p>
                     </div>
-                    <div className="p-6 md:p-8 bg-[#0b0f1a] border border-white/10 rounded-[24px] font-mono text-xl md:text-2xl text-indigo-300 text-left shadow-2xl">
-                        <span className="text-white/20">if (</span>
-                        <span className="text-indigo-400">trust_score</span>
-                        <span className="text-white/20"> &gt; </span>
-                        <span className="text-teal-400">70</span>
-                        <span className="text-white/20">) </span>
-                        <span className="text-indigo-400">approveUser()</span>
-                    </div>
-                    <p className="text-white/30 font-light tracking-tight max-w-lg mx-auto">
-                        Focus your development resources on your core product. We provide the truth layer that powers it.
-                    </p>
                 </div>
             </section>
 
             {/* 8. CTA - The Closing */}
             <section className="relative z-40 pt-16 pb-32 px-6 text-center">
-                <div className="max-w-4xl mx-auto space-y-6">
-                    <h2 className="text-4xl md:text-7xl font-bold font-display text-white tracking-tighter leading-[0.85]">
-                        Start building<br />with trust.
+                <div className="max-w-4xl mx-auto space-y-12">
+                    <h2 className="text-h1 !text-5xl md:!text-[88px]">
+                        Start Building<br /><span className="text-white/20">with Trust.</span>
                     </h2>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link href="/api-docs#get-key" className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-slate-200 transition-all shadow-2xl shadow-white/5">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                        <Link href="/api-docs#get-key" className="px-12 py-5 bg-white text-slate-950 rounded-2xl hover:bg-indigo-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 font-bold">
                             Get API Key
                         </Link>
-                        <Link href="/api-docs" className="px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <Link href="/api-docs" className="px-12 py-5 bg-white/5 text-white rounded-2xl border border-white/10 hover:bg-white/10 transition-all text-caption font-bold">
                             View Docs
                         </Link>
                     </div>

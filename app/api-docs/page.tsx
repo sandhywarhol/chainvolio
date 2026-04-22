@@ -3,10 +3,28 @@
 import React, { useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-
-console.log("Navbar:", Navbar);
-console.log("Footer:", Footer);
-import { Copy, Code2, ShieldCheck, Zap, Layers, Terminal, Briefcase, Users, Landmark } from "lucide-react";
+import { 
+    Copy, 
+    Code2, 
+    ShieldCheck, 
+    Zap, 
+    Layers, 
+    Terminal, 
+    Briefcase, 
+    Users, 
+    Landmark,
+    Search,
+    Cpu,
+    Workflow,
+    ArrowUpRight,
+    Activity,
+    Lock,
+    Key,
+    MousePointer2,
+    CheckCircle2,
+    AlertCircle
+} from "lucide-react";
+import Link from "next/link";
 
 export default function ApiDocsPage() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -81,7 +99,7 @@ export default function ApiDocsPage() {
   "confidence": 0.92,
   "confidence_label": "High",
   "trust_score": 78.2,
-  "reason": "Based on high verified contributions and consistent activity",
+  "reason": "Based on high verified contributions...",
   "last_updated": "2026-04-08T12:00:00Z",
   "breakdown": {
     "experience": 85,
@@ -115,276 +133,279 @@ if (data.score > 75 && data.confidence > 0.8) {
 }`;
 
   return (
-    <main className="min-h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white overflow-visible">
+    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-[#050505]">
       <Navbar />
+
+      {/* Ambient Background Glows */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-[10%] -left-[5%] w-[45%] h-[45%] bg-purple-500/[0.03] blur-[150px] rounded-full" />
+          <div className="absolute bottom-[15%] -right-[5%] w-[40%] h-[40%] bg-blue-500/[0.03] blur-[150px] rounded-full" />
+      </div>
       
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-24 grid grid-cols-1 lg:grid-cols-4 gap-12">
-        {/* Navigation Sidebar */}
-        <aside className="hidden lg:block space-y-8 sticky top-[100px] self-start h-fit">
-          <nav className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Introduction</p>
-            <a href="#introduction" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Overview</a>
-            <a href="#use-cases" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Use Cases</a>
-            <a href="#example-usage" className="block text-sm text-white/50 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Example Usage</a>
-            <a href="#suggested-ui" className="block text-sm text-white/50 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Suggested UI</a>
-            <a href="#authentication" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Authentication</a>
-          </nav>
+      <div className="flex-1 flex overflow-hidden relative z-10 pt-20">
+        <div className="max-w-6xl mx-auto w-full flex overflow-hidden px-6">
+          {/* Navigation Sidebar */}
+          <aside className="hidden lg:block w-1/4 space-y-8 overflow-y-auto h-full py-12 pr-8 custom-scrollbar">
+            <nav className="space-y-2">
+              <p className="text-caption text-white/20 mb-6 flex items-center gap-2">
+                  <Search className="w-3 h-3" /> Introduction
+              </p>
+              {[
+                  { label: "Overview", href: "#introduction" },
+                  { label: "Use Cases", href: "#use-cases" },
+                  { label: "Example Usage", href: "#example-usage" },
+                  { label: "Suggested UI", href: "#suggested-ui" },
+                  { label: "Authentication", href: "#authentication" }
+              ].map((item, i) => (
+                  <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-purple-500 font-medium tracking-tight">
+                      {item.label}
+                  </a>
+              ))}
+            </nav>
 
-          <nav className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Endpoints</p>
-            <a href="#get-score" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 font-mono border-l border-white/5 pl-4 hover:border-purple-500/50">GET /v1/wallet/...</a>
-            <a href="#batch-score" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 font-mono border-l border-white/5 pl-4 hover:border-purple-500/50">POST /v1/scores/batch</a>
-            <a href="#get-key" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Get API Key</a>
-            <a href="#try-api" className="block text-sm text-slate-400 hover:text-white transition-colors py-1.5 border-l border-white/5 pl-4 hover:border-purple-500/50">Try the API</a>
-          </nav>
-        </aside>
+            <nav className="space-y-2">
+              <p className="text-caption text-white/20 mb-6 flex items-center gap-2">
+                  <Terminal className="w-3 h-3" /> Endpoints
+              </p>
+              {[
+                  { label: "GET /v1/wallet/...", href: "#get-score", mono: true },
+                  { label: "POST /v1/scores/batch", href: "#batch-score", mono: true },
+                  { label: "Get API Key", href: "#get-key" },
+                  { label: "Try the API", href: "#try-api" }
+              ].map((item, i) => (
+                  <a key={i} href={item.href} className={`block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-blue-500 font-medium tracking-tight ${item.mono ? 'font-mono !text-xs' : ''}`}>
+                      {item.label}
+                  </a>
+              ))}
+            </nav>
+          </aside>
 
-        {/* Content Area */}
-        <div className="lg:col-span-3 space-y-20">
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto h-full px-8 lg:px-12 py-12 space-y-32 custom-scrollbar scroll-smooth">
           {/* Header */}
-          <header id="introduction" className="space-y-4 border-b border-white/5 pb-12 scroll-mt-[120px]">
-            <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full w-fit">
-              <Code2 className="w-3.5 h-3.5 text-purple-400" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-300">Developer Portal</span>
+          <header id="introduction" className="space-y-8 scroll-mt-[120px]">
+            <div className="flex items-center gap-3 px-4 py-1.5 bg-purple-500/[0.03] border border-purple-500/10 rounded-full w-fit">
+              <Code2 className="w-4 h-4 text-purple-400" />
+              <span className="text-caption text-purple-400/80">Documentation V1</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold font-display text-white tracking-tighter">Reputation API</h1>
-            <p className="text-lg font-light tracking-tight text-white/50 max-w-2xl leading-relaxed">
-              Integrate the ChainVolio reputation layer into your application. Authenticate professional identities and filter users by verified skill signals.
+            <h1 className="text-3xl md:text-h1 break-words overflow-hidden max-w-full">
+                Reputation <span className="text-white/20">API.</span>
+            </h1>
+            <p className="text-body text-lg md:text-xl italic border-l-2 border-purple-500/20 pl-6 md:pl-8 bg-purple-500/[0.01] py-6 rounded-r-3xl break-words">
+              "Integrate the ChainVolio reputation layer into your application. Authenticate professional identities and filter users by verified skill signals."
             </p>
           </header>
 
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
+
           {/* USE CASES */}
-          <section id="use-cases" className="space-y-8 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <Layers className="w-6 h-6 text-blue-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Use Cases</h2>
+          <section id="use-cases" className="space-y-12 scroll-mt-[120px]">
+            <div className="flex items-center gap-4">
+              <Layers className="w-5 h-5 text-blue-400" />
+              <h2 className="text-2xl md:text-h2 break-words">Use Cases</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Hiring */}
-              <div className="p-6 bg-slate-900/40 border border-white/5 rounded-2xl space-y-4 hover:border-purple-500/20 transition-colors group">
-                <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold font-display text-white uppercase text-[11px] tracking-widest">Hiring Platform</h3>
-                <p className="text-sm font-light tracking-tight text-white/40 leading-relaxed">Filter candidates by reputation score and verification confidence to surface elite talent instantly.</p>
-              </div>
-
-              {/* DAO */}
-              <div className="p-6 bg-slate-900/40 border border-white/5 rounded-2xl space-y-4 hover:border-blue-500/20 transition-colors group">
-                <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
-                  <Users className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold font-display text-white uppercase text-[11px] tracking-widest">DAO Governance</h3>
-                <p className="text-sm font-light tracking-tight text-white/40 leading-relaxed">Assign project voting power or council seats based on a member's domain-specific reputation score.</p>
-              </div>
-
-              {/* DeFi */}
-              <div className="p-6 bg-slate-900/40 border border-white/5 rounded-2xl space-y-4 hover:border-emerald-500/20 transition-colors group">
-                <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                  <Landmark className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold font-display text-white uppercase text-[11px] tracking-widest">Lending Protocols</h3>
-                <p className="text-sm font-light tracking-tight text-white/40 leading-relaxed">Adjust collateral requirements or interest rates based on a borrower's verified trust score.</p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                  { icon: <Briefcase className="w-5 h-5" />, title: "Hiring Platform", desc: "Filter candidates by reputation score and verification confidence instantly.", color: "purple" },
+                  { icon: <Users className="w-5 h-5" />, title: "DAO Gov", desc: "Assign voting power or council seats based on verified reputation.", color: "blue" },
+                  { icon: <Landmark className="w-5 h-5" />, title: "DeFi Lending", desc: "Adjust collateral requirements based on a borrower's verified trust score.", color: "emerald" }
+              ].map((item, i) => (
+                  <div key={i} className="p-6 md:p-8 bg-white/[0.01] border border-white/[0.03] rounded-[32px] space-y-6 hover:border-white/10 transition-all group w-full max-w-full break-words overflow-hidden">
+                    <div className={`p-4 rounded-xl bg-${item.color}-500/5 text-${item.color}-400 group-hover:bg-${item.color}-500/10 transition-colors w-fit`}>
+                      {item.icon}
+                    </div>
+                    <h3 className="text-caption text-white font-bold">{item.title}</h3>
+                    <p className="text-body group-hover:text-white/50">{item.desc}</p>
+                  </div>
+              ))}
             </div>
           </section>
 
           {/* EXAMPLE USAGE */}
-          <section id="example-usage" className="space-y-8 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <Code2 className="w-6 h-6 text-emerald-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Example Usage</h2>
+          <section id="example-usage" className="space-y-12 scroll-mt-[120px]">
+            <div className="flex items-center gap-4">
+              <Cpu className="w-5 h-5 text-teal-400" />
+              <h2 className="text-2xl md:text-h2 break-words">Example Usage</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <p className="text-white/50 font-light tracking-tight leading-relaxed">
-                  Use ChainVolio score as a decision-making signal. Implement simple logic to gate access, prioritize talent, or automate workflows with high confidence.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-10">
+                <p className="text-body text-lg italic opacity-60 break-words">
+                  "Use ChainVolio as a decision-making signal. Gate access, prioritize talent, or automate workflows with high confidence."
                 </p>
-                <ul className="space-y-3">
-                  {[
-                    "Gate high-value project features",
-                    "Automate screening for hiring pools",
-                    "Dynamically adjust platform permissions"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm text-slate-300">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                    {[
+                      "Gate high-value project features",
+                      "Automate screening for hiring pools",
+                      "Dynamically adjust platform permissions"
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 group">
+                        <div className="w-2 h-2 rounded-full bg-teal-500/20 group-hover:bg-teal-500 transition-all" />
+                        <span className="text-body text-inherit font-medium break-words overflow-hidden max-w-full">{item}</span>
+                      </div>
+                    ))}
+                </div>
               </div>
 
-              <div className="bg-[#0f172a] rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="px-4 py-3 bg-slate-800/50 border-b border-white/5 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                  <span>Usage Preview</span>
-                  <button onClick={() => copyToClipboard(usageExample, 'usage')} className="hover:text-white transition-colors">
-                    {copied === 'usage' ? 'Copied' : <Copy className="w-3 h-3" />}
+              <div className="bg-[#050505] rounded-[40px] overflow-hidden border border-white/[0.05] shadow-2xl relative group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-teal-500/40" />
+                      <span className="text-caption opacity-20">Application Logic</span>
+                  </div>
+                  <button onClick={() => copyToClipboard(usageExample, 'usage')} className="text-white/20 hover:text-white transition-colors">
+                    {copied === 'usage' ? 'Copied' : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="p-8 font-mono text-base leading-relaxed text-emerald-400/90 overflow-x-auto whitespace-pre">
+                <div className="p-6 md:p-10 font-mono text-sm md:text-base leading-relaxed text-teal-400/80 overflow-x-auto whitespace-pre italic break-all">
                   {usageExample}
                 </div>
               </div>
             </div>
           </section>
 
-
-
-          {/* SUGGESTED UI */}
-          <section id="suggested-ui" className="space-y-8 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <Code2 className="w-6 h-6 text-purple-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Suggested UI</h2>
+          {/* GET API KEY */}
+          <section id="get-key" className="space-y-10 scroll-mt-[120px]">
+            <div className="flex items-center gap-4">
+              <Zap className="w-5 h-5 text-purple-400" />
+              <h2 className="text-2xl md:text-h2 break-words">Identity Auth</h2>
             </div>
             
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              Developers can fully customize how reputation is displayed in their application. Here are common patterns used by ChainVolio partners for clear talent signaling.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Pattern 1 */}
-              <div className="p-8 bg-slate-900/40 border border-white/5 rounded-3xl space-y-6">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Minimalist Record</span>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                    <span className="text-sm font-light text-white/40">Score</span>
-                    <span className="text-xl font-bold font-display text-white">81</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                    <span className="text-sm font-light text-white/40">Confidence</span>
-                    <span className="text-sm font-medium text-emerald-400">High</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                    <span className="text-sm font-light text-white/40">Level</span>
-                    <span className="text-sm font-bold font-display text-purple-400 uppercase tracking-widest">Elite</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pattern 2 */}
-              <div className="p-8 bg-slate-900/40 border border-white/5 rounded-3xl flex flex-col items-center justify-center space-y-4 text-center">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Badge Signature</span>
-                <div className="px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full">
-                  <span className="text-xs font-black font-display text-purple-400 uppercase tracking-[0.3em]">Elite</span>
-                </div>
-                <div className="text-5xl font-bold font-display text-white tracking-tighter">
-                  81
-                </div>
-                <p className="text-[11px] font-medium text-emerald-400/80 uppercase tracking-widest">High Confidence</p>
-              </div>
-            </div>
-          </section>
-
-          {/* GET API KEY */}
-          <section id="get-key" className="space-y-6 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <Zap className="w-6 h-6 text-purple-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Get Your API Key</h2>
-            </div>
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              Start building immediately. Generate a secure API key to authenticate your requests. No credit card or registration required for the trial tier.
-            </p>
-
-            <div className="bg-gradient-to-br from-purple-600/10 to-transparent border border-purple-500/20 rounded-2xl p-6 md:p-8 space-y-6">
-              {!generatedKey ? (
-                <button 
-                  onClick={generateApiKey}
-                  disabled={generatingKey}
-                  className="px-8 py-3 bg-white text-slate-950 font-black rounded-xl hover:bg-slate-200 transition-all shadow-xl shadow-white/5"
-                >
-                  {generatingKey ? "Generating..." : "Generate API Key"}
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-black/40 rounded-xl border border-white/10 group">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Your Private API Key</p>
-                      <code className="text-emerald-400 font-mono text-sm">{generatedKey}</code>
+            <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-[48px] relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="relative z-10 flex flex-col md:flex-row gap-16 items-center">
+                    <div className="md:w-1/2 space-y-6">
+                        <h3 className="text-2xl md:text-h2 md:!text-3xl break-words">Get Your API Key</h3>
+                        <p className="text-body text-lg opacity-40 break-words">
+                          Start building immediately. Generate a secure API key to authenticate your crystalline requests.
+                        </p>
+                        {!generatedKey ? (
+                            <button 
+                              onClick={generateApiKey}
+                              disabled={generatingKey}
+                              className="px-10 py-5 bg-white text-slate-950 font-bold rounded-[20px] hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950"
+                            >
+                              {generatingKey ? "Generating..." : "Generate API Key"}
+                            </button>
+                          ) : (
+                            <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                                <span className="text-caption text-emerald-400 font-bold">Key Provisioned</span>
+                            </div>
+                        )}
                     </div>
-                    <button 
-                      onClick={() => copyToClipboard(generatedKey, "gen-key")} 
-                      className="p-2 hover:bg-white/5 rounded-lg text-slate-500 transition-colors"
-                    >
-                      <Copy className={`w-4 h-4 ${copied === 'gen-key' ? 'text-emerald-500' : ''}`} />
-                    </button>
-                  </div>
-                  <div className="flex items-start gap-2 text-amber-500/80">
-                    <ShieldCheck className="w-4 h-4 mt-0.5" />
-                    <p className="text-[11px] font-bold uppercase tracking-wide">Warning: Keep this key secure. It will not be shown again.</p>
-                  </div>
+
+                    <div className="md:w-1/2 w-full">
+                        {generatedKey ? (
+                           <div className="space-y-6 scale-in duration-500">
+                              <div className="p-8 bg-black border border-white/[0.05] rounded-3xl relative group/key">
+                                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                                <div className="flex items-center justify-between gap-4">
+                                    <code className="text-emerald-400 font-mono text-sm break-all">{generatedKey}</code>
+                                    <button 
+                                      onClick={() => copyToClipboard(generatedKey, "gen-key")} 
+                                      className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 text-white/20 hover:text-white transition-all flex-shrink-0"
+                                    >
+                                      <Copy className={`w-4 h-4 ${copied === 'gen-key' ? 'text-emerald-400' : ''}`} />
+                                    </button>
+                                </div>
+                              </div>
+                              <div className="p-4 bg-red-500/[0.02] border border-red-500/10 rounded-xl flex items-center gap-3">
+                                <ShieldCheck className="w-4 h-4 text-red-500/40" />
+                                <p className="text-caption !text-[8px] opacity-40">Key will not be shown again. Store securely.</p>
+                              </div>
+                           </div>
+                        ) : (
+                            <div className="aspect-square rounded-[40px] border border-white/[0.03] bg-white/[0.01] flex items-center justify-center relative overflow-hidden">
+                                <Key className="w-16 h-16 text-white/[0.03]" />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
+                            </div>
+                        )}
+                    </div>
                 </div>
-              )}
             </div>
           </section>
 
-          {/* Authentication */}
-          <section id="authentication" className="space-y-6 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-6 h-6 text-emerald-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Authentication</h2>
+          {/* Authentication Header Section */}
+          <section id="authentication" className="space-y-10 scroll-mt-[120px]">
+             <div className="flex items-center gap-4">
+              <Lock className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-2xl md:text-h2 break-words">Request Auth</h2>
             </div>
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              All API requests must be authenticated using an API Key. This key allows ChainVolio to associate requests with your platform and track usage limits.
-            </p>
-            <div className="bg-slate-900/50 border border-white/10 rounded-xl p-4 md:p-6 space-y-4">
-              <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">Required Header</p>
-              <div className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-white/5">
-                <code className="text-purple-400 text-sm font-mono tracking-tight">x-api-key: YOUR_API_KEY</code>
-                <button 
-                  onClick={() => copyToClipboard("x-api-key: YOUR_API_KEY", "auth")} 
-                  className="p-1.5 hover:bg-white/5 rounded text-slate-500 transition-colors"
-                >
-                  <Copy className={`w-4 h-4 ${copied === 'auth' ? 'text-emerald-500' : ''}`} />
-                </button>
-              </div>
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="space-y-6">
+                    <p className="text-body text-lg italic opacity-40">
+                        "All API requests must be authenticated using an x-api-key header. This key authorizes your platform to interface with the ChainVolio reputation engine."
+                    </p>
+                </div>
+                <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl group">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-caption opacity-20">Required Header</span>
+                    </div>
+                    <div className="p-5 md:p-6 bg-black border border-white/[0.05] rounded-2xl flex flex-col md:flex-row items-center justify-between group-hover:border-indigo-500/20 transition-all shadow-2xl gap-4">
+                        <code className="text-indigo-400 text-xs md:text-sm font-mono break-all italic">x-api-key: YOUR_API_KEY</code>
+                        <button 
+                          onClick={() => copyToClipboard("x-api-key: YOUR_API_KEY", "auth")} 
+                          className="p-2 text-white/20 hover:text-white transition-colors"
+                        >
+                          <Copy className={`w-4 h-4 ${copied === 'auth' ? 'text-indigo-400' : ''}`} />
+                        </button>
+                    </div>
+                </div>
             </div>
           </section>
+
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
           {/* GET SCORE */}
-          <section id="get-score" className="space-y-6 scroll-mt-[120px]">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <Terminal className="w-6 h-6 text-purple-500" />
-                  <h2 className="text-2xl font-bold font-display text-white tracking-tight">Get Wallet Score</h2>
-                </div>
-                <p className="text-sm text-slate-400 font-mono">GET /api/v1/wallet/:address/score</p>
+          <section id="get-score" className="space-y-12 scroll-mt-[120px]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full max-w-full">
+              <div className="flex items-center gap-4">
+                <Terminal className="w-5 h-5 text-purple-400" />
+                <h2 className="text-2xl md:text-h2 break-words">Get Wallet Score</h2>
               </div>
-              <span className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Cached (24h)</span>
+              <div className="flex flex-wrap items-center gap-3">
+                  <div className="px-3 py-1 bg-white/[0.03] border border-white/[0.05] rounded-full max-w-full overflow-hidden">
+                    <span className="text-body text-[9px] md:text-[10px] font-mono opacity-40 break-all">GET /v1/wallet/:address/score</span>
+                  </div>
+                  <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <span className="text-caption text-emerald-400 font-bold text-[9px] md:text-xs">Cached (24h)</span>
+                  </div>
+              </div>
             </div>
 
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              Retrieve the complete reputation profile for a specific wallet address. Returns the latest computed score, verification confidence, and ranking metrics.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Code Snippet */}
-              <div className="bg-[#0f172a] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
-                <div className="px-4 py-2 bg-slate-800/50 border-b border-white/5 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                  <span>JavaScript / Fetch</span>
-                  <div className="flex items-center gap-4">
-                    <button onClick={() => copyToClipboard(curlExample, 'curl-get')} className="hover:text-white flex items-center gap-1.5 transition-colors">
-                      {copied === 'curl-get' ? 'Copied!' : <><Terminal className="w-3 h-3" /> Copy cURL</>}
+              <div className="bg-[#050505] rounded-[32px] overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+                <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
+                  <span className="text-caption opacity-20">Fetch Signature</span>
+                  <div className="flex items-center gap-6">
+                    <button onClick={() => copyToClipboard(curlExample, 'curl-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
+                        <Terminal className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
+                        <span className="text-caption font-bold">cURL</span>
                     </button>
-                    <button onClick={() => copyToClipboard(getExample, 'js-get')} className="hover:text-white flex items-center gap-1.5 transition-colors">
-                      {copied === 'js-get' ? 'Copied!' : <><Copy className="w-3 h-3" /> Copy Fetch</>}
+                    <button onClick={() => copyToClipboard(getExample, 'js-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
+                        <Copy className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
+                        <span className="text-caption font-bold">Fetch</span>
                     </button>
                   </div>
                 </div>
-                <div className="p-4 font-mono text-[11px] leading-relaxed text-slate-300 overflow-x-auto whitespace-pre">
+                <div className="p-6 md:p-10 font-mono text-xs md:text-sm leading-relaxed text-white/40 overflow-x-auto whitespace-pre flex-1 italic break-all">
                   {getExample}
                 </div>
               </div>
 
               {/* JSON Response */}
-              <div className="bg-[#0f172a] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
-                <div className="px-4 py-2 bg-slate-800/50 border-b border-white/5 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                  <span>Example Response</span>
+              <div className="bg-[#050505] rounded-[32px] overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+                <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center text-caption opacity-20">
+                  <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                      <span className="!tracking-[0.1em]">Expected Response</span>
+                  </div>
                 </div>
-                <div className="p-4 font-mono text-[11px] leading-relaxed text-emerald-400/90 overflow-x-auto whitespace-pre">
+                <div className="p-6 md:p-10 font-mono text-[10px] md:text-xs leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre flex-1 break-all">
                   {jsonExample}
                 </div>
               </div>
@@ -392,113 +413,136 @@ if (data.score > 75 && data.confidence > 0.8) {
           </section>
 
           {/* BATCH SCORE */}
-          <section id="batch-score" className="space-y-6 scroll-mt-[120px]">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <Layers className="w-6 h-6 text-blue-500" />
-                  <h2 className="text-2xl font-bold font-display text-white tracking-tight">Batch Score Fetch</h2>
-                </div>
-                <p className="text-sm text-slate-400 font-mono">POST /api/v1/scores/batch</p>
+          <section id="batch-score" className="space-y-12 scroll-mt-[120px]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full max-w-full">
+              <div className="flex items-center gap-4">
+                <Workflow className="w-5 h-5 text-blue-400" />
+                <h2 className="text-2xl md:text-h2 break-words">Batch Score Fetch</h2>
               </div>
-              <span className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded text-[10px] font-bold text-blue-400 uppercase tracking-widest">Optimized</span>
+               <div className="flex flex-wrap items-center gap-3">
+                  <div className="px-3 py-1 bg-white/[0.03] border border-white/[0.05] rounded-full max-w-full overflow-hidden">
+                    <span className="text-body text-[9px] md:text-[10px] font-mono opacity-40 break-all">POST /v1/scores/batch</span>
+                  </div>
+                  <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                    <span className="text-caption text-blue-400 font-bold text-[9px] md:text-xs">Optimized</span>
+                  </div>
+              </div>
             </div>
 
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              Fetch reputation data for multiple wallets in a single request. Perfect for leaderboard generation or screening candidate pools.
-            </p>
-
-            <div className="bg-[#0f172a] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
-              <div className="px-4 py-2 bg-slate-800/50 border-b border-white/5 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                <span>Batch Fetch Request</span>
-                <div className="flex items-center gap-4">
-                  <button onClick={() => copyToClipboard(batchCurlExample, 'curl-batch')} className="hover:text-white flex items-center gap-1.5 transition-colors">
-                    {copied === 'curl-batch' ? 'Copied!' : <><Terminal className="w-3 h-3" /> Copy cURL</>}
+            <div className="bg-[#050505] rounded-[40px] overflow-hidden border border-white/[0.03] shadow-2xl group">
+              <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <Activity className="w-4 h-4 text-blue-400/60" />
+                    <span className="text-caption opacity-20">Batch Request Object</span>
+                </div>
+                <div className="flex items-center gap-6">
+                  <button onClick={() => copyToClipboard(batchCurlExample, 'curl-batch')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all">
+                    <Terminal className="w-3 h-3 group-hover:text-blue-400" />
+                    <span className="text-caption font-bold">cURL</span>
                   </button>
-                  <button onClick={() => copyToClipboard(batchExample, 'js-batch')} className="hover:text-white flex items-center gap-1.5 transition-colors">
-                    {copied === 'js-batch' ? 'Copied!' : <><Copy className="w-3 h-3" /> Copy Fetch</>}
+                  <button onClick={() => copyToClipboard(batchExample, 'js-batch')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all">
+                    <Copy className="w-3 h-3 group-hover:text-blue-400" />
+                    <span className="text-caption font-bold">Fetch</span>
                   </button>
                 </div>
               </div>
-              <div className="p-4 font-mono text-[11px] leading-relaxed text-slate-300 overflow-x-auto whitespace-pre">
+              <div className="p-6 md:p-12 font-mono text-xs md:text-base leading-relaxed text-white/30 overflow-x-auto whitespace-pre italic break-all">
                 {batchExample}
               </div>
             </div>
           </section>
 
           {/* TRY THE API */}
-          <section id="try-api" className="space-y-6 scroll-mt-[120px]">
-            <div className="flex items-center gap-3">
-              <Zap className="w-6 h-6 text-amber-500" />
-              <h2 className="text-2xl font-bold font-display text-white tracking-tight">Try the API</h2>
+          <section id="try-api" className="space-y-12 scroll-mt-[120px]">
+            <div className="flex items-center gap-4">
+              <Zap className="w-5 h-5 text-amber-500" />
+              <h2 className="text-2xl md:text-h2 md:!text-3xl break-words">Live Sandbox</h2>
             </div>
-            <p className="text-white/50 font-light tracking-tight leading-relaxed max-w-2xl">
-              Test the reputation engine in real-time. Enter a Solana wallet address below to fetch its live reputation data directly from our production API.
-            </p>
-
-            <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-6 md:p-8 space-y-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <input 
-                  type="text"
-                  placeholder="Enter wallet address..."
-                  value={testAddress}
-                  onChange={(e) => setTestAddress(e.target.value)}
-                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                />
-                <button 
-                  onClick={testApi}
-                  disabled={testing}
-                  className="px-8 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-500/20"
-                >
-                  {testing ? "Fetching..." : "Fetch Score"}
-                </button>
-              </div>
-
-              {testError && (
-                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs font-bold uppercase tracking-widest">
-                  Error: {testError}
-                </div>
-              )}
-
-              {testResult && (
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-slate-500 px-1">
-                    <div className="flex items-center gap-3">
-                      <span>API Response</span>
-                      {responseTime !== null && (
-                        <span className="text-emerald-500/80 flex items-center gap-1 group">
-                          <Zap className="w-2.5 h-2.5" />
-                          <span className="lowercase font-medium tracking-normal">Response time: {responseTime}ms</span>
-                        </span>
-                      )}
+            
+            <div className="p-6 md:p-12 bg-white/[0.01] border border-white/[0.03] rounded-[48px] shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+                <div className="relative z-10 space-y-12">
+                    <div className="flex flex-col md:flex-row gap-6">
+                        <div className="flex-1 relative group/input">
+                             <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                                <MousePointer2 className="w-4 h-4 text-white/20 group-focus-within/input:text-amber-500 transition-colors" />
+                             </div>
+                            <input 
+                              type="text"
+                              placeholder="Solana Wallet Address..."
+                              value={testAddress}
+                              onChange={(e) => setTestAddress(e.target.value)}
+                              className="w-full bg-black border border-white/[0.05] rounded-2xl pl-14 pr-6 py-5 text-base md:text-lg text-white placeholder:text-white/10 focus:outline-none focus:border-amber-500/30 transition-all font-mono italic"
+                            />
+                        </div>
+                        <button 
+                          onClick={testApi}
+                          disabled={testing}
+                          className="px-6 md:px-10 py-4 md:py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-amber-50 disabled:opacity-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950"
+                        >
+                          {testing ? "Executing..." : "Execute Query"}
+                        </button>
                     </div>
-                    <button onClick={() => copyToClipboard(JSON.stringify(testResult, null, 2), 'test-res')} className="hover:text-white transition-colors">
-                      {copied === 'test-res' ? 'Copied' : 'Copy JSON'}
-                    </button>
-                  </div>
-                  <div className="bg-[#0f172a] rounded-xl border border-white/5 p-4 font-mono text-[11px] leading-relaxed text-emerald-400/90 overflow-x-auto whitespace-pre max-h-[400px]">
-                    {JSON.stringify(testResult, null, 2)}
-                  </div>
+
+                    {testError && (
+                        <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4">
+                            <AlertCircle className="w-5 h-5 text-red-500" />
+                            <span className="text-caption text-red-400 font-bold">Error: {testError}</span>
+                        </div>
+                    )}
+
+                    {testResult && (
+                        <div className="space-y-6 scale-in duration-500">
+                             <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
+                                <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-2 text-caption opacity-20">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                                        Response Body
+                                    </div>
+                                    {responseTime !== null && (
+                                        <div className="flex items-center gap-2 text-caption text-emerald-500/60 font-bold">
+                                            <Zap className="w-3 h-3" />
+                                            {responseTime}ms Latency
+                                        </div>
+                                    )}
+                                </div>
+                                <button onClick={() => copyToClipboard(JSON.stringify(testResult, null, 2), 'test-res')} className="text-caption opacity-20 hover:opacity-100 transition-all font-bold">
+                                    {copied === 'test-res' ? 'Copied' : 'Copy JSON'}
+                                </button>
+                             </div>
+                             <div className="p-6 md:p-10 bg-black border border-white/[0.05] rounded-[32px] font-mono text-[10px] md:text-sm leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre shadow-2xl max-h-[500px] break-all">
+                                {JSON.stringify(testResult, null, 2)}
+                             </div>
+                        </div>
+                    )}
                 </div>
-              )}
             </div>
           </section>
 
           {/* Final Call to Action */}
-          <div className="p-10 bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-white/5 rounded-3xl space-y-6 text-center">
-            <Zap className="w-10 h-10 text-purple-400 mx-auto" />
-            <h3 className="text-2xl font-bold text-white">Need higher usage limits?</h3>
-            <p className="text-slate-400 max-w-sm mx-auto">
-              Custom partner tiers are available for high-volume integrators and enterprise screening pools.
-            </p>
-            <button className="px-8 py-3 bg-white text-slate-950 font-bold rounded-full hover:bg-slate-200 transition-all">
-              Contact Partnerships
-            </button>
-          </div>
+          <section className="relative z-40 md:py-24 md:px-8 pt-16 pb-28 px-4 border-t border-white/[0.03] h-auto overflow-hidden max-w-full">
+              <div className="p-8 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-[48px] text-center space-y-10 relative group flex flex-col items-center justify-start h-auto">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="relative z-10 flex flex-col items-center w-full space-y-8 md:space-y-10">
+                      <div className="p-5 rounded-2xl bg-white/[0.03] w-fit mx-auto">
+                        <Users className="w-10 h-10 text-white/40" />
+                      </div>
+                      <div className="space-y-4 w-full">
+                          <h3 className="text-2xl md:text-h2 md:!text-4xl break-words font-bold">Scale Your Integration.</h3>
+                          <p className="text-body text-lg italic opacity-40 w-full max-w-sm mx-auto break-words text-center">
+                            "Custom partner tiers are available for high-volume technical integrators and institutional screening pools."
+                          </p>
+                      </div>
+                      <button className="mt-8 px-8 md:px-12 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-slate-100 transition-all shadow-white/5 text-caption !text-slate-950 flex items-center justify-center gap-3 mx-auto w-full md:w-fit">
+                        Contact Partnerships <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                  </div>
+              </div>
+          </section>
+          <Footer />
         </div>
       </div>
-
-      <Footer />
-    </main>
-  );
+    </div>
+  </main>
+);
 }

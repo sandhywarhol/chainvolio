@@ -43,7 +43,7 @@ const WorkScreen = () => {
         </View>
       </View>
       <Text style={styles.org}>{item.org}</Text>
-      <Text style={styles.date}>{item.startDate} — {item.endDate}</Text>
+      <Text style={styles.date}>{item.startDate} - {item.endDate}</Text>
     </View>
   );
 

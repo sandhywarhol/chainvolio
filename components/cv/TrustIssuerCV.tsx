@@ -129,7 +129,7 @@ function ScoreFactorRow({
             className="text-[11px] font-black tabular-nums"
             style={{ color: accentHex }}
           >
-            {contribution > 0 ? `${contribution}pts` : "—"}
+            {contribution > 0 ? `${contribution}pts` : "-"}
           </span>
         </div>
       </div>

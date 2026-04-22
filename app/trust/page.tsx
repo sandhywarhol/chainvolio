@@ -2,6 +2,19 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { 
+    Shield, 
+    Lock, 
+    AlertTriangle, 
+    Fingerprint, 
+    Database, 
+    Share2, 
+    ShieldAlert,
+    Cpu,
+    CheckCircle2,
+    XCircle,
+    ArrowUpRight
+} from "lucide-react";
 
 export default function TrustPage() {
     return (
@@ -11,89 +24,126 @@ export default function TrustPage() {
 
             <Navbar />
 
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[10%] -left-[5%] w-[40%] h-[40%] bg-emerald-500/[0.03] blur-[120px] rounded-full" />
+                <div className="absolute bottom-[20%] -right-[5%] w-[35%] h-[35%] bg-blue-500/[0.03] blur-[120px] rounded-full" />
+            </div>
+
             {/* Hero Section */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
-                <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-emerald-400/60">Trust Architecture</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
+                    <Shield className="w-3 h-3 text-emerald-400" />
+                    <span className="text-caption text-emerald-400/80">Trust Architecture</span>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tighter text-white leading-[0.85] mb-8">
+                <h1 className="text-h1 mb-8">
                     Trust Model & Guarantees
                 </h1>
 
-                <p className="text-lg md:text-2xl text-white/50 leading-relaxed font-light tracking-tight max-w-3xl mx-auto">
+                <p className="text-body text-xl max-w-3xl mx-auto italic">
                     “ChainVolio is engineered under a zero-trust assumption. Trust is not granted; it is enforced.”
                 </p>
             </section>
 
-            <div className="max-w-[1240px] mx-auto border-t border-white/5 w-full px-8" />
+            <div className="max-w-[1240px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
             {/* Content Sections */}
             <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
-                <div className="grid md:grid-cols-2 gap-20">
+                <div className="grid md:grid-cols-2 gap-12">
                     {/* What We Enforce */}
-                    <div className="space-y-12">
+                    <div className="space-y-10 group/section">
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-bold text-white tracking-tight">What We Enforce</h2>
-                            <p className="text-sm text-white/30 font-light">Hard invariants built into the core protocol and database.</p>
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                    <Lock className="w-5 h-5" />
+                                </div>
+                                <h2 className="text-h2">What We Enforce</h2>
+                            </div>
+                            <p className="text-body">Hard invariants built into the core protocol and database.</p>
                         </div>
-                        <ul className="space-y-8">
+                        <div className="grid gap-4">
                             {[
-                                { title: "Verification", text: "Cryptographic verification for all state changes via wallet signatures." },
-                                { title: "Immutability", text: "Immutable professional history once attested or snapshotted." },
-                                { title: "Sovereignty", text: "Non-custodial identity ownership. You own the keys, you own the data." },
-                                { title: "Isolation", text: "Recruiter data isolation by default through strict RLS policies." }
+                                { title: "Verification", icon: <Fingerprint className="w-4 h-4" />, text: "Cryptographic verification for all state changes via wallet signatures." },
+                                { title: "Immutability", icon: <Database className="w-4 h-4" />, text: "Immutable professional history once attested or snapshotted." },
+                                { title: "Sovereignty", icon: <Share2 className="w-4 h-4" />, text: "Non-custodial identity ownership. You own the keys, you own the data." },
+                                { title: "Isolation", icon: <Shield className="w-4 h-4" />, text: "Recruiter data isolation by default through strict RLS policies." }
                             ].map((item, i) => (
-                                <li key={i} className="group">
+                                <div key={i} className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] hover:border-emerald-500/20 transition-all duration-300 group/card">
                                     <div className="flex gap-4 items-start">
-                                        <div className="w-1 h-1 rounded-full bg-emerald-500 mt-2 group-hover:scale-150 transition-transform" />
+                                        <div className="p-2 rounded-lg bg-emerald-500/5 text-emerald-400/60 group-hover/card:text-emerald-400 group-hover/card:bg-emerald-500/10 transition-colors">
+                                            {item.icon}
+                                        </div>
                                         <div>
-                                            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-1">{item.title}</h3>
-                                            <p className="text-sm text-white/40 font-light leading-relaxed">{item.text}</p>
+                                            <h3 className="text-caption mb-1.5 flex items-center gap-2">
+                                                {item.title}
+                                                <CheckCircle2 className="w-3 h-3 text-emerald-500/40" />
+                                            </h3>
+                                            <p className="text-body group-hover/card:text-white/60 transition-colors">{item.text}</p>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
 
                     {/* What We Do Not Promise */}
-                    <div className="space-y-12">
+                    <div className="space-y-10 group/section">
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-bold text-white tracking-tight text-white/40">What We Do Not Promise</h2>
-                            <p className="text-sm text-white/20 font-light">Limits of the system architecture.</p>
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+                                    <ShieldAlert className="w-5 h-5" />
+                                </div>
+                                <h2 className="text-h2 opacity-40">Platform Boundaries</h2>
+                            </div>
+                            <p className="text-body opacity-40">Calculated limits of the current architecture.</p>
                         </div>
-                        <ul className="space-y-8">
+                        <div className="grid gap-4">
                             {[
-                                { title: "Absolute Security", text: "No software system is immune to all vectors. We build for resilience, not perfection." },
-                                { title: "Zero Risk", text: "Market and technological risks are inherent to any Web3-native infrastructure." },
-                                { title: "Recovery", text: "Centralized account recovery. If you lose access to your wallet, the platform cannot restore it." }
+                                { title: "Absolute Security", icon: <AlertTriangle className="w-4 h-4" />, text: "No software system is immune to all vectors. We build for resilience, not perfection." },
+                                { title: "Zero Risk", icon: <Cpu className="w-4 h-4" />, text: "Market and technological risks are inherent to any Web3-native infrastructure." },
+                                { title: "Centralized Recovery", icon: <XCircle className="w-4 h-4" />, text: "Non-custodial design. If you lose access to your wallet, the platform cannot restore it." }
                             ].map((item, i) => (
-                                <li key={i} className="group opacity-60 hover:opacity-100 transition-opacity">
-                                    <div className="flex gap-4 items-start">
-                                        <div className="w-1 h-[1px] bg-white/20 mt-2.5 group-hover:w-4 transition-all" />
+                                <div key={i} className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-orange-500/10 transition-all duration-300 group/card">
+                                    <div className="flex gap-4 items-start opacity-40 group-hover/card:opacity-90 transition-opacity">
+                                        <div className="p-2 rounded-lg bg-orange-500/5 text-orange-400/60 transition-colors">
+                                            {item.icon}
+                                        </div>
                                         <div>
-                                            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-1">{item.title}</h3>
-                                            <p className="text-sm text-white/40 font-light leading-relaxed">{item.text}</p>
+                                            <h3 className="text-caption mb-1.5">{item.title}</h3>
+                                            <p className="text-body">{item.text}</p>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Closing Line */}
-            <section className="relative z-40 py-40 px-8 text-center border-t border-white/5">
-                <div className="max-w-4xl mx-auto space-y-8">
-                    <h2 className="text-5xl md:text-[72px] font-bold tracking-tighter leading-[0.85] flex flex-col items-center">
-                        <span className="text-white">Security is not a feature.</span>
-                        <span className="text-white/30">It is a system property.</span>
-                    </h2>
-                    <p className="text-white/30 text-lg md:text-xl font-light tracking-tight max-w-xl mx-auto">
+            <section className="relative z-40 py-40 px-8 text-center border-t border-white/5 overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-emerald-500/[0.02] blur-[120px] rounded-full pointer-events-none" />
+                
+                <div className="max-w-4xl mx-auto space-y-8 relative z-10">
+                    <div className="flex flex-col items-center gap-6 mb-4">
+                        <div className="w-16 h-16 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-emerald-400 shadow-2xl">
+                            <Shield className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-h1 flex flex-col items-center">
+                            <span className="text-white">Security is Not a Feature.</span>
+                            <span className="text-white">It Is a System Property.</span>
+                        </h2>
+                    </div>
+                    <p className="text-body text-xl max-w-xl mx-auto italic">
                         Engineered for Verifiable Careers.
                     </p>
+                    <div className="pt-8">
+                        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/10 text-white/60 hover:text-white transition-all cursor-default">
+                            <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+                            <span className="text-caption text-inherit">Built on Solana</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 

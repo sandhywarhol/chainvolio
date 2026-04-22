@@ -106,7 +106,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     }
                 }
 
-                // No valid session — show the auth button, do NOT auto-sign
+                // No valid session - show the auth button, do NOT auto-sign
                 setNeedsAuth(true);
                 setLoading(false);
             } catch (err) {
@@ -118,7 +118,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         initDashboard();
     }, [slug, connected, publicKey]);
 
-    // Activity listener — keeps session alive during active use (updates canonical key)
+    // Activity listener - keeps session alive during active use (updates canonical key)
     useEffect(() => {
         if (!connected || !publicKey) return;
 
