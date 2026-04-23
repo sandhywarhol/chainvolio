@@ -292,7 +292,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                         {/* SECTION 3: ACCOUNT */}
                                         <div className="space-y-4 pt-4">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Account</p>
-                                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex flex-col gap-5 relative overflow-x-hidden overflow-y-auto group/acc">
+                                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex flex-col gap-5 relative group/acc">
                                                 {/* Subtle accent glow */}
                                                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none group-hover/acc:bg-emerald-500/20 transition-colors" />
                                                 

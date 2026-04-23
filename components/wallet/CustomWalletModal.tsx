@@ -113,7 +113,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const noneAvailable = !phantomAvailable && !solflareAvailable;
 
     return (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4">
             <div 
                 className="absolute inset-0 bg-black/60 backdrop-blur-md"
                 onClick={onClose}
@@ -170,7 +170,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                 className="group flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 hover:bg-white/5 transition-all cursor-pointer"
                             >
                                 <div className="flex items-center gap-4 text-left">
-                                    <div className="w-10 h-10 rounded-xl bg-black/50 border border-white/5 p-2 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <div className="w-10 h-10 rounded-xl bg-black/50 border border-white/5 p-2 flex items-center justify-center transition-transform">
                                         <img src={wallet.icon} alt={wallet.name} className="w-full h-full object-contain rounded-md" />
                                     </div>
                                     <div>
