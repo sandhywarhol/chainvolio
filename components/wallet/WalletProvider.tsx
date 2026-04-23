@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
@@ -93,15 +93,17 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
     }
 }
 
-import { useEffect } from "react";
+// --- MOBILE RECOVERY COMPONENT ---
 import { useWallet } from "@solana/wallet-adapter-react";
 
 function MobileRecoveryHandler() {
-    const { wallet, connect, connected, publicKey } = useWallet();
+    const { wallet, connect, connected, publicKey, select } = useWallet();
+    const connectingRef = useRef(false);
+    const retryCountRef = useRef(0);
 
     useEffect(() => {
-        const handleRecovery = async () => {
-            if (typeof window === "undefined" || connected || publicKey) return;
+        const handleRecovery = async (isRetry = false) => {
+            if (typeof window === "undefined") return;
 
             // 1. Check if mobile
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -111,41 +113,92 @@ function MobileRecoveryHandler() {
             const hasPendingLogin = localStorage.getItem("cv_mobile_login_pending") === "true";
             if (!hasPendingLogin) return;
 
-            // 3. Check if we have the wallet address from a previous redirect
-            const hasAddress = localStorage.getItem("cv_mobile_wallet_address");
-            
-            // 4. If we have the address and the right adapter is selected (or we can select it)
-            if (hasAddress && !connected) {
-                try {
-                    // Throttling: avoid rapid re-connect attempts
-                    const lastAttempt = parseInt(sessionStorage.getItem("cv_last_recovery_attempt") || "0");
-                    const now = Date.now();
-                    if (now - lastAttempt < 2000) return; 
-                    sessionStorage.setItem("cv_last_recovery_attempt", now.toString());
+            // 3. Prevent multiple simultaneous calls (Requirement 3)
+            if (connectingRef.current) {
+                console.log("Mobile recovery: Connect already in progress, skipping...");
+                return;
+            }
 
-                    console.log("Mobile recovery: attempting to reconnect...");
-                    await connect();
-                    
-                    // If successful, we can clear the pending flag eventually, 
-                    // but keeping it for a bit handles edge cases where focus is lost/regained multiple times.
-                } catch (err) {
-                    console.error("Mobile recovery failed:", err);
+            // 4. Check if already connected (Requirement 2)
+            if (connected && publicKey) {
+                console.log("Mobile recovery: Wallet already connected:", publicKey.toBase58());
+                return;
+            }
+
+            console.log(`Mobile recovery: Reconnect attempt initiated (isRetry: ${isRetry})...`);
+            connectingRef.current = true;
+
+            try {
+                // 5. Ensure adapter readiness (Requirement 6)
+                if (!wallet) {
+                    console.log("Mobile recovery: No wallet selected, attempting to select 'Mobile App' adapter...");
+                    // If we have a stored address, we use the Mobile App adapter which handles the session
+                    if (localStorage.getItem("cv_mobile_wallet_address")) {
+                        select("Mobile App" as any);
+                        // Brief wait for selection to process
+                        await new Promise(r => setTimeout(r, 150));
+                    }
                 }
+
+                // Wait for adapter readiness if it's available
+                if (wallet && wallet.readyState !== WalletReadyState.Installed && wallet.readyState !== WalletReadyState.Loadable) {
+                    console.log("Mobile recovery: Wallet adapter not ready, waiting briefly...");
+                    await new Promise(r => setTimeout(r, 300));
+                }
+
+                console.log("Mobile recovery: Calling wallet.connect()...");
+                await connect();
+                
+                // 6. Force re-sync/verify (Requirement 4 & 5)
+                console.log("Mobile recovery: connect() call completed.", {
+                    connected: connected,
+                    publicKey: publicKey?.toBase58()
+                });
+
+                // Clear retry count on success
+                retryCountRef.current = 0;
+            } catch (err) {
+                console.error("Mobile recovery: Connection failed:", err);
+                
+                // 7. Mobile-specific fallback: retry once (Requirement 7)
+                if (!isRetry && retryCountRef.current < 1) {
+                    retryCountRef.current++;
+                    console.log("Mobile recovery: Retrying in 400ms...");
+                    setTimeout(() => {
+                        connectingRef.current = false; // Allow the retry
+                        handleRecovery(true);
+                    }, 400);
+                    return; // Return so we don't reset connectingRef yet
+                }
+            } finally {
+                connectingRef.current = false;
             }
         };
 
-        window.addEventListener("focus", handleRecovery);
-        window.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible') handleRecovery();
-        });
+        // Requirement 1: listen to BOTH window.focus and document.visibilitychange
+        const onFocus = () => {
+            console.log("Mobile recovery: Window focused");
+            handleRecovery();
+        };
+
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log("Mobile recovery: Visibility changed to visible");
+                handleRecovery();
+            }
+        };
+
+        window.addEventListener("focus", onFocus);
+        document.addEventListener("visibilitychange", onVisibilityChange);
         
-        // Immediate check on mount/load
+        // Immediate check on mount
         handleRecovery();
 
         return () => {
-            window.removeEventListener("focus", handleRecovery);
+            window.removeEventListener("focus", onFocus);
+            document.removeEventListener("visibilitychange", onVisibilityChange);
         };
-    }, [wallet, connected, connect, publicKey]);
+    }, [wallet, connected, connect, publicKey, select]);
 
     return null;
 }
