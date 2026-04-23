@@ -58,7 +58,7 @@ export async function performWalletConnection(
                 const solflareParams = new URLSearchParams({
                     app_url: window.location.origin,
                     dapp_encryption_public_key: dappPublicKey,
-                    redirect: currentUrl,
+                    redirect_url: currentUrl,
                     cluster: "mainnet-beta"
                 });
                 window.location.href = `https://solflare.com/ul/v1/connect?${solflareParams.toString()}`;
