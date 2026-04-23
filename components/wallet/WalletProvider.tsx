@@ -55,6 +55,7 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
         this._publicKey = null;
         localStorage.removeItem("cv_mobile_wallet_address");
         localStorage.removeItem("cv_mobile_session");
+        localStorage.removeItem("cv_mobile_login_pending");
         this.emit("disconnect");
     }
 
@@ -92,6 +93,63 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
     }
 }
 
+import { useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+
+function MobileRecoveryHandler() {
+    const { wallet, connect, connected, publicKey } = useWallet();
+
+    useEffect(() => {
+        const handleRecovery = async () => {
+            if (typeof window === "undefined" || connected || publicKey) return;
+
+            // 1. Check if mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (!isMobile) return;
+
+            // 2. Check if we have a pending login intention
+            const hasPendingLogin = localStorage.getItem("cv_mobile_login_pending") === "true";
+            if (!hasPendingLogin) return;
+
+            // 3. Check if we have the wallet address from a previous redirect
+            const hasAddress = localStorage.getItem("cv_mobile_wallet_address");
+            
+            // 4. If we have the address and the right adapter is selected (or we can select it)
+            if (hasAddress && !connected) {
+                try {
+                    // Throttling: avoid rapid re-connect attempts
+                    const lastAttempt = parseInt(sessionStorage.getItem("cv_last_recovery_attempt") || "0");
+                    const now = Date.now();
+                    if (now - lastAttempt < 2000) return; 
+                    sessionStorage.setItem("cv_last_recovery_attempt", now.toString());
+
+                    console.log("Mobile recovery: attempting to reconnect...");
+                    await connect();
+                    
+                    // If successful, we can clear the pending flag eventually, 
+                    // but keeping it for a bit handles edge cases where focus is lost/regained multiple times.
+                } catch (err) {
+                    console.error("Mobile recovery failed:", err);
+                }
+            }
+        };
+
+        window.addEventListener("focus", handleRecovery);
+        window.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') handleRecovery();
+        });
+        
+        // Immediate check on mount/load
+        handleRecovery();
+
+        return () => {
+            window.removeEventListener("focus", handleRecovery);
+        };
+    }, [wallet, connected, connect, publicKey]);
+
+    return null;
+}
+
 export function WalletProvider({ children }: { children: React.ReactNode }) {
     useMemo(() => {
         if (typeof window === "undefined") return;
@@ -121,6 +179,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
                             if (payload.session) localStorage.setItem("cv_mobile_session", payload.session);
                             localStorage.setItem("cv_phantom_encryption_public_key", phantomKey);
                             
+                            // Flag that we successfully got the address and should be "connected"
+                            localStorage.setItem("cv_mobile_login_pending", "true");
+
                             url.searchParams.delete("phantom_encryption_public_key");
                             url.searchParams.delete("data");
                             url.searchParams.delete("nonce");
@@ -156,8 +217,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ConnProv endpoint={endpoint}>
-      <SolWallProv wallets={wallets} autoConnect>
+      <SolWallProv wallets={wallets} autoConnect={true}>
         <ModalProv>
+          <MobileRecoveryHandler />
           {children}
         </ModalProv>
       </SolWallProv>

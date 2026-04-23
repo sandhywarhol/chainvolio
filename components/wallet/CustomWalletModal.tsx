@@ -52,11 +52,13 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 });
 
                 if (walletName === "Phantom") {
+                    localStorage.setItem("cv_mobile_login_pending", "true");
                     window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
                     return;
                 } else if (walletName === "Solflare") {
                     // Solflare uses 'redirect' instead of 'redirect_link' occasionally in some versions, 
                     // but 'v1/connect' usually follows Phantom's spec. We'll follow the user's specific requirement.
+                    localStorage.setItem("cv_mobile_login_pending", "true");
                     const solflareParams = new URLSearchParams({
                         app_url: window.location.origin,
                         dapp_encryption_public_key: dappPublicKey,
