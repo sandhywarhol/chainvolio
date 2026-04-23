@@ -8,6 +8,8 @@ import { ArrowRight, Flame } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { Wallet } from "lucide-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
@@ -219,8 +221,28 @@ export function LandingPageClient() {
 
                 {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
                 <div className="block md:hidden">
+                    {/* Mobile Top Wallet Section */}
+                    {!connected && (
+                        <div className="px-6 pt-24 pb-0">
+                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex flex-col gap-4 relative overflow-hidden">
+                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none" />
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                        <Wallet className="w-5 h-5 text-emerald-400" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Connect to ChainVolio</span>
+                                        <span className="text-xs font-bold text-white/70">Connect your wallet to build your reputation</span>
+                                    </div>
+                                </div>
+                                <div className="w-full relative z-10">
+                                    <WalletMultiButton />
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
-                <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
+                <section className={`px-6 ${connected ? 'pt-24' : 'pt-12'} pb-12 flex flex-col gap-12 text-center`}>
                     <div className="flex flex-col items-center">
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8">
                             <img src="/logos/solana logo.png" alt="Solana" className="w-3 h-3 object-contain" />

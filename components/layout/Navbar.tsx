@@ -171,19 +171,24 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     
                     <NotificationBell />
 
-                    {/* Mobile Menu Toggle */}
-                    {!isMobileMenuOpen && (
-                        <button
-                            className="md:hidden text-white/60 hover:text-white transition-colors relative z-[100002]"
-                            onClick={() => {
-                                const newState = !isMobileMenuOpen;
-                                setIsMobileMenuOpen(newState);
-                                if (newState) setActiveMobilePanel('main');
-                            }}
-                        >
-                            <Menu className="w-6 h-6" />
-                        </button>
-                    )}
+                    {/* Mobile Wallet & Menu Toggle */}
+                    <div className="flex md:hidden items-center gap-3">
+                        <div className="scale-90">
+                            <WalletMultiButton />
+                        </div>
+                        {!isMobileMenuOpen && (
+                            <button
+                                className="text-white/60 hover:text-white transition-colors relative z-[100002]"
+                                onClick={() => {
+                                    const newState = !isMobileMenuOpen;
+                                    setIsMobileMenuOpen(newState);
+                                    if (newState) setActiveMobilePanel('main');
+                                }}
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -289,31 +294,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                             </div>
                                         </div>
 
-                                        {/* SECTION 3: ACCOUNT */}
-                                        <div className="space-y-4 pt-4">
-                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Account</p>
-                                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex flex-col gap-5 relative group/acc">
-                                                {/* Subtle accent glow */}
-                                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none group-hover/acc:bg-emerald-500/20 transition-colors" />
-                                                
-                                                <div className="flex items-center justify-between relative z-10">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center border border-white/10 shadow-lg">
-                                                            <Wallet className="w-6 h-6 text-emerald-400" />
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-[0.15em] mb-0.5">Primary Wallet</span>
-                                                            <span className="text-sm font-black text-white/90 font-mono tracking-tight">
-                                                                {publicKey ? `${publicKey.toBase58().slice(0, 5)}...${publicKey.toBase58().slice(-5)}` : "Not Connected"}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="w-full relative z-10 scale-100 active:scale-[0.98] transition-transform">
-                                                    <WalletMultiButton />
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
 
