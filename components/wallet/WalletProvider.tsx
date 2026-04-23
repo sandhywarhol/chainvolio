@@ -4,7 +4,7 @@ import { useMemo, useEffect, useState } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletAdapterNetwork, WalletName } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -65,7 +65,7 @@ function MobileReturnHandler() {
                 if (targetWallet) {
                     const timer = setTimeout(async () => {
                         try {
-                            select(lastWallet);
+                            select(lastWallet as WalletName);
                             // Wait a tiny bit for select to propagate
                             await new Promise(r => setTimeout(r, 100));
                             await connect();
