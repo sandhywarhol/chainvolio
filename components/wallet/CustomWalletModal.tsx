@@ -121,25 +121,25 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 onClick={onClose}
             />
             
-            <div className="relative w-full max-w-md bg-[#0d0d0f] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full max-w-lg bg-[#0d0d0f] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 {/* Header */}
-                <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="p-8 border-b border-white/5 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-indigo-500" />
+                        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                            <ShieldCheck className="w-6 h-6 text-indigo-500" />
                             Connect Wallet
                         </h2>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Select Solana Provider</p>
+                        <p className="text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mt-1.5">Select Solana Provider</p>
                     </div>
                     <button 
                         onClick={onClose}
-                        className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
+                        className="p-3 hover:bg-white/5 rounded-2xl transition-colors text-slate-400 hover:text-white"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-6 h-6" />
                     </button>
                 </div>
 
-                <div className="p-6 space-y-4">
+                <div className="p-8 space-y-6">
                     {/* Requirement 7: No Wallet Installed State */}
                     {noneAvailable && (
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
@@ -169,15 +169,15 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                         handleInstall(wallet.downloadUrl);
                                     }
                                 }}
-                                className="group flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 hover:bg-white/5 transition-all cursor-pointer"
+                                className="group flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-[24px] hover:border-white/10 hover:bg-white/5 transition-all cursor-pointer"
                             >
-                                <div className="flex items-center gap-4 text-left">
-                                    <div className="w-10 h-10 rounded-xl bg-black/50 border border-white/5 p-2 flex items-center justify-center transition-transform">
+                                <div className="flex items-center gap-5 text-left">
+                                    <div className="w-14 h-14 rounded-2xl bg-black/50 border border-white/5 p-3 flex items-center justify-center transition-transform group-hover:scale-105">
                                         <img src={wallet.icon} alt={wallet.name} className="w-full h-full object-contain rounded-md" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-white transition-colors">{wallet.name}</p>
-                                        <p className="text-[10px] text-slate-500">
+                                        <p className="text-lg font-bold text-white transition-colors">{wallet.name}</p>
+                                        <p className="text-xs text-slate-500 font-medium">
                                             {wallet.available ? "Detected & Ready" : isMobile ? "Connect via App" : "Not Installed"}
                                         </p>
                                     </div>
@@ -185,13 +185,13 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
                                 {/* Requirement 5 & 6: Install vs Connect label */}
                                 {wallet.available || isMobile ? (
-                                    <div className="px-4 py-2 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-indigo-500/10">
+                                    <div className="px-6 py-3 bg-indigo-500 group-hover:bg-indigo-400 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20">
                                         {isMobile && !wallet.available ? "Open App" : "Connect"}
                                     </div>
                                 ) : (
-                                    <div className="px-4 py-2 bg-white/5 group-hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all border border-white/10 flex items-center gap-2">
+                                    <div className="px-6 py-3 bg-white/5 group-hover:bg-white/10 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-white/10 flex items-center gap-2">
                                         Install
-                                        <ExternalLink className="w-3 h-3" />
+                                        <ExternalLink className="w-4 h-4" />
                                     </div>
                                 )}
                             </div>
