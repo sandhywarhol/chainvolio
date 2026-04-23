@@ -1,113 +1,113 @@
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { WalletReadyState, WalletName } from "@solana/wallet-adapter-base";
-import nacl from "tweetnacl";
-import bs58 from "bs58";
 
 export interface ConnectionOptions {
-    isMobile: boolean;
-    retryOnFailure?: boolean;
+    isMobile?: boolean;
     onConnectingStateChange?: (isConnecting: boolean) => void;
-    recoveryWallet?: string;
 }
 
 /**
- * SINGLE shared connection logic for both manual triggers and automatic recovery.
+ * Connects to the specified wallet adapter directly.
+ *
+ * MOBILE PATH:
+ *   - If the wallet extension is not installed (not inside the wallet's browser),
+ *     redirect to the wallet app's universal link.
+ *   - The flag cv_connecting is set before redirect and cleared on return.
+ *   - No encryption. No complex recovery. No loops.
+ *
+ * DESKTOP PATH:
+ *   - Standard adapter.connect() flow. Unchanged.
  */
 export async function performWalletConnection(
     walletName: string,
     walletState: WalletContextState,
-    options: ConnectionOptions
+    options: ConnectionOptions = {}
 ): Promise<void> {
-    const { wallets, select, connect, wallet, connected, publicKey } = walletState;
-    const { isMobile, retryOnFailure = true, onConnectingStateChange, recoveryWallet } = options;
+    const { wallets, select, wallet } = walletState;
+    const { isMobile = false, onConnectingStateChange } = options;
 
     try {
         onConnectingStateChange?.(true);
-        console.log(`[WalletConnection] Initiating flow for: ${walletName}`);
+        console.log(`[WalletConnection] Initiating for: ${walletName} | mobile: ${isMobile}`);
 
-        // 1. Detection & Adapter Finding
+        // 1. Find the adapter
         const targetWallet = wallets.find(w => w.adapter.name === walletName);
         if (!targetWallet) {
-            throw new Error(`Wallet adapter for ${walletName} not found.`);
+            throw new Error(`Wallet adapter for "${walletName}" not found.`);
         }
 
-        const isInstalled = targetWallet.readyState === WalletReadyState.Installed || 
-                           (walletName === "Phantom" && !!(window as any).solana?.isPhantom) ||
-                           (walletName === "Solflare" && !!(window as any).solflare);
+        // 2. Check if the extension/app is available in this browser context
+        const isInstalled =
+            targetWallet.readyState === WalletReadyState.Installed ||
+            (walletName === "Phantom" && !!(window as any).solana?.isPhantom) ||
+            (walletName === "Solflare" && !!(window as any).solflare);
 
-        // 2. Mobile Deep Linking (Redirect)
-        if (isMobile && !isInstalled && walletName !== "Mobile App") {
-            console.log("[WalletConnection] Mobile & Not Installed: Handling deep link redirect.");
-            const currentUrl = window.location.href;
-            const keypair = nacl.box.keyPair();
-            localStorage.setItem("cv_dapp_secret_key", bs58.encode(keypair.secretKey));
-            const dappPublicKey = bs58.encode(keypair.publicKey);
+        // ── MOBILE: extension not present → deep link redirect ──────────────
+        if (isMobile && !isInstalled) {
+            // GUARD: if we're already mid-connect, do NOT redirect again.
+            // This prevents infinite loops if the user somehow ends up here twice.
+            const alreadyConnecting = localStorage.getItem("cv_connecting");
+            if (alreadyConnecting) {
+                console.warn("[WalletConnection] cv_connecting already set — refusing duplicate redirect.");
+                onConnectingStateChange?.(false);
+                return;
+            }
 
-            const params = new URLSearchParams({
-                app_url: window.location.origin,
-                dapp_encryption_public_key: dappPublicKey,
-                redirect_link: currentUrl,
-                cluster: "mainnet-beta"
-            });
+            const redirectUrl = window.location.href;
+            console.log(`[WalletConnection] Mobile redirect to ${walletName}. Return URL: ${redirectUrl}`);
 
-            localStorage.setItem("cv_mobile_login_pending", "true");
+            // Set the flag BEFORE redirect so we can detect a loop on return
+            localStorage.setItem("cv_connecting", walletName);
 
             if (walletName === "Phantom") {
+                const params = new URLSearchParams({
+                    redirect_link: redirectUrl,
+                    cluster: "mainnet-beta",
+                });
                 window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
             } else if (walletName === "Solflare") {
-                const solflareParams = new URLSearchParams({
-                    app_url: window.location.origin,
-                    dapp_encryption_public_key: dappPublicKey,
-                    redirect_url: currentUrl,
-                    cluster: "mainnet-beta"
+                const params = new URLSearchParams({
+                    redirect_url: redirectUrl,
+                    cluster: "mainnet-beta",
                 });
-                window.location.href = `https://solflare.com/ul/v1/connect?${solflareParams.toString()}`;
+                window.location.href = `https://solflare.com/ul/v1/connect?${params.toString()}`;
             }
-            return; 
+
+            // Execution stops here — the browser navigates away
+            return;
         }
 
-        // 3. Selection — inform the provider which wallet is active
+        // ── DESKTOP (or mobile inside wallet's own browser): standard flow ──
+
+        // 3. Select the adapter so wallet-adapter context is aware
         if (wallet?.adapter.name !== walletName) {
-            console.log(`[WalletConnection] Selecting adapter: ${walletName}`);
+            console.log(`[WalletConnection] Selecting: ${walletName}`);
             select(walletName as WalletName);
-            // Note: we do NOT await state propagation here because we connect via
-            // targetWallet.adapter directly (step 5), which bypasses the stale closure.
         }
 
-        // 4. Readiness Guard — use targetWallet.adapter (live instance, not stale React state)
+        // 4. Wait for readiness (Installed or Loadable)
         let attempts = 0;
-        while (attempts < 10 && 
-               targetWallet.adapter.readyState !== WalletReadyState.Installed && 
-               targetWallet.adapter.readyState !== WalletReadyState.Loadable) {
-            console.log(`[WalletConnection] Waiting for readiness (Attempt ${attempts + 1})...`);
+        while (
+            attempts < 10 &&
+            targetWallet.adapter.readyState !== WalletReadyState.Installed &&
+            targetWallet.adapter.readyState !== WalletReadyState.Loadable
+        ) {
+            console.log(`[WalletConnection] Waiting for readiness (attempt ${attempts + 1})...`);
             await new Promise(r => setTimeout(r, 200));
             attempts++;
         }
 
-        // 5. Connect directly on the adapter instance.
-        console.log(`[WalletConnection] Calling adapter.connect() directly for ${targetWallet.adapter.name}...`);
-        try {
-            await targetWallet.adapter.connect();
-        } catch (err: any) {
-            // Fallback retry for mobile: if Phantom/Solflare fail to connect after redirect,
-            // try to force the virtual "Mobile App" adapter which reads directly from storage.
-            if (isMobile && retryOnFailure && walletName !== "Mobile App") {
-                console.warn("[WalletConnection] Primary adapter failed, falling back to virtual Mobile App adapter...");
-                await new Promise(r => setTimeout(r, 500));
-                return performWalletConnection("Mobile App", walletState, {
-                    isMobile: true,
-                    retryOnFailure: false,
-                    onConnectingStateChange
-                });
-            } else {
-                throw err;
-            }
-        }
+        // 5. Connect directly on the live adapter — bypasses stale React state
+        console.log(`[WalletConnection] Calling adapter.connect() for ${targetWallet.adapter.name}...`);
+        await targetWallet.adapter.connect();
+
+        // 6. Clear any lingering mobile flag (e.g. user is now inside Phantom's browser)
+        localStorage.removeItem("cv_connecting");
 
         console.log("[WalletConnection] Connection successful.");
 
     } catch (err: any) {
-        if (err.name === "WalletConnectionError" || err.name === "WalletWindowClosedError") {
+        if (err.name === "WalletWindowClosedError" || err.name === "WalletConnectionError") {
             console.log("[WalletConnection] User cancelled connection.");
         } else {
             console.error("[WalletConnection] Failed:", err);

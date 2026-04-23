@@ -9,27 +9,26 @@ export function useWalletConnect() {
     const [isConnecting, setIsConnecting] = useState(false);
     const connectingRef = useRef(false);
 
-    const connectWallet = useCallback(async (walletName: string) => {
+    const connectWallet = useCallback(async (walletName: string, isMobile = false) => {
         if (connectingRef.current) return;
-        
+
         try {
             await performWalletConnection(walletName, walletState, {
-                isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
+                isMobile,
                 onConnectingStateChange: (state) => {
                     setIsConnecting(state);
                     connectingRef.current = state;
-                }
+                },
             });
         } catch (err) {
-            // Error is handled/logged in the utility
             throw err;
         }
     }, [walletState]);
 
-    return { 
-        connectWallet, 
+    return {
+        connectWallet,
         isConnecting,
         connected: walletState.connected,
-        publicKey: walletState.publicKey
+        publicKey: walletState.publicKey,
     };
 }

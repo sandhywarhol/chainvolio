@@ -1,29 +1,6 @@
-/**
- * Detects common mobile in-app browsers that often break wallet deep links
- * due to storage isolation or blocked redirects.
- */
-export function isInAppBrowser(): boolean {
-    if (typeof window === "undefined") return false;
-    
-    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
-    
-    return (
-        /Instagram/i.test(ua) ||
-        /FBAN/i.test(ua) ||
-        /FBAV/i.test(ua) ||
-        /Discord/i.test(ua) ||
-        /Line/i.test(ua) ||
-        /Snapchat/i.test(ua) ||
-        /WhatsApp/i.test(ua) ||
-        // General check for "InApp" strings some browsers use
-        /InApp/i.test(ua)
-    );
-}
+// This file is intentionally empty.
+// browser-utils.ts was used for in-app browser detection during the mobile wallet experiment.
+// The mobile wallet feature has been rolled back. This file is preserved as a stub to avoid import errors.
+// It is safe to delete this file once all imports referencing it have been confirmed absent.
 
-/**
- * Checks if the browser is the internal Phantom Wallet browser
- */
-export function isPhantomBrowser(): boolean {
-    if (typeof window === "undefined") return false;
-    return !!(window as any).solana?.isPhantom;
-}
+export {}
