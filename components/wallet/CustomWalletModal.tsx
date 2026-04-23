@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { X, ExternalLink, ShieldCheck, AlertCircle } from "lucide-react";
-import nacl from "tweetnacl";
-import bs58 from "bs58";
+import { useWalletConnect } from "@/hooks/useWalletConnect";
+import { WalletReadyState } from "@solana/wallet-adapter-react";
 
 interface CustomWalletModalProps {
     isOpen: boolean;
@@ -13,7 +13,8 @@ interface CustomWalletModalProps {
 }
 
 export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
-    const { wallets, select, connect } = useWallet();
+    const { wallets } = useWallet();
+    const { connectWallet, isConnecting } = useWalletConnect();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -40,61 +41,12 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     if (!mounted || !isOpen) return null;
 
-    const handleConnect = async (walletName: string) => {
+    const handleConnectAction = async (walletName: string) => {
         try {
-            // Mobile Deep Linking Logic (Requirement 1 & 2)
-            if (isMobile && !phantomAvailable && !solflareAvailable) {
-                const currentUrl = window.location.href;
-                
-                // Generate ephemeral keypair for this session to handle the response
-                const keypair = nacl.box.keyPair();
-                localStorage.setItem("cv_dapp_secret_key", bs58.encode(keypair.secretKey));
-                const dappPublicKey = bs58.encode(keypair.publicKey);
-
-                const params = new URLSearchParams({
-                    app_url: window.location.origin,
-                    dapp_encryption_public_key: dappPublicKey,
-                    redirect_link: currentUrl,
-                    cluster: "mainnet-beta"
-                });
-
-                if (walletName === "Phantom") {
-                    localStorage.setItem("cv_mobile_login_pending", "true");
-                    window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
-                    return;
-                } else if (walletName === "Solflare") {
-                    // Solflare uses 'redirect' instead of 'redirect_link' occasionally in some versions, 
-                    // but 'v1/connect' usually follows Phantom's spec. We'll follow the user's specific requirement.
-                    localStorage.setItem("cv_mobile_login_pending", "true");
-                    const solflareParams = new URLSearchParams({
-                        app_url: window.location.origin,
-                        dapp_encryption_public_key: dappPublicKey,
-                        redirect: currentUrl,
-                        cluster: "mainnet-beta"
-                    });
-                    window.location.href = `https://solflare.com/ul/v1/connect?${solflareParams.toString()}`;
-                    return;
-                }
-            }
-
-            const targetWallet = wallets.find(w => w.adapter.name === walletName);
-            if (targetWallet) {
-                select(targetWallet.adapter.name);
-                
-                // Call connect immediately to preserve user gesture context
-                // Most modern adapters handle the selection sync-ly enough for this to work
-                try {
-                    await connect();
-                } catch (err: any) {
-                    if (err.name !== "WalletConnectionError" && err.name !== "WalletWindowClosedError") {
-                        console.error("Connection failed:", err);
-                    }
-                }
-            }
-            
+            await connectWallet(walletName);
             onClose();
         } catch (err) {
-            console.error("Selection failed:", err);
+            // Error is logged in the hook
             onClose();
         }
     };
@@ -171,7 +123,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                 key={wallet.name}
                                 onClick={() => {
                                     if (wallet.available || isMobile) {
-                                        handleConnect(wallet.name);
+                                        handleConnectAction(wallet.name);
                                     } else {
                                         handleInstall(wallet.downloadUrl);
                                     }
@@ -193,8 +145,12 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                 {/* Requirement 5 & 6: Install vs Connect label */}
                                 <div className="ml-2 shrink-0">
                                     {wallet.available || isMobile ? (
-                                        <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 whitespace-nowrap">
-                                            {isMobile && !wallet.available ? "Open App" : "Connect"}
+                                        <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 whitespace-nowrap min-w-[100px] flex items-center justify-center">
+                                            {isConnecting ? (
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                isMobile && !wallet.available ? "Open App" : "Connect"
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 group-hover:bg-white/10 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-white/10 flex items-center gap-2 whitespace-nowrap">

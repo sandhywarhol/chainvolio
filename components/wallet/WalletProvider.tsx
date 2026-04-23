@@ -11,6 +11,7 @@ import { BaseWalletAdapter, WalletName, WalletReadyState, WalletConfigError } fr
 import { PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import nacl from "tweetnacl";
+import { performWalletConnection } from "@/lib/wallet-connection";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 // --- MOBILE REDIRECT ADAPTER ---
@@ -97,7 +98,8 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
 import { useWallet } from "@solana/wallet-adapter-react";
 
 function MobileRecoveryHandler() {
-    const { wallet, connect, connected, publicKey, select } = useWallet();
+    const walletState = useWallet();
+    const { wallet, connected, publicKey } = walletState;
     const connectingRef = useRef(false);
     const retryCountRef = useRef(0);
 
@@ -129,30 +131,25 @@ function MobileRecoveryHandler() {
             connectingRef.current = true;
 
             try {
-                // 5. Ensure adapter readiness (Requirement 6)
-                if (!wallet) {
-                    console.log("Mobile recovery: No wallet selected, attempting to select 'Mobile App' adapter...");
-                    // If we have a stored address, we use the Mobile App adapter which handles the session
-                    if (localStorage.getItem("cv_mobile_wallet_address")) {
-                        select("Mobile App" as any);
-                        // Brief wait for selection to process
-                        await new Promise(r => setTimeout(r, 150));
+                // Determine which wallet to use for recovery
+                let recoveryWallet = wallet?.adapter.name;
+                
+                if (!recoveryWallet) {
+                    const storedAddress = localStorage.getItem("cv_mobile_wallet_address");
+                    if (storedAddress) {
+                        recoveryWallet = "Mobile App";
+                    } else {
+                        // Fallback to Phantom if nothing else is specified but we have a pending login
+                        recoveryWallet = "Phantom";
                     }
                 }
 
-                // Wait for adapter readiness if it's available
-                if (wallet && wallet.readyState !== WalletReadyState.Installed && wallet.readyState !== WalletReadyState.Loadable) {
-                    console.log("Mobile recovery: Wallet adapter not ready, waiting briefly...");
-                    await new Promise(r => setTimeout(r, 300));
-                }
-
-                console.log("Mobile recovery: Calling wallet.connect()...");
-                await connect();
-                
-                // 6. Force re-sync/verify (Requirement 4 & 5)
-                console.log("Mobile recovery: connect() call completed.", {
-                    connected: connected,
-                    publicKey: publicKey?.toBase58()
+                await performWalletConnection(recoveryWallet, walletState, {
+                    isMobile: true,
+                    retryOnFailure: !isRetry,
+                    onConnectingStateChange: (state) => {
+                        connectingRef.current = state;
+                    }
                 });
 
                 // Clear retry count on success
@@ -165,10 +162,8 @@ function MobileRecoveryHandler() {
                     retryCountRef.current++;
                     console.log("Mobile recovery: Retrying in 400ms...");
                     setTimeout(() => {
-                        connectingRef.current = false; // Allow the retry
                         handleRecovery(true);
                     }, 400);
-                    return; // Return so we don't reset connectingRef yet
                 }
             } finally {
                 connectingRef.current = false;
