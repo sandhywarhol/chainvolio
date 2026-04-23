@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { X, ExternalLink, ShieldCheck, AlertCircle } from "lucide-react";
 import { useWalletConnect } from "@/hooks/useWalletConnect";
-import { WalletReadyState } from "@solana/wallet-adapter-react";
+import { WalletReadyState } from "@solana/wallet-adapter-base";
 
 interface CustomWalletModalProps {
     isOpen: boolean;

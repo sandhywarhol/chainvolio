@@ -7,6 +7,7 @@ export interface ConnectionOptions {
     isMobile: boolean;
     retryOnFailure?: boolean;
     onConnectingStateChange?: (isConnecting: boolean) => void;
+    recoveryWallet?: string;
 }
 
 /**
@@ -18,7 +19,7 @@ export async function performWalletConnection(
     options: ConnectionOptions
 ): Promise<void> {
     const { wallets, select, connect, wallet, connected, publicKey } = walletState;
-    const { isMobile, retryOnFailure = true, onConnectingStateChange } = options;
+    const { isMobile, retryOnFailure = true, onConnectingStateChange, recoveryWallet } = options;
 
     try {
         onConnectingStateChange?.(true);
@@ -79,8 +80,7 @@ export async function performWalletConnection(
         const currentAdapter = wallet?.adapter || targetWallet.adapter;
         while (attempts < 10 && 
                currentAdapter.readyState !== WalletReadyState.Installed && 
-               currentAdapter.readyState !== WalletReadyState.Loadable &&
-               currentAdapter.readyState !== WalletReadyState.Installed) {
+               currentAdapter.readyState !== WalletReadyState.Loadable) {
             console.log(`[WalletConnection] Waiting for readiness (Attempt ${attempts + 1})...`);
             await new Promise(r => setTimeout(r, 200));
             attempts++;
@@ -95,7 +95,11 @@ export async function performWalletConnection(
             if (isMobile && retryOnFailure) {
                 console.warn("[WalletConnection] Mobile connection failed, retrying once in 500ms...");
                 await new Promise(r => setTimeout(r, 500));
-                await connect();
+                await performWalletConnection(recoveryWallet || "Phantom", walletState, {
+                    isMobile: true,
+                    retryOnFailure: false,
+                    onConnectingStateChange
+                });
             } else {
                 throw err;
             }

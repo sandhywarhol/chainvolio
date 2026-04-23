@@ -137,14 +137,14 @@ function MobileRecoveryHandler() {
                 if (!recoveryWallet) {
                     const storedAddress = localStorage.getItem("cv_mobile_wallet_address");
                     if (storedAddress) {
-                        recoveryWallet = "Mobile App";
+                        recoveryWallet = "Mobile App" as any;
                     } else {
                         // Fallback to Phantom if nothing else is specified but we have a pending login
-                        recoveryWallet = "Phantom";
+                        recoveryWallet = "Phantom" as any;
                     }
                 }
 
-                await performWalletConnection(recoveryWallet, walletState, {
+                await performWalletConnection(recoveryWallet || "Phantom", walletState, {
                     isMobile: true,
                     retryOnFailure: !isRetry,
                     onConnectingStateChange: (state) => {
