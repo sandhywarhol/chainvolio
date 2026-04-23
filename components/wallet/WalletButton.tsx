@@ -55,19 +55,27 @@ export function WalletMultiButton() {
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2.5"
       >
-        {currentWalletIcon ? (
-           <img src={currentWalletIcon} alt="Wallet" className="w-3.5 h-3.5 object-contain rounded-md" />
-        ) : (
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        )}
+        <div className="relative">
+          {currentWalletIcon ? (
+            <img src={currentWalletIcon} alt="Wallet" className="w-3.5 h-3.5 object-contain rounded-md" />
+          ) : (
+            <div className={`w-2 h-2 rounded-full ${(wallet?.adapter as any).verified === false ? "bg-amber-500 animate-pulse" : "bg-emerald-500 animate-pulse"}`} />
+          )}
+          {(wallet?.adapter as any).verified === false && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full border border-black animate-pulse" />
+          )}
+        </div>
         {truncatedAddress}
         <ChevronDown className={`w-3 h-3 transition-transform ${isMenuOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isMenuOpen && (
         <div className="absolute top-full right-0 mt-2 w-56 bg-[#0d0d0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-2 z-[1000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="px-4 py-2 border-b border-white/5 mb-1">
+          <div className="px-4 py-2 border-b border-white/5 mb-1 flex items-center justify-between">
              <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Connected via {wallet?.adapter.name}</p>
+             {(wallet?.adapter as any).verified === false && (
+                <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[7px] font-black uppercase rounded">Unverified</span>
+             )}
           </div>
 
           <button

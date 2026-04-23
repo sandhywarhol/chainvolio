@@ -21,6 +21,7 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
     icon = "/favicon.png";
     private _publicKey: PublicKey | null = null;
     private _readyState = WalletReadyState.Installed;
+    private _verified = false;
 
     constructor() {
         super();
@@ -41,6 +42,17 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
     get connecting() { return false; }
     get readyState() { return this._readyState; }
     get supportedTransactionVersions() { return null; }
+    get verified() { return this._verified; }
+
+    setVerified(value: boolean) {
+        this._verified = value;
+        if (value) {
+            localStorage.setItem("cv_mobile_wallet_verified", "true");
+        } else {
+            localStorage.removeItem("cv_mobile_wallet_verified");
+        }
+        this.emit("readyStateChange", this._readyState);
+    }
 
     async connect(): Promise<void> {
         const addr = localStorage.getItem("cv_mobile_wallet_address");
@@ -134,6 +146,29 @@ function MobileRecoveryHandler() {
             isMobile: true,
             retryOnFailure: false,
             onConnectingStateChange: () => {}
+        }).then(async () => {
+            // Requirement 1: Lightweight verification after restoration
+            const adapter = walletState.wallets.find(w => w.adapter.name === "Mobile App")?.adapter as MobileRedirectAdapter;
+            if (adapter && adapter.publicKey) {
+                try {
+                    // Check if the account has any activity/balance as a "lightweight" check
+                    // We don't need a full transaction, just an account info check.
+                    console.log("[MobileRecovery] Verifying restored connection...");
+                    const connection = (window as any).cv_solana_connection; // Fallback to global if needed
+                    if (connection) {
+                        const accountInfo = await connection.getAccountInfo(adapter.publicKey);
+                        if (accountInfo) {
+                            console.log("[MobileRecovery] Connection verified on-chain.");
+                            adapter.setVerified(true);
+                        } else {
+                            console.log("[MobileRecovery] Account is empty/new. Session is restored but unverified.");
+                            adapter.setVerified(false);
+                        }
+                    }
+                } catch (err) {
+                    console.warn("[MobileRecovery] On-chain verification failed, but session is restored.", err);
+                }
+            }
         }).catch((err) => {
             console.error("[MobileRecovery] Connection failed:", err);
         });
@@ -235,6 +270,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const ConnProv = ConnectionProvider as any;
     const SolWallProv = SolanaWalletProvider as any;
     const ModalProv = WalletModalProvider as any;
+
+    // Expose connection for MobileRecoveryHandler to use
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const connection = new (require("@solana/web3.js").Connection)(endpoint);
+            (window as any).cv_solana_connection = connection;
+        }
+    }, [endpoint]);
 
     return (
         <ConnProv endpoint={endpoint}>
