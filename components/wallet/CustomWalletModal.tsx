@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { X, ExternalLink, ShieldCheck, AlertCircle } from "lucide-react";
-import nacl from "tweetnacl";
-import bs58 from "bs58";
+import { useWalletConnect } from "@/hooks/useWalletConnect";
+import { WalletReadyState } from "@solana/wallet-adapter-base";
 
 interface CustomWalletModalProps {
     isOpen: boolean;
@@ -12,10 +13,16 @@ interface CustomWalletModalProps {
 }
 
 export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
-    const { wallets, select } = useWallet();
+    const { wallets } = useWallet();
+    const { connectWallet, isConnecting } = useWalletConnect();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -24,7 +31,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         setIsMobile(checkMobile);
 
-        // Detect via adapter readyState (most reliable)
+        // More reliable detection using adapter readyState
         const phantom = wallets.find(w => w.adapter.name === "Phantom");
         const solflare = wallets.find(w => w.adapter.name === "Solflare");
 
@@ -32,59 +39,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         setSolflareAvailable(solflare?.readyState === "Installed" || !!(window as any).solflare);
     }, [isOpen, wallets]);
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
-    const handleConnect = async (walletName: string) => {
+    const handleConnectAction = async (walletName: string) => {
         try {
-            // Mobile Deep Linking (only when on mobile and no extension available)
-            if (isMobile && !phantomAvailable && !solflareAvailable) {
-                const currentUrl = window.location.href;
-
-                const keypair = nacl.box.keyPair();
-                localStorage.setItem("cv_dapp_secret_key", bs58.encode(keypair.secretKey));
-                const dappPublicKey = bs58.encode(keypair.publicKey);
-
-                const params = new URLSearchParams({
-                    app_url: window.location.origin,
-                    dapp_encryption_public_key: dappPublicKey,
-                    redirect_link: currentUrl,
-                    cluster: "mainnet-beta"
-                });
-
-                if (walletName === "Phantom") {
-                    window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
-                    return;
-                } else if (walletName === "Solflare") {
-                    const solflareParams = new URLSearchParams({
-                        app_url: window.location.origin,
-                        dapp_encryption_public_key: dappPublicKey,
-                        redirect: currentUrl,
-                        cluster: "mainnet-beta"
-                    });
-                    window.location.href = `https://solflare.com/ul/v1/connect?${solflareParams.toString()}`;
-                    return;
-                }
-            }
-
-            // Desktop: find the adapter and call connect() directly on it.
-            // We CANNOT use useWallet().connect() here because it reads `wallet` from
-            // React state — which hasn't updated yet after select(). Calling the adapter
-            // directly bypasses the stale closure and triggers the Phantom popup immediately.
-            const targetWallet = wallets.find(w => w.adapter.name === walletName);
-            if (targetWallet) {
-                select(targetWallet.adapter.name);
-                try {
-                    await targetWallet.adapter.connect();
-                } catch (err: any) {
-                    if (err.name !== "WalletConnectionError" && err.name !== "WalletWindowClosedError") {
-                        console.error("Connection failed:", err);
-                    }
-                }
-            }
-
+            await connectWallet(walletName);
             onClose();
         } catch (err) {
-            console.error("Selection failed:", err);
+            // Error is logged in the hook
             onClose();
         }
     };
@@ -93,6 +55,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         window.open(url, "_blank", "noopener,noreferrer");
     };
 
+    // Requirement 1 & 4: Only show Phantom and Solflare
     const supportedWallets = [
         {
             name: "Phantom",
@@ -110,44 +73,44 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const noneAvailable = !phantomAvailable && !solflareAvailable;
 
-    return (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+    return createPortal(
+        <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-3 sm:p-4 overflow-x-hidden overflow-y-auto">
+            <div 
+                className="fixed inset-0 bg-black/80 backdrop-blur-md"
                 onClick={onClose}
             />
-
-            <div className="relative w-full max-w-md bg-[#0d0d0f] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            
+            <div className="relative w-full max-w-[92%] sm:max-w-lg bg-[#0d0d0f] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 {/* Header */}
-                <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="p-6 sm:p-8 border-b border-white/5 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-indigo-500" />
+                        <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+                            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-500" />
                             Connect Wallet
                         </h2>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Select Solana Provider</p>
+                        <p className="text-[10px] sm:text-[11px] text-slate-500 uppercase tracking-[0.2em] font-bold mt-1.5">Select Solana Provider</p>
                     </div>
-                    <button
+                    <button 
                         onClick={onClose}
-                        className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
+                        className="p-2 sm:p-3 hover:bg-white/5 rounded-2xl transition-colors text-slate-400 hover:text-white shrink-0"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                 </div>
 
-                <div className="p-6 space-y-4">
-                    {/* No wallet installed warning */}
+                <div className="p-5 sm:p-8 space-y-6">
+                    {/* Requirement 7: No Wallet Installed State */}
                     {noneAvailable && (
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                             <div className="space-y-1">
-                                <p className="text-xs font-bold text-amber-200">
+                                <p className="text-[11px] sm:text-xs font-bold text-amber-200">
                                     {isMobile ? "Connect via Wallet App" : "No supported Solana wallet detected."}
                                 </p>
-                                <p className="text-[10px] text-amber-500/80 leading-relaxed">
-                                    {isMobile
-                                        ? "Click a wallet below to open this page inside your wallet app for a secure connection."
-                                        : "To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue."
+                                <p className="text-[9px] sm:text-[10px] text-amber-500/80 leading-relaxed">
+                                    {isMobile 
+                                      ? "Click a wallet below to open this page inside your wallet app for a secure connection."
+                                      : "To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue."
                                     }
                                 </p>
                             </div>
@@ -156,50 +119,58 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
                     <div className="space-y-3">
                         {supportedWallets.map((wallet) => (
-                            <div
+                            <div 
                                 key={wallet.name}
                                 onClick={() => {
                                     if (wallet.available || isMobile) {
-                                        handleConnect(wallet.name);
+                                        handleConnectAction(wallet.name);
                                     } else {
                                         handleInstall(wallet.downloadUrl);
                                     }
                                 }}
-                                className="group flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 hover:bg-white/5 transition-all cursor-pointer"
+                                className="group flex items-center justify-between p-4 sm:p-6 bg-white/[0.02] border border-white/5 rounded-[24px] hover:border-white/10 hover:bg-white/5 transition-all cursor-pointer"
                             >
-                                <div className="flex items-center gap-4 text-left">
-                                    <div className="w-10 h-10 rounded-xl bg-black/50 border border-white/5 p-2 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div className="flex items-center gap-3 sm:gap-5 text-left min-w-0">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-black/50 border border-white/5 p-2 sm:p-3 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
                                         <img src={wallet.icon} alt={wallet.name} className="w-full h-full object-contain rounded-md" />
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-white transition-colors">{wallet.name}</p>
-                                        <p className="text-[10px] text-slate-500">
+                                    <div className="min-w-0">
+                                        <p className="text-base sm:text-lg font-bold text-white transition-colors truncate">{wallet.name}</p>
+                                        <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate">
                                             {wallet.available ? "Detected & Ready" : isMobile ? "Connect via App" : "Not Installed"}
                                         </p>
                                     </div>
                                 </div>
 
-                                {wallet.available || isMobile ? (
-                                    <div className="px-4 py-2 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-indigo-500/10">
-                                        {isMobile && !wallet.available ? "Open App" : "Connect"}
-                                    </div>
-                                ) : (
-                                    <div className="px-4 py-2 bg-white/5 group-hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all border border-white/10 flex items-center gap-2">
-                                        Install
-                                        <ExternalLink className="w-3 h-3" />
-                                    </div>
-                                )}
+                                {/* Requirement 5 & 6: Install vs Connect label */}
+                                <div className="ml-2 shrink-0">
+                                    {wallet.available || isMobile ? (
+                                        <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 whitespace-nowrap min-w-[100px] flex items-center justify-center">
+                                            {isConnecting ? (
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                isMobile && !wallet.available ? "Open App" : "Connect"
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 group-hover:bg-white/10 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-white/10 flex items-center gap-2 whitespace-nowrap">
+                                            Install
+                                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="pt-4 flex justify-center">
-                        <p className="text-[9px] text-slate-600 font-medium uppercase tracking-tighter">
+                    <div className="pt-2 flex justify-center text-center">
+                        <p className="text-[9px] text-slate-600 font-medium uppercase tracking-tight max-w-[200px]">
                             Supported for maximum security and performance
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

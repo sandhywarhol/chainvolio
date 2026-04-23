@@ -8,6 +8,8 @@ import { ArrowRight, Flame } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { Wallet } from "lucide-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
@@ -111,7 +113,6 @@ export function LandingPageClient() {
             />
 
             <main className="flex-1 flex flex-col relative">
-                <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
                 {/* DESKTOP LAYOUT (HIDDEN ON MOBILE) */}
                 <div className="hidden md:flex flex-col flex-1 relative">
@@ -119,7 +120,6 @@ export function LandingPageClient() {
                 <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
                     <div className="text-left max-w-4xl lg:w-[70%]">
                         <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                            <img src="/logos/solana logo.png" alt="Solana" className="w-3.5 h-3.5 object-contain" />
                             <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
                         </div>
                         <h1 className="text-5xl md:text-6xl lg:text-[72px] font-extrabold font-display leading-[1.05] tracking-tight mb-8 text-white">
@@ -218,13 +218,10 @@ export function LandingPageClient() {
                 <Footer />
             </div>
 
-                {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
                 <div className="block md:hidden">
-
                 <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
                     <div className="flex flex-col items-center">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8">
-                            <img src="/logos/solana logo.png" alt="Solana" className="w-3 h-3 object-contain" />
+                        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6">
                             <span className="text-[9px] font-bold uppercase tracking-[0.15em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
                         </div>
                         <h1 className="text-4xl sm:text-[42px] font-black leading-[1.1] tracking-tight text-white px-2">

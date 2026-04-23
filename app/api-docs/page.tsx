@@ -134,13 +134,14 @@ if (data.score > 75 && data.confidence > 0.8) {
 
   return (
     <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-[#050505]">
+
       <Navbar />
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[20%] -left-[10%] w-[40%] h-[40%] bg-purple-500/5 blur-[120px] rounded-full" />
-          <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[10%] left-[20%] w-[30%] h-[30%] bg-blue-500/5 blur-[120px] rounded-full" />
+          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[160px] rounded-full" />
+          <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[160px] rounded-full" />
+          <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[160px] rounded-full" />
       </div>
       
       <div className="flex-1 flex overflow-hidden relative z-10 pt-20">
