@@ -12,10 +12,11 @@ interface CustomWalletModalProps {
 }
 
 export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
-    const { wallets, select, connect } = useWallet();
+    const { wallets, select } = useWallet();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+
     useEffect(() => {
         if (typeof window === "undefined") return;
 
@@ -23,7 +24,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         setIsMobile(checkMobile);
 
-        // More reliable detection using adapter readyState
+        // Detect via adapter readyState (most reliable)
         const phantom = wallets.find(w => w.adapter.name === "Phantom");
         const solflare = wallets.find(w => w.adapter.name === "Solflare");
 
@@ -35,11 +36,10 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleConnect = async (walletName: string) => {
         try {
-            // Mobile Deep Linking Logic (Requirement 1 & 2)
+            // Mobile Deep Linking (only when on mobile and no extension available)
             if (isMobile && !phantomAvailable && !solflareAvailable) {
                 const currentUrl = window.location.href;
-                
-                // Generate ephemeral keypair for this session to handle the response
+
                 const keypair = nacl.box.keyPair();
                 localStorage.setItem("cv_dapp_secret_key", bs58.encode(keypair.secretKey));
                 const dappPublicKey = bs58.encode(keypair.publicKey);
@@ -55,8 +55,6 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                     window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
                     return;
                 } else if (walletName === "Solflare") {
-                    // Solflare uses 'redirect' instead of 'redirect_link' occasionally in some versions, 
-                    // but 'v1/connect' usually follows Phantom's spec. We'll follow the user's specific requirement.
                     const solflareParams = new URLSearchParams({
                         app_url: window.location.origin,
                         dapp_encryption_public_key: dappPublicKey,
@@ -68,21 +66,22 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 }
             }
 
+            // Desktop: find the adapter and call connect() directly on it.
+            // We CANNOT use useWallet().connect() here because it reads `wallet` from
+            // React state — which hasn't updated yet after select(). Calling the adapter
+            // directly bypasses the stale closure and triggers the Phantom popup immediately.
             const targetWallet = wallets.find(w => w.adapter.name === walletName);
             if (targetWallet) {
                 select(targetWallet.adapter.name);
-                
-                // Call connect immediately to preserve user gesture context
-                // Most modern adapters handle the selection sync-ly enough for this to work
                 try {
-                    await connect();
+                    await targetWallet.adapter.connect();
                 } catch (err: any) {
                     if (err.name !== "WalletConnectionError" && err.name !== "WalletWindowClosedError") {
                         console.error("Connection failed:", err);
                     }
                 }
             }
-            
+
             onClose();
         } catch (err) {
             console.error("Selection failed:", err);
@@ -94,7 +93,6 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         window.open(url, "_blank", "noopener,noreferrer");
     };
 
-    // Requirement 1 & 4: Only show Phantom and Solflare
     const supportedWallets = [
         {
             name: "Phantom",
@@ -114,11 +112,11 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     return (
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
-            <div 
+            <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-md"
                 onClick={onClose}
             />
-            
+
             <div className="relative w-full max-w-md bg-[#0d0d0f] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 {/* Header */}
                 <div className="p-6 border-b border-white/5 flex items-center justify-between">
@@ -129,7 +127,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         </h2>
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Select Solana Provider</p>
                     </div>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
                     >
@@ -138,7 +136,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 </div>
 
                 <div className="p-6 space-y-4">
-                    {/* Requirement 7: No Wallet Installed State */}
+                    {/* No wallet installed warning */}
                     {noneAvailable && (
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -147,9 +145,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                     {isMobile ? "Connect via Wallet App" : "No supported Solana wallet detected."}
                                 </p>
                                 <p className="text-[10px] text-amber-500/80 leading-relaxed">
-                                    {isMobile 
-                                      ? "Click a wallet below to open this page inside your wallet app for a secure connection."
-                                      : "To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue."
+                                    {isMobile
+                                        ? "Click a wallet below to open this page inside your wallet app for a secure connection."
+                                        : "To use ChainVolio you need a Solana wallet. Install Phantom or Solflare to continue."
                                     }
                                 </p>
                             </div>
@@ -158,7 +156,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
                     <div className="space-y-3">
                         {supportedWallets.map((wallet) => (
-                            <div 
+                            <div
                                 key={wallet.name}
                                 onClick={() => {
                                     if (wallet.available || isMobile) {
@@ -181,7 +179,6 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                     </div>
                                 </div>
 
-                                {/* Requirement 5 & 6: Install vs Connect label */}
                                 {wallet.available || isMobile ? (
                                     <div className="px-4 py-2 bg-indigo-500 group-hover:bg-indigo-400 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-indigo-500/10">
                                         {isMobile && !wallet.available ? "Open App" : "Connect"}
