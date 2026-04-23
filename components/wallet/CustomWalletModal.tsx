@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { X, ExternalLink, ShieldCheck, AlertCircle } from "lucide-react";
+import { X, ExternalLink, ShieldCheck, AlertCircle, Copy, Check, MessageSquareWarning, Info } from "lucide-react";
 import { useWalletConnect } from "@/hooks/useWalletConnect";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
+import { isInAppBrowser, isPhantomBrowser } from "@/lib/browser-utils";
 
 interface CustomWalletModalProps {
     isOpen: boolean;
@@ -18,10 +19,15 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isInApp, setIsInApp] = useState(false);
+    const [isPhantom, setIsPhantom] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showCopyTooltip, setShowCopyTooltip] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        setIsInApp(isInAppBrowser());
+        setIsPhantom(isPhantomBrowser());
     }, []);
 
     useEffect(() => {
@@ -99,8 +105,54 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 </div>
 
                 <div className="p-5 sm:p-8 space-y-6">
-                    {/* Requirement 7: No Wallet Installed State */}
-                    {noneAvailable && (
+                    {/* In-App Browser Warning (UX Enhancement) */}
+                    {isMobile && isInApp && !isPhantom && (
+                        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl space-y-3">
+                            <div className="flex items-start gap-3">
+                                <MessageSquareWarning className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                    <p className="text-[11px] font-bold text-rose-200">In-App Browser Detected</p>
+                                    <p className="text-[9px] text-rose-500/80 leading-relaxed">
+                                        You are viewing this in an app like Instagram or Discord. These browsers often block wallet connections.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(window.location.href);
+                                    setShowCopyTooltip(true);
+                                    setTimeout(() => setShowCopyTooltip(false), 2000);
+                                }}
+                                className="w-full py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 rounded-xl flex items-center justify-center gap-2 transition-all group"
+                            >
+                                {showCopyTooltip ? (
+                                    <>
+                                        <Check className="w-3.5 h-3.5 text-rose-400" />
+                                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Link Copied!</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Copy className="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Copy Link to Safari/Chrome</span>
+                                    </>
+                                )}
+                            </button>
+                            
+                            <div className="flex items-center gap-2 justify-center py-1">
+                                <div className="h-[1px] bg-rose-500/20 flex-1" />
+                                <span className="text-[8px] text-rose-500/40 font-black uppercase">Or use</span>
+                                <div className="h-[1px] bg-rose-500/20 flex-1" />
+                            </div>
+
+                            <p className="text-[8px] text-center text-rose-500/60 font-medium">
+                                For the best experience, open this site in the <span className="text-rose-400 font-bold">Phantom Internal Browser</span>.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* No wallet installed warning */}
+                    {noneAvailable && !isInApp && (
                         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                             <div className="space-y-1">

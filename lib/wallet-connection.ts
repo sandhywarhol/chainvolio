@@ -85,19 +85,16 @@ export async function performWalletConnection(
         }
 
         // 5. Connect directly on the adapter instance.
-        // CRITICAL: We call targetWallet.adapter.connect() NOT connect() from useWallet().
-        // useWallet().connect() reads `wallet` from React state — which is still null/stale
-        // right after select() because React hasn't re-rendered yet.
-        // targetWallet.adapter is a live object reference, so it always works immediately.
-        console.log("[WalletConnection] Calling adapter.connect() directly...");
+        console.log(`[WalletConnection] Calling adapter.connect() directly for ${targetWallet.adapter.name}...`);
         try {
             await targetWallet.adapter.connect();
         } catch (err: any) {
-            // Fallback retry for mobile
-            if (isMobile && retryOnFailure) {
-                console.warn("[WalletConnection] Mobile connection failed, retrying once in 500ms...");
+            // Fallback retry for mobile: if Phantom/Solflare fail to connect after redirect,
+            // try to force the virtual "Mobile App" adapter which reads directly from storage.
+            if (isMobile && retryOnFailure && walletName !== "Mobile App") {
+                console.warn("[WalletConnection] Primary adapter failed, falling back to virtual Mobile App adapter...");
                 await new Promise(r => setTimeout(r, 500));
-                await performWalletConnection(recoveryWallet || "Phantom", walletState, {
+                return performWalletConnection("Mobile App", walletState, {
                     isMobile: true,
                     retryOnFailure: false,
                     onConnectingStateChange

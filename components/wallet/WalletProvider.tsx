@@ -164,7 +164,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         const data = params.get("data");
         const nonce = params.get("nonce");
 
+        // If we have redirect params, try to process them
         if (data && nonce && phantomKey) {
+            let decryptedSuccessfully = false;
             try {
                 const sharedSecretKey = localStorage.getItem("cv_dapp_secret_key");
                 if (sharedSecretKey) {
@@ -179,23 +181,38 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
                     if (decryptedData) {
                         const payload = JSON.parse(new TextDecoder().decode(decryptedData));
                         if (payload.public_key) {
+                            console.log("[WalletProvider] Decrypted mobile payload successfully.");
                             localStorage.setItem("cv_mobile_wallet_address", payload.public_key);
                             if (payload.session) localStorage.setItem("cv_mobile_session", payload.session);
                             localStorage.setItem("cv_phantom_encryption_public_key", phantomKey);
                             
                             // Flag for MobileRecoveryHandler to pick up on next mount
                             localStorage.setItem("cv_mobile_login_pending", "true");
-
-                            url.searchParams.delete("phantom_encryption_public_key");
-                            url.searchParams.delete("data");
-                            url.searchParams.delete("nonce");
-                            window.history.replaceState({}, "", url.toString());
+                            decryptedSuccessfully = true;
                         }
                     }
+                } else {
+                    console.warn("[WalletProvider] Missing cv_dapp_secret_key in localStorage. Could not decrypt return payload.");
                 }
             } catch (err) {
-                console.error("Failed to process mobile wallet redirect:", err);
+                console.error("[WalletProvider] Failed to process mobile wallet redirect:", err);
             }
+
+            // Fallback: If decryption failed but we already HAVE a wallet address in storage,
+            // we can still assume a successful return and try to reconnect.
+            if (!decryptedSuccessfully) {
+                const existingAddr = localStorage.getItem("cv_mobile_wallet_address");
+                if (existingAddr) {
+                    console.log("[WalletProvider] Decryption failed but existing address found. Attempting recovery anyway.");
+                    localStorage.setItem("cv_mobile_login_pending", "true");
+                }
+            }
+
+            // Always strip params to clean up URL and prevent re-processing
+            url.searchParams.delete("phantom_encryption_public_key");
+            url.searchParams.delete("data");
+            url.searchParams.delete("nonce");
+            window.history.replaceState({}, "", url.toString());
         }
     }, []);
 
