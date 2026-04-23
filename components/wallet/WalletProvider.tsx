@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
+import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -23,7 +23,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
  * (window.solana / window.solflare are available inside the wallet browser).
  */
 function MobileReturnHandler() {
-    const { connected, connect, select, wallets } = require("@solana/wallet-adapter-react").useWallet();
+    const { connected, connect, select, wallets } = useWallet();
 
     useEffect(() => {
         if (typeof window === "undefined") return;
