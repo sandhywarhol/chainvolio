@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useEffect } from "react";
-import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
+import { useMemo, useRef, useEffect, useState } from "react";
+import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -95,110 +95,66 @@ class MobileRedirectAdapter extends BaseWalletAdapter {
 }
 
 // --- MOBILE RECOVERY COMPONENT ---
-import { useWallet } from "@solana/wallet-adapter-react";
-
+// Runs ONCE on mount. Handles the return from Phantom deep link and connects the
+// MobileRedirectAdapter. Does NOT listen to focus/visibilitychange to avoid loops.
 function MobileRecoveryHandler() {
     const walletState = useWallet();
-    const { wallet, connected, publicKey } = walletState;
-    const connectingRef = useRef(false);
-    const retryCountRef = useRef(0);
+    const { connected, publicKey } = walletState;
+    const hasRunRef = useRef(false);
 
     useEffect(() => {
-        const handleRecovery = async (isRetry = false) => {
-            if (typeof window === "undefined") return;
+        // Run only once per mount
+        if (hasRunRef.current) return;
+        if (typeof window === "undefined") return;
 
-            // 1. Check if mobile
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (!isMobile) return;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (!isMobile) return;
 
-            // 2. Check if we have a pending login intention
-            const hasPendingLogin = localStorage.getItem("cv_mobile_login_pending") === "true";
-            if (!hasPendingLogin) return;
+        const hasPendingLogin = localStorage.getItem("cv_mobile_login_pending") === "true";
+        if (!hasPendingLogin) return;
 
-            // 3. Prevent multiple simultaneous calls (Requirement 3)
-            if (connectingRef.current) {
-                console.log("Mobile recovery: Connect already in progress, skipping...");
-                return;
-            }
+        // Instruction 4: If already connected, clear flag and stop — do NOT reconnect.
+        if (connected && publicKey) {
+            console.log("[MobileRecovery] Already connected, clearing pending flag.");
+            localStorage.removeItem("cv_mobile_login_pending");
+            return;
+        }
 
-            // 4. Check if already connected (Requirement 2)
-            if (connected && publicKey) {
-                console.log("Mobile recovery: Wallet already connected:", publicKey.toBase58());
-                return;
-            }
+        // Mark as run so this never fires twice
+        hasRunRef.current = true;
 
-            console.log(`Mobile recovery: Reconnect attempt initiated (isRetry: ${isRetry})...`);
-            connectingRef.current = true;
+        // Clear the pending flag immediately BEFORE attempting connection.
+        // This ensures that even if the connection call fails or the page
+        // re-mounts, we do NOT enter the loop again.
+        localStorage.removeItem("cv_mobile_login_pending");
 
-            try {
-                // Determine which wallet to use for recovery
-                let recoveryWallet = wallet?.adapter.name;
-                
-                if (!recoveryWallet) {
-                    const storedAddress = localStorage.getItem("cv_mobile_wallet_address");
-                    if (storedAddress) {
-                        recoveryWallet = "Mobile App" as any;
-                    } else {
-                        // Fallback to Phantom if nothing else is specified but we have a pending login
-                        recoveryWallet = "Phantom" as any;
-                    }
-                }
+        console.log("[MobileRecovery] Pending login detected. Connecting via MobileRedirectAdapter...");
 
-                await performWalletConnection(recoveryWallet || "Phantom", walletState, {
-                    isMobile: true,
-                    retryOnFailure: !isRetry,
-                    onConnectingStateChange: (state) => {
-                        connectingRef.current = state;
-                    }
-                });
+        performWalletConnection("Mobile App", walletState, {
+            isMobile: true,
+            retryOnFailure: false,
+            onConnectingStateChange: () => {}
+        }).catch((err) => {
+            console.error("[MobileRecovery] Connection failed:", err);
+        });
 
-                // Clear retry count on success
-                retryCountRef.current = 0;
-            } catch (err) {
-                console.error("Mobile recovery: Connection failed:", err);
-                
-                // 7. Mobile-specific fallback: retry once (Requirement 7)
-                if (!isRetry && retryCountRef.current < 1) {
-                    retryCountRef.current++;
-                    console.log("Mobile recovery: Retrying in 400ms...");
-                    setTimeout(() => {
-                        handleRecovery(true);
-                    }, 400);
-                }
-            } finally {
-                connectingRef.current = false;
-            }
-        };
-
-        // Requirement 1: listen to BOTH window.focus and document.visibilitychange
-        const onFocus = () => {
-            console.log("Mobile recovery: Window focused");
-            handleRecovery();
-        };
-
-        const onVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                console.log("Mobile recovery: Visibility changed to visible");
-                handleRecovery();
-            }
-        };
-
-        window.addEventListener("focus", onFocus);
-        document.addEventListener("visibilitychange", onVisibilityChange);
-        
-        // Immediate check on mount
-        handleRecovery();
-
-        return () => {
-            window.removeEventListener("focus", onFocus);
-            document.removeEventListener("visibilitychange", onVisibilityChange);
-        };
-    }, [walletState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty deps: run once on mount only. DO NOT add walletState here.
 
     return null;
 }
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
+    // Requirement 1: Disable autoConnect on mobile to prevent automatic reconnects
+    // and redirect loops after returning from Phantom/Solflare deep link.
+    const [autoConnect, setAutoConnect] = useState(true);
+    useEffect(() => {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            setAutoConnect(false);
+        }
+    }, []);
+
     useMemo(() => {
         if (typeof window === "undefined") return;
         
@@ -227,7 +183,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
                             if (payload.session) localStorage.setItem("cv_mobile_session", payload.session);
                             localStorage.setItem("cv_phantom_encryption_public_key", phantomKey);
                             
-                            // Flag that we successfully got the address and should be "connected"
+                            // Flag for MobileRecoveryHandler to pick up on next mount
                             localStorage.setItem("cv_mobile_login_pending", "true");
 
                             url.searchParams.delete("phantom_encryption_public_key");
@@ -245,32 +201,32 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     const network = WalletAdapterNetwork.Mainnet;
 
-  const endpoint = useMemo(
-    () => process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl(network),
-    [network]
-  );
+    const endpoint = useMemo(
+        () => process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl(network),
+        [network]
+    );
 
-  const wallets = useMemo(
-    () => [
-        new PhantomWalletAdapter(), 
-        new SolflareWalletAdapter(),
-        new MobileRedirectAdapter()
-    ], 
-    []
-  );
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(), 
+            new SolflareWalletAdapter(),
+            new MobileRedirectAdapter()
+        ], 
+        []
+    );
 
-  const ConnProv = ConnectionProvider as any;
-  const SolWallProv = SolanaWalletProvider as any;
-  const ModalProv = WalletModalProvider as any;
+    const ConnProv = ConnectionProvider as any;
+    const SolWallProv = SolanaWalletProvider as any;
+    const ModalProv = WalletModalProvider as any;
 
-  return (
-    <ConnProv endpoint={endpoint}>
-      <SolWallProv wallets={wallets} autoConnect={true}>
-        <ModalProv>
-          <MobileRecoveryHandler />
-          {children}
-        </ModalProv>
-      </SolWallProv>
-    </ConnProv>
-  );
+    return (
+        <ConnProv endpoint={endpoint}>
+            <SolWallProv wallets={wallets} autoConnect={autoConnect}>
+                <ModalProv>
+                    <MobileRecoveryHandler />
+                    {children}
+                </ModalProv>
+            </SolWallProv>
+        </ConnProv>
+    );
 }
