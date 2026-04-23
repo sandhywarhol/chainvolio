@@ -120,7 +120,6 @@ export function LandingPageClient() {
                 <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
                     <div className="text-left max-w-4xl lg:w-[70%]">
                         <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                            <img src="/logos/solana logo.png" alt="Solana" className="w-3.5 h-3.5 object-contain" />
                             <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
                         </div>
                         <h1 className="text-5xl md:text-6xl lg:text-[72px] font-extrabold font-display leading-[1.05] tracking-tight mb-8 text-white">
@@ -222,8 +221,7 @@ export function LandingPageClient() {
                 <div className="block md:hidden">
                 <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
                     <div className="flex flex-col items-center">
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8">
-                            <img src="/logos/solana logo.png" alt="Solana" className="w-3 h-3 object-contain" />
+                        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6">
                             <span className="text-[9px] font-bold uppercase tracking-[0.15em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
                         </div>
                         <h1 className="text-4xl sm:text-[42px] font-black leading-[1.1] tracking-tight text-white px-2">

@@ -193,7 +193,7 @@ function MobileRecoveryHandler() {
             window.removeEventListener("focus", onFocus);
             document.removeEventListener("visibilitychange", onVisibilityChange);
         };
-    }, [wallet, connected, connect, publicKey, select]);
+    }, [walletState]);
 
     return null;
 }
