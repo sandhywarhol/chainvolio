@@ -25,7 +25,17 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     useEffect(() => {
         if (typeof window === "undefined") return;
-...
+
+        // Mobile detection
+        const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        setIsMobile(checkMobile);
+
+        // More reliable detection using adapter readyState
+        const phantom = wallets.find(w => w.adapter.name === "Phantom");
+        const solflare = wallets.find(w => w.adapter.name === "Solflare");
+
+        setPhantomAvailable(phantom?.readyState === "Installed" || !!(window as any).solana?.isPhantom);
+        setSolflareAvailable(solflare?.readyState === "Installed" || !!(window as any).solflare);
     }, [isOpen, wallets]);
 
     if (!mounted || !isOpen) return null;
@@ -207,5 +217,4 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         </div>,
         document.body
     );
-}
 }
