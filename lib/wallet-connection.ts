@@ -42,10 +42,10 @@ export async function performWalletConnection(
             (walletName === "Phantom" && !!(window as any).solana?.isPhantom) ||
             (walletName === "Solflare" && !!(window as any).solflare);
 
-        // ── MOBILE: extension not present → deep link redirect ──────────────
+        // ── MOBILE: not inside wallet browser → open site inside wallet's in-app browser ──
+        // Using "browse" links opens the site directly inside the wallet's built-in browser
+        // where window.solana / window.solflare is injected, enabling standard connect flow.
         if (isMobile && !isInstalled) {
-            // GUARD: if we're already mid-connect, do NOT redirect again.
-            // This prevents infinite loops if the user somehow ends up here twice.
             const alreadyConnecting = localStorage.getItem("cv_connecting");
             if (alreadyConnecting) {
                 console.warn("[WalletConnection] cv_connecting already set — refusing duplicate redirect.");
@@ -53,27 +53,23 @@ export async function performWalletConnection(
                 return;
             }
 
-            const redirectUrl = window.location.href;
-            console.log(`[WalletConnection] Mobile redirect to ${walletName}. Return URL: ${redirectUrl}`);
+            const currentUrl = window.location.href;
+            const origin = window.location.origin;
+            console.log(`[WalletConnection] Mobile: opening ${walletName} in-app browser. URL: ${currentUrl}`);
 
-            // Set the flag BEFORE redirect so we can detect a loop on return
             localStorage.setItem("cv_connecting", walletName);
 
             if (walletName === "Phantom") {
-                const params = new URLSearchParams({
-                    redirect_link: redirectUrl,
-                    cluster: "mainnet-beta",
-                });
-                window.location.href = `https://phantom.app/ul/v1/connect?${params.toString()}`;
+                const encodedUrl = encodeURIComponent(currentUrl);
+                const encodedRef = encodeURIComponent(origin);
+                window.location.href = `https://phantom.app/ul/browse/${encodedUrl}?ref=${encodedRef}`;
             } else if (walletName === "Solflare") {
-                const params = new URLSearchParams({
-                    redirect_url: redirectUrl,
-                    cluster: "mainnet-beta",
-                });
-                window.location.href = `https://solflare.com/ul/v1/connect?${params.toString()}`;
+                const encodedUrl = encodeURIComponent(currentUrl);
+                const encodedRef = encodeURIComponent(origin);
+                window.location.href = `https://solflare.com/ul/v1/browse/${encodedUrl}?ref=${encodedRef}`;
             }
 
-            // Execution stops here — the browser navigates away
+            // Execution stops here — the browser navigates to the wallet app
             return;
         }
 
@@ -85,12 +81,14 @@ export async function performWalletConnection(
             select(walletName as WalletName);
         }
 
-        // 4. Wait for readiness (Installed or Loadable)
+        // 4. Wait for readiness — also exit early if window object already confirms wallet presence
         let attempts = 0;
         while (
-            attempts < 10 &&
+            attempts < 15 &&
             targetWallet.adapter.readyState !== WalletReadyState.Installed &&
-            targetWallet.adapter.readyState !== WalletReadyState.Loadable
+            targetWallet.adapter.readyState !== WalletReadyState.Loadable &&
+            !(walletName === "Phantom" && !!(window as any).solana?.isPhantom) &&
+            !(walletName === "Solflare" && !!(window as any).solflare)
         ) {
             console.log(`[WalletConnection] Waiting for readiness (attempt ${attempts + 1})...`);
             await new Promise(r => setTimeout(r, 200));
