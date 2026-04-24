@@ -9,11 +9,15 @@ export async function GET(
 ) {
   try {
     const { address } = params;
-    
-    // Auth check
-    const auth = await validateApiKey(request);
-    if (!auth.valid) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status });
+
+    // Score data is public — allow unauthenticated access from any client.
+    // Still validate API key when one is provided so external devs get usage tracked.
+    const apiKey = request.headers.get("x-api-key");
+    if (apiKey) {
+      const auth = await validateApiKey(request);
+      if (!auth.valid) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+      }
     }
 
     if (!supabaseServer) {

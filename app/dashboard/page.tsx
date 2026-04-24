@@ -82,6 +82,7 @@ export default function DashboardPage() {
   const [isImpactExpanded, setIsImpactExpanded] = useState(false);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [showCertModal, setShowCertModal] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const handleShare = async () => {
     if (!profile || !publicKey) return;
@@ -127,6 +128,7 @@ export default function DashboardPage() {
       })
       .catch((err) => {
         console.error("Dashboard fetch error:", err);
+        setFetchError(err.message || "Failed to load dashboard");
         setLoading(false);
       });
 
@@ -175,6 +177,38 @@ export default function DashboardPage() {
       <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
         {loading ? (
           <LoadingScreen message="Aggregating professional reputation..." />
+        ) : fetchError ? (
+          <div className="mb-8 p-6 rounded-xl bg-slate-800/60 border border-red-500/20 flex flex-col gap-4">
+            <div className="flex items-center gap-3 text-red-400">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+              <p className="font-medium">Failed to load your profile</p>
+            </div>
+            <p className="text-slate-400 text-sm">There was a problem connecting to the server. This is usually temporary.</p>
+            <button
+              onClick={() => {
+                setFetchError(null);
+                setLoading(true);
+                fetch(`/api/dashboard/stats?wallet=${publicKey.toBase58()}`)
+                  .then(r => r.json())
+                  .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    setProfile(data.profile);
+                    setCollections(data.collections || []);
+                    setAttestationCount(data.attestationCount || 0);
+                    if (Array.isArray(data.certificates)) setCertificates(data.certificates);
+                    setLoading(false);
+                  })
+                  .catch(err => {
+                    setFetchError(err.message || "Failed to load dashboard");
+                    setLoading(false);
+                  });
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm w-fit transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try again
+            </button>
+          </div>
         ) : !profile?.displayName ? (
           <div className="mb-8 p-4 rounded-lg bg-slate-800 border border-slate-700">
             <p className="mb-4">No profile yet. Create one first.</p>

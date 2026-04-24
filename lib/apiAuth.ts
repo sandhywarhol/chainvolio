@@ -3,11 +3,16 @@ import { supabaseServer } from "@/lib/supabase/server";
 export async function validateApiKey(request: Request) {
   const apiKey = request.headers.get("x-api-key");
   const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
   const host = request.headers.get("host");
-  
-  // Allow internal requests from the same origin to bypass API key check
-  // We check for Origin and verify it matches Host to prevent simple spoofing
-  if (!apiKey && origin && origin.includes(host || "")) {
+
+  // Allow internal requests from the same origin to bypass API key check.
+  // Browsers reliably send Referer for same-origin fetch() GET requests even
+  // when Origin is omitted (common for same-origin GETs per the Fetch spec).
+  const isInternalOrigin = !!(origin && host && origin.includes(host));
+  const isInternalReferer = !!(referer && host && referer.includes(host));
+
+  if (!apiKey && (isInternalOrigin || isInternalReferer)) {
     return { valid: true, isInternal: true };
   }
 
