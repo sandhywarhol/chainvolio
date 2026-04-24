@@ -52,7 +52,7 @@ export default function VerifiedOrganizationPage() {
             </div>
 
             {/* HERO SECTION */}
-            <section className="relative z-10 pt-32 pb-20 px-8 max-w-[1240px] mx-auto w-full">
+            <section className="relative z-10 pt-32 pb-20 px-4 md:px-8 max-w-[1240px] mx-auto w-full">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
                 <div className="relative z-10 space-y-8 max-w-3xl">
@@ -61,11 +61,11 @@ export default function VerifiedOrganizationPage() {
                         Trust Gateway
                     </div>
 
-                    <h1 className="text-6xl md:text-7xl font-bold tracking-tighter leading-[0.95]">
+                    <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter leading-[0.95]">
                         Verified <span className="text-emerald-400">Organization</span>
                     </h1>
 
-                    <p className="text-xl text-white/50 leading-relaxed font-light tracking-tight">
+                    <p className="text-sm md:text-xl text-white/50 leading-relaxed font-light tracking-tight">
                         Issue high-trust attestations and strengthen your organization's credibility on-chain. Verified organizations issue credentials with higher weight, making candidate profiles more credible and evaluated faster.
                     </p>
 
@@ -98,10 +98,10 @@ export default function VerifiedOrganizationPage() {
             </section>
 
             {/* WHY UPGRADE SECTION */}
-            <section className="relative z-10 py-24 px-8 max-w-[1240px] mx-auto w-full border-t border-white/5">
+            <section className="relative z-10 py-16 md:py-24 px-4 md:px-8 max-w-[1240px] mx-auto w-full border-t border-white/5">
                 <div className="mb-16 max-w-2xl">
-                    <h2 className="text-4xl font-bold tracking-tight mb-6">Why Upgrade to Verified</h2>
-                    <p className="text-white/40 font-light text-lg">
+                    <h2 className="text-2xl md:text-4xl font-bold tracking-tight mb-6">Why Upgrade to Verified</h2>
+                    <p className="text-white/40 font-light text-sm md:text-lg">
                         Verification transforms your organization from a participant into a trusted issuer within the ChainVolio network.
                     </p>
                 </div>
@@ -139,7 +139,7 @@ export default function VerifiedOrganizationPage() {
                             items: ["Payment is not just a fee, but a commitment", "Ensures serious participation", "Reduces spam", "Maintains high-quality trust signals"]
                         }
                     ].map((benefit, i) => (
-                        <div key={i} className="p-10 rounded-[40px] bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group overflow-hidden relative">
+                        <div key={i} className="p-6 md:p-10 rounded-[40px] bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-emerald-500/10 transition-all">
                                 {benefit.icon}
@@ -157,7 +157,7 @@ export default function VerifiedOrganizationPage() {
                     ))}
                 </div>
 
-                <div className="mt-20 p-12 rounded-[40px] bg-emerald-500/[0.03] border border-emerald-500/10 text-center relative overflow-hidden group">
+                <div className="mt-20 p-6 md:p-12 rounded-[40px] bg-emerald-500/[0.03] border border-emerald-500/10 text-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     <p className="text-2xl md:text-3xl font-light text-white italic tracking-tight relative z-10">
                         "Companies don't pay to give attestations - they pay to become <span className="text-emerald-400 font-bold not-italic">trusted issuers</span>."
@@ -166,10 +166,10 @@ export default function VerifiedOrganizationPage() {
             </section>
 
             {/* WHO IS THIS FOR */}
-            <section className="relative z-10 py-24 px-8 max-w-[1240px] mx-auto w-full border-t border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
+            <section className="relative z-10 py-16 md:py-24 px-4 md:px-8 max-w-[1240px] mx-auto w-full border-t border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
                     <div>
-                        <h2 className="text-4xl font-bold tracking-tighter mb-8">Who is this for?</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold tracking-tighter mb-8">Who is this for?</h2>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { icon: <Building className="w-4 h-4" />, label: "Companies & Startups" },
@@ -185,7 +185,7 @@ export default function VerifiedOrganizationPage() {
                         </div>
                     </div>
 
-                    <div className="p-10 rounded-[40px] bg-emerald-500/5 border border-emerald-500/10 relative overflow-hidden group">
+                    <div className="p-6 md:p-10 rounded-[40px] bg-emerald-500/5 border border-emerald-500/10 relative overflow-hidden group">
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/20 blur-[100px] group-hover:bg-emerald-500/40 transition-all duration-700" />
                         <h3 className="text-2xl font-bold mb-6">How Verification Works</h3>
                         <div className="space-y-8 relative z-10">
@@ -208,11 +208,11 @@ export default function VerifiedOrganizationPage() {
             </section>
 
             {/* CTA SECTION */}
-            <section id="apply" className="relative z-10 py-32 px-8 max-w-[1000px] mx-auto w-full text-center">
+            <section id="apply" className="relative z-10 py-16 md:py-32 px-4 md:px-8 max-w-[1000px] mx-auto w-full text-center">
                 <div className="space-y-12">
                     <div className="space-y-6">
-                        <h2 className="text-5xl font-bold tracking-tighter">Upgrade your organization and <br /> start scaling trust today.</h2>
-                        <p className="text-xl text-white/40 font-light italic max-w-xl mx-auto border-l-2 border-emerald-500/20 pl-6 text-left">
+                        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter">Upgrade your organization and start scaling trust today.</h2>
+                        <p className="text-sm md:text-xl text-white/40 font-light italic max-w-xl mx-auto border-l-2 border-emerald-500/20 pl-6 text-left">
                             Secure the future of professional trust by verifying your identity directly on-chain.
                         </p>
                     </div>

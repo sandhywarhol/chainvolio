@@ -271,7 +271,7 @@ export default function AdminVerificationPage() {
                         <LayoutDashboard className="w-8 h-8 text-slate-500" />
                         <div className="absolute inset-0 bg-purple-500/10 blur-xl rounded-full" />
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tighter mb-4">Admin Dashboard</h1>
+                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">Admin Dashboard</h1>
                     <p className="text-white/40 mb-8 max-w-sm">Please connect your authorized wallet to access the verification portal.</p>
                     <WalletMultiButton />
                 </div>
@@ -288,7 +288,7 @@ export default function AdminVerificationPage() {
                     <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8">
                         <ShieldAlert className="w-10 h-10 text-red-500" />
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tighter mb-4">Unauthorized Access</h1>
+                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">Unauthorized Access</h1>
                     <p className="text-red-400 font-medium bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/20">This page is restricted to admin wallets only.</p>
                     <p className="text-white/20 mt-8 text-sm">Target wallet not recognized: <br /><span className="text-white/40 font-mono">{publicKey?.toBase58()}</span></p>
                 </div>
@@ -367,7 +367,7 @@ export default function AdminVerificationPage() {
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Live Portal</span>
                         </div>
-                        <h1 className="text-4xl font-bold tracking-tighter">Identity Verification Requests</h1>
+                        <h1 className="text-2xl md:text-4xl font-bold tracking-tighter">Identity Verification Requests</h1>
                         <p className="text-white/40 max-w-md">Review and approve identity verification requests across all tiers.</p>
                     </div>
 
@@ -384,19 +384,19 @@ export default function AdminVerificationPage() {
                 <div className="grid md:grid-cols-4 gap-4 mb-12">
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Pending</span>
-                        <span className="text-3xl font-bold text-yellow-400">{allPending.length}</span>
+                        <span className="text-xl md:text-3xl font-bold text-yellow-400">{allPending.length}</span>
                     </div>
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Approved</span>
-                        <span className="text-3xl font-bold text-emerald-400">{allReviewed.filter(r => r.status === "verified").length}</span>
+                        <span className="text-xl md:text-3xl font-bold text-emerald-400">{allReviewed.filter(r => r.status === "verified").length}</span>
                     </div>
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Rejected</span>
-                        <span className="text-3xl font-bold text-red-400">{allReviewed.filter(r => r.status === "rejected").length}</span>
+                        <span className="text-xl md:text-3xl font-bold text-red-400">{allReviewed.filter(r => r.status === "rejected").length}</span>
                     </div>
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total</span>
-                        <span className="text-3xl font-bold text-white">{requests.length}</span>
+                        <span className="text-xl md:text-3xl font-bold text-white">{requests.length}</span>
                     </div>
                 </div>
 

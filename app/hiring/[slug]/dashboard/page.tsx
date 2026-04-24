@@ -76,7 +76,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         async function initDashboard() {
             setLoading(true);
             try {
-                // Use the CANONICAL key written by signChainVolioAction in wallet-utils.ts
                 const walletStr = publicKey!.toBase58();
                 const canonicalKey = `cv_sig_view_dashboard_${walletStr}_${slug}`;
                 const cached = sessionStorage.getItem(canonicalKey);
@@ -85,28 +84,18 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     try {
                         const parsed = JSON.parse(cached);
                         const twoHours = 2 * 60 * 60 * 1000;
-                        const fifteenMinutes = 15 * 60 * 1000;
-                        const now = Date.now();
-                        const lastActive = parseInt(sessionStorage.getItem(`${canonicalKey}_active`) || "0");
-
-                        const notExpired = now - parsed.timestamp < twoHours;
-                        const notIdle = lastActive > 0 && now - lastActive < fifteenMinutes;
-
-                        if (notExpired && notIdle) {
-                            sessionStorage.setItem(`${canonicalKey}_active`, now.toString());
+                        // Only check the 2-hour window — no idle timeout
+                        if (Date.now() - parsed.timestamp < twoHours - 30000) {
                             await fetchWithSignature(parsed);
                             return;
-                        } else {
-                            // Clear stale session
-                            sessionStorage.removeItem(canonicalKey);
-                            sessionStorage.removeItem(`${canonicalKey}_active`);
                         }
+                        sessionStorage.removeItem(canonicalKey);
                     } catch {
                         sessionStorage.removeItem(canonicalKey);
                     }
                 }
 
-                // No valid session - show the auth button, do NOT auto-sign
+                // No valid session — show the authorize button
                 setNeedsAuth(true);
                 setLoading(false);
             } catch (err) {
@@ -116,26 +105,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
 
         initDashboard();
-    }, [slug, connected, publicKey]);
-
-    // Activity listener - keeps session alive during active use (updates canonical key)
-    useEffect(() => {
-        if (!connected || !publicKey) return;
-
-        const refreshActivity = () => {
-            const canonicalKey = `cv_sig_view_dashboard_${publicKey!.toBase58()}_${slug}`;
-            if (sessionStorage.getItem(canonicalKey)) {
-                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
-            }
-        };
-
-        window.addEventListener('mousedown', refreshActivity);
-        window.addEventListener('keydown', refreshActivity);
-
-        return () => {
-            window.removeEventListener('mousedown', refreshActivity);
-            window.removeEventListener('keydown', refreshActivity);
-        };
     }, [slug, connected, publicKey]);
 
     const handleAuthorize = async () => {
@@ -148,9 +117,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "view_dashboard", slug, { forceFresh: true });
 
             if (signedAction) {
-                // Stamp the activity timestamp alongside the canonical signature key
-                const canonicalKey = `cv_sig_view_dashboard_${publicKey.toBase58()}_${slug}`;
-                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
                 await fetchWithSignature(signedAction);
             } else {
                 setNeedsAuth(true);
@@ -182,14 +148,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             if (res.ok) {
                 setData(result);
                 setNeedsAuth(false);
-                // Refresh activity timestamp on successful interaction
-                const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
-                sessionStorage.setItem(`${canonicalKey}_active`, Date.now().toString());
             } else {
                 if (res.status === 401) {
                     const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
                     sessionStorage.removeItem(canonicalKey);
-                    sessionStorage.removeItem(`${canonicalKey}_active`);
                     setError(result.error || "Signature verification failed.");
                     setNeedsAuth(true);
                 } else {
@@ -797,7 +759,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 </div>
                             </div>
                             <div className="flex items-baseline gap-2 relative z-10">
-                                <div className="text-3xl font-bold text-white tracking-tight">{stat.value}</div>
+                                <div className="text-xl md:text-3xl font-bold text-white tracking-tight">{stat.value}</div>
                                 <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">{stat.desc}</span>
                             </div>
                         </div>

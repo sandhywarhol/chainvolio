@@ -41,17 +41,17 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
             </button>
 
             {isExpanded && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-8" onClick={() => setIsExpanded(false)}>
-                    <div className="relative border border-white/20 rounded-sm max-w-5xl w-full max-h-[85vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-8" onClick={() => setIsExpanded(false)}>
+                    <div className="relative border border-white/20 rounded-sm max-w-5xl w-full max-h-[92vh] sm:max-h-[85vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
                         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70">
                             <source src="/box%20navigation.mp4" type="video/mp4" />
                         </video>
-                        <div className="relative z-10 p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[85vh] overflow-y-auto custom-scrollbar">
+                        <div className="relative z-10 p-5 sm:p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[92vh] sm:max-h-[85vh] overflow-y-auto custom-scrollbar">
                             <button onClick={() => setIsExpanded(false)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">×</button>
                             
                             <div className="space-y-16 py-4">
                                 <div className="space-y-4">
-                                    <h2 className="text-3xl font-bold tracking-tight text-white uppercase flex items-center gap-3">
+                                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white uppercase flex items-center gap-3">
                                         <div className="p-2 flex-shrink-0 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-lg">
                                             <TrendingUp className="w-6 h-6" />
                                         </div>

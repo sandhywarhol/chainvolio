@@ -603,7 +603,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
               {activeModal === "score" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-center py-4 border-b border-white/5 mb-4">
-                    <span className="text-5xl font-black text-white">{displayScore}</span>
+                    <span className="text-3xl md:text-5xl font-black text-white">{displayScore}</span>
                     <span className="text-sm font-bold text-slate-500 mt-3 ml-1">/100</span>
                   </div>
                   {(() => {

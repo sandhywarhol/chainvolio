@@ -251,8 +251,8 @@ export default function CreateCollection() {
                 {!createdSlug ? (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="mb-10 text-center">
-                            <h1 className="text-3xl font-bold mb-3 tracking-tight text-white">Define Your Ideal Candidate</h1>
-                            <p className="text-slate-400 text-lg max-w-xl mx-auto">Customize what you want to evaluate. Collect verifiable on-chain portfolios tailored to your specific role.</p>
+                            <h1 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight text-white">Define Your Ideal Candidate</h1>
+                            <p className="text-slate-400 text-sm md:text-lg max-w-xl mx-auto">Customize what you want to evaluate. Collect verifiable on-chain portfolios tailored to your specific role.</p>
                         </header>
 
                         <form onSubmit={handleSubmit} className="space-y-8">
@@ -766,8 +766,8 @@ export default function CreateCollection() {
                             </div>
                         </div>
 
-                        <h1 className="text-4xl font-bold mb-4 text-white">Collection is Live!</h1>
-                        <p className="text-slate-400 mb-10 max-w-md mx-auto text-lg leading-relaxed">
+                        <h1 className="text-2xl md:text-4xl font-bold mb-4 text-white">Collection is Live!</h1>
+                        <p className="text-slate-400 mb-10 max-w-md mx-auto text-sm md:text-lg leading-relaxed">
                             Your recruitment portal for <span className="text-emerald-400 font-bold">{formData.title}</span> is ready to accept verified CVs.
                         </p>
 

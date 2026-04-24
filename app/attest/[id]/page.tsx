@@ -311,7 +311,7 @@ export default function AttestPage() {
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
                         🔗 Identity-Linked Verification
                     </div>
-                    <h1 className="text-3xl font-bold mb-2">Verify Proof of Work</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold mb-2">Verify Proof of Work</h1>
                     <p className="text-slate-400">Confirm a candidate's professional contributions on-chain.</p>
                 </div>
 
