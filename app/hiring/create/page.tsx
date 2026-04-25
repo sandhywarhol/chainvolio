@@ -39,6 +39,7 @@ import {
     Target
 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateCollection() {
     const { publicKey, signMessage } = useWallet();
@@ -237,11 +238,7 @@ export default function CreateCollection() {
     const hiringAccess = getHiringAccess();
 
     if (tierLoading) {
-        return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     return (
