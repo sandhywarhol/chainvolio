@@ -1,7 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { CheckCircle, XCircle, Code2, Star, Users, Building, Shield, ArrowLeft, Zap, Briefcase, Award } from "lucide-react";
+import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
+import { Toast } from "@/components/ui/Toast";
 
 // ─── Color palette (matches modal) ─────────────────────────────────────────
 const C = {
@@ -169,6 +173,30 @@ function Cell({ value, colKey }: { value: string | boolean; colKey: CK }) {
 }
 
 export default function PricingPage() {
+    const { publicKey } = useWallet();
+    const [profile, setProfile] = useState<any>(null);
+    const [showVerificationModal, setShowVerificationModal] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [initialTier, setInitialTier] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (publicKey) {
+            fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
+                .then(r => r.json())
+                .then(data => setProfile(data))
+                .catch(err => console.error("Error fetching profile:", err));
+        }
+    }, [publicKey]);
+
+    const handleTierClick = (tierId: string) => {
+        if (!publicKey) {
+            setToastMessage("Please connect your wallet first");
+            return;
+        }
+        setInitialTier(tierId);
+        setShowVerificationModal(true);
+    };
+
     const colKeys: CK[] = ["emerald", "pink", "blue", "amber"];
 
     return (
@@ -309,15 +337,15 @@ export default function PricingPage() {
                                     </div>
 
                                     {/* CTA */}
-                                    <Link
-                                        href="/dashboard"
+                                    <button
+                                        onClick={() => handleTierClick(tier.id)}
                                         className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all text-center block ${"popular" in tier && tier.popular
                                             ? "text-black hover:opacity-90"
                                             : "bg-white/5 hover:bg-white/10 text-white/70 border border-white/10"}`}
                                         style={"popular" in tier && tier.popular ? { background: col.hex } : undefined}
                                     >
                                         {tier.id === "Builder" ? "Earn Free Verification" : tier.id === "Figure" ? "Request Access" : "Get Started"}
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         );
@@ -429,6 +457,34 @@ export default function PricingPage() {
                     Each request is reviewed by the ChainVolio team before approval. Prices reflect platform access fees.
                 </p>
             </div>
+
+            {showVerificationModal && publicKey && (
+                <VerificationRequestModal
+                    walletAddress={publicKey.toBase58()}
+                    profileName={profile?.displayName || "Builder"}
+                    website={profile?.website}
+                    socials={`${profile?.twitter || ""} ${profile?.linkedin || ""}`.trim()}
+                    currentStatus={profile?.verificationStatus || null}
+                    currentTier={profile?.verificationTier || null}
+                    initialTierId={initialTier}
+                    onClose={() => setShowVerificationModal(false)}
+                    onSuccess={() => {
+                        setShowVerificationModal(false);
+                        setToastMessage("Request submitted successfully!");
+                        // Refetch profile
+                        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
+                            .then(r => r.json())
+                            .then(data => setProfile(data));
+                    }}
+                />
+            )}
+
+            {toastMessage && (
+                <Toast
+                    message={toastMessage}
+                    onClose={() => setToastMessage(null)}
+                />
+            )}
         </div>
     );
 }

@@ -24,7 +24,10 @@ type VerificationRequestModalProps = {
     onSuccess: () => void;
     currentStatus: string | null;
     currentTier?: string | null;
+    pendingUpgradeStatus?: string | null;
     isRenewal?: boolean;
+    /** When set, automatically selects this tier when the modal opens (from pricing page). */
+    initialTierId?: string | null;
     profileName: string;
     website?: string;
     socials?: string;
@@ -294,12 +297,20 @@ function TierCard({
                     type="button"
                     disabled={isLoading || isUnavailable}
                     onClick={() => onSelect(tier.id)}
-                    className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${isCurrent
+                    className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 mt-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isCurrent
                             ? "bg-white/5 text-white/40 border border-white/10"
-                            : "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg hover:shadow-emerald-500/25"
-                        }`}
+                            : "popular" in tier && tier.popular
+                                ? "text-black hover:opacity-90"
+                                : "bg-white/5 hover:bg-white/10 text-white/70 border border-white/10"
+                    }`}
+                    style={(!isCurrent && "popular" in tier && tier.popular) ? { background: col.hex } : undefined}
                 >
-                    {isLoading ? "Loading..." : isCurrent ? "Active" : isUnavailable ? "Locked" : "Select Tier"}
+                    {isLoading ? "Loading..." : isCurrent ? "Active" : isUnavailable ? "Locked" : (
+                        tier.id === "Builder" ? "Earn Free Verification" : 
+                        tier.id === "Figure" ? "Request Access" : 
+                        "Get Started"
+                    )}
                 </button>
 
             </div>
@@ -314,7 +325,9 @@ export function VerificationRequestModal({
     onSuccess,
     currentStatus,
     currentTier,
+    pendingUpgradeStatus,
     isRenewal,
+    initialTierId,
     profileName,
     website,
     socials,
@@ -333,6 +346,8 @@ export function VerificationRequestModal({
             }
         }
     }, [isRenewal, currentTier]);
+
+
 
     // Derived tier objects
     const activeTier = selectedTier ? TIERS.find(t => t.id === selectedTier) ?? null : null;
@@ -419,8 +434,17 @@ export function VerificationRequestModal({
         setSelectedTier(tierId);
     };
 
-    // ── Pending ──
-    if (currentStatus === "pending") {
+    // ── Pre-select tier when opened from pricing page ──
+    useEffect(() => {
+        if (initialTierId && !isRenewal) {
+            handleSelectTier(initialTierId);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialTierId, isRenewal]);
+
+    // ── Pending (new application or pending upgrade) ──
+    const isPendingUpgrade = currentStatus === "verified" && pendingUpgradeStatus === "pending";
+    if (currentStatus === "pending" || isPendingUpgrade) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
                 <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
@@ -437,7 +461,9 @@ export function VerificationRequestModal({
                         </div>
                         <h2 className="text-lg font-bold mb-2">Review In Progress</h2>
                         <p className="text-white/35 mb-6 text-sm leading-relaxed">
-                            Your verification request is under review. We'll update your status once it's processed by our team.
+                            {isPendingUpgrade
+                                ? "Your upgrade request is under review. Your current badge remains active until the upgrade is approved."
+                                : "Your verification request is under review. We'll update your status once it's processed by our team."}
                         </p>
                         <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-colors border border-white/10 text-sm">
                             Got it
