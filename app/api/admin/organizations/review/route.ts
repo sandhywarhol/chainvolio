@@ -99,11 +99,22 @@ export async function POST(request: Request) {
         let auditNote   = reason || "";
 
         if (action === "approve") {
+            // Detect upgrade: if pending_upgrade_type is set, this approval promotes to a new tier
+            const isUpgrade = org.pending_upgrade_status === "pending" && !!org.pending_upgrade_type;
+            const effectiveType = isUpgrade ? org.pending_upgrade_type : org.type;
+
             updateData.status = "verified";
-            updateData.verifier_tier = TYPE_TO_TIER[org.type] ?? 1;
+            updateData.type = effectiveType;
+            updateData.verifier_tier = TYPE_TO_TIER[effectiveType] ?? 1;
             updateData.reviewed_at = nowIso;
             updateData.approved_at = nowIso;
             updateData.rejection_reason = null;
+
+            // Clear pending upgrade fields after approval
+            if (isUpgrade) {
+                updateData.pending_upgrade_type = null;
+                updateData.pending_upgrade_status = null;
+            }
 
             if (org.billing_cycle) {
                 // Determine the base date for the new expiration.
@@ -126,26 +137,25 @@ export async function POST(request: Request) {
                 const expiry = new Date(baseDate);
                 if (org.billing_cycle === "monthly") expiry.setDate(expiry.getDate() + 30);
                 else if (org.billing_cycle === "yearly") expiry.setDate(expiry.getDate() + 365);
-                
+
                 updateData.expires_at = expiry.toISOString();
                 console.log(`[TEST-MONITOR] New expiration set to ${updateData.expires_at}.`);
             } else {
                 updateData.expires_at = null;
             }
             auditAction = "approved";
-            if (!auditNote) auditNote = "Approved by admin.";
+            if (!auditNote) auditNote = isUpgrade ? `Upgraded to ${effectiveType} by admin.` : "Approved by admin.";
             console.log("[TEST-MONITOR] Approval complete.");
 
             // --- 2.5 Trigger Approval Notification ---
             try {
                 let celebrateMessage = "";
-                const type = org.type || "Builder";
-                
-                if (type.includes("Builder")) celebrateMessage = "You are now a Verified Builder 🎉";
-                else if (type.includes("Public Figure")) celebrateMessage = "You are now a Verified Public Figure 🎉";
-                else if (type.includes("Company")) celebrateMessage = "Your account is now verified as a Company 🎉";
-                else if (type.includes("Community") || type.includes("DAO")) celebrateMessage = "Your account is now verified as a Community 🎉";
-                else celebrateMessage = `Your account is now verified as ${type} 🎉`;
+
+                if (effectiveType.includes("Builder")) celebrateMessage = "You are now a Verified Builder 🎉";
+                else if (effectiveType.includes("Public Figure")) celebrateMessage = "You are now a Verified Public Figure 🎉";
+                else if (effectiveType.includes("Company")) celebrateMessage = "Your account is now verified as a Company 🎉";
+                else if (effectiveType.includes("Community") || effectiveType.includes("DAO")) celebrateMessage = "Your account is now verified as a Community 🎉";
+                else celebrateMessage = `Your account is now verified as ${effectiveType} 🎉`;
 
                 await supabase.from("notifications").insert({
                     wallet_address: org.wallet_address,

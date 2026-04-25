@@ -49,7 +49,7 @@ const TIERS = [
         price: "Free",
         billing: "Earn via profile",
         authority: "Builder Contributor",
-        attestationPower: 1,
+        attestationPower: 2,
         button: "Earn Verification",
         benefits: [
             "Verified Builder Badge",
@@ -66,7 +66,7 @@ const TIERS = [
         price: "Free",
         billing: "Manual review",
         authority: "Elevated Influence",
-        attestationPower: 2,
+        attestationPower: 3,
         button: "Request Verification",
         benefits: [
             "Verified Public Figure Badge",
@@ -83,7 +83,7 @@ const TIERS = [
         price: "4 USDC",
         billing: "/ month",
         authority: "Collective Authority",
-        attestationPower: 3,
+        attestationPower: 4,
         button: "Start Verification",
         benefits: [
             "Verified Community Identity",
@@ -100,7 +100,7 @@ const TIERS = [
         price: "9 USDC",
         billing: "/ month",
         authority: "Institutional Authority",
-        attestationPower: 4,
+        attestationPower: 5,
         popular: true,
         button: "Start Verification",
         benefits: [
@@ -117,16 +117,16 @@ const TIERS = [
 // null    = free (manual review)
 type TierPricing = number | { monthly: number; yearly: number } | null;
 
-// In SOL_TEST mode use ultra-low SOL amounts; in USDC_PROD use real USDC amounts.
+// Builder is free (auto-verified via merit). Figure is free (manual review). Community/Company pay.
 const TIER_PRICES: Record<string, TierPricing> = IS_SOL_TEST
     ? {
-        Builder: SOL_TEST_PRICES.Builder.oneTime!,
+        Builder: null,
         Figure: null,
         Community: { monthly: SOL_TEST_PRICES.Community.monthly!, yearly: SOL_TEST_PRICES.Community.yearly! },
         Company: { monthly: SOL_TEST_PRICES.Company.monthly!, yearly: SOL_TEST_PRICES.Company.yearly! },
     }
     : {
-        Builder: 10,
+        Builder: null,
         Figure: null,
         Community: { monthly: 4, yearly: 40 },
         Company: { monthly: 9, yearly: 90 },
@@ -162,7 +162,7 @@ function PowerStrips({ count, colorKey }: { count: number; colorKey: CK }) {
     const col = C[colorKey];
     return (
         <div className="flex items-center gap-[3px]">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
                 <div
                     key={i}
                     className={`h-[3px] rounded-full transition-all duration-300 ${i < count ? `${col.bar} opacity-80` : "bg-white/8"}`}
@@ -332,10 +332,47 @@ export function VerificationRequestModal({
     const handleSelectTier = async (tierId: string) => {
         setError(null);
 
-        // ── Builder Tier → redirect to profile completion ───────────────────
+        // ── Builder Tier → auto-verify if criteria met, else guide to dashboard ──
         if (tierId === "Builder") {
-            onClose();
-            window.location.href = "/dashboard";
+            setLoading(true);
+            try {
+                const res = await fetch("/api/verify/auto-builder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ walletAddress }),
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    setError(data.error || "Something went wrong.");
+                    return;
+                }
+
+                if (data.alreadyVerified) {
+                    onSuccess();
+                    return;
+                }
+
+                if (data.granted) {
+                    onSuccess();
+                    return;
+                }
+
+                // Criteria not met — tell the user what's missing
+                if (data.missing && data.missing.length > 0) {
+                    const labels: Record<string, string> = {
+                        display_name: "display name (profile)",
+                        contact: "at least one contact channel",
+                        receipt: "at least one proof of work",
+                    };
+                    const missingList = data.missing.map((m: string) => labels[m] || m).join(", ");
+                    setError(`Complete your profile first: ${missingList}. Then try again.`);
+                }
+            } catch (err: any) {
+                setError(err.message || "Network error.");
+            } finally {
+                setLoading(false);
+            }
             return;
         }
 

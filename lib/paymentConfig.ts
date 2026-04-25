@@ -27,7 +27,6 @@ export const TREASURY_WALLET = "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv";
 export const LAMPORTS_PER_SOL = 1_000_000_000;
 
 export const SOL_TEST_PRICES: Record<string, { monthly?: number; yearly?: number; oneTime?: number }> = {
-    Builder:   { oneTime: 0.0001 },
     Community: { monthly: 0.0001, yearly: 0.0002 },
     Company:   { monthly: 0.0001, yearly: 0.0002 },
 };
@@ -52,13 +51,11 @@ export const USDC_MINT_DEVNET  = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 export const USDC_DECIMALS     = 6;
 
 export const USDC_PROD_PRICES: Record<string, { monthly?: bigint; yearly?: bigint; oneTime?: bigint }> = {
-    Builder:   { oneTime: BigInt("10000000")  },   // 10 USDC
     Community: { monthly: BigInt("4000000"),  yearly: BigInt("40000000")  },  // 4 / 40 USDC
     Company:   { monthly: BigInt("9000000"), yearly: BigInt("90000000") },  // 9 / 90 USDC
 };
 
 export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: number; oneTime?: number }> = {
-    Builder:   { oneTime: 10 },
     Community: { monthly: 4,  yearly: 40  },
     Company:   { monthly: 9,  yearly: 90  },
 };
@@ -131,7 +128,7 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
         border: "border-pink-500/50",
         bgBase: "bg-pink-500",
         hex: "#ec4899",
-        bars: 2,
+        bars: 3,
         icon: true,
         tierLabel: "Public",
     };
@@ -141,7 +138,7 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
         border: "border-blue-500/50",
         bgBase: "bg-blue-500",
         hex: "#3b82f6",
-        bars: 3,
+        bars: 4,
         icon: true,
         tierLabel: "Community / DAO",
     };
@@ -151,7 +148,7 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
         border: "border-amber-500/50",
         bgBase: "bg-amber-500",
         hex: "#f59e0b",
-        bars: 4,
+        bars: 5,
         icon: true,
         tierLabel: "Company / Org",
     };
@@ -161,19 +158,19 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
         border: "border-emerald-500/50",
         bgBase: "bg-emerald-500",
         hex: "#10b981",
-        bars: 1,
+        bars: 2,
         icon: true,
         tierLabel: "Builder",
     };
 
-    // Default / Unverified → Regular (Slate/Gray)
+    // Default / Unverified → Regular (1 strip, slate color)
     return {
         color: "text-slate-400 bg-slate-500/10 border-slate-500/20",
         iconText: "text-slate-400",
         border: "border-slate-500/50",
         bgBase: "bg-slate-500",
         hex: "#94a3b8",
-        bars: 0,
+        bars: 1,
         icon: false,
         tierLabel: "Regular",
     };

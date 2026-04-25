@@ -245,7 +245,7 @@ function VerifiedCheckBadge({ verificationType }: { verificationType?: string })
           <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between">
             <span className="text-[8px] text-slate-500 uppercase font-black tracking-tight">Attestation Power</span>
             <div className="flex gap-[3px]">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className={`h-[3px] w-2.5 rounded-full ${i < s.bars ? `${s.bgBase} opacity-90` : 'bg-white/10'}`} />
               ))}
             </div>

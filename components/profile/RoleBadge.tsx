@@ -34,7 +34,7 @@ export function RoleBadge({ type, isVerified = true, className = "", showTooltip
       {/* Attestation power strips - positioned absolutely so they don't shift the label's center */}
       {s.bars > 0 && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 flex gap-[3.5px] mt-1.5">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
               className="h-[2px] w-3.5 rounded-full transition-all"
@@ -56,7 +56,7 @@ export function RoleBadge({ type, isVerified = true, className = "", showTooltip
             <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between gap-3">
               <span className="text-[8px] text-slate-500 uppercase font-black tracking-tight whitespace-nowrap">Attestation Power</span>
               <div className="flex gap-[3px]">
-                {Array.from({ length: 4 }).map((_, i) => (
+                {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className={`h-[3px] w-3 rounded-full ${i < s.bars ? `${s.bgBase} opacity-90` : 'bg-white/10'}`} />
                 ))}
               </div>

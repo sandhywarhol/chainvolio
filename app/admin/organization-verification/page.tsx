@@ -6,6 +6,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ShieldCheck, XCircle, CheckCircle, Globe, Clock, ShieldAlert, LayoutDashboard, Code2, Star, Users, Building, ExternalLink, RotateCcw, Ban, Trash2, Clock8, Search, Filter, BarChart3, TrendingUp, PieChart } from "lucide-react";
+import { getBadgeStyles } from "@/lib/paymentConfig";
 
 
 import { format } from "date-fns";
@@ -13,21 +14,21 @@ import { Toast } from "@/components/ui/Toast";
 
 const ADMIN_WALLET = "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv";
 
-// ── Tier badge styles ──────────────────────────────────────────────────────
-const TIER_STYLES: Record<string, { color: string; Icon: any; label: string }> = {
-    "Builder":               { color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", Icon: Code2,     label: "Builder" },
-    "Public Figure":         { color: "text-pink-400 bg-pink-500/10 border-pink-500/20",          Icon: Star,      label: "Public Figure" },
-    "Community / DAO":       { color: "text-blue-400 bg-blue-500/10 border-blue-500/20",           Icon: Users,     label: "Community / DAO" },
-    "Company / Organization":{ color: "text-amber-400 bg-amber-500/10 border-amber-500/20",        Icon: Building,  label: "Company / Org" },
+// ── Tier icon map (icon-only, colors/labels come from getBadgeStyles) ──────
+const TIER_ICONS: Record<string, any> = {
+    "Builder":                Code2,
+    "Public Figure":          Star,
+    "Community / DAO":        Users,
+    "Company / Organization": Building,
 };
 
 function TierBadge({ type }: { type: string }) {
-    const style = TIER_STYLES[type] || TIER_STYLES["Builder"];
-    const Icon = style.Icon;
+    const s = getBadgeStyles(type);
+    const Icon = TIER_ICONS[type] || ShieldCheck;
     return (
-        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-tight ${style.color}`}>
+        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-tight ${s.color}`}>
             <Icon className="w-2.5 h-2.5" />
-            {style.label}
+            {s.tierLabel}
         </span>
     );
 }
