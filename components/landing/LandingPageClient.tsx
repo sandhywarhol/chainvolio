@@ -24,36 +24,25 @@ const SLIDES = [
     { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification status" },
 ];
 
-const PARTNERS = [
-    { src: "/logos/solana.png", name: "Solana", scale: 0.7 },
-    { src: "/logos/magic%20eden.png", name: "Magic Eden" },
-    { src: "/logos/tensor.png", name: "Tensor", scale: 0.75 },
-    { src: "/logos/pyth.png", name: "Pyth", scale: 1.2 },
-    { src: "/logos/helius.png", name: "Helius", scale: 1.2 },
-    { src: "/logos/superteam.png", name: "Superteam" },
-    { src: "/logos/alchemy.png", name: "Alchemy" },
-    { src: "/logos/infura.png", name: "Infura", scale: 0.7 },
-    { src: "/logos/chainlink.png", name: "Chainlink" },
-    { src: "/logos/the%20graph.png", name: "The Graph" },
-    { src: "/logos/open%20sea.png", name: "OpenSea", scale: 0.75 },
-    { src: "/logos/discord.png", name: "Discord", scale: 0.7 },
-    { src: "/logos/github.png", name: "GitHub" },
-    { src: "/logos/notion.png", name: "Notion" },
-];
+// PARTNERS are now loaded dynamically from /api/logos
 
-function CryptoLogo({ src, name, scale = 1 }: { src: string; name: string; scale?: number }) {
+
+function CryptoLogo({ src, name }: { src: string; name: string }) {
     return (
-        <div className="flex-shrink-0 flex items-center justify-center">
-            <img
-                src={src}
-                alt={name}
-                style={{ height: `${18 * scale}px` }}
-                className="w-auto max-w-[120px] object-contain transition-all duration-300 opacity-40 hover:opacity-100 grayscale hover:grayscale-0 brightness-200"
-                onError={(e) => {
-                    console.error(`Failed to load logo: ${src}`);
-                    e.currentTarget.style.display = 'none';
-                }}
-            />
+        <div className="flex-shrink-0 flex items-center gap-2.5 group/logo cursor-default">
+            <div className="h-4 flex items-center justify-center">
+                <img
+                    src={src}
+                    alt={name}
+                    className="max-h-full w-auto object-contain transition-all duration-700 opacity-50 grayscale brightness-[0.6] group-hover/logo:opacity-100 group-hover/logo:grayscale-0 group-hover/logo:brightness-110"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                    }}
+                />
+            </div>
+            <span className="text-[9px] font-bold text-white/20 group-hover/logo:text-white/60 transition-all duration-500 tracking-[0.2em] whitespace-nowrap uppercase">
+                {name}
+            </span>
         </div>
     );
 }
@@ -63,6 +52,7 @@ export function LandingPageClient() {
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [partners, setPartners] = useState<{ src: string; name: string; scale?: number }[]>([]);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const searchParams = useSearchParams();
@@ -97,6 +87,13 @@ export function LandingPageClient() {
             .then((data) => setProfile(data))
             .catch(() => setProfile(null));
     }, [publicKey, connected]);
+
+    useEffect(() => {
+        fetch('/api/logos')
+            .then(r => r.json())
+            .then(data => setPartners(data))
+            .catch(err => console.error('Error fetching logos:', err));
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white">
@@ -162,6 +159,12 @@ export function LandingPageClient() {
                                 Discover Talent <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
+                        
+                        <div className="mt-24">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">
+                                Powering the Web3 career stack
+                            </p>
+                        </div>
                     </div>
 
                     <div className="lg:w-[45%] w-full relative group lg:-mt-24" style={{ perspective: '2000px' }}>
@@ -201,14 +204,14 @@ export function LandingPageClient() {
                     </div>
                 </section>
 
-                <div className="w-full py-10 overflow-hidden relative group/marquee">
-                    <div className="absolute left-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
+                <div className="w-full pt-4 pb-12 overflow-hidden relative group/marquee" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
                     <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                         {[...Array(4)].map((_, i) => (
-                            <div key={i} className="flex gap-32 items-center flex-shrink-0 pr-32">
-                                {PARTNERS.map((partner) => (
-                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={partner.scale} />
+                            <div key={i} className="flex gap-24 items-center flex-shrink-0 pr-24">
+                                {partners.map((partner) => (
+                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} />
                                 ))}
                             </div>
                         ))}
@@ -281,16 +284,22 @@ export function LandingPageClient() {
                         >
                             Discover Talent <ArrowRight className="w-4 h-4" />
                         </button>
+
+                        <div className="mt-12 text-left">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20">
+                                Powering the Web3 career stack
+                            </p>
+                        </div>
                     </div>
 
                 </section>
 
-                <div className="w-full py-6 overflow-hidden relative">
+                <div className="w-full pt-2 pb-10 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
                     <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-16 items-center flex-shrink-0 pr-16">
-                                {PARTNERS.map((partner) => (
-                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} scale={(partner.scale ?? 1) * 0.8} />
+                                {partners.map((partner) => (
+                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} />
                                 ))}
                             </div>
                         ))}

@@ -122,12 +122,14 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={devItems}
                         />
 
-                        <Link
-                            href="/dashboard"
-                            className={`transition-colors py-2 ${isActive('/dashboard') ? 'text-emerald-400 font-extrabold' : 'text-emerald-400/60 hover:text-emerald-400'}`}
-                        >
-                            Dashboard
-                        </Link>
+                        {publicKey && (
+                            <Link
+                                href="/dashboard"
+                                className={`transition-colors py-2 ${isActive('/dashboard') ? 'text-emerald-400 font-extrabold' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+                            >
+                                Dashboard
+                            </Link>
+                        )}
 
                         {publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" && (
                             <Link
@@ -270,13 +272,15 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                         <div className="space-y-4">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">User Hub</p>
                                             <div className="flex flex-col gap-2">
-                                                <MobileNavLink 
-                                                    href="/dashboard" 
-                                                    icon={<LayoutGrid className="w-5 h-5" />} 
-                                                    label="Dashboard" 
-                                                    color="text-emerald-400"
-                                                    onClick={() => setIsMobileMenuOpen(false)} 
-                                                />
+                                                {publicKey && (
+                                                    <MobileNavLink 
+                                                        href="/dashboard" 
+                                                        icon={<LayoutGrid className="w-5 h-5" />} 
+                                                        label="Dashboard" 
+                                                        color="text-emerald-400"
+                                                        onClick={() => setIsMobileMenuOpen(false)} 
+                                                    />
+                                                )}
                                                 {publicKey && (
                                                     <MobileNavLink 
                                                         href={`/cv/${publicKey.toBase58()}`} 
