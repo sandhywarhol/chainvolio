@@ -790,7 +790,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     <span className="text-[9px] font-black uppercase tracking-[0.2em]">Focus Areas</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5">
-                                    {data.collection.metadata.focusAreas.map((area: string) => {
+                                    {data?.collection.metadata?.focusAreas?.map((area: string) => {
                                         const label: Record<string, string> = { on_chain: "On-Chain", github: "GitHub", dao: "DAO", hackathon: "Hackathon", nft: "NFT" };
                                         return (
                                             <span key={area} className="px-2 py-0.5 bg-indigo-500/5 border border-indigo-500/10 rounded text-[9px] font-black text-indigo-400/70 uppercase tracking-wider">
@@ -805,7 +805,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             <div className="flex items-center gap-2 text-slate-600">
                                 <CalendarDays className="w-3 h-3" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest">
-                                    Deadline: <span className="text-slate-400">{new Date(data.collection.metadata.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                    Deadline: <span className="text-slate-400">{data?.collection.metadata?.deadline ? new Date(data.collection.metadata.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "No Deadline"}</span>
                                 </span>
                             </div>
                         )}
