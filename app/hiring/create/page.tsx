@@ -32,7 +32,10 @@ import {
     ChevronDown,
     ChevronUp,
     LayoutGrid,
-    User
+    User,
+    Mail,
+    Send,
+    Linkedin
 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 
@@ -67,6 +70,9 @@ export default function CreateCollection() {
         discordUrl: "",
         githubUrl: "",
         projectStage: "Early",
+        companyEmail: "",
+        telegramUrl: "",
+        linkedinUrl: "",
         contactChannel: "",
         deadline: "",
         visibility: "public",
@@ -477,6 +483,36 @@ export default function CreateCollection() {
                                                 className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
                                             />
                                         </div>
+                                        <div className="relative">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="email"
+                                                placeholder="Company Email"
+                                                value={formData.companyEmail}
+                                                onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Send className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="Telegram Group / Channel"
+                                                value={formData.telegramUrl}
+                                                onChange={(e) => setFormData({ ...formData, telegramUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <input
+                                                type="text"
+                                                placeholder="Company LinkedIn"
+                                                value={formData.linkedinUrl}
+                                                onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                            />
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Preferred Contact Method</label>
@@ -488,48 +524,6 @@ export default function CreateCollection() {
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
                                         />
                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Evaluation Focus */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> Evaluation Focus
-                                    </h3>
-                                    <span className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">Select areas to highlight (Optional)</span>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                    {focusOptions.map((opt) => (
-                                        <div
-                                            key={opt.id}
-                                            onClick={() => toggleFocus(opt.id)}
-                                            className={`
-                        cursor-pointer p-4 rounded-xl border transition-all duration-200 group relative overflow-hidden
-                        ${formData.focusAreas.includes(opt.id)
-                                                    ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                                    : 'bg-[#121214] border-white/5 hover:border-white/10 hover:bg-white/[0.02]'}
-                      `}
-                                        >
-                                            <div className="flex items-start gap-3 relative z-10">
-                                                <div className={`
-                          p-2 rounded-lg transition-colors
-                          ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-400 group-hover:text-slate-200'}
-                        `}>
-                                                    <opt.icon className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className={`text-sm font-bold mb-0.5 ${formData.focusAreas.includes(opt.id) ? 'text-emerald-100' : 'text-slate-300'}`}>{opt.label}</p>
-                                                    <p className="text-[10px] text-slate-500 leading-tight">{opt.desc}</p>
-                                                </div>
-                                            </div>
-                                            {formData.focusAreas.includes(opt.id) && (
-                                                <div className="absolute top-2 right-2 text-emerald-500">
-                                                    <Check className="w-4 h-4" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
                                 </div>
                             </div>
 
@@ -640,6 +634,49 @@ export default function CreateCollection() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Evaluation Focus */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> Evaluation Focus
+                                    </h3>
+                                    <span className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">Select areas to highlight (Optional)</span>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                    {focusOptions.map((opt) => (
+                                        <div
+                                            key={opt.id}
+                                            onClick={() => toggleFocus(opt.id)}
+                                            className={`
+                        cursor-pointer p-4 rounded-xl border transition-all duration-200 group relative overflow-hidden
+                        ${formData.focusAreas.includes(opt.id)
+                                                    ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                    : 'bg-[#121214] border-white/5 hover:border-white/10 hover:bg-white/[0.02]'}
+                      `}
+                                        >
+                                            <div className="flex items-start gap-3 relative z-10">
+                                                <div className={`
+                          p-2 rounded-lg transition-colors
+                          ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-400 group-hover:text-slate-200'}
+                        `}>
+                                                    <opt.icon className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <p className={`text-sm font-bold mb-0.5 ${formData.focusAreas.includes(opt.id) ? 'text-emerald-100' : 'text-slate-300'}`}>{opt.label}</p>
+                                                    <p className="text-[10px] text-slate-500 leading-tight">{opt.desc}</p>
+                                                </div>
+                                            </div>
+                                            {formData.focusAreas.includes(opt.id) && (
+                                                <div className="absolute top-2 right-2 text-emerald-500">
+                                                    <Check className="w-4 h-4" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
 
                             {/* Feature 4: Minimal Eligibility Filters */}
                             <div className="space-y-4">

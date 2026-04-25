@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
-import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Twitter, Github, MessageSquare, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter } from "lucide-react";
+import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Twitter, Github, MessageSquare, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter, Mail, Linkedin } from "lucide-react";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
 
@@ -275,6 +275,21 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     {collection.metadata?.discordUrl && (
                                                         <a href={collection.metadata.discordUrl} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Discord">
                                                             <MessageSquare className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.telegramUrl && (
+                                                        <a href={collection.metadata.telegramUrl.startsWith('http') ? collection.metadata.telegramUrl : `https://t.me/${collection.metadata.telegramUrl.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Telegram">
+                                                            <Send className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.companyEmail && (
+                                                        <a href={`mailto:${collection.metadata.companyEmail}`} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Email">
+                                                            <Mail className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {collection.metadata?.linkedinUrl && (
+                                                        <a href={collection.metadata.linkedinUrl.startsWith('http') ? collection.metadata.linkedinUrl : `https://${collection.metadata.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="LinkedIn">
+                                                            <Linkedin className="w-4 h-4" />
                                                         </a>
                                                     )}
                                                 </div>
