@@ -54,6 +54,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [processingId, setProcessingId] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState("recent");
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
+    const [focusMatchOnly, setFocusMatchOnly] = useState(false);
     const [needsAuth, setNeedsAuth] = useState(false);
 
     const { publicKey, connected, signMessage, sendTransaction } = useWallet();
@@ -459,11 +460,21 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             list = list.filter(c => c.signalStrength !== 'Low');
         }
 
-        // Sorting
+        // Focus Match Filter
+        if (focusMatchOnly) {
+            list = list.filter(c => c.signalMatch);
+        }
+
+        // Sorting — rejected candidates always sink to bottom regardless of sort mode
         list.sort((a, b) => {
+            const aRejected = a.recruiterStatus === 'rejected' ? 1 : 0;
+            const bRejected = b.recruiterStatus === 'rejected' ? 1 : 0;
+            if (aRejected !== bRejected) return aRejected - bRejected;
+
             const dateA = a.lastActive ? new Date(a.lastActive).getTime() : 0;
             const dateB = b.lastActive ? new Date(b.lastActive).getTime() : 0;
 
+            if (sortBy === "best_fit") return (b.fitScore || 0) - (a.fitScore || 0) || (b.signalScore || 0) - (a.signalScore || 0);
             if (sortBy === "recent") return dateB - dateA;
             if (sortBy === "attestations") return (b.attestedCount || 0) - (a.attestedCount || 0);
             if (sortBy === "total_proof") return (b.powCount || 0) - (a.powCount || 0);
@@ -471,7 +482,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         });
 
         return list;
-    }, [data, searchTerm, roleFilter, attestedOnly, spamFilter, sortBy]);
+    }, [data, searchTerm, roleFilter, attestedOnly, spamFilter, focusMatchOnly, sortBy]);
 
     const uniqueRoles = useMemo(() => {
         if (!data) return [];
@@ -821,10 +832,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 <select
                                     value={roleFilter}
                                     onChange={(e) => setRoleFilter(e.target.value)}
-                                    className="bg-transparent text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
+                                    className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
                                 >
-                                    <option value="all">ALL</option>
-                                    {uniqueRoles.map((role: string) => <option key={role} value={role}>{role.toUpperCase()}</option>)}
+                                    <option value="all" className="bg-[#121215] text-white">ALL</option>
+                                    {uniqueRoles.map((role: string) => (
+                                        <option key={role} value={role} className="bg-[#121215] text-white">
+                                            {role.toUpperCase()}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -833,11 +848,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-transparent text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
+                                    className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
                                 >
-                                    <option value="recent">RECENCY</option>
-                                    <option value="attestations">AUTHORITY</option>
-                                    <option value="total_proof">VOLUME</option>
+                                    <option value="best_fit" className="bg-[#121215] text-white">BEST FIT</option>
+                                    <option value="recent" className="bg-[#121215] text-white">RECENCY</option>
+                                    <option value="attestations" className="bg-[#121215] text-white">AUTHORITY</option>
+                                    <option value="total_proof" className="bg-[#121215] text-white">VOLUME</option>
                                 </select>
                             </div>
 
@@ -867,6 +883,19 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     className="hidden"
                                 />
                                 <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">High Signal Only</span>
+                            </label>
+
+                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
+                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${focusMatchOnly ? 'bg-indigo-500 border-indigo-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                    {focusMatchOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={focusMatchOnly}
+                                    onChange={(e) => setFocusMatchOnly(e.target.checked)}
+                                    className="hidden"
+                                />
+                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Focus Match Only</span>
                             </label>
                         </div>
                     </div>
@@ -898,7 +927,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">No Profiles Found</p>
                                                 <p className="text-slate-600 text-[11px]">Adjust your calibration to discover more candidates.</p>
                                             </div>
-                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all mt-4">Clear All Filters</button>
+                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); setFocusMatchOnly(false); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all mt-4">Clear All Filters</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -974,7 +1003,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                             <td className="px-8 py-6 hidden md:table-cell">
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-xs font-bold text-slate-200 capitalize truncate max-w-[180px]">{candidate.role}</span>
-                                                    <span className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">{candidate.primarySignal || "Standard Contribution"}</span>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">{candidate.primarySignal || "Standard Contribution"}</span>
+                                                        {candidate.signalMatch && (
+                                                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-black text-emerald-400 uppercase tracking-widest">MATCH</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">

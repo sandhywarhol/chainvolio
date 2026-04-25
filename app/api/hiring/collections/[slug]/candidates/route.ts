@@ -117,6 +117,17 @@ export async function GET(
             .select("wallet_address, status, type, expires_at")
             .in("wallet_address", wallets);
 
+        // Focus matching setup (computed once, used per candidate)
+        const focusAreas: string[] = collection.metadata?.focusAreas || [];
+        const focusToSignal: Record<string, string> = {
+            on_chain: "on-chain activity",
+            github: "github / code",
+            dao: "dao governance",
+            hackathon: "hackathon wins",
+            nft: "nft / creative",
+        };
+        const matchedSignals = focusAreas.map(f => focusToSignal[f]).filter(Boolean);
+
         // 6. Aggregate data per candidate
         const candidates = submissions.map(sub => {
             const profile = profiles?.find(p => p.wallet_address === sub.candidate_wallet);
@@ -144,6 +155,15 @@ export async function GET(
             if (score >= 70) signalStrength = 'Strong';
             else if (score >= 30) signalStrength = 'Medium';
 
+            // Calculate Fit Score (focusAreas match + attestations + verification)
+            const primaryNorm = (sub.primary_signal || "").toLowerCase();
+            const signalMatch = matchedSignals.length > 0 &&
+                matchedSignals.some(m => primaryNorm.includes(m) || m.includes(primaryNorm));
+            let fitScore = 0;
+            if (signalMatch) fitScore += 60;
+            fitScore += Math.min(attestedReceipts.length * 5, 25);
+            if (userVerifications.some(v => v.status === 'verified')) fitScore += 15;
+
             return {
                 id: sub.id,
                 wallet: sub.candidate_wallet,
@@ -165,6 +185,8 @@ export async function GET(
                 submittedAt: sub.submitted_at,
                 signalScore: score,
                 signalStrength: signalStrength,
+                fitScore,
+                signalMatch,
                 cardNumber: profile?.card_number || null,
                 snapshotBio: snapshot.profile?.bio || null,
                 snapshotSkills: snapshot.profile?.skills || null,

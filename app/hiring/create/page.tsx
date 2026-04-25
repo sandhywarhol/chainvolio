@@ -35,7 +35,8 @@ import {
     User,
     Mail,
     Send,
-    Linkedin
+    Linkedin,
+    Target
 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 
@@ -68,7 +69,6 @@ export default function CreateCollection() {
         websiteUrl: "",
         twitterUrl: "",
         discordUrl: "",
-        githubUrl: "",
         projectStage: "Early",
         companyEmail: "",
         telegramUrl: "",
@@ -77,6 +77,7 @@ export default function CreateCollection() {
         deadline: "",
         visibility: "public",
         focusAreas: [] as string[],
+        customFocus: "",
         filters: {
             minReceiptsThreshold: 0,
             verifiedOnly: false
@@ -427,7 +428,7 @@ export default function CreateCollection() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">One-line Project Description</label>
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Project or Company Description</label>
                                     <input
                                         type="text"
                                         placeholder="Subtle, high-signal recruitment infrastructure for Web3."
@@ -440,7 +441,7 @@ export default function CreateCollection() {
                                 {/* Official Links */}
                                 <div className="pt-4 space-y-4">
                                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                        <LayoutGrid className="w-3 h-3" /> Official Presence
+                                        <LayoutGrid className="w-3 h-3" /> Official Presence <span className="text-slate-600 font-normal normal-case ml-1">(OPTIONAL)</span>
                                     </h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="relative">
@@ -470,16 +471,6 @@ export default function CreateCollection() {
                                                 placeholder="Discord Link"
                                                 value={formData.discordUrl}
                                                 onChange={(e) => setFormData({ ...formData, discordUrl: e.target.value })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                            <input
-                                                type="text"
-                                                placeholder="GitHub Organization"
-                                                value={formData.githubUrl}
-                                                onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
                                                 className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-xs"
                                             />
                                         </div>
@@ -515,7 +506,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Preferred Contact Method</label>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Preferred Contact Method <span className="text-slate-600 font-normal normal-case ml-1">(OPTIONAL)</span></label>
                                         <input
                                             type="text"
                                             placeholder="e.g. DM on X, Discord Ticket, or Email"
@@ -674,6 +665,40 @@ export default function CreateCollection() {
                                             )}
                                         </div>
                                     ))}
+
+                                    {/* Custom Focus Box */}
+                                    <div
+                                        className={`
+                                            p-4 rounded-xl border transition-all duration-200 group relative overflow-hidden
+                                            ${formData.customFocus
+                                                ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                : 'bg-[#121214] border-white/5 hover:border-white/10 hover:bg-white/[0.02]'}
+                                        `}
+                                    >
+                                        <div className="flex items-start gap-3 relative z-10">
+                                            <div className={`
+                                                p-2 rounded-lg transition-colors
+                                                ${formData.customFocus ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-400 group-hover:text-slate-200'}
+                                            `}>
+                                                <Target className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Add Your Focus..."
+                                                    value={formData.customFocus}
+                                                    onChange={(e) => setFormData({ ...formData, customFocus: e.target.value })}
+                                                    className="bg-transparent border-none outline-none text-sm font-bold w-full placeholder:text-slate-600 text-white"
+                                                />
+                                                <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Write your specific priority</p>
+                                            </div>
+                                        </div>
+                                        {formData.customFocus && (
+                                            <div className="absolute top-2 right-2 text-emerald-500">
+                                                <Check className="w-4 h-4" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

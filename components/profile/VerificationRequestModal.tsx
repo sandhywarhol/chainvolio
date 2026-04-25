@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { X, CheckCircle, Clock, ShieldCheck, Users, Building, Code2, Star, Lock, Shield } from "lucide-react";
 import { PaymentModal } from "@/components/profile/PaymentModal";
 import { SubscriptionModal, BillingCycle } from "@/components/profile/SubscriptionModal";
@@ -52,9 +53,11 @@ const TIERS = [
         attestationPower: 2,
         button: "Earn Verification",
         benefits: [
-            "Verified Builder Badge",
-            "Profile becomes more trusted by organizations",
-            "Higher credibility in the reputation network",
+            "Verified Builder Badge on public profile",
+            "5 attestations / month",
+            "Up to 5 hiring collections",
+            "Higher trust when organizations view your work",
+            "Auto-verified. No waiting, no review.",
         ],
     },
     {
@@ -70,8 +73,10 @@ const TIERS = [
         button: "Request Verification",
         benefits: [
             "Verified Public Figure Badge",
-            "Higher credibility when giving attestations",
-            "Trusted & Recognized identity in the ecosystem",
+            "10 attestations / month with elevated authority",
+            "Up to 10 hiring collections",
+            "Endorsements carry more weight across the ecosystem",
+            "Recognized identity across protocols & DAOs",
         ],
     },
     {
@@ -80,15 +85,17 @@ const TIERS = [
         Icon: Users,
         label: "Community / DAO",
         desc: "DAOs, Web3 communities & decentralized groups.",
-        price: "4 USDC",
+        price: "4.99 USDC",
         billing: "/ month",
         authority: "Collective Authority",
         attestationPower: 4,
         button: "Start Verification",
         benefits: [
-            "Verified Community Identity",
-            "Community jobs are marked as trusted opportunities",
-            "Ability to give recognized attestations",
+            "Verified Community Identity badge",
+            "20 recognized attestations / month",
+            "Unlimited hiring collections",
+            "Jobs listed as Trusted Community Opportunity",
+            "Candidates can verify your community is legit",
         ],
     },
     {
@@ -97,16 +104,18 @@ const TIERS = [
         Icon: Building,
         label: "Company / Org",
         desc: "Startups, agencies, studios & official organizations.",
-        price: "9 USDC",
+        price: "9.99 USDC",
         billing: "/ month",
         authority: "Institutional Authority",
         attestationPower: 5,
         popular: true,
         button: "Start Verification",
         benefits: [
-            "Verified Organization Badge",
-            "Job listings appear as trusted hiring sources",
-            "Attestations carry organizational credibility",
+            "Verified Organization Badge for maximum institutional trust",
+            "40 attestations / month, highest quota on the platform",
+            "Unlimited hiring collections",
+            "Jobs appear as verified institutional hiring sources",
+            "\"Institutional Trust\" signal visible to every candidate",
         ],
     },
 ] as const;
@@ -128,14 +137,14 @@ const TIER_PRICES: Record<string, TierPricing> = IS_SOL_TEST
     : {
         Builder: null,
         Figure: null,
-        Community: { monthly: 4, yearly: 40 },
-        Company: { monthly: 9, yearly: 90 },
+        Community: { monthly: 4.99, yearly: 49.90 },
+        Company: { monthly: 9.99, yearly: 99.90 },
     };
 
 /** Previous (anchor) prices shown as strikethrough for value anchoring. */
 const TIER_ANCHOR_PRICES: Record<string, { monthly?: number; yearly?: number }> = {
-    Community: { monthly: 9,  yearly: 90  },
-    Company:   { monthly: 19, yearly: 190 },
+    Community: { monthly: 9.99,  yearly: 99.90  },
+    Company:   { monthly: 19.99, yearly: 199.90 },
 };
 
 const isSubscriptionTier = (id: string) =>
@@ -327,7 +336,6 @@ export function VerificationRequestModal({
 
     // Derived tier objects
     const activeTier = selectedTier ? TIERS.find(t => t.id === selectedTier) ?? null : null;
-    const activePricing = selectedTier ? TIER_PRICES[selectedTier] : undefined;
 
     const handleSelectTier = async (tierId: string) => {
         setError(null);
@@ -626,9 +634,14 @@ export function VerificationRequestModal({
                                 })}
                             </div>
 
-                            <p className="mt-4 text-center text-[10px] text-white/20">
-                                Each request is reviewed by the ChainVolio team before approval. Prices reflect platform access fees.
-                            </p>
+                            <div className="mt-4 flex items-center justify-between">
+                                <p className="text-[10px] text-white/20">
+                                    Each request is reviewed by the ChainVolio team before approval. Prices reflect platform access fees.
+                                </p>
+                                <Link href="/pricing" onClick={onClose} className="text-[10px] font-bold text-indigo-400/60 hover:text-indigo-400 uppercase tracking-widest transition-colors whitespace-nowrap ml-4">
+                                    See full comparison →
+                                </Link>
+                            </div>
                         </div>
                     )}
 

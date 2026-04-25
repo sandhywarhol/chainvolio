@@ -51,13 +51,13 @@ export const USDC_MINT_DEVNET  = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 export const USDC_DECIMALS     = 6;
 
 export const USDC_PROD_PRICES: Record<string, { monthly?: bigint; yearly?: bigint; oneTime?: bigint }> = {
-    Community: { monthly: BigInt("4000000"),  yearly: BigInt("40000000")  },  // 4 / 40 USDC
-    Company:   { monthly: BigInt("9000000"), yearly: BigInt("90000000") },  // 9 / 90 USDC
+    Community: { monthly: BigInt("4990000"),  yearly: BigInt("49900000")  },  // 4.99 / 49.90 USDC
+    Company:   { monthly: BigInt("9990000"),  yearly: BigInt("99900000")  },  // 9.99 / 99.90 USDC
 };
 
 export const USDC_PROD_DISPLAY: Record<string, { monthly?: number; yearly?: number; oneTime?: number }> = {
-    Community: { monthly: 4,  yearly: 40  },
-    Company:   { monthly: 9,  yearly: 90  },
+    Community: { monthly: 4.99, yearly: 49.90 },
+    Company:   { monthly: 9.99, yearly: 99.90 },
 };
 
 
