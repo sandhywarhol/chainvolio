@@ -218,11 +218,11 @@ export default function PricingPage() {
                         return (
                             <div
                                 key={tier.id}
-                                className={`relative flex flex-col rounded-2xl bg-black/40 border overflow-hidden transition-all duration-300 group backdrop-blur-sm ${tier.popular ? `border-amber-500/30` : "border-white/8 hover:border-white/15"}`}
-                                style={{ boxShadow: tier.popular ? `0 0 40px ${col.hex}15, 0 0 0 1px ${col.hex}20` : undefined }}
+                                className={`relative flex flex-col rounded-2xl bg-black/40 border overflow-hidden transition-all duration-300 group backdrop-blur-sm ${"popular" in tier && tier.popular ? `border-amber-500/30` : "border-white/8 hover:border-white/15"}`}
+                                style={{ boxShadow: "popular" in tier && tier.popular ? `0 0 40px ${col.hex}15, 0 0 0 1px ${col.hex}20` : undefined }}
                             >
                                 {/* Popular ribbon */}
-                                {tier.popular && (
+                                {"popular" in tier && tier.popular && (
                                     <div className="absolute top-0 right-4 text-[8px] font-black uppercase tracking-widest text-black px-2.5 py-1.5 rounded-b-lg" style={{ background: col.hex }}>
                                         Most Trust
                                     </div>
@@ -240,7 +240,7 @@ export default function PricingPage() {
                                             </div>
                                             <div>
                                                 <h3 className={`text-[15px] font-black leading-tight ${col.text}`}>{tier.label}</h3>
-                                                {tier.popular && <span className="text-[9px] font-bold text-amber-400/60 uppercase tracking-widest">Recommended</span>}
+                                                {"popular" in tier && tier.popular && <span className="text-[9px] font-bold text-amber-400/60 uppercase tracking-widest">Recommended</span>}
                                             </div>
                                         </div>
                                         <p className="text-[11px] text-white/35 leading-relaxed font-medium">{tier.desc}</p>
@@ -311,10 +311,10 @@ export default function PricingPage() {
                                     {/* CTA */}
                                     <Link
                                         href="/dashboard"
-                                        className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all text-center block ${tier.popular
+                                        className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all text-center block ${"popular" in tier && tier.popular
                                             ? "text-black hover:opacity-90"
                                             : "bg-white/5 hover:bg-white/10 text-white/70 border border-white/10"}`}
-                                        style={tier.popular ? { background: col.hex } : undefined}
+                                        style={"popular" in tier && tier.popular ? { background: col.hex } : undefined}
                                     >
                                         {tier.id === "Builder" ? "Earn Free Verification" : tier.id === "Figure" ? "Request Access" : "Get Started"}
                                     </Link>
