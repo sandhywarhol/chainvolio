@@ -19,20 +19,17 @@ export async function GET() {
                 // Proper casing helper
                 const formatName = (str: string) => {
                     const specialCases: Record<string, string> = {
+                        'x': 'X',
                         'github': 'GitHub',
-                        'solana': 'Solana',
-                        'pyth': 'Pyth',
-                        'helius': 'Helius',
-                        'alchemy': 'Alchemy',
-                        'chainlink': 'Chainlink',
+                        'linkedin': 'LinkedIn',
                         'notion': 'Notion',
                         'discord': 'Discord',
-                        'opensea': 'OpenSea',
-                        'open sea': 'OpenSea',
-                        'magic eden': 'Magic Eden',
-                        'the graph': 'The Graph',
+                        'telegram': 'Telegram',
                         'superteam': 'Superteam',
-                        'tensor': 'Tensor',
+                        'solana': 'Solana',
+                        'phantom': 'Phantom',
+                        'solflare': 'Solflare',
+                        'alchemy': 'Alchemy',
                     };
 
                     const lower = str.toLowerCase();
