@@ -31,7 +31,7 @@ export async function GET(
         // 1. Get collection details
         const { data: collection, error: colError } = await supabase
             .from("hiring_collections")
-            .select("id, slug, owner_wallet, title, created_at")
+            .select("id, slug, owner_wallet, title, metadata, eligibility_filters, created_at")
             .eq("slug", slug)
             .single();
 
@@ -166,6 +166,8 @@ export async function GET(
                 signalScore: score,
                 signalStrength: signalStrength,
                 cardNumber: profile?.card_number || null,
+                snapshotBio: snapshot.profile?.bio || null,
+                snapshotSkills: snapshot.profile?.skills || null,
             };
         });
 

@@ -22,7 +22,10 @@ import {
     XCircle,
     Trash2,
     AlertCircle,
-    Lock
+    Lock,
+    CalendarDays,
+    Target,
+    FileText
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -766,6 +769,38 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     ))}
                 </div>
 
+                {/* Collection Context Bar */}
+                {(data?.collection.metadata?.focusAreas?.length > 0 || data?.collection.metadata?.deadline) && (
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6 px-1">
+                        {data?.collection.metadata?.focusAreas?.length > 0 && (
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5 text-slate-600">
+                                    <Target className="w-3 h-3" />
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em]">Focus Areas</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {data.collection.metadata.focusAreas.map((area: string) => {
+                                        const label: Record<string, string> = { on_chain: "On-Chain", github: "GitHub", dao: "DAO", hackathon: "Hackathon", nft: "NFT" };
+                                        return (
+                                            <span key={area} className="px-2 py-0.5 bg-indigo-500/5 border border-indigo-500/10 rounded text-[9px] font-black text-indigo-400/70 uppercase tracking-wider">
+                                                {label[area] || area}
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                        {data?.collection.metadata?.deadline && (
+                            <div className="flex items-center gap-2 text-slate-600">
+                                <CalendarDays className="w-3 h-3" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">
+                                    Deadline: <span className="text-slate-400">{new Date(data.collection.metadata.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Filters Bar */}
                 <div className="bg-[#121215]/80 backdrop-blur-sm border border-white/[0.04] rounded-2xl p-4 mb-10">
                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
@@ -1032,6 +1067,26 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                             </div>
 
                                                             <div className="space-y-4">
+                                                                {/* Bio & Skills from Snapshot */}
+                                                                {(candidate.snapshotBio || candidate.snapshotSkills) && (
+                                                                    <div className="p-5 bg-white/[0.01] border border-white/[0.04] rounded-xl space-y-3">
+                                                                        {candidate.snapshotBio && (
+                                                                            <div className="flex items-start gap-3">
+                                                                                <FileText className="w-3 h-3 text-slate-600 mt-0.5 shrink-0" />
+                                                                                <p className="text-[12px] text-slate-400 leading-relaxed font-medium">{candidate.snapshotBio}</p>
+                                                                            </div>
+                                                                        )}
+                                                                        {candidate.snapshotSkills && (
+                                                                            <div className="flex flex-wrap gap-1.5 pl-6">
+                                                                                {String(candidate.snapshotSkills).split(',').map((skill: string) => skill.trim()).filter(Boolean).map((skill: string) => (
+                                                                                    <span key={skill} className="px-2 py-0.5 bg-white/[0.03] border border-white/[0.05] rounded text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                                                                        {skill}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
                                                                 {candidate.attestedCount > 0 ? (
                                                                     <div className="p-8 bg-white/[0.01] border border-white/[0.04] rounded-2xl relative group/card overflow-hidden">
                                                                         <div className="absolute -top-6 -right-6 p-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-700 group-hover/card:scale-110">
