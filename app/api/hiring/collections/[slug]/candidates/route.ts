@@ -102,20 +102,55 @@ export async function GET(
 
         if (receiptsError) console.error("[Dashboard API] Receipts fetch error:", receiptsError);
 
-        // 5. Batch fetch attestations (to verify "Attested" status)
+        // 5. Batch fetch attestations (to verify "Attested" status + attester wallet for tier weighting)
         const receiptIds = receipts?.map(r => r.id) || [];
         const { data: attestations } = await supabase
             .from("attestations")
-            .select("receipt_id")
+            .select("receipt_id, attester_wallet")
             .in("receipt_id", receiptIds);
 
         const attestationMap = new Set(attestations?.map(a => a.receipt_id));
 
-        // 5.5 Batch fetch verification status
+        // 5.5 Batch fetch verification status (candidates)
         const { data: verifications } = await supabase
             .from("organization_verifications")
             .select("wallet_address, status, type, expires_at")
             .in("wallet_address", wallets);
+
+        // 5.6 Batch fetch attester tiers for weighted attestation scoring
+        const attesterWallets = [...new Set(
+            (attestations ?? []).map((a: any) => a.attester_wallet).filter(Boolean)
+        )] as string[];
+
+        let attesterTierMap = new Map<string, string>();
+        if (attesterWallets.length > 0) {
+            const { data: attesterVerifs } = await supabase
+                .from("organization_verifications")
+                .select("wallet_address, type, status, expires_at")
+                .in("wallet_address", attesterWallets);
+
+            const nowMs = Date.now();
+            attesterVerifs?.forEach((v: any) => {
+                const active = v.status === 'verified' && (!v.expires_at || new Date(v.expires_at).getTime() > nowMs);
+                attesterTierMap.set(v.wallet_address, active ? v.type : 'unverified');
+            });
+        }
+
+        // receipt_id → attester tier string
+        const receiptTierMap = new Map<string, string>();
+        (attestations ?? []).forEach((a: any) => {
+            receiptTierMap.set(a.receipt_id, attesterTierMap.get(a.attester_wallet) ?? 'unverified');
+        });
+
+        // Attestation weight by attester tier (Company > Community > Public Figure > Builder > Unverified)
+        function attestationWeight(tier: string | undefined): number {
+            const t = (tier || '').toLowerCase();
+            if (t.includes('company') || t.includes('org')) return 30;
+            if (t.includes('community') || t.includes('dao')) return 25;
+            if (t.includes('figure') || t.includes('public')) return 22;
+            if (t.includes('builder')) return 20;
+            return 12; // unverified
+        }
 
         // Focus matching setup (computed once, used per candidate)
         const focusAreas: string[] = collection.metadata?.focusAreas || [];
@@ -146,7 +181,8 @@ export async function GET(
             // Calculate Signal Score
             let score = 0;
             score += Math.min(userReceipts.length * 10, 50); // Up to 50 pts for proof volume
-            score += Math.min(attestedReceipts.length * 20, 40); // Up to 40 pts for verified attestations
+            const weightedAttestation = attestedReceipts.reduce((sum, r) => sum + attestationWeight(receiptTierMap.get(r.id)), 0);
+            score += Math.min(weightedAttestation, 40); // Weighted: Company=30, Community=25, Figure=22, Builder=20, Unverified=12
 
             const daysSinceActive = (new Date().getTime() - new Date(latestActivity).getTime()) / (1000 * 3600 * 24);
             if (daysSinceActive < 30) score += 10; // 10 pts for recent activity
@@ -161,7 +197,7 @@ export async function GET(
                 matchedSignals.some(m => primaryNorm.includes(m) || m.includes(primaryNorm));
             let fitScore = 0;
             if (signalMatch) fitScore += 60;
-            fitScore += Math.min(attestedReceipts.length * 5, 25);
+            fitScore += Math.min(Math.round(attestedReceipts.reduce((s, r) => s + attestationWeight(receiptTierMap.get(r.id)) / 4, 0)), 25);
             if (userVerifications.some(v => v.status === 'verified')) fitScore += 15;
 
             return {

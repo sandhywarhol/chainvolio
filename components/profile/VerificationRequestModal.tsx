@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { X, CheckCircle, Clock, ShieldCheck, Users, Building, Code2, Star, Lock, Shield } from "lucide-react";
+import { X, CheckCircle, Clock, ShieldCheck, Users, Building, Code2, Star, Shield } from "lucide-react";
 import { PaymentModal } from "@/components/profile/PaymentModal";
 import { SubscriptionModal, BillingCycle } from "@/components/profile/SubscriptionModal";
 import { IS_SOL_TEST, SOL_TEST_PRICES, getAttestationQuota } from "@/lib/paymentConfig";
@@ -75,8 +75,8 @@ const TIERS = [
             "Verified Public Figure Badge",
             "10 attestations / month with elevated authority",
             "Up to 10 hiring collections",
-            "Endorsements carry more weight across the ecosystem",
-            "Recognized identity across protocols & DAOs",
+            "Endorsements carry more weight via tier-based scoring",
+            "Recognized identity across the ChainVolio network",
         ],
     },
     {
