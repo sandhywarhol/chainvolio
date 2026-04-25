@@ -1,6 +1,19 @@
 import { DOMAIN_MAP } from "../constants/scoring";
 
-export function computeReputation(profile: any, receipts: any[]) {
+export interface AttestationTierBreakdown {
+    company: number;
+    community: number;
+    figure: number;
+    builder: number;
+    unverified: number;
+}
+
+export function computeReputation(
+    profile: any,
+    receipts: any[],
+    attestationWeights?: Map<string, number>,
+    tierBreakdown?: AttestationTierBreakdown
+) {
     let experience = 0;
     let verification = 0;
     let consistency = 0;
@@ -20,15 +33,27 @@ export function computeReputation(profile: any, receipts: any[]) {
         });
         experience = Math.min(100, expScore);
 
-        // Verification
-        const verified = receipts.filter((r: any) =>
-            r.status === "Attested" ||
-            r.status === "Verified" ||
-            r.status === "verified" ||
-            r.attestation_type === "Hiring Proof" ||
-            r.tx_signature
-        ).length;
-        verification = Math.round((verified / receipts.length) * 100);
+        // Verification — weighted by attester tier if available
+        if (attestationWeights && attestationWeights.size > 0) {
+            // Scale weight 12→30 to multiplier 1.0→2.5 so quality attestors count more
+            // but no one's score drops below the binary-count baseline
+            const scaleWeight = (w: number) => 1.0 + ((w - 12) / 18) * 1.5;
+            let weightedCount = 0;
+            receipts.forEach((r: any) => {
+                const w = attestationWeights.get(r.id);
+                if (w !== undefined) weightedCount += scaleWeight(w);
+            });
+            verification = Math.round((Math.min(weightedCount, receipts.length) / receipts.length) * 100);
+        } else {
+            const verified = receipts.filter((r: any) =>
+                r.status === "Attested" ||
+                r.status === "Verified" ||
+                r.status === "verified" ||
+                r.attestation_type === "Hiring Proof" ||
+                r.tx_signature
+            ).length;
+            verification = Math.round((verified / receipts.length) * 100);
+        }
 
         // Consistency
         let totalMonths = 0;
@@ -210,6 +235,7 @@ export function computeReputation(profile: any, receipts: any[]) {
             consistency,
             skill,
             activity
-        }
+        },
+        attestation_tier_breakdown: tierBreakdown ?? null,
     };
 }
