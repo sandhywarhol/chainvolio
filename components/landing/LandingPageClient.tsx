@@ -105,8 +105,8 @@ export function LandingPageClient() {
                 onRecruitersClick={() => setActiveModal('recruiters')}
                 onTalentClick={() => setActiveModal('talent')}
                 onAskClick={() => setActiveModal('ask')}
-                onScreeningClick={() => setActiveModal('screening')}
-                onAttestationClick={() => setActiveModal('attestation')}
+                onScreeningClick={() => router.push('/guides/screening')}
+                onAttestationClick={() => router.push('/guides/attestation')}
             />
 
             <main className="flex-1 flex flex-col relative">
