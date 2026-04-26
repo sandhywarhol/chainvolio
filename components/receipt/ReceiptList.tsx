@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clipboard, Lock } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
@@ -152,7 +153,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                   }`}
                 title={r.status === "Attested" ? `Verified by ${r.attesterWallet}` : "Self-reported by candidate"}
               >
-                {r.status === "Attested" ? "✓ Attested" : "Candidate Claim"}
+                {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
               </span>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-between items-center">
@@ -165,14 +166,14 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                   }}
                   className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
                 >
-                  📋 Copy Verification Link
+                  <Clipboard className="w-3.5 h-3.5" aria-hidden="true" /> Copy Verification Link
                 </button>
               </div>
 
               <div className="flex items-center gap-3">
                 {r.status === "Attested" || r.status === "Locked" || r.status === "Submitted" ? (
                   <span className="text-[10px] text-slate-500 flex items-center gap-1 italic">
-                    <span className="text-emerald-500/50">🔒</span> This record is locked for editing after submission/attestation
+                    <Lock className="w-3 h-3 text-emerald-500/50 flex-shrink-0" aria-hidden="true" /> This record is locked for editing after submission/attestation
                   </span>
                 ) : (
                   <button

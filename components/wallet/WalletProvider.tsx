@@ -2,8 +2,6 @@
 
 import { useMemo, useEffect, useState } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
-import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
@@ -43,13 +41,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         [network]
     );
 
-    const wallets = useMemo(
-        () => [
-            new PhantomWalletAdapter(),
-            new SolflareWalletAdapter(),
-        ],
-        []
-    );
+    // Phantom and Solflare auto-register via the Standard Wallet interface —
+    // listing them manually causes 40+ duplicate warnings per navigation.
+    const wallets = useMemo(() => [], []);
 
     const ConnProv = ConnectionProvider as any;
     const SolWallProv = SolanaWalletProvider as any;

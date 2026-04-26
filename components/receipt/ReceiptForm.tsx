@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Upload } from "lucide-react";
+import { X, Upload, Lock } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
@@ -196,7 +196,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
     <form onSubmit={handleSubmit} className="p-6 rounded-lg bg-slate-800/50 border border-slate-700 mb-8 space-y-4">
       {isLocked && (
         <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-400 mb-6">
-          <span className="text-xl">🔒</span>
+          <Lock className="w-5 h-5 flex-shrink-0" aria-label="Locked" />
           <div className="text-xs">
             <p className="font-bold uppercase tracking-wider mb-0.5">Immutable Verification</p>
             <p className="opacity-80 text-white">This record is locked after attestation. No further edits can be cryptographically signed.</p>
