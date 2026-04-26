@@ -358,7 +358,7 @@ export default function HowItWorksPage() {
                         <div className="space-y-4 w-full">
                             <h3 className="text-3xl md:text-h2 md:!text-4xl text-white font-bold">Start Building Today.</h3>
                             <p className="text-body text-lg italic opacity-40 w-full max-w-sm mx-auto text-center">
-                              "Join thousands of professionals already securing their reputation on-chain."
+                              "Be among the first professionals to secure your reputation on-chain."
                             </p>
                         </div>
                         <Link href="/create-profile" className="mt-8 px-12 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-slate-100 transition-all shadow-white/5 text-caption !text-slate-950 flex items-center justify-center gap-3 mx-auto w-fit">

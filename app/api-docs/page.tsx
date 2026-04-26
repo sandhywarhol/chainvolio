@@ -306,14 +306,29 @@ if (data.score > 75 && data.confidence > 0.8) {
               <Zap className="w-5 h-5 text-purple-400" />
               <h2 className="text-2xl md:text-h2 break-words">Identity Auth</h2>
             </div>
-            
+
+            {/* How key generation works */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { step: "01", title: "Connect Wallet", desc: "Connect your Solana wallet — your key is tied to your wallet address for identity." },
+                { step: "02", title: "Sign Once", desc: "Sign a one-time message to prove ownership. No funds are moved, no transaction is sent." },
+                { step: "03", title: "Get Your Key", desc: "Your key is generated instantly. Use it in the x-api-key header on every request." },
+              ].map((item) => (
+                <div key={item.step} className="p-6 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-3 hover:border-purple-500/20 transition-all">
+                  <span className="text-[10px] font-black text-purple-400/40 uppercase tracking-[0.25em]">Step {item.step}</span>
+                  <p className="text-caption text-white font-bold">{item.title}</p>
+                  <p className="text-body text-xs">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
             <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-[48px] relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
                 <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row gap-16 items-center">
                     <div className="md:w-1/2 space-y-6">
                         <h3 className="text-2xl md:text-h2 md:!text-3xl break-words">Get Your API Key</h3>
                         <p className="text-body text-lg opacity-40 break-words">
-                          Connect your Solana wallet to generate a key tied to your identity. One key per wallet.
+                          Connect your Solana wallet to generate a key tied to your identity. One key per wallet — free up to 1,000 requests.
                         </p>
 
                         {!connected ? (

@@ -64,7 +64,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const isActive = (path: string) => pathname === path;
 
     const whyItems = [
-        { label: "Why Chainvolio", href: "/why" },
+        { label: "Why ChainVolio", href: "/why" },
         { label: "Trust Model", href: "/trust" },
         { label: "System Status", href: "/status" },
         { label: "About Us", href: "/about" },
