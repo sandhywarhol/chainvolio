@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
         let query = supabase
             .from("organization_verifications")
-            .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, created_at, expires_at")
+            .select("id, name, type, wallet_address, website, social_link, proof, status, rejection_reason, tx_signature, amount_paid, billing_cycle, pending_upgrade_type, pending_upgrade_status, created_at, expires_at")
             .order("created_at", { ascending: false });
 
         if (!showTestUsers) {

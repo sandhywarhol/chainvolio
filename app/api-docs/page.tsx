@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { 
-    Copy, 
-    Code2, 
-    ShieldCheck, 
-    Zap, 
-    Layers, 
-    Terminal, 
-    Briefcase, 
-    Users, 
+import {
+    Copy,
+    Code2,
+    ShieldCheck,
+    Zap,
+    Layers,
+    Terminal,
+    Briefcase,
+    Users,
     Landmark,
     Search,
     Cpu,
@@ -22,11 +24,15 @@ import {
     Key,
     MousePointer2,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    RefreshCw,
+    Wallet,
 } from "lucide-react";
 import Link from "next/link";
 
 export default function ApiDocsPage() {
+  const { publicKey, signMessage, connected } = useWallet();
+
   const [copied, setCopied] = useState<string | null>(null);
   const [testAddress, setTestAddress] = useState("");
   const [testResult, setTestResult] = useState<any>(null);
@@ -34,6 +40,9 @@ export default function ApiDocsPage() {
   const [testError, setTestError] = useState<string | null>(null);
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [generatingKey, setGeneratingKey] = useState(false);
+  const [keyError, setKeyError] = useState<string | null>(null);
+  const [keyIsExisting, setKeyIsExisting] = useState(false);
+  const [keyUsage, setKeyUsage] = useState<{ count: number; limit: number } | null>(null);
   const [responseTime, setResponseTime] = useState<number | null>(null);
 
   const copyToClipboard = (text: string, id: string) => {
@@ -65,17 +74,41 @@ export default function ApiDocsPage() {
   };
 
   const generateApiKey = async () => {
+    if (!publicKey || !signMessage) return;
     setGeneratingKey(true);
+    setKeyError(null);
     try {
+      const { signChainVolioAction } = await import("@/lib/wallet-utils");
+      const signedAction = await signChainVolioAction(
+        { publicKey, signMessage } as any,
+        "generate_api_key"
+      );
+      if (!signedAction) {
+        setKeyError("Signing was cancelled.");
+        return;
+      }
+
       const res = await fetch("/api/v1/keys/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: "Docs Key" })
+        body: JSON.stringify({
+          wallet: publicKey.toBase58(),
+          signature: signedAction.signature,
+          nonce: signedAction.nonce,
+          timestamp: signedAction.timestamp,
+          name: "Developer Key",
+        }),
       });
       const data = await res.json();
-      if (data.key) setGeneratedKey(data.key);
-    } catch (err) {
-      console.error(err);
+      if (!res.ok) {
+        setKeyError(data.error || "Failed to generate key.");
+        return;
+      }
+      setGeneratedKey(data.key);
+      setKeyIsExisting(data.existing ?? false);
+      setKeyUsage({ count: data.usage_count ?? 0, limit: data.usage_limit ?? 1000 });
+    } catch (err: any) {
+      setKeyError(err.message || "Unexpected error.");
     } finally {
       setGeneratingKey(false);
     }
@@ -156,7 +189,6 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { label: "Overview", href: "#introduction" },
                   { label: "Use Cases", href: "#use-cases" },
                   { label: "Example Usage", href: "#example-usage" },
-                  { label: "Suggested UI", href: "#suggested-ui" },
                   { label: "Authentication", href: "#authentication" }
               ].map((item, i) => (
                   <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-purple-500 font-medium tracking-tight">
@@ -281,47 +313,79 @@ if (data.score > 75 && data.confidence > 0.8) {
                     <div className="md:w-1/2 space-y-6">
                         <h3 className="text-2xl md:text-h2 md:!text-3xl break-words">Get Your API Key</h3>
                         <p className="text-body text-lg opacity-40 break-words">
-                          Start building immediately. Generate a secure API key to authenticate your crystalline requests.
+                          Connect your Solana wallet to generate a key tied to your identity. One key per wallet.
                         </p>
-                        {!generatedKey ? (
-                            <button 
-                              onClick={generateApiKey}
-                              disabled={generatingKey}
-                              className="px-10 py-5 bg-white text-slate-950 font-bold rounded-[20px] hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950"
-                            >
-                              {generatingKey ? "Generating..." : "Generate API Key"}
-                            </button>
-                          ) : (
-                            <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                                <span className="text-caption text-emerald-400 font-bold">Key Provisioned</span>
+
+                        {!connected ? (
+                            <div className="space-y-4">
+                                <p className="text-caption text-white/30 text-sm">Connect your wallet first to generate a key.</p>
+                                <WalletMultiButton />
+                            </div>
+                        ) : !generatedKey ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-[11px] text-emerald-400/70 font-mono">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    {publicKey?.toBase58().slice(0, 8)}…{publicKey?.toBase58().slice(-8)} connected
+                                </div>
+                                <button
+                                    onClick={generateApiKey}
+                                    disabled={generatingKey}
+                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-[20px] hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
+                                >
+                                    {generatingKey ? "Signing…" : "Generate API Key"}
+                                </button>
+                                {keyError && (
+                                    <p className="text-xs text-red-400 font-medium">{keyError}</p>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3">
+                                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                                    <div>
+                                        <span className="text-caption text-emerald-400 font-bold block">
+                                            {keyIsExisting ? "Existing Key Retrieved" : "Key Provisioned"}
+                                        </span>
+                                        {keyUsage && (
+                                            <span className="text-[10px] text-emerald-400/50">
+                                                {keyUsage.count} / {keyUsage.limit} requests used
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => { setGeneratedKey(null); setKeyError(null); }}
+                                    className="flex items-center gap-2 text-xs text-white/20 hover:text-white/50 transition-colors"
+                                >
+                                    <RefreshCw className="w-3 h-3" /> Regenerate key
+                                </button>
                             </div>
                         )}
                     </div>
 
                     <div className="md:w-1/2 w-full">
                         {generatedKey ? (
-                           <div className="space-y-6 scale-in duration-500">
+                           <div className="space-y-6">
                               <div className="p-8 bg-black border border-white/[0.05] rounded-3xl relative group/key">
                                 <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
                                 <div className="flex items-center justify-between gap-4">
                                     <code className="text-emerald-400 font-mono text-sm break-all">{generatedKey}</code>
-                                    <button 
-                                      onClick={() => copyToClipboard(generatedKey, "gen-key")} 
+                                    <button
+                                      onClick={() => copyToClipboard(generatedKey, "gen-key")}
                                       className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 text-white/20 hover:text-white transition-all flex-shrink-0"
                                     >
                                       <Copy className={`w-4 h-4 ${copied === 'gen-key' ? 'text-emerald-400' : ''}`} />
                                     </button>
                                 </div>
                               </div>
-                              <div className="p-4 bg-red-500/[0.02] border border-red-500/10 rounded-xl flex items-center gap-3">
-                                <ShieldCheck className="w-4 h-4 text-red-500/40" />
-                                <p className="text-caption !text-[8px] opacity-40">Key will not be shown again. Store securely.</p>
+                              <div className="p-4 bg-amber-500/[0.03] border border-amber-500/10 rounded-xl flex items-center gap-3">
+                                <ShieldCheck className="w-4 h-4 text-amber-500/40 flex-shrink-0" />
+                                <p className="text-caption !text-[10px] text-amber-400/40">Store this key securely. Do not expose it in client-side code.</p>
                               </div>
                            </div>
                         ) : (
                             <div className="aspect-square rounded-[40px] border border-white/[0.03] bg-white/[0.01] flex items-center justify-center relative overflow-hidden">
-                                <Key className="w-16 h-16 text-white/[0.03]" />
+                                <Wallet className="w-16 h-16 text-white/[0.03]" />
                                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
                             </div>
                         )}
@@ -336,20 +400,36 @@ if (data.score > 75 && data.confidence > 0.8) {
               <Lock className="w-5 h-5 text-indigo-400" />
               <h2 className="text-2xl md:text-h2 break-words">Request Auth</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-12 items-start">
                 <div className="space-y-6">
                     <p className="text-body text-lg italic opacity-40">
-                        "All API requests must be authenticated using an x-api-key header. This key authorizes your platform to interface with the ChainVolio reputation engine."
+                        "Pass your API key via the <code className="not-italic text-indigo-400 text-sm">x-api-key</code> header to authenticate requests and track usage."
                     </p>
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-3 p-4 bg-emerald-500/[0.03] border border-emerald-500/10 rounded-xl">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                            <div>
+                                <p className="text-caption text-emerald-400 font-bold text-xs mb-1">GET /v1/wallet/:address/score</p>
+                                <p className="text-body text-xs opacity-40">Publicly accessible. API key optional — include it to track your usage quota.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-4 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-xl">
+                            <Key className="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" />
+                            <div>
+                                <p className="text-caption text-indigo-400 font-bold text-xs mb-1">POST /v1/scores/batch</p>
+                                <p className="text-body text-xs opacity-40">Requires API key. Use for high-volume integrations.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl group">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-caption opacity-20">Required Header</span>
+                        <span className="text-caption opacity-20">Header (optional for GET, required for POST batch)</span>
                     </div>
                     <div className="p-5 md:p-6 bg-black border border-white/[0.05] rounded-2xl flex flex-col md:flex-row items-center justify-between group-hover:border-indigo-500/20 transition-all shadow-2xl gap-4">
                         <code className="text-indigo-400 text-xs md:text-sm font-mono break-all italic">x-api-key: YOUR_API_KEY</code>
-                        <button 
-                          onClick={() => copyToClipboard("x-api-key: YOUR_API_KEY", "auth")} 
+                        <button
+                          onClick={() => copyToClipboard("x-api-key: YOUR_API_KEY", "auth")}
                           className="p-2 text-white/20 hover:text-white transition-colors"
                         >
                           <Copy className={`w-4 h-4 ${copied === 'auth' ? 'text-indigo-400' : ''}`} />

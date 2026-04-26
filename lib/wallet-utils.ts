@@ -3,7 +3,7 @@ import bs58 from "bs58";
 
 export async function signChainVolioAction(
     wallet: WalletContextState,
-    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission" | "view_dashboard" | "admin_access" | "approve_org" | "reject_org",
+    action: "submit_cv" | "submit_work" | "update_work" | "apply_job" | "attest" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "review_submission" | "view_dashboard" | "admin_access" | "approve_org" | "reject_org" | "generate_api_key",
     context?: string,
     options: { forceFresh?: boolean } = {}
 ): Promise<{ signature: string; nonce: string; timestamp: number } | null> {
@@ -22,7 +22,7 @@ export async function signChainVolioAction(
                 const twoHours = 2 * 60 * 60 * 1000;
                 
                 // For most actions, allow 2 hour cache (backend now supports this)
-                const cacheWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org")
+                const cacheWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org" || action === "generate_api_key")
                     ? twoHours
                     : tenMinutes;
 

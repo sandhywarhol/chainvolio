@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { 
-    SERVER_PAYMENT_MODE, 
-    TREASURY_WALLET, 
-    USDC_MINT_MAINNET, 
+import {
+    SERVER_PAYMENT_MODE,
+    TREASURY_WALLET,
+    USDC_MINT_MAINNET,
     USDC_MINT_DEVNET,
     getSolTestLamports,
     getSolTestPrice,
     USDC_PROD_PRICES,
     USDC_PROD_DISPLAY
 } from "@/lib/paymentConfig";
+
+const ADMIN_WALLET = "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv";
 
 // Tier ID → display type label stored in DB
 const TIER_TYPE_MAP: Record<string, string> = {
@@ -251,6 +253,39 @@ export async function POST(request: Request) {
                 .eq("id", lockRecordId);
 
             if (finalError) throw new Error(`Database error: ${finalError.message}`);
+
+            const cycleLabel = billingCycle === "yearly" ? "yearly" : billingCycle === "monthly" ? "monthly" : "";
+            const isUpgradeNotif = existing?.status === "verified";
+
+            // ── Notify user: payment received, pending admin review ──────────
+            try {
+                await supabase.from("notifications").insert({
+                    wallet_address: walletAddress,
+                    title: "Payment Received – Pending Review",
+                    message: `Your ${type} verification payment (${displayPrice} USDC${cycleLabel ? ` / ${cycleLabel}` : ""}) has been received. Your badge will appear after admin review.`,
+                    type: "verification",
+                    related_id: lockRecordId,
+                    link: "/dashboard#verification-status",
+                    is_read: false,
+                });
+            } catch (notifErr) {
+                console.error("[validate-payment] Failed to send user notification:", notifErr);
+            }
+
+            // ── Notify admin: new verification payment waiting for review ────
+            try {
+                await supabase.from("notifications").insert({
+                    wallet_address: ADMIN_WALLET,
+                    title: isUpgradeNotif ? "New Upgrade Request" : "New Verification Payment",
+                    message: `${profileName || walletAddress} paid ${displayPrice} USDC for ${type}${cycleLabel ? ` (${cycleLabel})` : ""}. Awaiting your review.`,
+                    type: "admin_payment",
+                    related_id: lockRecordId,
+                    link: "/admin/organization-verification",
+                    is_read: false,
+                });
+            } catch (notifErr) {
+                console.error("[validate-payment] Failed to send admin notification:", notifErr);
+            }
 
             return NextResponse.json({ ok: true });
 

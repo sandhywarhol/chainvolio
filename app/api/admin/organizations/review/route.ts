@@ -184,6 +184,7 @@ export async function POST(request: Request) {
             auditAction = "revoked";
             if (!auditNote) auditNote = "Verification revoked by admin.";
 
+
         } else if (action === "reset") {
             updateData.status = "pending";
             updateData.approved_at = null;
@@ -208,6 +209,38 @@ export async function POST(request: Request) {
 
         if (updateError) {
             return NextResponse.json({ error: updateError.message }, { status: 500 });
+        }
+
+        // 2.5 Trigger notifications for non-approval actions (approval notification sent above)
+        if (action === "reject") {
+            try {
+                const rejReason = updateData.rejection_reason || "No reason provided.";
+                await supabase.from("notifications").insert({
+                    wallet_address: org.wallet_address,
+                    title: "Verification Request Rejected",
+                    message: `Your ${org.type || "verification"} request was not approved. Reason: ${rejReason}. You may resubmit after addressing the feedback.`,
+                    type: "verification",
+                    related_id: id,
+                    link: "/dashboard#verification-status",
+                    is_read: false,
+                });
+            } catch (notifErr) {
+                console.error("Failed to trigger rejection notification:", notifErr);
+            }
+        } else if (action === "revoke") {
+            try {
+                await supabase.from("notifications").insert({
+                    wallet_address: org.wallet_address,
+                    title: "Verification Revoked",
+                    message: `Your ${org.type || "verification"} status has been revoked by the ChainVolio team.${reason ? ` Reason: ${reason}` : ""} Please contact support for more information.`,
+                    type: "verification",
+                    related_id: id,
+                    link: "/dashboard#verification-status",
+                    is_read: false,
+                });
+            } catch (notifErr) {
+                console.error("Failed to trigger revocation notification:", notifErr);
+            }
         }
 
         // 3. Audit log

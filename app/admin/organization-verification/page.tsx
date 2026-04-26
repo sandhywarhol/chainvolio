@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Navbar } from "@/components/layout/Navbar";
@@ -46,6 +46,9 @@ type OrgRequest = {
     rejection_reason?: string;
     tx_signature?: string;
     amount_paid?: number;
+    billing_cycle?: string | null;
+    pending_upgrade_type?: string | null;
+    pending_upgrade_status?: string | null;
     expires_at?: string;
     profiles?: { card_number: number, display_name: string };
 };
@@ -79,7 +82,8 @@ export default function AdminVerificationPage() {
     const [analytics, setAnalytics] = useState<{ totalUsers: number; topCountries: any[] } | null>(null);
     const [showAnalytics, setShowAnalytics] = useState(false);
 
-
+    // Cache the 2-hour session signature so auto-refresh never prompts the wallet again
+    const signedActionRef = useRef<{ signature: string; nonce: string; timestamp: number } | undefined>(undefined);
 
     const isAdmin = publicKey?.toBase58() === ADMIN_WALLET;
 
@@ -97,25 +101,41 @@ export default function AdminVerificationPage() {
         fetchRequests();
     }, [connected, publicKey, showTestUsers]);
 
-    const fetchRequests = async () => {
+    // Auto-refresh every 60 seconds using the cached 2-hour session signature
+    useEffect(() => {
+        if (!isAdmin) return;
+        const interval = setInterval(() => {
+            const cached = signedActionRef.current;
+            if (cached) fetchRequests(cached);
+        }, 60_000);
+        return () => clearInterval(interval);
+    }, [isAdmin, showTestUsers]);
+
+    const fetchRequests = async (reusedSignedAction?: { signature: string; nonce: string; timestamp: number }) => {
         setLoading(true);
         try {
             const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "admin_access");
+
+            let signedAction = reusedSignedAction;
             if (!signedAction) {
-                setLoading(false);
-                return;
+                const fresh = await signChainVolioAction({ publicKey, signMessage } as any, "admin_access");
+                if (!fresh) {
+                    setLoading(false);
+                    return;
+                }
+                signedAction = fresh;
+                signedActionRef.current = fresh;
             }
 
             const res = await fetch("/api/admin/organizations", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    adminWallet: ADMIN_WALLET, 
-                    signature: signedAction.signature, 
-                    nonce: signedAction.nonce, 
-                    timestamp: signedAction.timestamp, 
-                    showTestUsers 
+                body: JSON.stringify({
+                    adminWallet: ADMIN_WALLET,
+                    signature: signedAction.signature,
+                    nonce: signedAction.nonce,
+                    timestamp: signedAction.timestamp,
+                    showTestUsers
                 }),
             });
 
@@ -526,7 +546,7 @@ export default function AdminVerificationPage() {
                             <input type="checkbox" className="hidden" checked={showTestUsers} onChange={(e) => setShowTestUsers(e.target.checked)} />
                         </label>
                         <div className="w-[1px] h-4 bg-white/10 mr-2" />
-                        <button onClick={fetchRequests} className="text-xs font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2">
+                        <button onClick={() => fetchRequests(signedActionRef.current)} className="text-xs font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2">
                             <RotateCcw className="w-3 h-3" /> Refresh
                         </button>
                         <button 
@@ -851,11 +871,23 @@ export default function AdminVerificationPage() {
                                         {/* Amount Paid */}
                                         <td className="px-8 py-6">
                                             {req.amount_paid !== undefined && req.amount_paid !== null ? (
-                                                <span className={`text-sm font-bold ${
-                                                    req.amount_paid > 0 ? "text-emerald-400" : "text-white/30"
-                                                }`}>
-                                                    {req.amount_paid > 0 ? `${req.amount_paid} USDC` : "Free"}
-                                                </span>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className={`text-sm font-bold ${
+                                                        req.amount_paid > 0 ? "text-emerald-400" : "text-white/30"
+                                                    }`}>
+                                                        {req.amount_paid > 0 ? `${req.amount_paid} USDC` : "Free"}
+                                                    </span>
+                                                    {req.billing_cycle && (
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                                                            {req.billing_cycle}
+                                                        </span>
+                                                    )}
+                                                    {req.pending_upgrade_type && (
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70">
+                                                            ↑ {req.pending_upgrade_type}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             ) : (
                                                 <span className="text-xs text-slate-600 italic">-</span>
                                             )}

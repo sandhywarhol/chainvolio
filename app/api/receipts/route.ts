@@ -122,7 +122,7 @@ export async function GET(request: Request) {
         attesterVerificationType: isAttesterVerified ? orgData?.type : null,
         attestationId: attestation?.id || null,
         txSignature: attestation?.tx_signature || null,
-        attesterAt: attestation?.attester_at || null,
+        attesterAt: attestation?.memo_issued_at || attestation?.created_at || null,
         confidence: attestation?.confidence_level || "Confirmed",
         attesterComment: attestation?.comment || null,
         updates: r.receipt_updates || [],

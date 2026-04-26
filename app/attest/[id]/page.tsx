@@ -24,6 +24,16 @@ async function sha256hex(text: string): Promise<string> {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Canonical JSON: sorted keys at every level so hash is deterministic regardless
+// of JS object insertion order or PostgreSQL JSONB key reordering on retrieval.
+function canonicalJson(value: unknown): string {
+    if (value === null || typeof value !== "object") return JSON.stringify(value);
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+    const obj = value as Record<string, unknown>;
+    const pairs = Object.keys(obj).sort().map(k => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`);
+    return `{${pairs.join(",")}}`;
+}
+
 const MEMO_PID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -147,8 +157,9 @@ export default function AttestPage() {
                 },
             };
 
-            // 3. SHA-256 content hash (anchored on-chain)
-            const memoJSON = JSON.stringify(memoV2);
+            // 3. SHA-256 content hash (anchored on-chain) — use canonical JSON so the
+            // hash is reproducible after PostgreSQL JSONB reorders keys alphabetically.
+            const memoJSON = canonicalJson(memoV2);
             const contentHash = await sha256hex(memoJSON);
 
             // 4. Compact on-chain memo (under 566 bytes)

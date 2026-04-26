@@ -24,6 +24,16 @@ async function sha256hex(text: string): Promise<string> {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Canonical JSON: sorted keys at every level — must match the attest page so
+// the hash verifies correctly after PostgreSQL JSONB reorders keys alphabetically.
+function canonicalJson(value: unknown): string {
+    if (value === null || typeof value !== "object") return JSON.stringify(value);
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+    const obj = value as Record<string, unknown>;
+    const pairs = Object.keys(obj).sort().map(k => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`);
+    return `{${pairs.join(",")}}`;
+}
+
 function truncate(str: string, head = 8, tail = 8) {
     if (!str || str.length <= head + tail + 3) return str;
     return `${str.slice(0, head)}…${str.slice(-tail)}`;
@@ -65,7 +75,7 @@ export default function MemoPage() {
             .then(async d => {
                 setData(d);
                 if (d.attestation?.memo_v2 && d.attestation?.content_hash) {
-                    const computed = await sha256hex(JSON.stringify(d.attestation.memo_v2));
+                    const computed = await sha256hex(canonicalJson(d.attestation.memo_v2));
                     setHashOk(computed === d.attestation.content_hash);
                 }
             })
@@ -362,13 +372,30 @@ export default function MemoPage() {
                                 </div>
 
                                 <div className={`pt-8 border-t ${t.divider}`}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <ShieldCheck className="text-emerald-500" size={14} />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Tamper-Proof Secure</span>
-                                    </div>
-                                    <p className="text-[9px] opacity-40 leading-relaxed font-medium">
-                                        The content hash of this memo ({String(attestation.content_hash).slice(0, 8)}...) matches the on-chain instruction data, ensuring zero tampering.
-                                    </p>
+                                    {hashOk === null ? (
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Verifying integrity…</span>
+                                        </div>
+                                    ) : hashOk ? (
+                                        <>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <ShieldCheck className="text-emerald-500" size={14} />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Tamper-Proof Secure</span>
+                                            </div>
+                                            <p className="text-[9px] opacity-40 leading-relaxed font-medium">
+                                                Content hash ({String(attestation.content_hash).slice(0, 8)}…) matches the on-chain record. Zero tampering detected.
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-amber-500">⚠ Hash Mismatch</span>
+                                            </div>
+                                            <p className="text-[9px] opacity-60 leading-relaxed font-medium text-amber-400">
+                                                Content hash could not be verified. The memo data may have been modified after anchoring.
+                                            </p>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>

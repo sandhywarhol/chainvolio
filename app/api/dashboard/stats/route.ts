@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { getAttestationQuota } from "@/lib/paymentConfig";
+import { syncUserStatus } from "@/lib/sync";
 
 export async function GET(request: Request) {
     if (!supabase) {
@@ -108,6 +109,9 @@ export async function GET(request: Request) {
             attestationUsed: (profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0),
             attestationResetDate: profile?.attestation_reset_date || null,
         };
+
+        // Fire-and-forget: triggers expiry notifications and auto-builder checks
+        syncUserStatus(wallet).catch(console.error);
 
         return NextResponse.json({
             profile: identity,

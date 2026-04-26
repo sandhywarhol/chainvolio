@@ -52,12 +52,15 @@ export async function syncUserStatus(wallet: string) {
         if (meetsBuilderCriteria) {
             const canAutoVerify = !orgData || (orgData.status !== 'verified' && orgData.type === 'Builder') || (!orgData.type && orgData.status !== 'verified');
             if (canAutoVerify) {
+                const nowIso = new Date().toISOString();
                 const upsertData = {
                     wallet_address: wallet,
                     type: 'Builder',
                     status: 'verified',
                     name: profile.display_name || wallet,
-                    updated_at: new Date().toISOString()
+                    verification_source: 'auto_builder',
+                    approved_at: nowIso,
+                    updated_at: nowIso,
                 };
                 if (orgData?.id) {
                     await supabase.from("organization_verifications").update(upsertData).eq("id", orgData.id);
@@ -65,6 +68,26 @@ export async function syncUserStatus(wallet: string) {
                     await supabase.from("organization_verifications").insert(upsertData);
                 }
                 console.log(`[SYNC] User verified as Builder: ${wallet}`);
+
+                // Notify user of auto-verification (deduplicated by related_id)
+                const notifKey = `builder-auto-${wallet}`;
+                const { data: existingNotif } = await supabase
+                    .from("notifications")
+                    .select("id")
+                    .eq("wallet_address", wallet)
+                    .eq("related_id", notifKey)
+                    .maybeSingle();
+                if (!existingNotif) {
+                    await supabase.from("notifications").insert({
+                        wallet_address: wallet,
+                        title: "Builder Badge Earned",
+                        message: "You are now a Verified Builder 🎉 Your profile meets all criteria.",
+                        type: "verification",
+                        related_id: notifKey,
+                        link: "/dashboard#verification-status",
+                        is_read: false,
+                    });
+                }
             }
         }
 

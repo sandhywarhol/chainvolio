@@ -209,6 +209,9 @@ export async function POST(request: Request) {
         }
 
         // b. Total Monthly Quota Check
+        // trackedUsed is hoisted so the counter update at the end of the handler is correct
+        // even after a monthly reset (where the in-block `used` would be 0).
+        let trackedUsed = 0;
         if (profile) {
             let used = profile.attestation_used || 0;
             let resetDate = profile.attestation_reset_date ? new Date(profile.attestation_reset_date) : new Date(0);
@@ -217,21 +220,23 @@ export async function POST(request: Request) {
                 used = 0;
                 resetDate = new Date();
                 resetDate.setDate(resetDate.getDate() + 30);
-                
+
                 // Update reset date in DB immediately
                 await supabase
                     .from("profiles")
-                    .update({ 
-                        attestation_used: 0, 
-                        attestation_reset_date: resetDate.toISOString() 
+                    .update({
+                        attestation_used: 0,
+                        attestation_reset_date: resetDate.toISOString()
                     })
                     .eq("wallet_address", attesterWallet);
             }
 
+            trackedUsed = used;
+
             // enforcement
             if (used >= quota) {
-                return NextResponse.json({ 
-                    error: `Monthly attestation limit reached for ${verificationTier} tier (${used}/${quota}). Please upgrade your verification tier to increase your quota.` 
+                return NextResponse.json({
+                    error: `Monthly attestation limit reached for ${verificationTier} tier (${used}/${quota}). Please upgrade your verification tier to increase your quota.`
                 }, { status: 403 });
             }
         } else {
@@ -337,11 +342,11 @@ export async function POST(request: Request) {
             // Non-blocking
         }
 
-        // Update user attestation count
+        // Update user attestation count (use trackedUsed which reflects any monthly reset)
         if (profile) {
             await supabase
                 .from("profiles")
-                .update({ attestation_used: (profile.attestation_used || 0) + 1 })
+                .update({ attestation_used: trackedUsed + 1 })
                 .eq("wallet_address", attesterWallet);
         } else {
             await supabase.from("profiles").upsert({

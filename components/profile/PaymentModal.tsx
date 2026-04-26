@@ -5,6 +5,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
     PublicKey,
     Transaction,
+    SystemProgram,
+    LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import {
     getAssociatedTokenAddress,
@@ -25,6 +27,8 @@ import {
     TREASURY_WALLET,
     USDC_MINT_MAINNET,
     USDC_DECIMALS,
+    IS_SOL_TEST,
+    getSolTestLamports,
 } from "@/lib/paymentConfig";
 
 // ─── Color palette (mirrors VerificationRequestModal) ──────────────────────
@@ -82,10 +86,12 @@ export function PaymentModal({
 
     const col = C[colorKey];
 
-    // Display helpers
-    const displayAmount  = price;
-    const displayCurrency = "USDC";
-    const displayLabel   = `${price} USDC`;
+    // Display helpers — adapt to payment mode
+    const displayAmount   = IS_SOL_TEST ? getSolTestLamports(tierId, billingCycle) / LAMPORTS_PER_SOL : price;
+    const displayCurrency = IS_SOL_TEST ? "SOL" : "USDC";
+    const displayLabel    = IS_SOL_TEST
+        ? `${displayAmount} SOL`
+        : `${price} USDC`;
 
     const isProcessing = phase !== "idle" && phase !== "error" && phase !== "success";
 
@@ -109,44 +115,58 @@ export function PaymentModal({
             let signature: string;
             const treasuryPubkey = new PublicKey(TREASURY_WALLET);
             const { blockhash } = await connection.getLatestBlockhash("confirmed");
-            
-            // ── USDC_PROD: SPL token transfer (transferChecked) ──────────
-            const usdcMintPubkey = new PublicKey(USDC_MINT_MAINNET);
-
-            // 1. Resolve ATAs
-            const userAta = await getAssociatedTokenAddress(usdcMintPubkey, publicKey);
-            const treasuryAta = await getAssociatedTokenAddress(usdcMintPubkey, treasuryPubkey);
 
             const tx = new Transaction({ recentBlockhash: blockhash, feePayer: publicKey });
 
-            // Check if treasury ATA exists; if not, create it.
-            const treasuryAtaInfo = await connection.getAccountInfo(treasuryAta);
-            if (!treasuryAtaInfo) {
+            if (IS_SOL_TEST) {
+                // ── SOL_TEST: native SOL transfer (SystemProgram.transfer) ──
+                const lamports = getSolTestLamports(tierId, billingCycle);
+                if (!lamports) throw new Error("Invalid SOL_TEST price — check paymentConfig.");
+
                 tx.add(
-                    createAssociatedTokenAccountInstruction(
-                        publicKey,
+                    SystemProgram.transfer({
+                        fromPubkey: publicKey,
+                        toPubkey:   treasuryPubkey,
+                        lamports,
+                    })
+                );
+            } else {
+                // ── USDC_PROD: SPL token transfer (transferChecked) ──────────
+                const usdcMintPubkey = new PublicKey(USDC_MINT_MAINNET);
+
+                // 1. Resolve ATAs
+                const userAta      = await getAssociatedTokenAddress(usdcMintPubkey, publicKey);
+                const treasuryAta  = await getAssociatedTokenAddress(usdcMintPubkey, treasuryPubkey);
+
+                // Create treasury ATA if it doesn't exist yet
+                const treasuryAtaInfo = await connection.getAccountInfo(treasuryAta);
+                if (!treasuryAtaInfo) {
+                    tx.add(
+                        createAssociatedTokenAccountInstruction(
+                            publicKey,
+                            treasuryAta,
+                            treasuryPubkey,
+                            usdcMintPubkey
+                        )
+                    );
+                }
+
+                // 2. Add transferChecked instruction
+                const usdcUnits = BigInt(Math.round(price * Math.pow(10, USDC_DECIMALS)));
+
+                tx.add(
+                    createTransferCheckedInstruction(
+                        userAta,
+                        usdcMintPubkey,
                         treasuryAta,
-                        treasuryPubkey,
-                        usdcMintPubkey
+                        publicKey,
+                        usdcUnits,
+                        USDC_DECIMALS,
+                        [],
+                        TOKEN_PROGRAM_ID
                     )
                 );
             }
-
-            // 2. Add transferChecked instruction
-            const usdcUnits = BigInt(Math.round(price * Math.pow(10, USDC_DECIMALS)));
-            
-            tx.add(
-                createTransferCheckedInstruction(
-                    userAta,
-                    usdcMintPubkey,
-                    treasuryAta,
-                    publicKey,
-                    usdcUnits,
-                    USDC_DECIMALS,
-                    [],
-                    TOKEN_PROGRAM_ID
-                )
-            );
 
             try {
                 signature = await sendTransaction(tx, connection, { 
