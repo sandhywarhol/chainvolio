@@ -243,25 +243,158 @@ export function LandingPageClient() {
                         </div>
                     </div>
                 </section>
-
                 <div className="w-full pt-4 pb-12 overflow-hidden relative group/marquee" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
                     <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-                        {[...Array(4)].map((_, i) => (
-                            <div key={i} className="flex gap-24 items-center flex-shrink-0 pr-24">
-                                {partners.map((partner) => (
-                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} />
-                                ))}
+                        {[...partners, ...partners].map((partner, i) => (
+                            <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-20 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default">
+                                <img
+                                    src={partner.src}
+                                    alt={partner.name}
+                                    className="h-6 w-auto object-contain"
+                                    style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
+                                />
                             </div>
                         ))}
                     </div>
                 </div>
 
+                {/* --- NEW SECTIONS START HERE --- */}
+
+                {/* 1. PROBLEM SECTION */}
+                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
+                    <div className="max-w-[1200px] mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                            <div>
+                                <h2 className="text-[11px] font-black uppercase text-rose-500 tracking-[0.4em] mb-6">The Problem</h2>
+                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
+                                    Traditional CVs are <br />
+                                    <span className="text-white/40">unreliable and easy to fake.</span>
+                                </h3>
+                                <div className="space-y-6">
+                                    <p className="text-white/50 text-sm leading-relaxed max-w-md font-light">
+                                        Recruiters spend months filtering through unverified portfolios, while talented individuals struggle to stand out amongst a sea of inflated claims and AI-generated resumes.
+                                    </p>
+                                    <ul className="space-y-4">
+                                        {["Endless screening cycles", "No proof of actual contribution", "Difficulty verifying soft skills"].map(item => (
+                                            <li key={item} className="flex items-center gap-3 text-white/30 text-[10px] font-black uppercase tracking-widest">
+                                                <div className="w-1.5 h-1.5 bg-rose-500/40 rounded-full" />
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="aspect-video w-full rounded-[32px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/box">
+                                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-700"></div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 relative z-10">Problem Visualization Diagram</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 2. SOLUTION SECTION */}
+                <section className="py-32 px-4 md:px-8 bg-white/[0.01]">
+                    <div className="max-w-[1200px] mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                            <div className="order-2 lg:order-1 aspect-video w-full rounded-[32px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/box">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-700"></div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 relative z-10">On-Chain Proof Animation</p>
+                            </div>
+                            <div className="order-1 lg:order-2">
+                                <h2 className="text-[11px] font-black uppercase text-emerald-400 tracking-[0.4em] mb-6">The Solution</h2>
+                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
+                                    Verifiable identity <br />
+                                    <span className="text-white/40">anchored to on-chain proof.</span>
+                                </h3>
+                                <p className="text-white/50 text-sm leading-relaxed mb-10 max-w-md font-light">
+                                    ChainVolio converts professional contributions into cryptographic signals. Every skill claimed is backed by a verifier, ensuring trust without the need for manual background checks.
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                                        <p className="text-emerald-400 text-2xl font-bold mb-1 tracking-tight">100%</p>
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Verifiable Output</p>
+                                    </div>
+                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                                        <p className="text-emerald-400 text-2xl font-bold mb-1 tracking-tight">Instant</p>
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Trust Layer</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 3. HOW IT WORKS SECTION */}
+                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
+                    <div className="max-w-[1200px] mx-auto">
+                        <div className="text-center mb-24">
+                            <h2 className="text-[11px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-6">Workflow</h2>
+                            <h3 className="text-3xl md:text-4xl font-bold text-white tracking-tight">How ChainVolio works</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                { step: "01", title: "Build Profile", desc: "Connect your wallet and import your professional contributions to your secure ledger." },
+                                { step: "02", title: "Request Proof", desc: "Send verification requests to your project leads, founders or managers directly via Link." },
+                                { step: "03", title: "Earn Reputation", desc: "Your CV updates with on-chain attestations, creating an immutable proof of work." }
+                            ].map((item, idx) => (
+                                <div key={idx} className="relative p-10 rounded-[32px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all duration-500 group">
+                                    <div className="w-12 h-12 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center text-[11px] font-black text-indigo-400 mb-8 group-hover:scale-110 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all">
+                                        {item.step}
+                                    </div>
+                                    <h4 className="text-xl font-bold text-white mb-4 tracking-tight">{item.title}</h4>
+                                    <p className="text-white/40 text-xs leading-relaxed font-light">{item.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 4. VALUE SNAPSHOT */}
+                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
+                    <div className="max-w-[1200px] mx-auto">
+                        <div className="w-full h-[400px] rounded-[40px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/snapshot">
+                            <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/[0.03] to-transparent opacity-0 group-hover/snapshot:opacity-100 transition-opacity duration-1000"></div>
+                            <div className="text-center relative z-10 px-6">
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-6">Value Proposition Snapshot</p>
+                                <p className="text-[11px] text-white/10 max-w-sm mx-auto leading-relaxed font-medium">Interactive ecosystem module showing the cryptographic relationship between Builders, Verifiers, and Organizations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 5. FINAL CTA */}
+                <section className="py-48 px-4 md:px-8 border-t border-white/[0.02] bg-gradient-to-b from-transparent to-white/[0.01]">
+                    <div className="max-w-[800px] mx-auto text-center">
+                        <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tighter leading-[1.1]">
+                            Build your <br />
+                            <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">on-chain reputation.</span>
+                        </h2>
+                        <p className="text-white/40 text-base mb-12 max-w-lg mx-auto leading-relaxed font-light">
+                            Join thousands of builders and organizations creating a more transparent, verifiable future for Web3 careers.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                             <button
+                                onClick={() => setIsWalletModalOpen(true)}
+                                className="premium-shimmer-button w-full sm:w-auto px-12 py-4.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(20,241,149,0.25)]"
+                            >
+                                Get Started Now
+                            </button>
+                            <Link
+                                href="/why"
+                                className="w-full sm:w-auto px-12 py-4.5 bg-white/[0.02] hover:bg-white/[0.05] text-white/70 font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                            >
+                                Learn More
+                            </Link>
+                        </div>
+                    </div>
+                </section>
                 <Footer />
             </div>
 
-                <div className="block md:hidden">
+            {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
+            <div className="block md:hidden">
                 <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
                     <div className="flex flex-col items-center">
                         <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6">
@@ -373,6 +506,41 @@ export function LandingPageClient() {
                                 ))}
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* --- MOBILE SECTIONS --- */}
+
+                <div className="px-6 py-20 space-y-32">
+                    {/* Problem */}
+                    <div>
+                        <h2 className="text-[10px] font-black uppercase text-rose-500 tracking-[0.4em] mb-4">The Problem</h2>
+                        <h3 className="text-2xl font-bold text-white mb-6">Traditional CVs are easy to fake.</h3>
+                        <p className="text-white/40 text-sm leading-relaxed font-light mb-8">Recruiters waste time on unverified claims. Talent gets lost in the noise.</p>
+                        <div className="aspect-video w-full rounded-2xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.01]">
+                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 text-center px-4">Problem Visualization</p>
+                        </div>
+                    </div>
+
+                    {/* Solution */}
+                    <div>
+                        <h2 className="text-[10px] font-black uppercase text-emerald-400 tracking-[0.4em] mb-4">The Solution</h2>
+                        <h3 className="text-2xl font-bold text-white mb-6">On-chain professional proof.</h3>
+                        <p className="text-white/40 text-sm leading-relaxed font-light mb-8">ChainVolio anchors Every skill to a verifier, creating instant trust.</p>
+                        <div className="aspect-video w-full rounded-2xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.01]">
+                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 text-center px-4">Solution Animation</p>
+                        </div>
+                    </div>
+
+                    {/* Final CTA Mobile */}
+                    <div className="text-center py-20">
+                        <h2 className="text-3xl font-bold text-white mb-6">Build your legacy.</h2>
+                        <button
+                            onClick={() => setIsWalletModalOpen(true)}
+                            className="w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-sm rounded-xl shadow-lg"
+                        >
+                            Get Started
+                        </button>
                     </div>
                 </div>
 
