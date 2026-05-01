@@ -326,18 +326,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                     </div>
                                 </div>
                             ))}
-                        </div>
-
-                        {/* Divider */}
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 h-px bg-white/[0.06]" />
-                            <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">or</span>
-                            <div className="flex-1 h-px bg-white/[0.06]" />
-                        </div>
-
-                        {/* Google sign-in */}
-                        <div
-                            onClick={() => { onClose(); signInWithGoogle(); }}
+                            {/* Google sign-in */}
+                            <div
+                                onClick={() => { onClose(); signInWithGoogle(); }}
                             className="group flex items-center justify-between p-3.5 bg-white/[0.02] border border-white/5 rounded-[18px] hover:border-teal-500/20 hover:bg-teal-500/[0.03] transition-all cursor-pointer"
                         >
                             <div className="flex items-center gap-3 min-w-0">
@@ -357,6 +348,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             <div className="shrink-0 ml-2">
                                 <div className="px-3 py-1.5 bg-teal-500/10 group-hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all whitespace-nowrap">
                                     Sign In
+                                </div>
                                 </div>
                             </div>
                         </div>

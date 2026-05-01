@@ -9,6 +9,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
 import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 
 interface NavbarProps {
@@ -27,6 +28,7 @@ interface NavbarProps {
 export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier, verificationTier }: NavbarProps) {
 
     const { publicKey } = useWallet();
+    const { isGoogleSignedIn } = useGoogleAuth();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides' | 'developer'>('main');
@@ -122,7 +124,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={devItems}
                         />
 
-                        {publicKey && (
+                        {(publicKey || isGoogleSignedIn) && (
                             <Link
                                 href="/dashboard"
                                 className={`transition-colors py-2 ${isActive('/dashboard') ? 'text-emerald-400 font-extrabold' : 'text-emerald-400/60 hover:text-emerald-400'}`}
@@ -272,7 +274,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                         <div className="space-y-4">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">User Hub</p>
                                             <div className="flex flex-col gap-2">
-                                                {publicKey && (
+                                                {(publicKey || isGoogleSignedIn) && (
                                                     <MobileNavLink 
                                                         href="/dashboard" 
                                                         icon={<LayoutGrid className="w-5 h-5" />} 

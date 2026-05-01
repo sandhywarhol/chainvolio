@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServer
         .from("org_accounts")
         .select(
-            "auth_uid, org_name, org_type, bio, avatar_url, website, twitter, linkedin, discord, telegram, country, plan_name, subscription_status, current_period_end, onboarding_complete"
+            "auth_uid, org_name, org_type, bio, avatar_url, website, twitter, linkedin, discord, telegram, country, plan_name, subscription_status, current_period_end, onboarding_complete, created_at"
         )
         .eq("auth_uid", authUid)
         .single();
@@ -29,6 +29,15 @@ export async function GET(req: NextRequest) {
     const effectivePlan =
         data.subscription_status === "canceled" || isExpired ? "free" : (data.plan_name ?? "free");
 
+    let orgIdNumber = 1;
+    if (data.created_at) {
+        const { count } = await supabaseServer
+            .from("org_accounts")
+            .select("*", { count: "exact", head: true })
+            .lte("created_at", data.created_at);
+        orgIdNumber = count || 1;
+    }
+
     const org = {
         auth_uid: data.auth_uid,
         org_name: data.org_name,
@@ -43,6 +52,7 @@ export async function GET(req: NextRequest) {
         country: data.country,
         effective_plan: effectivePlan as string,
         is_verified: effectivePlan !== "free",
+        org_id_number: orgIdNumber,
     };
 
     return NextResponse.json({ org }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } });

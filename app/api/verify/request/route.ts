@@ -50,12 +50,12 @@ export async function POST(request: Request) {
                     return NextResponse.json({ error: `You are already verified as ${existing.type}. Please apply for a higher tier to upgrade.` }, { status: 400 });
                 }
 
-                // ALLOW UPGRADE: Store in pending_upgrade columns to preserve current status
+                // AUTO-UPGRADE: Immediately update type since they are already verified
                 const { error: upgradeError } = await supabase
                     .from("organization_verifications")
                     .update({
-                        pending_upgrade_type: type,
-                        pending_upgrade_status: "pending",
+                        type,
+                        verifier_tier: targetRank,
                         name: profileName || walletAddress,
                         website: website || null,
                         social_link: socials || null,

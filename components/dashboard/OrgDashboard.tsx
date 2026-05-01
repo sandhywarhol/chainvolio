@@ -202,7 +202,6 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const handleDeleteProject = async (id: string) => {
     const wallet = walletAddress;
     const authUid = googleOrgAccount?.auth_uid;
-    const accessToken = (googleOrgAccount as any)?._accessToken ?? null;
 
     const params = new URLSearchParams({ id });
     if (wallet) params.set("wallet", wallet);
@@ -216,8 +215,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   };
 
   const handleShare = async () => {
-    const isGoogle = !!googleOrgAccount && !walletAddress;
-    const url = `${window.location.origin}${isGoogle ? `/org/${googleOrgAccount!.auth_uid}` : `/cv/${walletAddress}`}`;
+    const isGooglePath = !!googleOrgAccount && !walletAddress;
+    const formattedName = encodeURIComponent((isGooglePath ? googleOrgAccount?.org_name : profile.displayName)?.replace(/\s+/g, "-") || "Org");
+    const rawId = isGooglePath ? googleOrgAccount?.org_id_number : profile.cardNumber;
+    const cleanId = String(rawId || 1).padStart(5, "0");
+    const url = `${window.location.origin}/${formattedName}/${cleanId}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -364,12 +366,15 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const isGooglePath = !!googleOrgAccount && !walletAddress;
   const isActive = isGooglePath ? isPaidPlan : (profile.isVerified && !profile.isExpired);
   const accentHex = isCommunity ? "#14b8a6" : "#f59e0b";
-  const orgId = isGooglePath
-    ? `#${String(parseInt(googleOrgAccount!.auth_uid.replace(/-/g, "").slice(0, 6), 16) % 99999 + 1).padStart(5, "0")}`
-    : walletAddress
-      ? `#${String(walletAddress.slice(0, 12).split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 99999 + 1).padStart(5, "0")}`
-      : "";
-  const publicPageUrl = isGooglePath ? `/org/${googleOrgAccount!.auth_uid}` : `/cv/${walletAddress}`;
+  const orgId = isGooglePath && googleOrgAccount?.org_id_number
+    ? `ORG #${String(googleOrgAccount.org_id_number).padStart(5, "0")}`
+    : !isGooglePath && profile.cardNumber
+      ? `ORG #${String(profile.cardNumber).padStart(5, "0")}`
+      : "ORG #00001";
+  const formattedName = encodeURIComponent((isGooglePath ? googleOrgAccount?.org_name : profile.displayName)?.replace(/\s+/g, "-") || "Org");
+  const rawId = isGooglePath ? googleOrgAccount?.org_id_number : profile.cardNumber;
+  const cleanId = String(rawId || 1).padStart(5, "0");
+  const publicPageUrl = `/${formattedName}/${cleanId}`;
   const editUrl = isGooglePath ? "/org/edit-profile" : "/org/edit-profile-wallet";
   const effectiveHiringLimit = isGooglePath ? planLimits.collections : hiringLimit;
   const isAtEffectiveLimit = effectiveHiringLimit !== null && hiringUsed >= effectiveHiringLimit;
@@ -412,11 +417,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               >
                 {managingSubscription ? "Loading..." : "Manage Subscription"}
               </button>
-            ) : (
-              <Link href="/recruiter/pricing" className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-xs font-bold transition-colors flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5" /> Upgrade Plan
-              </Link>
-            )
+            ) : null
           ) : profile.isVerified ? (
             (profile.isExpired || profile.isExpiringSoon) ? (
               <button
@@ -438,16 +439,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Tier
               </button>
             ) : null
-          ) : (
-            profile.verificationStatus !== "pending" && (
-              <button
-                onClick={() => onRequestVerification(false)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-xs font-bold border border-teal-500/20 transition-colors"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" /> Apply for Verification
-              </button>
-            )
-          )}
+          ) : null}
           <button
             onClick={handleShare}
             className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 text-xs font-medium text-white transition-colors flex items-center gap-1.5"
@@ -536,7 +528,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           {/* Info */}
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight mb-1">{profile.displayName}</h1>
-            {orgId && <p className="text-[10px] font-mono text-slate-600 mb-3">ORG {orgId}</p>}
+            {orgId && <p className="text-[10px] font-mono text-slate-600 mb-3">{orgId}</p>}
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase font-black tracking-widest text-slate-400">
                 {isGooglePath ? `${planBadge.text} Plan` : (profile.verificationTier ?? (profile.isVerified ? "Verified" : "Unverified"))}
@@ -955,7 +947,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         <OrgProjectForm
           ownerWallet={walletAddress}
           ownerAuthUid={googleOrgAccount?.auth_uid}
-          accessToken={(googleOrgAccount as any)?._accessToken ?? null}
+          accessToken={accessToken}
           onSuccess={(p) => { setProjects(prev => [p, ...prev]); setShowProjectForm(false); }}
           onClose={() => setShowProjectForm(false)}
         />

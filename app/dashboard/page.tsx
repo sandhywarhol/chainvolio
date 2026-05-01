@@ -931,6 +931,7 @@ export default function DashboardPage() {
           currentStatus={profile.verificationStatus || null}
           currentTier={profile.verificationTier || null}
           isRenewal={isRenewal}
+          isOrg={isRecruiterTier(profile.verificationType ?? "")}
           onClose={() => {
             setShowVerificationModal(false);
             setIsRenewal(false);
@@ -1047,6 +1048,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
           currentStatus={null}
           currentTier={null}
           isRenewal={isRenewalGoogle}
+          isOrg={true}
           onClose={() => { setShowVerifyModal(false); setIsRenewalGoogle(false); }}
           onSuccess={() => { setShowVerifyModal(false); setIsRenewalGoogle(false); }}
         />

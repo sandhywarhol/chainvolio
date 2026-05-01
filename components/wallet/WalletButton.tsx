@@ -71,18 +71,10 @@ export function WalletMultiButton() {
 
             {googleMenuOpen && (
               <div className="absolute right-0 top-full mt-1.5 w-52 bg-[#0d0d0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-1.5 z-[1000]">
-                <div className="px-4 py-2 border-b border-white/5">
+                <div className="px-4 py-2 border-b border-white/5 mb-1">
                   <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Signed in as</p>
                   <p className="text-[11px] text-white/70 truncate mt-0.5">{googleSession.user.email}</p>
                 </div>
-                <a
-                  href="/dashboard"
-                  onClick={() => setGoogleMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:bg-white/5 transition-colors"
-                >
-                  <Building2 className="w-3.5 h-3.5 text-teal-400" />
-                  My Dashboard
-                </a>
                 <button
                   onClick={() => { googleSignOut(); setGoogleMenuOpen(false); }}
                   className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-colors"
@@ -100,7 +92,7 @@ export function WalletMultiButton() {
           className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
         >
           <Wallet className="w-3.5 h-3.5" />
-          {googleSession ? "Link Wallet" : "Connect Wallet"}
+          {googleSession ? "Link Wallet" : "Sign In"}
         </button>
         <CustomWalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
@@ -127,18 +119,10 @@ export function WalletMultiButton() {
 
           {googleMenuOpen && (
             <div className="absolute right-0 top-full mt-1.5 w-52 bg-[#0d0d0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-1.5 z-[1000]">
-              <div className="px-4 py-2 border-b border-white/5">
+              <div className="px-4 py-2 border-b border-white/5 mb-1">
                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Signed in as</p>
                 <p className="text-[11px] text-white/70 truncate mt-0.5">{googleSession.user.email}</p>
               </div>
-              <a
-                href="/dashboard"
-                onClick={() => setGoogleMenuOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:bg-white/5 transition-colors"
-              >
-                <Building2 className="w-3.5 h-3.5 text-teal-400" />
-                My Dashboard
-              </a>
               <button
                 onClick={() => { googleSignOut(); setGoogleMenuOpen(false); }}
                 className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-colors"

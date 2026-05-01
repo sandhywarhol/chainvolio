@@ -1,5 +1,6 @@
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import CVPageClient from "../../cv/[wallet]/page";
+import PublicOrgPageClient from "../../org/[auth_uid]/page";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -16,7 +17,29 @@ export async function generateMetadata({ params }: { params: { profileName: stri
         .eq("card_number", Number(params.cardNumber))
         .single();
 
-    if (!data) return {};
+    if (!data) {
+        // Try org_accounts
+        const { data: orgs } = await supabase
+            .from("org_accounts")
+            .select("org_name, bio")
+            .order("created_at", { ascending: true })
+            .range(Number(params.cardNumber) - 1, Number(params.cardNumber) - 1);
+        
+        if (orgs && orgs.length > 0) {
+            const org = orgs[0];
+            const name = org.org_name || params.profileName;
+            const title = `${name} | ChainVolio Professional Identity`;
+            const description = org.bio || `View the cryptographically verified professional identity of ${name}.`;
+            const ogImage = `https://www.chainvolio.xyz/homepage/og%20image%20for%20all.jpg?v=5`;
+            return {
+                title,
+                description,
+                openGraph: { title, description, type: "website", images: [{ url: ogImage, width: 1200, height: 630 }] },
+                twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+            };
+        }
+        return {};
+    }
 
     const name = data.display_name || params.profileName;
     const title = `${name} | ChainVolio Professional Identity`;
@@ -46,13 +69,43 @@ export default async function ProfileAliasPage({ params }: { params: { profileNa
 
     const { data, error } = await supabase
         .from("profiles")
-        .select("wallet_address")
+        .select("wallet_address, display_name")
         .eq("card_number", Number(params.cardNumber))
-        .single();
+        .maybeSingle();
 
-    if (error || !data?.wallet_address) {
-        return notFound();
+    let walletAddress = data?.wallet_address;
+
+    // Resolve collision or missing entry
+    if (walletAddress && data?.display_name) {
+        const urlName = params.profileName.toLowerCase();
+        const dbName = data.display_name.replace(/\s+/g, "-").toLowerCase();
+        // If names don't match, maybe it's actually an org account with the same number
+        if (dbName !== urlName) {
+            const { data: orgs } = await supabase
+                .from("org_accounts")
+                .select("auth_uid, org_name")
+                .order("created_at", { ascending: true })
+                .range(Number(params.cardNumber) - 1, Number(params.cardNumber) - 1);
+            if (orgs && orgs.length > 0 && orgs[0].org_name?.replace(/\s+/g, "-").toLowerCase() === urlName) {
+                return <PublicOrgPageClient authUidOverride={orgs[0].auth_uid} />;
+            }
+        }
     }
 
-    return <CVPageClient walletAddressOverride={data.wallet_address} />;
+    if (walletAddress) {
+        return <CVPageClient walletAddressOverride={walletAddress} />;
+    }
+
+    // If not found in profiles, check org_accounts
+    const { data: orgs } = await supabase
+        .from("org_accounts")
+        .select("auth_uid")
+        .order("created_at", { ascending: true })
+        .range(Number(params.cardNumber) - 1, Number(params.cardNumber) - 1);
+
+    if (orgs && orgs.length > 0) {
+        return <PublicOrgPageClient authUidOverride={orgs[0].auth_uid} />;
+    }
+
+    return notFound();
 }

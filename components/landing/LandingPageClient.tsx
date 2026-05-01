@@ -13,6 +13,7 @@ import { Wallet } from "lucide-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 const SLIDES = [
     { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile" },
@@ -49,6 +50,7 @@ function CryptoLogo({ src, name }: { src: string; name: string }) {
 
 export function LandingPageClient() {
     const { publicKey, connected } = useWallet();
+    const { orgAccount: googleOrgAccount, isGoogleSignedIn } = useGoogleAuth();
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -129,36 +131,74 @@ export function LandingPageClient() {
                                 Backed by on-chain proof and attestations.
                             </p>
                         </div>
-                        <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-                            {connected && publicKey ? (
-                                <Link
-                                    href={`/cv/${publicKey.toBase58()}`}
-                                    className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
-                                >
-                                    View Your CV
-                                </Link>
-                            ) : (
-                                <button
-                                    onClick={() => setIsWalletModalOpen(true)}
-                                    className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
-                                >
-                                    Build Your Reputation
-                                </button>
-                            )}
-                            <button
-                                onClick={() => {
-                                    if (!connected) {
-                                        setIsWalletModalOpen(true);
-                                        return;
-                                    }
+                        {/* Detect recruiter context */}
+                        {(() => {
+                            // Google recruiter: signed in with Google
+                            const isGoogleRecruiter = isGoogleSignedIn;
+                            // Wallet recruiter: connected wallet and org-tier profile
+                            const isWalletRecruiter = connected && !!publicKey && !!profile && isRecruiterTier(profile.verificationTier);
+                            const isRecruiter = isGoogleRecruiter || isWalletRecruiter;
 
-                                    router.push("/hiring/create");
-                                }}
-                                className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                            >
-                                Discover Talent <ArrowRight className="w-4 h-4" />
-                            </button>
-                        </div>
+                            const orgType = googleOrgAccount?.org_type
+                                ?? (profile?.verificationTier?.toLowerCase().includes("company") ? "company" : "community");
+                            const isCommunityOrg = orgType === "community";
+
+                            // Public page URL for recruiter
+                            const orgPageUrl = isGoogleRecruiter
+                                ? `/dashboard`
+                                : publicKey ? `/cv/${publicKey.toBase58()}` : `/dashboard`;
+
+                            return (
+                                <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
+                                    {/* Left button */}
+                                    {isRecruiter ? (
+                                        <Link
+                                            href={orgPageUrl}
+                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
+                                        >
+                                            {isCommunityOrg ? "View Your Community" : "View Your Company"}
+                                        </Link>
+                                    ) : connected && publicKey ? (
+                                        <Link
+                                            href={`/cv/${publicKey.toBase58()}`}
+                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
+                                        >
+                                            View Your CV
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() => setIsWalletModalOpen(true)}
+                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
+                                        >
+                                            Build Your Reputation
+                                        </button>
+                                    )}
+
+                                    {/* Right button */}
+                                    {isRecruiter ? (
+                                        <Link
+                                            href="/hiring/create"
+                                            className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Discover Talent <ArrowRight className="w-4 h-4" />
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                if (!connected) {
+                                                    setIsWalletModalOpen(true);
+                                                    return;
+                                                }
+                                                router.push("/hiring/create");
+                                            }}
+                                            className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Discover Talent <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })()}
                         
                         <div className="mt-24">
                             <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">
@@ -257,33 +297,63 @@ export function LandingPageClient() {
                     </div>
 
                     <div className="flex flex-col gap-4 px-2">
-                        {connected && publicKey ? (
-                            <Link
-                                href={`/cv/${publicKey.toBase58()}`}
-                                className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                            >
-                                View Your CV
-                            </Link>
-                        ) : (
-                            <button
-                                onClick={() => setIsWalletModalOpen(true)}
-                                className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                            >
-                                Build Your Reputation
-                            </button>
-                        )}
-                        <button
-                            onClick={() => {
-                                if (!connected) {
-                                    setIsWalletModalOpen(true);
-                                    return;
-                                }
-                                router.push("/hiring/create");
-                            }}
-                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                        >
-                            Discover Talent <ArrowRight className="w-4 h-4" />
-                        </button>
+                        {(() => {
+                            const isGoogleRecruiter = isGoogleSignedIn;
+                            const isWalletRecruiter = connected && !!publicKey && !!profile && isRecruiterTier(profile.verificationTier);
+                            const isRecruiter = isGoogleRecruiter || isWalletRecruiter;
+                            const orgType = googleOrgAccount?.org_type
+                                ?? (profile?.verificationTier?.toLowerCase().includes("company") ? "company" : "community");
+                            const isCommunityOrg = orgType === "community";
+                            const orgPageUrl = isGoogleRecruiter ? `/dashboard` : publicKey ? `/cv/${publicKey.toBase58()}` : `/dashboard`;
+
+                            return (
+                                <>
+                                    {isRecruiter ? (
+                                        <Link
+                                            href={orgPageUrl}
+                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+                                        >
+                                            {isCommunityOrg ? "View Your Community" : "View Your Company"}
+                                        </Link>
+                                    ) : connected && publicKey ? (
+                                        <Link
+                                            href={`/cv/${publicKey.toBase58()}`}
+                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+                                        >
+                                            View Your CV
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() => setIsWalletModalOpen(true)}
+                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
+                                        >
+                                            Build Your Reputation
+                                        </button>
+                                    )}
+                                    {isRecruiter ? (
+                                        <Link
+                                            href="/hiring/create"
+                                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Discover Talent <ArrowRight className="w-4 h-4" />
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                if (!connected) {
+                                                    setIsWalletModalOpen(true);
+                                                    return;
+                                                }
+                                                router.push("/hiring/create");
+                                            }}
+                                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Discover Talent <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </>
+                            );
+                        })()}
 
                         <div className="mt-12 text-left">
                             <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20">

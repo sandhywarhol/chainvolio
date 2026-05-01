@@ -34,6 +34,7 @@ type PublicOrg = {
   country: string | null;
   effective_plan: string;
   is_verified: boolean;
+  org_id_number: number;
 };
 
 type Project = {
@@ -56,45 +57,36 @@ type Collection = {
   created_at: string;
 };
 
-function deriveOrgId(authUid: string): string {
-  const n = parseInt(authUid.replace(/-/g, "").slice(0, 6), 16) % 99999 + 1;
-  return `#${String(n).padStart(5, "0")}`;
-}
-
-export default function PublicOrgPage() {
+export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: string }) {
   const { auth_uid } = useParams<{ auth_uid: string }>();
   const [org, setOrg] = useState<PublicOrg | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!auth_uid) return;
+    const authUid = authUidOverride || auth_uid;
+
+    if (!authUid) {
+      setLoading(false);
+      return;
+    }
+
     Promise.all([
-      fetch(`/api/org/public?auth_uid=${auth_uid}`).then(r => r.json()),
-      fetch(`/api/org/projects?auth_uid=${auth_uid}`).then(r => r.ok ? r.json() : { data: [] }),
-      fetch(`/api/hiring/collections?auth_uid=${auth_uid}`).then(r => r.ok ? r.json() : { data: [] }),
+      fetch(`/api/org/public?auth_uid=${authUid}`).then(r => r.json()),
+      fetch(`/api/org/projects?auth_uid=${authUid}`).then(r => r.ok ? r.json() : { data: [] }),
+      fetch(`/api/hiring/collections?auth_uid=${authUid}`).then(r => r.ok ? r.json() : { data: [] }),
     ]).then(([orgRes, projRes, colRes]) => {
       if (orgRes.error || !orgRes.org) { setNotFound(true); return; }
       setOrg(orgRes.org);
       if (Array.isArray(projRes.data)) setProjects(projRes.data);
       if (Array.isArray(colRes.data)) setCollections(colRes.data);
     }).finally(() => setLoading(false));
-  }, [auth_uid]);
+  }, [auth_uid, authUidOverride]);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setToast("Link copied!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setToast("Failed to copy link.");
-    }
-  };
+
 
   if (loading) return <LoadingScreen message="Loading organization profile..." />;
 
@@ -120,13 +112,11 @@ export default function PublicOrgPage() {
 
   const isCommunity = org.org_type === "community";
   const accentHex = isCommunity ? "#14b8a6" : "#f59e0b";
-  const orgId = deriveOrgId(org.auth_uid);
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-[#050507] text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       <Navbar />
-      <main className="min-h-screen bg-[#050507] py-12 px-4">
-        <div className="max-w-3xl mx-auto space-y-6">
+      <main className="flex-1 w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12 space-y-6">
 
           {/* Hero card */}
           <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-[#0a0b0f]">
@@ -170,14 +160,22 @@ export default function PublicOrgPage() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight">{org.org_name ?? "Unnamed Organization"}</h1>
+                <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight mb-3">{org.org_name ?? "Unnamed Organization"}</h1>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase font-black tracking-widest text-slate-400">
+                    {org.is_verified ? (isCommunity ? "Verified Community" : "Verified Organization") : (isCommunity ? "Community" : "Organization")}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase font-black tracking-widest text-slate-400">
+                    {projects.length + collections.length} Activities
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase font-black tracking-widest text-slate-400">
+                    {org.effective_plan.toUpperCase()} PLAN
+                  </span>
                 </div>
-                <p className="text-[10px] font-mono text-slate-600 mb-3">ORG {orgId}</p>
-                {org.bio && <p className="text-base text-slate-300 leading-relaxed max-w-2xl mb-4">{org.bio}</p>}
+                {org.bio && <p className="text-base text-slate-300 leading-relaxed max-w-2xl">{org.bio}</p>}
 
                 {/* Social links */}
-                <div className="flex flex-wrap items-center gap-6 mt-4">
+                <div className="flex flex-wrap items-center gap-6 mt-6">
                   {org.website && (
                     <a href={org.website.startsWith("http") ? org.website : `https://${org.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
                       <Globe className="w-3.5 h-3.5" /> Website
@@ -203,16 +201,12 @@ export default function PublicOrgPage() {
                       <Send className="w-3.5 h-3.5" /> Telegram
                     </a>
                   )}
+                  <div className="flex-1" />
+                  <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-tight text-slate-400">
+                    <span className="text-[8px] uppercase font-bold text-slate-600">ID</span>
+                    <span className="font-black text-slate-300">#{String(org.org_id_number || 1).padStart(5, "0")}</span>
+                  </div>
                 </div>
-
-                {/* Share button */}
-                <button
-                  onClick={handleCopy}
-                  className="mt-5 flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-white transition-colors"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied ? "Copied!" : "Copy profile link"}
-                </button>
               </div>
             </div>
           </div>
@@ -322,10 +316,9 @@ export default function PublicOrgPage() {
             <div className="py-10 text-center text-slate-500 text-sm">No public content yet.</div>
           )}
 
-        </div>
       </main>
       <Footer />
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
-    </>
+    </div>
   );
 }

@@ -19,7 +19,19 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ orgAccount: data ?? null });
+    let org_id_number = 1;
+    if (data?.created_at) {
+        const { count, error: countError } = await supabaseServer
+            .from("org_accounts")
+            .select("*", { count: "exact", head: true })
+            .lte("created_at", data.created_at);
+        
+        if (!countError && count !== null) {
+            org_id_number = count;
+        }
+    }
+
+    return NextResponse.json({ orgAccount: data ? { ...data, org_id_number } : null });
 }
 
 // POST /api/org-accounts

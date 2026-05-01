@@ -31,6 +31,7 @@ type VerificationRequestModalProps = {
     profileName: string;
     website?: string;
     socials?: string;
+    isOrg?: boolean;
 };
 
 // ─── Tier color palette ────────────────────────────────────────────────────
@@ -331,6 +332,7 @@ export function VerificationRequestModal({
     profileName,
     website,
     socials,
+    isOrg,
 }: VerificationRequestModalProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -446,7 +448,7 @@ export function VerificationRequestModal({
     const isPendingUpgrade = currentStatus === "verified" && pendingUpgradeStatus === "pending";
     if (currentStatus === "pending" || isPendingUpgrade) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
                 <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
                     {/* Video background */}
                     <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60">
@@ -481,7 +483,7 @@ export function VerificationRequestModal({
 
     if (currentStatus === "verified" && !canUpgrade) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
                 <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
                     {/* Video background */}
                     <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60">
@@ -524,14 +526,14 @@ export function VerificationRequestModal({
 
     // Modal width adapts to content step
     const modalWidth = !selectedTier
-        ? "max-w-[1200px]"
+        ? "max-w-2xl"
         : showSubscription
             ? "max-w-2xl"
             : "max-w-3xl";
 
     // ── Main modal ──
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
             <div className={`relative border border-white/15 rounded-2xl shadow-2xl overflow-y-auto md:overflow-hidden max-h-[92vh] md:max-h-none transition-all duration-300 w-full ${modalWidth}`}>
                 {/* Video background */}
                 <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none">
@@ -639,8 +641,8 @@ export function VerificationRequestModal({
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-y-6 md:gap-4">
-                                {TIERS.map((tier) => {
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 md:gap-4">
+                                {TIERS.filter(t => isOrg ? (t.id === "Community" || t.id === "Company") : (t.id === "Builder" || t.id === "Figure")).map((tier) => {
                                     const currentId = REVERSE_TIER_MAP[currentTier || ""] || null;
                                     const currentRank = TIER_RANK[currentId || ""] || 0;
                                     const isSelected = currentId === tier.id && currentStatus === "verified";

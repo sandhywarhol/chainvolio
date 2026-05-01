@@ -28,6 +28,7 @@ export interface OrgAccount {
     plan_name: string;                  // 'free' | 'starter' | 'pro' | 'enterprise'
     current_period_end: string | null;
     saved_candidates_count: number;
+    org_id_number?: number;
 }
 
 export function useGoogleAuth() {

@@ -90,6 +90,7 @@ async function handleEvent(event: Stripe.Event) {
                 stripe_subscription_id: sub.id,
                 subscription_status: sub.status,
                 plan_name: planName,
+                ...(planName === "company" ? { org_type: "company" } : planName === "community" ? { org_type: "community" } : {}),
                 current_period_end: item?.current_period_end
                     ? new Date(item.current_period_end * 1000).toISOString()
                     : null,
@@ -110,9 +111,11 @@ async function handleEvent(event: Stripe.Event) {
             if (sub) {
                 const item = sub.items.data[0];
                 const priceId = item?.price.id ?? "";
+                const planName = getPlanFromPriceId(priceId);
                 await updateSubscription(authUid, {
                     subscription_status: "active",
-                    plan_name: getPlanFromPriceId(priceId),
+                    plan_name: planName,
+                    ...(planName === "company" ? { org_type: "company" } : planName === "community" ? { org_type: "community" } : {}),
                     current_period_end: item?.current_period_end
                         ? new Date(item.current_period_end * 1000).toISOString()
                         : null,
@@ -139,10 +142,12 @@ async function handleEvent(event: Stripe.Event) {
 
             const item = sub.items.data[0];
             const priceId = item?.price.id ?? "";
+            const planName = getPlanFromPriceId(priceId);
             await updateSubscription(authUid, {
                 stripe_subscription_id: sub.id,
                 subscription_status: sub.status,
-                plan_name: getPlanFromPriceId(priceId),
+                plan_name: planName,
+                ...(planName === "company" ? { org_type: "company" } : planName === "community" ? { org_type: "community" } : {}),
                 current_period_end: item?.current_period_end
                     ? new Date(item.current_period_end * 1000).toISOString()
                     : null,
