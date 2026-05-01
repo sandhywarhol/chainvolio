@@ -25,9 +25,7 @@ import {
     Code2,
     Palette,
     Filter,
-    Twitter,
     Building2,
-    MessageSquare,
     ExternalLink,
     ChevronDown,
     ChevronUp,
@@ -35,10 +33,10 @@ import {
     User,
     Mail,
     Send,
-    Linkedin,
     Target
 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
+import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateCollection() {
@@ -452,7 +450,7 @@ export default function CreateCollection() {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <XIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                             <input
                                                 type="text"
                                                 placeholder="X / Twitter handle"
@@ -462,7 +460,7 @@ export default function CreateCollection() {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <DiscordIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                             <input
                                                 type="text"
                                                 placeholder="Discord Link"
@@ -492,7 +490,7 @@ export default function CreateCollection() {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                            <LinkedInIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                             <input
                                                 type="text"
                                                 placeholder="Company LinkedIn"

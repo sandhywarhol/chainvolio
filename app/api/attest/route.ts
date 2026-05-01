@@ -159,17 +159,41 @@ export async function POST(request: Request) {
             .eq("wallet_address", attesterWallet)
             .maybeSingle();
 
+        // Check if attester wallet belongs to a Google org (Stripe subscriber)
+        const { data: googleOrgData } = await supabase
+            .from("org_accounts")
+            .select("auth_uid, org_name, plan_name, subscription_status, current_period_end")
+            .eq("wallet_address", attesterWallet)
+            .maybeSingle();
+
         const now = new Date();
         const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
         const isExpired = expiresAtDate ? now > expiresAtDate : false;
         const isVerified = orgData?.status === 'verified' && !isExpired;
 
+        const googleOrgPeriodExpired = googleOrgData?.current_period_end
+            ? new Date(googleOrgData.current_period_end) < now
+            : false;
+        const isGoogleOrgActive = !!(
+            googleOrgData?.subscription_status === 'active' &&
+            !googleOrgPeriodExpired &&
+            googleOrgData?.plan_name &&
+            googleOrgData.plan_name !== 'free'
+        );
+
         if (isVerified && orgData?.type) {
             verificationTier = orgData.type;
+        } else if (isGoogleOrgActive && googleOrgData?.plan_name) {
+            verificationTier = googleOrgData.plan_name; // 'community' or 'company'
         }
 
         // 1. Resolve Identity
-        if (profile && isExternal === false) {
+        if (isGoogleOrgActive && googleOrgData) {
+            // Google Stripe org: use org name as the attester identity
+            finalAttesterName = googleOrgData.org_name || finalAttesterName;
+            finalAttesterOrg = googleOrgData.org_name || null;
+            finalAttesterRole = getVerificationLabel(verificationTier);
+        } else if (profile && isExternal === false) {
             finalAttesterName = profile.display_name;
             finalAttesterOrg = profile.organization || null;
             if (isVerified) {
@@ -177,7 +201,7 @@ export async function POST(request: Request) {
             } else {
                 finalAttesterRole = profile.headline || profile.professional_role || "Builder";
             }
-        } else if (!isVerified) {
+        } else if (!isVerified && !isGoogleOrgActive) {
             // Unverified users or those without a profile get the "Regular" label
             verificationTier = "unverified";
             // If they provided a name/role manually, we keep it but it will be labeled as "Regular" in the UI

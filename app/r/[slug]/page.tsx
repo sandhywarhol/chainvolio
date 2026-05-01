@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
-import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Twitter, Github, MessageSquare, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter, Mail, Linkedin } from "lucide-react";
+import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Github, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter, Mail } from "lucide-react";
+import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
 
@@ -264,7 +265,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     )}
                                                     {collection.metadata?.twitterUrl && (
                                                         <a href={collection.metadata.twitterUrl.startsWith('http') ? collection.metadata.twitterUrl : `https://x.com/${collection.metadata.twitterUrl.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Twitter / X">
-                                                            <Twitter className="w-4 h-4" />
+                                                            <XIcon className="w-4 h-4" />
                                                         </a>
                                                     )}
                                                     {collection.metadata?.githubUrl && (
@@ -274,7 +275,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     )}
                                                     {collection.metadata?.discordUrl && (
                                                         <a href={collection.metadata.discordUrl} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="Discord">
-                                                            <MessageSquare className="w-4 h-4" />
+                                                            <DiscordIcon className="w-4 h-4" />
                                                         </a>
                                                     )}
                                                     {collection.metadata?.telegramUrl && (
@@ -289,7 +290,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     )}
                                                     {collection.metadata?.linkedinUrl && (
                                                         <a href={collection.metadata.linkedinUrl.startsWith('http') ? collection.metadata.linkedinUrl : `https://${collection.metadata.linkedinUrl}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/5" title="LinkedIn">
-                                                            <Linkedin className="w-4 h-4" />
+                                                            <LinkedInIcon className="w-4 h-4" />
                                                         </a>
                                                     )}
                                                 </div>

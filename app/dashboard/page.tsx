@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -17,8 +18,10 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, Twitter, LayoutDashboard, ExternalLink, Plus, Linkedin, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
+import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { format } from "date-fns";
 
 
@@ -50,6 +53,7 @@ type Profile = {
   verificationTier?: string;
   verificationStatus?: string;
   verificationType?: string;
+  pendingVerificationType?: string;
   rejectionReason?: string;
   organization?: string;
   attestationQuota?: number;
@@ -69,6 +73,7 @@ type HiringCollection = {
 
 export default function DashboardPage() {
   const { publicKey, connected } = useWallet();
+  const { session, orgAccount, loading: googleLoading } = useGoogleAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,18 +153,30 @@ export default function DashboardPage() {
       .catch(() => {});
   };
 
+  // Google auth resolving
+  if (googleLoading) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
+
+  // Google org users always get the Google dashboard — even if a wallet is also connected.
+  // Wallet connection is irrelevant for the Google/Stripe payment path.
+  if (session) {
+    return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} />;
+  }
+
   if (!publicKey) {
+    // Not signed in at all
     return (
       <main className="min-h-screen text-white bg-[#030303]">
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold">Connect your wallet</h1>
-            <p className="text-slate-400">Please connect your wallet to view your dashboard</p>
+            <h1 className="text-3xl font-bold">Sign in to continue</h1>
+            <p className="text-slate-400">Connect a wallet or sign in with Google to view your dashboard</p>
           </div>
           <WalletMultiButton />
         </div>
-      </main >
+      </main>
     );
   }
 
@@ -219,6 +236,18 @@ export default function DashboardPage() {
               Create Profile
             </Link>
           </div>
+        ) : isRecruiterTier(profile?.verificationType) || (profile?.verificationStatus === "pending" && isRecruiterTier(profile?.pendingVerificationType ?? "")) ? (
+          // ── Org Dashboard (Community / Company accounts) ──────────────────────
+          <OrgDashboard
+            profile={profile}
+            walletAddress={walletAddress}
+            collections={collections}
+            attestationCount={attestationCount}
+            onRequestVerification={(renewal) => {
+              setIsRenewal(renewal);
+              setShowVerificationModal(true);
+            }}
+          />
         ) : (
           <>
             <div className="mb-12">
@@ -937,6 +966,91 @@ export default function DashboardPage() {
         />
       )}
       <Footer />
+    </main>
+  );
+}
+
+// ── Wrapper for Google-only org users ───────────────────────────────────────
+import type { Session } from "@supabase/supabase-js";
+import type { OrgAccount } from "@/hooks/useGoogleAuth";
+
+function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; orgAccount: OrgAccount | null }) {
+  const router = useRouter();
+  const [googleCollections, setGoogleCollections] = useState<{ id: string; title: string; slug: string; created_at: string }[]>([]);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [isRenewalGoogle, setIsRenewalGoogle] = useState(false);
+
+  // New Google users who haven't completed onboarding → org setup
+  const needsOnboarding = !orgAccount || !orgAccount.onboarding_complete;
+  useEffect(() => {
+    if (needsOnboarding) router.replace("/onboarding/org");
+  }, [needsOnboarding, router]);
+
+  // Collections fetch (runs regardless; skips if no orgAccount)
+  useEffect(() => {
+    if (!orgAccount?.auth_uid || !session?.access_token) return;
+    fetch(`/api/hiring/collections?auth_uid=${orgAccount.auth_uid}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(data => { if (Array.isArray(data.data)) setGoogleCollections(data.data); })
+      .catch(() => {});
+  }, [orgAccount, session]);
+
+  if (needsOnboarding) {
+    return <LoadingScreen message="Setting up your organization..." />;
+  }
+
+  const googleProfile = {
+    displayName: orgAccount?.org_name ?? session.user.email?.split("@")[0] ?? "My Organization",
+    bio: orgAccount?.bio ?? null,
+    avatarUrl: orgAccount?.avatar_url ?? null,
+    website: orgAccount?.website ?? null,
+    twitter: orgAccount?.twitter ?? null,
+    linkedin: orgAccount?.linkedin ?? null,
+    discord: orgAccount?.discord ?? null,
+    telegram: orgAccount?.telegram ?? null,
+    email: orgAccount?.email ?? session.user.email ?? null,
+    country: orgAccount?.country ?? null,
+    isVerified: false as const,
+    verificationStatus: null,
+    completionPercentage: 0,
+    isProfileComplete: false,
+  };
+
+  return (
+    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+      <Navbar />
+      <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
+        <OrgDashboard
+          profile={googleProfile}
+          walletAddress={null}
+          collections={googleCollections}
+          attestationCount={0}
+          onRequestVerification={(renewal) => {
+            setIsRenewalGoogle(renewal);
+            setShowVerifyModal(true);
+          }}
+          googleOrgAccount={orgAccount}
+          accessToken={session.access_token}
+        />
+      </section>
+      <Footer />
+
+      {showVerifyModal && (
+        <VerificationRequestModal
+          walletAddress=""
+          profileName={googleProfile.displayName}
+          website={orgAccount?.website ?? undefined}
+          socials={[orgAccount?.twitter, orgAccount?.linkedin].filter(Boolean).join(" ")}
+          currentStatus={null}
+          currentTier={null}
+          isRenewal={isRenewalGoogle}
+          onClose={() => { setShowVerifyModal(false); setIsRenewalGoogle(false); }}
+          onSuccess={() => { setShowVerifyModal(false); setIsRenewalGoogle(false); }}
+        />
+      )}
     </main>
   );
 }

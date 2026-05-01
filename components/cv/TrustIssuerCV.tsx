@@ -20,12 +20,12 @@ import {
   X,
   ExternalLink,
   Github,
-  Linkedin,
   Mail,
-  MessageSquare,
+  FolderOpen,
 } from "lucide-react";
-import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
+import { getBadgeStyles } from "@/lib/paymentConfig";
 import { Toast } from "@/components/ui/Toast";
+import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -67,6 +67,20 @@ type Receipt = {
   wallet_address?: string;
 };
 
+type OrgProject = {
+  id: string;
+  title: string;
+  description: string | null;
+  project_type: string | null;
+  project_url: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  is_ongoing: boolean;
+  tags: string[];
+  status: string;
+  created_at: string;
+};
+
 type Props = {
   profile: Profile;
   receipts: Receipt[]; // For Organizations, these should be their *issued* endorsements
@@ -74,6 +88,7 @@ type Props = {
   wallet: string;
   collections?: any[];
   isCommunity?: boolean;
+  projects?: OrgProject[];
 };
 
 // ─── Shared Components (Extracted from previous layouts) ────────────────────────
@@ -151,7 +166,7 @@ function ScoreFactorRow({
 
 // ─── Main Unified Layout ──────────────────────────────────────────────────────
 
-export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, wallet, collections = [], isCommunity = false }: Props) {
+export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, wallet, collections = [], isCommunity = false, projects = [] }: Props) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
   const [showAllRecent, setShowAllRecent] = useState(false);
@@ -257,23 +272,23 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                 </a>
               )}
               {profile.twitter && (
-                <a href={`https://twitter.com/${profile.twitter.replace("@", "")}`} target="_blank" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
-                  𝕏 Twitter
+                <a href={profile.twitter.startsWith("http") ? profile.twitter : `https://x.com/${profile.twitter.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                  <XIcon className="w-3.5 h-3.5" /> Twitter
                 </a>
               )}
               {profile.linkedin && (
-                <a href={profile.linkedin} target="_blank" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
-                  <Linkedin className="w-3.5 h-3.5" /> LinkedIn
+                <a href={profile.linkedin.startsWith("http") ? profile.linkedin : `https://linkedin.com/in/${profile.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                  <LinkedInIcon className="w-3.5 h-3.5" /> LinkedIn
                 </a>
               )}
               {profile.github && (
-                <a href={`https://github.com/${profile.github.replace("@", "")}`} target="_blank" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                <a href={`https://github.com/${profile.github.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
                   <Github className="w-3.5 h-3.5" /> GitHub
                 </a>
               )}
               {profile.discord && (
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer" onClick={() => { navigator.clipboard.writeText(profile.discord || ""); setToastMessage("Discord ID Copied!"); }}>
-                  <MessageSquare className="w-3.5 h-3.5" /> {profile.discord}
+                  <DiscordIcon className="w-3.5 h-3.5" /> {profile.discord}
                 </div>
               )}
               {profile.email && (
@@ -399,7 +414,73 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
         </div>
       )}
 
-      {/* ── 6. Community Specific Sections ────────────────────────────────────── */}
+      {/* ── 6. Projects & Programs ────────────────────────────────────────────── */}
+      {projects.length > 0 && (
+        <div className="p-6 rounded-3xl bg-[#0a0b0f] border border-white/5">
+          <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+            <FolderOpen className="w-4 h-4 text-emerald-400" /> Projects &amp; Programs
+          </h2>
+          <div className="grid gap-4">
+            {projects.map(p => (
+              <div key={p.id} className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <h3 className="text-sm font-black text-white">{p.title}</h3>
+                      {p.project_type && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-white/5 text-slate-500 border border-white/10">
+                          {p.project_type}
+                        </span>
+                      )}
+                      {p.is_ongoing && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Active
+                        </span>
+                      )}
+                      {!p.is_ongoing && p.status === "completed" && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          Completed
+                        </span>
+                      )}
+                    </div>
+                    {p.description && (
+                      <p className="text-xs text-slate-400 leading-relaxed mb-2">{p.description}</p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {p.start_date && (
+                        <span className="text-[10px] text-slate-600 font-mono">
+                          {new Date(p.start_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                          {p.is_ongoing ? " — Ongoing" : p.end_date
+                            ? ` — ${new Date(p.end_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
+                            : ""}
+                        </span>
+                      )}
+                      {p.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {p.tags.map(tag => (
+                            <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-slate-600 border border-white/5">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {p.project_url && (
+                    <a
+                      href={p.project_url.startsWith("http") ? p.project_url : `https://${p.project_url}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex-shrink-0 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-500 hover:text-white transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 7. Community Specific Sections ────────────────────────────────────── */}
       {isCommunity && (distinctRecipients.length > 0 || sortedRoles.length > 0) && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -85,21 +85,37 @@ export async function POST(request: Request) {
         const isVerified = orgData?.status === "verified" && !isExpired;
         const verificationTier = isVerified ? (orgData?.type || "unverified") : "unverified";
 
-        // --- Hiring Tier Gate ---
-        const hiringLimit = getHiringLimit(verificationTier);
-        console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} limit=${hiringLimit}`);
+        // --- Google org subscription check (wallet linked to a paid org_account) ---
+        const { data: googleOrgData } = await supabase
+            .from("org_accounts")
+            .select("plan_name, subscription_status, current_period_end")
+            .eq("wallet_address", ownerWallet)
+            .maybeSingle();
+
+        const googlePeriodExpired = googleOrgData?.current_period_end
+            ? new Date(googleOrgData.current_period_end) < now : false;
+        const isGoogleOrgActive = !!(
+            googleOrgData?.subscription_status === "active" &&
+            !googlePeriodExpired &&
+            googleOrgData?.plan_name &&
+            googleOrgData.plan_name !== "free"
+        );
+
+        // Active Google subscription unlocks unlimited hiring (same as verified wallet orgs)
+        const effectiveHiringLimit = isGoogleOrgActive ? null : getHiringLimit(verificationTier);
+        console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} googleOrg=${isGoogleOrgActive} limit=${effectiveHiringLimit}`);
 
         // Capped tiers (non-unlimited): check existing collection count
-        if (hiringLimit !== null) {
+        if (effectiveHiringLimit !== null) {
             const { count: existingCount } = await supabase
                 .from("hiring_collections")
                 .select("*", { count: "exact", head: true })
                 .eq("owner_wallet", ownerWallet);
 
             const used = existingCount ?? 0;
-            console.log(`[hiring-api] collections used=${used} limit=${hiringLimit}`);
+            console.log(`[hiring-api] collections used=${used} limit=${effectiveHiringLimit}`);
 
-            if (used >= hiringLimit) {
+            if (used >= effectiveHiringLimit!) {
                 return errorResponse(
                     "ERR_HIRING_LIMIT_REACHED",
                     "You've reached your hiring limit. Upgrade for unlimited access.",
@@ -118,7 +134,10 @@ export async function POST(request: Request) {
 
         // --- Trusted Hiring Signal Logic (Benefit System) ---
         const updatedMetadata = { ...metadata };
-        if (isVerified && isRecruiterTier(orgData?.type)) {
+        if (isGoogleOrgActive) {
+            updatedMetadata.isTrusted = true;
+            updatedMetadata.verificationTier = googleOrgData!.plan_name;
+        } else if (isVerified && isRecruiterTier(orgData?.type)) {
             updatedMetadata.isTrusted = true;
             updatedMetadata.verificationTier = orgData.type;
         } else {

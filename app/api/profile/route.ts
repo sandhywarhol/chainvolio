@@ -350,6 +350,7 @@ export async function GET(request: Request) {
     expiresAt: orgData?.expires_at || null,
     verifierTier: orgData?.verifier_tier || 1,
     verificationStatus: orgData?.status || null,
+    pendingVerificationType: orgData?.type || null,
     rejectionReason: orgData?.rejection_reason || null,
     // Attestation Quota (Benefit System)
     attestationQuota,

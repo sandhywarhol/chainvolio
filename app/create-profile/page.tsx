@@ -8,7 +8,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
-import { Instagram, Linkedin, Twitter, Github, Globe, MessageSquare, Send, Phone, Mail, Loader2 } from "lucide-react";
+import { Instagram, Github, Globe, Send, Phone, Mail, Loader2 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 
 export default function CreateProfilePage() {

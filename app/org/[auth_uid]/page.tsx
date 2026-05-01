@@ -1,0 +1,331 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import {
+  Building2,
+  ShieldCheck,
+  Globe,
+  Send,
+  ExternalLink,
+  FolderOpen,
+  LayoutDashboard,
+  Copy,
+  Check,
+} from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { Toast } from "@/components/ui/Toast";
+import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
+
+type PublicOrg = {
+  auth_uid: string;
+  org_name: string | null;
+  org_type: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  website: string | null;
+  twitter: string | null;
+  linkedin: string | null;
+  discord: string | null;
+  telegram: string | null;
+  country: string | null;
+  effective_plan: string;
+  is_verified: boolean;
+};
+
+type Project = {
+  id: string;
+  title: string;
+  description: string | null;
+  project_type: string | null;
+  project_url: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  is_ongoing: boolean;
+  status: string | null;
+  tags: string[];
+};
+
+type Collection = {
+  id: string;
+  title: string;
+  slug: string;
+  created_at: string;
+};
+
+function deriveOrgId(authUid: string): string {
+  const n = parseInt(authUid.replace(/-/g, "").slice(0, 6), 16) % 99999 + 1;
+  return `#${String(n).padStart(5, "0")}`;
+}
+
+export default function PublicOrgPage() {
+  const { auth_uid } = useParams<{ auth_uid: string }>();
+  const [org, setOrg] = useState<PublicOrg | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!auth_uid) return;
+    Promise.all([
+      fetch(`/api/org/public?auth_uid=${auth_uid}`).then(r => r.json()),
+      fetch(`/api/org/projects?auth_uid=${auth_uid}`).then(r => r.ok ? r.json() : { data: [] }),
+      fetch(`/api/hiring/collections?auth_uid=${auth_uid}`).then(r => r.ok ? r.json() : { data: [] }),
+    ]).then(([orgRes, projRes, colRes]) => {
+      if (orgRes.error || !orgRes.org) { setNotFound(true); return; }
+      setOrg(orgRes.org);
+      if (Array.isArray(projRes.data)) setProjects(projRes.data);
+      if (Array.isArray(colRes.data)) setCollections(colRes.data);
+    }).finally(() => setLoading(false));
+  }, [auth_uid]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setToast("Link copied!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setToast("Failed to copy link.");
+    }
+  };
+
+  if (loading) return <LoadingScreen message="Loading organization profile..." />;
+
+  if (notFound) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-[#050507] flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-black text-white mb-2">Organization Not Found</h1>
+            <p className="text-slate-400 text-sm mb-6">This org page doesn't exist or has been removed.</p>
+            <Link href="/" className="px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm font-bold border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
+              Back to Home
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!org) return null;
+
+  const isCommunity = org.org_type === "community";
+  const accentHex = isCommunity ? "#14b8a6" : "#f59e0b";
+  const orgId = deriveOrgId(org.auth_uid);
+
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-[#050507] py-12 px-4">
+        <div className="max-w-3xl mx-auto space-y-6">
+
+          {/* Hero card */}
+          <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-[#0a0b0f]">
+            <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${accentHex}10 0%, transparent 60%)` }} />
+
+            {/* Top-right: verified badge or org type badge */}
+            <div className="absolute top-6 right-6 md:top-8 md:right-8 z-30 flex flex-col items-end gap-2">
+              {org.is_verified ? (
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${isCommunity ? "bg-teal-500/10 border-teal-500/30" : "bg-amber-500/10 border-amber-500/30"}`}>
+                  <ShieldCheck className={`w-3.5 h-3.5 ${isCommunity ? "text-teal-400" : "text-amber-400"}`} />
+                  <span className={`text-[9px] font-black uppercase tracking-[0.1em] ${isCommunity ? "text-teal-400" : "text-amber-400"}`}>
+                    {isCommunity ? "Community Verified" : "Company Verified"}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-slate-800/80 border-slate-700/50">
+                  <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-400">
+                    {isCommunity ? "Community / DAO" : "Company / Org"}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-start gap-6 md:gap-8">
+              {/* Avatar */}
+              <div className="flex flex-col items-center flex-shrink-0">
+                {org.avatar_url ? (
+                  <img src={org.avatar_url} alt={org.org_name ?? "Org"} className="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover border-2" style={{ borderColor: `${accentHex}40` }} />
+                ) : (
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center border-2" style={{ background: `${accentHex}10`, borderColor: `${accentHex}30` }}>
+                    <Building2 className="w-8 h-8" style={{ color: accentHex, opacity: 0.7 }} />
+                  </div>
+                )}
+                {org.country && (
+                  <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border border-white/5 bg-white/[0.03] text-slate-500">
+                    📍 {org.country}
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-1">
+                  <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight">{org.org_name ?? "Unnamed Organization"}</h1>
+                </div>
+                <p className="text-[10px] font-mono text-slate-600 mb-3">ORG {orgId}</p>
+                {org.bio && <p className="text-base text-slate-300 leading-relaxed max-w-2xl mb-4">{org.bio}</p>}
+
+                {/* Social links */}
+                <div className="flex flex-wrap items-center gap-6 mt-4">
+                  {org.website && (
+                    <a href={org.website.startsWith("http") ? org.website : `https://${org.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                      <Globe className="w-3.5 h-3.5" /> Website
+                    </a>
+                  )}
+                  {org.twitter && (
+                    <a href={org.twitter.startsWith("http") ? org.twitter : `https://x.com/${org.twitter.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                      <XIcon className="w-3.5 h-3.5" /> Twitter
+                    </a>
+                  )}
+                  {org.linkedin && (
+                    <a href={org.linkedin.startsWith("http") ? org.linkedin : `https://linkedin.com/company/${org.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                      <LinkedInIcon className="w-3.5 h-3.5" /> LinkedIn
+                    </a>
+                  )}
+                  {org.discord && (
+                    <a href={org.discord.startsWith("http") ? org.discord : `https://discord.gg/${org.discord}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                      <DiscordIcon className="w-3.5 h-3.5" /> Discord
+                    </a>
+                  )}
+                  {org.telegram && (
+                    <a href={org.telegram.startsWith("http") ? org.telegram : `https://t.me/${org.telegram.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                      <Send className="w-3.5 h-3.5" /> Telegram
+                    </a>
+                  )}
+                </div>
+
+                {/* Share button */}
+                <button
+                  onClick={handleCopy}
+                  className="mt-5 flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-white transition-colors"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? "Copied!" : "Copy profile link"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats pods */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-2xl bg-[#0a0b0f] border border-white/5 space-y-2">
+              <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-emerald-500/10">
+                <LayoutDashboard className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-[20px] font-black text-white">{collections.length}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Hiring Collections</p>
+              </div>
+            </div>
+            <div className="p-4 rounded-2xl bg-[#0a0b0f] border border-white/5 space-y-2">
+              <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-purple-500/10">
+                <FolderOpen className="w-4 h-4 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-[20px] font-black text-white">{projects.length}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Projects</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Projects */}
+          {projects.length > 0 && (
+            <div className="rounded-2xl bg-slate-800/30 border border-slate-700/50 overflow-hidden">
+              <div className="flex items-center gap-3 p-4 border-b border-slate-700/50">
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <FolderOpen className="w-4 h-4 text-emerald-400" />
+                </div>
+                <h2 className="text-sm font-black text-white">Projects &amp; Programs</h2>
+                <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">{projects.length}</span>
+              </div>
+              <div className="p-4 grid gap-3">
+                {projects.map(p => (
+                  <div key={p.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl">
+                    <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-bold text-white">{p.title}</h3>
+                      {p.project_type && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-400 border border-slate-600/50">{p.project_type}</span>
+                      )}
+                      {(p.is_ongoing || p.status === "active") && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+                      )}
+                      {p.status === "completed" && (
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Completed</span>
+                      )}
+                    </div>
+                    {p.description && <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-1.5">{p.description}</p>}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {p.start_date && (
+                        <span className="text-[10px] text-slate-600 font-mono">
+                          {new Date(p.start_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                          {p.is_ongoing ? " — Ongoing" : p.end_date ? ` — ${new Date(p.end_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}` : ""}
+                        </span>
+                      )}
+                      {p.project_url && (
+                        <a href={p.project_url.startsWith("http") ? p.project_url : `https://${p.project_url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-teal-400 hover:underline flex items-center gap-1">
+                          <ExternalLink className="w-2.5 h-2.5" /> View Project
+                        </a>
+                      )}
+                    </div>
+                    {p.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {p.tags.map(tag => (
+                          <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-600 border border-slate-700/50">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hiring Collections */}
+          {collections.length > 0 && (
+            <div className="rounded-2xl bg-slate-800/30 border border-slate-700/50 overflow-hidden">
+              <div className="flex items-center gap-3 p-4 border-b border-slate-700/50">
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <LayoutDashboard className="w-4 h-4 text-emerald-400" />
+                </div>
+                <h2 className="text-sm font-black text-white">Open Hiring Collections</h2>
+                <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">{collections.length}</span>
+              </div>
+              <div className="p-4 grid gap-3">
+                {collections.map(col => (
+                  <Link key={col.id} href={`/r/${col.slug}`} target="_blank"
+                    className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
+                    <div>
+                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">{col.title}</h3>
+                      <span className="text-[10px] text-slate-500">{new Date(col.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate-500 group-hover:text-teal-400 transition-colors">
+                      View <ExternalLink className="w-2.5 h-2.5" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {projects.length === 0 && collections.length === 0 && (
+            <div className="py-10 text-center text-slate-500 text-sm">No public content yet.</div>
+          )}
+
+        </div>
+      </main>
+      <Footer />
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+    </>
+  );
+}

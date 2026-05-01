@@ -2,24 +2,38 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabaseAuth } from "@/lib/supabase/auth";
 
 /**
- * Phantom Connect OAuth callback page.
- * Phantom redirects here after Google/Apple social login.
- * The Phantom React SDK handles the token extraction automatically from the URL.
- * We just redirect back to the dashboard after a short moment.
+ * Supabase OAuth callback page.
+ * After Google sign-in, Supabase redirects here with a `code` query param (PKCE flow).
+ * We exchange it for a session, then forward to the dashboard.
  */
 export default function AuthCallbackPage() {
     const router = useRouter();
 
     useEffect(() => {
-        // The PhantomProvider SDK automatically processes the OAuth callback
-        // from the URL hash/query params. After processing, redirect home.
-        const timer = setTimeout(() => {
-            router.replace("/dashboard");
-        }, 1500);
+        const handleCallback = async () => {
+            if (!supabaseAuth) {
+                router.replace("/dashboard");
+                return;
+            }
 
-        return () => clearTimeout(timer);
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get("code");
+            const next = params.get("next") ?? "/dashboard";
+
+            if (code) {
+                const { error } = await supabaseAuth.auth.exchangeCodeForSession(code);
+                if (error) {
+                    console.error("[auth/callback] Code exchange failed:", error.message);
+                }
+            }
+
+            router.replace(next);
+        };
+
+        handleCallback();
     }, [router]);
 
     return (

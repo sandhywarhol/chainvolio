@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
-import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Linkedin, Send, Phone, Check, ExternalLink, ChevronDown, ChevronUp, Info } from "lucide-react";
+import { Github, Globe, MessageSquare, Copy, Wallet, Mail, MapPin, FileText, Play, Palette, Link as LinkIcon, User, Clock, Briefcase, CheckCircle2, BadgeCheck, Star, Award, ShieldCheck, Instagram, Check, ExternalLink, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getBadgeStyles, normalizeTier } from "@/lib/paymentConfig";
 
 import { PortfolioModal } from "@/components/portfolio/PortfolioModal";
@@ -20,6 +20,7 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
 import { TrustIssuerCV } from "@/components/cv/TrustIssuerCV";
+import { RecruiterSoftPrompt } from "@/components/cv/RecruiterSoftPrompt";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 type Profile = {
@@ -649,6 +650,7 @@ export default function CVPage(props: any) {
 
   const [collections, setCollections] = useState<any[]>([]);
   const [endorsements, setEndorsements] = useState<any[]>([]);
+  const [orgProjects, setOrgProjects] = useState<any[]>([]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -672,7 +674,8 @@ export default function CVPage(props: any) {
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/hiring/collections?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/organizations/attestations?wallet=${wallet}`).then((r) => r.json()),
-    ]).then(([recsData, port, collectionsData, endorsementsData]) => {
+      fetch(`/api/org/projects?wallet=${wallet}`).then((r) => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+    ]).then(([recsData, port, collectionsData, endorsementsData, projectsData]) => {
       const recs = Array.isArray(recsData) ? recsData : (recsData.receipts || []);
       const sortedRecs = [...recs].sort((a: any, b: any) => 
         (b.status === "Attested" ? 1 : 0) - (a.status === "Attested" ? 1 : 0)
@@ -700,6 +703,10 @@ export default function CVPage(props: any) {
              profile: e.receipt?.profile || { display_name: "Anonymous Builder", avatar_url: null }
         }));
         setEndorsements(mappedEndorsements);
+      }
+
+      if (Array.isArray(projectsData?.data)) {
+        setOrgProjects(projectsData.data);
       }
     }).catch(err => console.error("Non-critical fetches failed:", err));
 
@@ -758,11 +765,12 @@ export default function CVPage(props: any) {
           <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
             <TrustIssuerCV
                profile={profile}
-               receipts={endorsements} // Uses issued endorsements for impact
+               receipts={endorsements}
                scoreData={scoreData}
                wallet={wallet}
                collections={collections}
                isCommunity={isCommunity}
+               projects={orgProjects}
             />
             <footer className="mt-auto text-center border-t border-slate-800 pt-8 pb-4 mt-12">
               <p className="text-slate-600 text-xs max-w-md mx-auto">
@@ -1504,6 +1512,7 @@ export default function CVPage(props: any) {
           </p>
         </footer>
       </section>
+      <RecruiterSoftPrompt />
       <Footer />
     </main>
   );
