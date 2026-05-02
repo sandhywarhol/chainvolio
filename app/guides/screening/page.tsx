@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export default function ScreeningGuide() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-blue-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-blue-500/30 selection:text-white bg-black">
             {/* noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -55,7 +55,7 @@ export default function ScreeningGuide() {
                     
                     {/* Core Principles */}
                     <div className="grid lg:grid-cols-2 gap-12 pt-24">
-                        <div className="group space-y-10 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/20 transition-all duration-500">
+                        <div className="group space-y-10 p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/20 transition-all duration-500">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-emerald-500/5 text-emerald-400">
                                     <ShieldCheck className="w-5 h-5" />
@@ -76,7 +76,7 @@ export default function ScreeningGuide() {
                             </div>
                         </div>
 
-                        <div className="group space-y-10 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-blue-500/20 transition-all duration-500">
+                        <div className="group space-y-10 p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-blue-500/20 transition-all duration-500">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-blue-500/5 text-blue-400">
                                     <Activity className="w-5 h-5" />
@@ -147,7 +147,7 @@ export default function ScreeningGuide() {
                                     metrics: ["Signal confidence indicator"]
                                 }
                             ].map((s) => (
-                                <div key={s.id} className="p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] flex flex-col gap-6 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group">
+                                <div key={s.id} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] flex flex-col gap-6 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group">
                                     <div className="flex justify-between items-center text-white/20">
                                         <div className="p-2 rounded-lg bg-white/[0.03] group-hover:bg-white/[0.08] group-hover:text-white transition-all">
                                             {s.icon}
@@ -159,7 +159,7 @@ export default function ScreeningGuide() {
                                             {s.title}
                                             <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
                                         </h4>
-                                        <p className="text-body text-xs font-light">{s.desc}</p>
+                                        <p className="text-body text-xs font-medium">{s.desc}</p>
                                     </div>
                                     <div className="pt-4 border-t border-white/[0.05] space-y-3">
                                         <p className="text-[9px] text-blue-400 opacity-40 uppercase tracking-[0.3em] font-bold">Map To Dashboard:</p>
@@ -178,7 +178,7 @@ export default function ScreeningGuide() {
                     </div>
 
                     {/* Dashboard Teaser */}
-                    <div className="bg-blue-500/[0.02] rounded-[32px] p-12 border border-blue-500/10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-[0_20px_50px_rgba(59,130,246,0.05)]">
+                    <div className="bg-blue-500/[0.02] rounded-2xl p-12 border border-blue-500/10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-[0_20px_50px_rgba(59,130,246,0.05)]">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] opacity-50 group-hover:bg-blue-500/10 transition-all pointer-events-none" />
                         <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-emerald-500/5 blur-[80px] opacity-50 group-hover:bg-emerald-500/10 transition-all pointer-events-none" />
                         

@@ -275,7 +275,7 @@ function WorkRecordCard({
   return (
     <div
       onClick={() => onSelect(r)}
-      className="p-4 md:p-5 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer group/work relative"
+      className="p-4 md:p-5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/50 transition-all cursor-pointer group/work relative"
     >
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0 max-w-full">
@@ -295,7 +295,7 @@ function WorkRecordCard({
           <div className={`mt-3 ${!isExpanded ? "hidden md:block" : "block"}`}>
             {/* Attester info (if attested) */}
             {r.status === "Attested" && r.attesterWallet && (
-              <div className="mb-4 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-2">
+              <div className="mb-4 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">
                     {r.attestationId ? "On-chain Recruiter Proof" : "Verification Signature"}
@@ -319,11 +319,11 @@ function WorkRecordCard({
                         className="w-12 h-12 rounded-full object-cover border border-emerald-500/20 shadow-lg"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-slate-800 border border-emerald-500/20 flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
+                      <div className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
                         {r.attesterName?.[0] || '?'}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
+                    <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                     </div>
                   </div>
@@ -424,7 +424,7 @@ function WorkRecordCard({
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       title={getEvidenceTooltip(link.label)}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-slate-600 shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-white/[0.08] shadow-sm"
                     >
                       {getEvidenceIcon(link.label)} {link.label}
                     </a>

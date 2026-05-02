@@ -64,14 +64,14 @@ export default function OrgOnboardingPage() {
 
     if (loading) {
         return (
-            <main className="min-h-screen flex items-center justify-center">
+            <main className="min-h-screen flex items-center justify-center bg-black">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-[#0a0f1a]">
+        <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-black">
             <div className="w-full max-w-lg">
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold text-white mb-2">

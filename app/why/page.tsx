@@ -19,7 +19,7 @@ import {
 
 export default function WhyPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-transparent">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black">
 
             <Navbar />
 
@@ -52,7 +52,7 @@ export default function WhyPage() {
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
                     {/* The Old Way */}
-                    <div className="group relative p-8 rounded-3xl bg-white/[0.02] border border-white/[0.05] hover:border-red-500/20 transition-all duration-500">
+                    <div className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-red-500/20 transition-all duration-500">
                         <div className="space-y-6">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export default function WhyPage() {
                     </div>
 
                     {/* The ChainVolio Way - Calm Confidence */}
-                    <div className="group relative p-8 rounded-3xl bg-white/[0.03] border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-500 shadow-[0_20px_50px_rgba(16,185,129,0.05)]">
+                    <div className="group relative p-8 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-500 shadow-[0_20px_50px_rgba(16,185,129,0.05)]">
                         {/* Subtle inner glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
                         
@@ -151,7 +151,7 @@ export default function WhyPage() {
                             desc: "Your professional identity is wallet-native and sovereign. Built on open cryptographic standards, it functions as a global trust layer without institutional intermediaries."
                         }
                     ].map((card, i) => (
-                        <div key={i} className="group p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all duration-500">
+                        <div key={i} className="group p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all duration-500">
                             <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center text-teal-400 mb-6 group-hover:scale-110 transition-transform duration-500">
                                 {card.icon}
                             </div>
@@ -244,7 +244,7 @@ export default function WhyPage() {
                 
                 <div className="max-w-4xl mx-auto space-y-8 relative z-10">
                     <div className="flex flex-col items-center gap-6 mb-4">
-                        <div className="w-16 h-16 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-teal-400 shadow-2xl">
+                        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-teal-400 shadow-2xl">
                             <ExternalLink className="w-8 h-8" />
                         </div>
                         <h2 className="text-h1 flex flex-col items-center">

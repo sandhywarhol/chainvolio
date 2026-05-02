@@ -20,9 +20,9 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
 
     return (
         <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative w-full max-w-lg bg-[#0d0d10] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
                     <div className="flex items-center gap-2">
                         {receipt.attestationType === "Hiring Proof" ? (
                             <ShieldCheck className="w-5 h-5 text-emerald-400" />
@@ -42,7 +42,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                     {/* Status Hero */}
                     <div className={`p-3 rounded-xl border text-center ${isAttested
                         ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                        : "bg-slate-800/50 border-slate-700 text-slate-400"
+                        : "bg-white/[0.03] border-white/[0.06] text-white/40"
                         }`}>
                         <div className="flex flex-col items-center gap-1.5">
                             {receipt.attestationType === "Hiring Proof" ? (
@@ -95,19 +95,19 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
 
                     {/* Verification Details */}
                     {isAttested && (
-                        <div className="space-y-4 pt-4 border-t border-slate-800">
+                        <div className="space-y-4 pt-4 border-t border-white/[0.06]">
                             <div className="space-y-3">
                                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                                     {receipt.attestationType === "Hiring Proof" ? "Verified Recruiter" : "Confirmed By"}
                                 </h4>
-                                <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 backdrop-blur-md">
+                                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-md">
                                     <div className="flex-shrink-0 relative">
                                         {receipt.attesterAvatar ? (
                                             <img src={receipt.attesterAvatar} className="w-12 h-12 rounded-full border border-emerald-500/20 object-cover shadow-lg" />
                                         ) : (
-                                            <div className="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow-lg">👤</div>
+                                            <div className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-lg shadow-lg">👤</div>
                                         )}
-                                        <div className="absolute -bottom-1 -right-1 bg-slate-900 rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
+                                        <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
                                             <ShieldCheck className="w-4 h-4 text-emerald-400" />
                                         </div>
                                     </div>
@@ -137,7 +137,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                     </div>
                                 </div>
                                 {receipt.attesterComment && (
-                                    <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 italic text-slate-300 text-sm relative">
+                                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] italic text-slate-300 text-sm relative">
                                         <span className="absolute -top-2 -left-1 text-2xl text-emerald-500/30 font-serif">"</span>
                                         {receipt.attesterComment}
                                         <span className="absolute -bottom-4 -right-1 text-2xl text-emerald-500/30 font-serif">"</span>

@@ -5,7 +5,7 @@ import { ArrowLeft, XCircle } from "lucide-react";
 
 export default function SubscriptionCancelPage() {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-[#050507] text-white px-4">
+        <main className="min-h-screen flex flex-col items-center justify-center bg-black text-white px-4">
             <div className="max-w-md w-full text-center space-y-6">
                 <div className="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto">
                     <XCircle className="w-8 h-8 text-slate-500" />

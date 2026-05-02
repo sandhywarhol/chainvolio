@@ -183,7 +183,7 @@ export default function OrgEditProfileWalletPage() {
 
     if (!connected || !publicKey) {
         return (
-            <main className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#050507] text-white px-4">
+            <main className="min-h-screen flex flex-col items-center justify-center gap-6 bg-black text-white px-4">
                 <Building2 className="w-10 h-10 text-slate-600" />
                 <h1 className="text-2xl font-bold">Connect your wallet</h1>
                 <p className="text-slate-400 text-center max-w-sm text-sm">
@@ -195,9 +195,9 @@ export default function OrgEditProfileWalletPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#050507] text-white">
+        <main className="min-h-screen bg-black text-white">
             {/* Sticky header */}
-            <div className="sticky top-0 z-50 bg-[#050507]/90 backdrop-blur-xl border-b border-white/5 px-4 py-4">
+            <div className="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-4 py-4">
                 <div className="max-w-2xl mx-auto flex items-center justify-between">
                     <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
                         <ArrowLeft className="w-4 h-4" /> Back to Dashboard

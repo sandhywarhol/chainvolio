@@ -166,7 +166,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 }`;
 
   return (
-    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-transparent">
+    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-black">
 
       <Navbar />
 
@@ -245,7 +245,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { icon: <Users className="w-5 h-5" />, title: "DAO Gov", desc: "Assign voting power or council seats based on verified reputation.", color: "blue" },
                   { icon: <Landmark className="w-5 h-5" />, title: "DeFi Lending", desc: "Adjust collateral requirements based on a borrower's verified trust score.", color: "emerald" }
               ].map((item, i) => (
-                  <div key={i} className="p-6 md:p-8 bg-white/[0.01] border border-white/[0.03] rounded-[32px] space-y-6 hover:border-white/10 transition-all group w-full max-w-full break-words overflow-hidden">
+                  <div key={i} className="p-6 md:p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-6 hover:border-white/10 transition-all group w-full max-w-full break-words overflow-hidden">
                     <div className={`p-4 rounded-xl bg-${item.color}-500/5 text-${item.color}-400 group-hover:bg-${item.color}-500/10 transition-colors w-fit`}>
                       {item.icon}
                     </div>
@@ -282,7 +282,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                 </div>
               </div>
 
-              <div className="bg-[#050505] rounded-[40px] overflow-hidden border border-white/[0.05] shadow-2xl relative group">
+              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl relative group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                   <div className="flex items-center gap-2">
@@ -322,7 +322,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               ))}
             </div>
 
-            <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-[48px] relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+            <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-2xl relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
                 <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row gap-16 items-center">
                     <div className="md:w-1/2 space-y-6">
@@ -345,7 +345,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                                 <button
                                     onClick={generateApiKey}
                                     disabled={generatingKey}
-                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-[20px] hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
+                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
                                 >
                                     {generatingKey ? "Signing…" : "Generate API Key"}
                                 </button>
@@ -381,7 +381,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                     <div className="md:w-1/2 w-full">
                         {generatedKey ? (
                            <div className="space-y-6">
-                              <div className="p-8 bg-black border border-white/[0.05] rounded-3xl relative group/key">
+                              <div className="p-8 bg-black border border-white/[0.05] rounded-2xl relative group/key">
                                 <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
                                 <div className="flex items-center justify-between gap-4">
                                     <code className="text-emerald-400 font-mono text-sm break-all">{generatedKey}</code>
@@ -399,7 +399,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                               </div>
                            </div>
                         ) : (
-                            <div className="aspect-square rounded-[40px] border border-white/[0.03] bg-white/[0.01] flex items-center justify-center relative overflow-hidden">
+                            <div className="aspect-square rounded-2xl border border-white/[0.03] bg-white/[0.01] flex items-center justify-center relative overflow-hidden">
                                 <Wallet className="w-16 h-16 text-white/[0.03]" />
                                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
                             </div>
@@ -437,7 +437,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                         </div>
                     </div>
                 </div>
-                <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl group">
+                <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl group">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-caption opacity-20">Header (optional for GET, required for POST batch)</span>
                     </div>
@@ -475,7 +475,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Code Snippet */}
-              <div className="bg-[#050505] rounded-[32px] overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
                 <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                   <span className="text-caption opacity-20">Fetch Signature</span>
                   <div className="flex items-center gap-6">
@@ -495,7 +495,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               </div>
 
               {/* JSON Response */}
-              <div className="bg-[#050505] rounded-[32px] overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
                 <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center text-caption opacity-20">
                   <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
@@ -526,7 +526,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               </div>
             </div>
 
-            <div className="bg-[#050505] rounded-[40px] overflow-hidden border border-white/[0.03] shadow-2xl group">
+            <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl group">
               <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <Activity className="w-4 h-4 text-blue-400/60" />
@@ -556,7 +556,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               <h2 className="text-2xl md:text-h2 md:!text-3xl break-words">Live Sandbox</h2>
             </div>
             
-            <div className="p-6 md:p-12 bg-white/[0.01] border border-white/[0.03] rounded-[48px] shadow-2xl relative overflow-hidden group">
+            <div className="p-6 md:p-12 bg-white/[0.01] border border-white/[0.03] rounded-2xl shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
                 <div className="relative z-10 space-y-12">
                     <div className="flex flex-col md:flex-row gap-6">
@@ -607,7 +607,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                                     {copied === 'test-res' ? 'Copied' : 'Copy JSON'}
                                 </button>
                              </div>
-                             <div className="p-6 md:p-10 bg-black border border-white/[0.05] rounded-[32px] font-mono text-[10px] md:text-sm leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre shadow-2xl max-h-[500px] break-all">
+                             <div className="p-6 md:p-10 bg-black border border-white/[0.05] rounded-2xl font-mono text-[10px] md:text-sm leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre shadow-2xl max-h-[500px] break-all">
                                 {JSON.stringify(testResult, null, 2)}
                              </div>
                         </div>
@@ -618,7 +618,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 
           {/* Final Call to Action */}
           <section className="relative z-40 md:py-24 md:px-8 pt-16 pb-28 px-4 border-t border-white/[0.03] h-auto overflow-hidden max-w-full">
-              <div className="p-8 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-[48px] text-center space-y-10 relative group flex flex-col items-center justify-start h-auto">
+              <div className="p-8 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-center space-y-10 relative group flex flex-col items-center justify-start h-auto">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="relative z-10 flex flex-col items-center w-full space-y-8 md:space-y-10">
                       <div className="p-5 rounded-2xl bg-white/[0.03] w-fit mx-auto">

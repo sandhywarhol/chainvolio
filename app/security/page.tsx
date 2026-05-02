@@ -25,7 +25,7 @@ export default function SecurityPage() {
     const [showPdfNotice, setShowPdfNotice] = useState(false);
 
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white bg-black">
             {/* Refined noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -87,7 +87,7 @@ export default function SecurityPage() {
                             desc: "ChainVolio does not custody keys. Identity authority remains with user wallets. We only verify cryptographic proofs."
                         }
                     ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(16,185,129,0.02)]">
+                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(16,185,129,0.02)]">
                             <div className="p-3 rounded-xl bg-emerald-500/5 text-emerald-400 mb-8 group-hover:bg-emerald-500/10 group-hover:text-emerald-300 transition-all w-fit">
                                 {item.icon}
                             </div>
@@ -130,7 +130,7 @@ export default function SecurityPage() {
                             desc: "Platform guarantees are derived deterministically from code and database constraints, rather than aspirational trust."
                         }
                     ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-blue-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(59,130,246,0.02)]">
+                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-blue-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(59,130,246,0.02)]">
                             <div className="p-3 rounded-xl bg-blue-500/5 text-blue-400 mb-8 group-hover:bg-blue-500/10 group-hover:text-blue-300 transition-all w-fit">
                                 {item.icon}
                             </div>
@@ -233,7 +233,7 @@ export default function SecurityPage() {
                         </div>
                     </div>
 
-                    <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl max-w-sm">
+                    <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl max-w-sm">
                         <p className="text-caption text-white/20 mb-4">Core Invariant</p>
                         <p className="text-body italic">
                             “ChainVolio is engineered under a zero-trust assumption: the frontend may be compromised, users may be adversarial, and failures are inevitable.”

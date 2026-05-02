@@ -47,7 +47,7 @@ export default function SubscriptionSuccessPage() {
     }, [session, refetchOrgAccount]);
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-[#050507] text-white px-4">
+        <main className="min-h-screen flex flex-col items-center justify-center bg-black text-white px-4">
             <div className="max-w-md w-full text-center">
                 {status === "polling" && (
                     <div className="space-y-4">

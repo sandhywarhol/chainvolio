@@ -31,7 +31,7 @@ import Link from "next/link";
 
 export default function HowItWorksPage() {
   return (
-    <main className="h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white overflow-x-hidden bg-[#050505]">
+    <main className="h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white overflow-x-hidden bg-black">
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -159,7 +159,7 @@ export default function HowItWorksPage() {
                     { icon: <Award className="w-5 h-5" />, title: "Institutional Trust Issuers", desc: "Top Web3 organizations act as 'Trust Issuers,' providing high-authority attestations that carry significant weight in the talent market.", color: "purple" },
                     { icon: <FileCheck className="w-5 h-5" />, title: "Portable Reputation", desc: "Your identity is stored on-chain. If ChainVolio ever disappears, your proofs and attestations remain accessible on the Solana network.", color: "cyan" }
                 ].map((item, i) => (
-                    <div key={i} className="p-10 bg-white/[0.01] border border-white/[0.03] rounded-[48px] space-y-6 hover:border-white/10 transition-all group relative overflow-hidden">
+                    <div key={i} className="p-10 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-6 hover:border-white/10 transition-all group relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent group-hover:via-emerald-500/30 transition-all" />
                       <div className={`p-4 rounded-2xl bg-white/[0.03] text-white/40 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-colors w-fit shadow-xl`}>
                         {item.icon}
@@ -192,7 +192,7 @@ export default function HowItWorksPage() {
                       { step: "2", title: "Evaluate", desc: "Review candidate Trust Scores, which synthesize their on-chain history and peer-backed attestations." },
                       { step: "3", title: "Hire", desc: "Close candidates with confidence, knowing their professional history has been cryptographically confirmed." }
                     ].map((s, idx) => (
-                      <div key={idx} className="p-8 rounded-[32px] bg-white/[0.02] border border-white/5 space-y-4 hover:bg-emerald-500/[0.02] transition-colors group">
+                      <div key={idx} className="p-8 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4 hover:bg-emerald-500/[0.02] transition-colors group">
                         <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold group-hover:scale-110 transition-transform">{s.step}</div>
                         <h4 className="font-bold text-white uppercase tracking-wider text-sm">{s.title}</h4>
                         <p className="text-xs text-slate-400 leading-relaxed font-medium">{s.desc}</p>
@@ -255,7 +255,7 @@ export default function HowItWorksPage() {
                               items: ["Attestations are transparent, traceable, and verifiable", "Contribute to a trust layer, not just a hiring pipeline"]
                           }
                       ].map((block, i) => (
-                          <div key={i} className="p-8 rounded-[32px] bg-white/[0.02] border border-white/5 space-y-6 hover:bg-white/[0.04] transition-all group overflow-hidden relative">
+                          <div key={i} className="p-8 rounded-2xl bg-white/[0.02] border border-white/5 space-y-6 hover:bg-white/[0.04] transition-all group overflow-hidden relative">
                               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                               <div className="p-3 bg-white/[0.03] rounded-2xl w-fit group-hover:scale-110 transition-transform">
                                   {block.icon}
@@ -273,7 +273,7 @@ export default function HowItWorksPage() {
                       ))}
                   </div>
 
-                  <div className="p-8 rounded-3x1 bg-emerald-500/[0.03] border border-emerald-500/10 text-center">
+                  <div className="p-8 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10 text-center">
                       <p className="text-emerald-400 font-bold italic italic text-sm">
                           "Give fewer, better attestations - and let them speak for your brand."
                       </p>
@@ -288,7 +288,7 @@ export default function HowItWorksPage() {
                           Verified organizations can issue direct attestations to their employees and contractors. This builds your reputation as a primary talent incubator and helps secure the professional future of your best team members.
                         </p>
                       </div>
-                      <div className="w-full md:w-1/3 p-8 bg-emerald-500/[0.03] border border-emerald-500/10 rounded-3xl text-center group">
+                      <div className="w-full md:w-1/3 p-8 bg-emerald-500/[0.03] border border-emerald-500/10 rounded-2xl text-center group">
                           <p className="text-emerald-400 font-bold text-sm mb-2 group-hover:scale-110 transition-transform">Verification Hub</p>
                           <p className="text-[10px] text-white/40 uppercase tracking-[0.2em]">Scale Your Impact</p>
                       </div>
@@ -332,8 +332,8 @@ export default function HowItWorksPage() {
                 </div>
 
                 <div id="get-attested" className="space-y-8 border-t border-white/5 pt-12">
-                  <div className="flex items-center gap-6 p-10 bg-blue-500/[0.03] border border-blue-500/10 rounded-[48px] group">
-                    <div className="hidden md:flex w-20 h-20 rounded-3xl bg-white/[0.03] items-center justify-center text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
+                  <div className="flex items-center gap-6 p-10 bg-blue-500/[0.03] border border-blue-500/10 rounded-2xl group">
+                    <div className="hidden md:flex w-20 h-20 rounded-2xl bg-white/[0.03] items-center justify-center text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
                         <Award className="w-10 h-10" />
                     </div>
                     <div className="space-y-4">
@@ -349,7 +349,7 @@ export default function HowItWorksPage() {
 
             {/* Final Call to Action */}
             <section className="relative z-40 md:py-24 md:px-8 pt-16 pb-20 px-4 border-t border-white/[0.03] h-auto">
-                <div className="p-10 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-[48px] text-center space-y-10 relative overflow-hidden group flex flex-col items-center justify-start h-auto">
+                <div className="p-10 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-center space-y-10 relative overflow-hidden group flex flex-col items-center justify-start h-auto">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                     <div className="relative z-10 flex flex-col items-center w-full space-y-8 md:space-y-10">
                         <div className="p-5 rounded-2xl bg-white/[0.03] w-fit mx-auto">

@@ -320,7 +320,7 @@ export default function AttestPage() {
     }
 
     if (error && !receipt) return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black">
             <p className="text-red-400">{error}</p>
             <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
         </main>
@@ -328,7 +328,7 @@ export default function AttestPage() {
 
     // ─── Success ──────────────────────────────────────────────────────────────
     if (success) return (
-        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6">
+        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black">
             <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-4xl">✓</div>
             <div className="text-center space-y-2">
                 <h1 className="text-2xl font-bold">Attestation Recorded On-Chain</h1>
@@ -364,7 +364,7 @@ export default function AttestPage() {
     const showForm = (googleSession || publicKey) && !isOwnWork;
 
     return (
-        <main className="min-h-screen text-white">
+        <main className="min-h-screen text-white bg-black">
             <nav className="flex items-center justify-between px-6 py-4 max-w-2xl mx-auto relative z-[100]">
                 <Link href="/" className="flex items-center gap-1.5 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />

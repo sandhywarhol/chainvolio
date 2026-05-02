@@ -1,46 +1,253 @@
 "use client";
 
 // Force re-compile: v2-floating-card
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { 
-    ArrowRight, 
-    ArrowUpRight, 
-    CheckCircle2, 
-    Shield, 
+import {
+    ArrowRight,
+    CheckCircle2,
     ShieldCheck,
-    Users, 
-    Zap, 
-    Flame, 
-    Wallet,
-    FileText,
-    Target,
     Building2,
     LayoutDashboard,
     FolderOpen,
     Lock,
     Award,
     Globe,
-    Github,
     Terminal,
-    ExternalLink
+    ExternalLink,
+    User,
+    FileCheck2,
+    PenLine,
+    Share2,
+    Boxes,
+    Hash,
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
-import { isRecruiterTier } from "@/lib/paymentConfig";
-import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { Web3ResumeSection } from "./Web3ResumeSection";
+
+// --- Interactive Verifiable Work History Flow (3D Chip Style) ---
+function VerifiableWorkHistoryFlow() {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    const nodes: {
+        icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }> | "profile";
+        label: string;
+        sublabel: string;
+        color: string;
+    }[] = [
+        { icon: "profile",   label: "Your Profile",  sublabel: "Identity",    color: "#ffffff"  },
+        { icon: FileCheck2,  label: "Work Recorded", sublabel: "Contribution",color: "#60a5fa"  },
+        { icon: ShieldCheck, label: "Attested",       sublabel: "By Org",      color: "#14F195"  },
+        { icon: PenLine,     label: "Signed",         sublabel: "Crypto Sig",  color: "#a78bfa"  },
+        { icon: Boxes,       label: "On-Chain",       sublabel: "Solana",      color: "#34d399"  },
+        { icon: Hash,        label: "Hash Created",   sublabel: "Immutable",   color: "#9945FF"  },
+        { icon: Share2,      label: "Shareable",      sublabel: "To Recruiters",color: "#f59e0b" },
+    ];
+
+    const isLineActive = (lineIndex: number) =>
+        hoveredIndex !== null && lineIndex < hoveredIndex;
+
+    return (
+        <div className="relative w-full flex items-center justify-center py-12 pb-16 select-none">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(153,69,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+
+            <div className="flex items-center w-full max-w-4xl mx-auto px-4">
+                {nodes.map((node, i) => {
+                    const isHovered = hoveredIndex === i;
+                    const isActive  = hoveredIndex !== null && i <= hoveredIndex;
+                    const IconComp  = node.icon === "profile" ? null : node.icon;
+                    const isProfile = node.icon === "profile";
+                    const chipW     = "52px";
+                    const chipH     = "52px";
+                    const r         = "16px";
+
+                    return (
+                        <div key={i} className="contents">
+                            {/* ── NODE ── */}
+                            <div
+                                className="relative flex-shrink-0 flex flex-col items-center cursor-pointer z-10"
+                                onMouseEnter={() => setHoveredIndex(i)}
+                                onMouseLeave={() => setHoveredIndex(null)}
+                            >
+                                {/* 3D chip: tilt at rest, lifts on hover */}
+                                <motion.div
+                                    className="relative"
+                                    animate={{
+                                        y:       isHovered ? -10 : 0,
+                                        rotateX: isHovered ? 0 : 8,
+                                        rotateY: isHovered ? 0 : -10,
+                                        scale:   isHovered ? 1.1 : 1,
+                                    }}
+                                    transition={{ duration: 0.25, ease: "easeOut" }}
+                                    style={{ perspective: "600px", transformStyle: "preserve-3d" }}
+                                >
+                                    {/* Layer 3 — deepest shadow */}
+                                    <div style={{
+                                        position: "absolute", width: chipW, height: chipH,
+                                        top: "7px", left: "5px", borderRadius: r,
+                                        background: "#010101",
+                                        border: "1px solid rgba(255,255,255,0.02)",
+                                    }} />
+
+                                    {/* Layer 2 */}
+                                    <div style={{
+                                        position: "absolute", width: chipW, height: chipH,
+                                        top: "3px", left: "2px", borderRadius: r,
+                                        background: "#060606",
+                                        border: "1px solid rgba(255,255,255,0.04)",
+                                    }} />
+
+                                    {/* Main face */}
+                                    <motion.div
+                                        animate={{
+                                            borderColor: isActive ? node.color + "55" : "rgba(255,255,255,0.09)",
+                                            boxShadow: isHovered
+                                                ? `0 0 30px ${node.color}40, 0 14px 44px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)`
+                                                : "0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
+                                        }}
+                                        transition={{ duration: 0.2 }}
+                                        className="relative flex items-center justify-center overflow-hidden"
+                                        style={{
+                                            width: chipW, height: chipH, borderRadius: r,
+                                            background: "linear-gradient(145deg, #1e1e1e 0%, #0e0e0e 100%)",
+                                            border: "1px solid rgba(255,255,255,0.09)",
+                                        }}
+                                    >
+                                        {/* Lighting: top-edge highlight */}
+                                        <div className="absolute inset-x-2 top-0 h-[1px] pointer-events-none"
+                                            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)" }} />
+                                        {/* Lighting: left-edge highlight */}
+                                        <div className="absolute inset-y-2 left-0 w-[1px] pointer-events-none"
+                                            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)" }} />
+
+                                        {/* Color inner glow (active) */}
+                                        <motion.div
+                                            animate={{ opacity: isActive ? 1 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute inset-0 pointer-events-none"
+                                            style={{
+                                                borderRadius: r,
+                                                background: `radial-gradient(circle at 40% 40%, ${node.color}22 0%, transparent 65%)`,
+                                            }}
+                                        />
+
+                                        {/* Content */}
+                                        {isProfile ? (
+                                            <User
+                                                className="relative z-10 w-6 h-6"
+                                                style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.4)" }}
+                                            />
+                                        ) : (
+                                            IconComp && (
+                                                <IconComp
+                                                    className="relative z-10 w-7 h-7"
+                                                    style={{ color: isActive ? node.color : "rgba(255,255,255,0.2)" }}
+                                                />
+                                            )
+                                        )}
+                                    </motion.div>
+                                </motion.div>
+
+                                {/* Ground glow puddle */}
+                                <motion.div
+                                    animate={{
+                                        opacity: isHovered ? 1 : 0.35,
+                                        scaleX: isHovered ? 1.4 : 0.85,
+                                    }}
+                                    transition={{ duration: 0.25 }}
+                                    className="pointer-events-none"
+                                    style={{
+                                        width: "100%", height: "10px", marginTop: "6px",
+                                        background: isActive
+                                            ? `radial-gradient(ellipse at center, ${node.color}45 0%, transparent 70%)`
+                                            : "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, transparent 70%)",
+                                        filter: "blur(4px)",
+                                    }}
+                                />
+
+                                {/* Hover label */}
+                                <motion.div
+                                    animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 5 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute -bottom-10 flex flex-col items-center pointer-events-none whitespace-nowrap"
+                                >
+                                    <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: node.color }}>
+                                        {node.label}
+                                    </span>
+                                    <span className="text-[9px] text-white/30 tracking-wider mt-0.5">{node.sublabel}</span>
+                                </motion.div>
+                            </div>
+
+                            {/* ── CONNECTOR ── */}
+                            {i < nodes.length - 1 && (
+                                <div className="relative flex-1 h-6 flex items-center mx-1 overflow-visible">
+                                    {/* dashed base */}
+                                    <svg width="100%" height="2" className="absolute top-1/2 -translate-y-1/2 overflow-visible" preserveAspectRatio="none">
+                                        <line x1="0" y1="1" x2="100%" y2="1"
+                                            stroke="rgba(255,255,255,0.07)"
+                                            strokeWidth="1.5"
+                                            strokeDasharray="4 7"
+                                        />
+                                    </svg>
+
+                                    {/* active glow line */}
+                                    <motion.div
+                                        initial={{ opacity: 0, scaleX: 0 }}
+                                        animate={{
+                                            opacity: isLineActive(i) ? 1 : 0,
+                                            scaleX: isLineActive(i) ? 1 : 0,
+                                        }}
+                                        transition={{ duration: 0.25, ease: "easeOut" }}
+                                        className="absolute h-[1.5px] w-full pointer-events-none"
+                                        style={{
+                                            top: "50%",
+                                            transform: "translateY(-50%)",
+                                            transformOrigin: "left center",
+                                            background: `linear-gradient(to right, ${nodes[i].color}90, ${nodes[i + 1].color}90)`,
+                                            boxShadow: `0 0 8px ${nodes[i + 1].color}60`,
+                                        }}
+                                    />
+
+                                    {/* traveling particle */}
+                                    {isLineActive(i) && (
+                                        <motion.div
+                                            key={`dot-${i}-${hoveredIndex}`}
+                                            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none"
+                                            style={{
+                                                background: nodes[i + 1].color,
+                                                boxShadow: `0 0 8px ${nodes[i + 1].color}, 0 0 16px ${nodes[i + 1].color}60`,
+                                                left: 0,
+                                            }}
+                                            animate={{ left: "100%" }}
+                                            transition={{
+                                                duration: 1.0,
+                                                repeat: Infinity,
+                                                ease: "linear",
+                                                delay: i * 0.12,
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 // --- Static UI Mockup for Feature Card ---
 function MockProfileUI() {
     return (
-        <div className="w-full h-full bg-[#080808] flex border border-white/5 rounded-2xl overflow-hidden shadow-2xl font-sans text-sm">
+        <div className="w-full h-full flex font-sans text-sm">
             {/* 1. Sidebar (Linear Style) */}
             <div className="w-64 border-r border-white/5 bg-white/[0.01] p-6 flex flex-col gap-8">
                 <div className="flex items-center gap-3">
@@ -151,79 +358,379 @@ function MockProfileUI() {
     );
 }
 
-// --- Real-world Attestation Preview UI ---
-function AttestationPreviewUI() {
+// ─── Stacked Feature Cards ───────────────────────────────────────────────────
+
+// Linear-style card shell
+const CARD_BASE: React.CSSProperties = {
+    width: "360px",
+    borderRadius: "14px",
+    overflow: "hidden",
+    position: "relative",
+    background: "#111115",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 24px 64px rgba(0,0,0,0.95), 0 4px 16px rgba(0,0,0,0.7)",
+};
+
+// Shared header dots (three-dot menu like Linear)
+function CardDots() {
     return (
-        <div className="w-full h-full bg-[#080808] p-8 flex flex-col justify-center items-center relative overflow-hidden group">
-            {/* Ambient Background Aura */}
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-            
-            {/* The Verification Card */}
-            <div className="relative w-full max-w-[340px] aspect-[1.4/1] rounded-2xl bg-[#0c0c0d] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 flex flex-col justify-between overflow-hidden group/card hover:border-violet-500/30 transition-all duration-500">
-                {/* Security Hologram Effect */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-violet-500/10 blur-[60px] rounded-full pointer-events-none group-hover/card:bg-violet-500/20 transition-colors"></div>
-                
-                {/* Header */}
-                <div className="flex items-start justify-between relative z-10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center shadow-inner">
-                            <Award className="w-5 h-5 text-violet-400" />
-                        </div>
-                        <div className="space-y-0.5">
-                            <h4 className="text-sm font-bold text-white/90">Solana Foundation</h4>
-                            <p className="text-[10px] text-white/30 font-medium">Official Issuer</p>
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-black uppercase tracking-widest">Verified</span>
-                        <span className="text-[7px] font-mono text-white/20">#882-SF-CV</span>
-                    </div>
-                </div>
+        <div className="flex items-center gap-1">
+            {[0,1,2].map(i => (
+                <div key={i} className="w-[3px] h-[3px] rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
+            ))}
+        </div>
+    );
+}
 
-                {/* Main Content */}
-                <div className="space-y-3 relative z-10">
-                    <div className="h-[1px] w-full bg-white/5"></div>
-                    <div className="space-y-1">
-                        <h5 className="text-base font-bold text-white tracking-tight leading-tight">Infrastructure Partnership Program Grant</h5>
-                        <p className="text-[10px] text-white/40 font-medium italic">"Exceptional contribution to the Solana core ecosystem development and RPC infrastructure."</p>
-                    </div>
-                </div>
+// Initials avatar
+function Avatar({ initials, color }: { initials: string; color: string }) {
+    return (
+        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
+            style={{ background: color + "22", color, border: `1px solid ${color}33` }}>
+            {initials}
+        </div>
+    );
+}
 
-                {/* Footer / Meta */}
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5 relative z-10">
-                    <div className="flex items-center gap-4">
-                        <div className="space-y-0.5">
-                            <p className="text-[8px] text-white/20 uppercase tracking-widest font-bold">Issued Date</p>
-                            <p className="text-[9px] text-white/60 font-mono">MAR 24, 2026</p>
-                        </div>
+// Card 1 — Activity Feed (emerald) — like Linear's left Activity panel
+function AttestationCard() {
+    const items = [
+        { initials: "DC", color: "#34d399", name: "David Chen",           action: "attested your work on",         subject: "Brand Identity Design",        time: "2m ago" },
+        { initials: "GD", color: "#60a5fa", name: "Glassdoor",            action: "verified your employment at",   subject: "Stripe",                        time: "1h ago" },
+        { initials: "SA", color: "#a78bfa", name: "Smart Contract Auditor",action: "attested your audit on",        subject: "Payment Protocol v2",           time: "3h ago" },
+        { initials: "GH", color: "#f59e0b", name: "GitHub",               action: "verified your contribution in", subject: "chainvolio/identity-core",       time: "1d ago" },
+    ];
+    return (
+        <div style={CARD_BASE}>
+            {/* Header */}
+            <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: "rgba(52,211,153,0.12)" }}>
+                        <ShieldCheck style={{ width: 11, height: 11, color: "#34d399" }} />
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 group-hover/card:bg-violet-500/10 transition-colors">
-                        <ShieldCheck className="w-3 h-3 text-violet-400" />
-                        <span className="text-[9px] font-bold text-violet-400/80">On-Chain Proof</span>
-                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>Activity</span>
                 </div>
-
-                {/* Visual Polish: Scanning line animation */}
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent animate-[scan_3s_linear_infinite] pointer-events-none"></div>
+                <CardDots />
             </div>
 
-            {/* Background Details */}
-            <div className="mt-12 flex items-center gap-8 opacity-20">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
-                        <Lock className="w-3 h-3" />
-                    </div>
-                    <span className="text-[8px] uppercase tracking-widest">Encrypted</span>
+            {/* Filter pill */}
+            <div className="px-4 py-2.5 flex items-center gap-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>All</span>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round"/></svg>
                 </div>
-                <div className="h-[1px] w-12 bg-white/10"></div>
-                <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
-                        <Globe className="w-3 h-3" />
+            </div>
+
+            {/* Activity items */}
+            <div className="py-1">
+                {items.map((item, i) => (
+                    <div key={i} className="px-4 py-2.5 flex items-start gap-3 hover:bg-white/[0.02] transition-colors cursor-default"
+                        style={{ borderBottom: i < items.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                        <Avatar initials={item.initials} color={item.color} />
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>{item.name}</span>
+                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)", flexShrink: 0 }}>{item.time}</span>
+                            </div>
+                            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", lineHeight: 1.5, marginTop: 1 }}>
+                                {item.action}
+                            </p>
+                            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.58)", fontWeight: 500, marginTop: 1 }}>
+                                {item.subject}
+                            </p>
+                        </div>
                     </div>
-                    <span className="text-[8px] uppercase tracking-widest">Immutable</span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// Card 2 — Attestation Issuance (blue) — like Linear's center Thread panel
+function OrgIssuerCard() {
+    return (
+        <div style={CARD_BASE}>
+            {/* Header */}
+            <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: "rgba(96,165,250,0.12)" }}>
+                        <PenLine style={{ width: 11, height: 11, color: "#60a5fa" }} />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>Issuing Attestation</span>
+                </div>
+                <CardDots />
+            </div>
+
+            {/* Thread messages */}
+            <div className="px-4 pt-4 space-y-4">
+                {/* Org message */}
+                <div className="flex items-start gap-3">
+                    <Avatar initials="NP" color="#60a5fa" />
+                    <div className="flex-1">
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>Nexus Protocol</span>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)" }}>4:54 PM</span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.52)", lineHeight: 1.55 }}>
+                            Issuing attestation for exceptional work on core infrastructure and parallel transaction optimization for mainnet.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Contributor message */}
+                <div className="flex items-start gap-3">
+                    <Avatar initials="AR" color="#34d399" />
+                    <div className="flex-1">
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>Alex Rivera</span>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)" }}>4:54 PM</span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.52)", lineHeight: 1.55 }}>
+                            Transaction confirmed on Solana. This record is now public and tamper-proof forever.
+                        </p>
+                    </div>
+                </div>
+
+                {/* System message */}
+                <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)" }}>
+                        <ShieldCheck style={{ width: 12, height: 12, color: "#60a5fa" }} />
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>ChainVolio</span>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)" }}>4:55 PM</span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.52)", lineHeight: 1.55 }}>
+                            Signature verified. Attestation anchored on-chain and ready to share with recruiters.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Compose bar */}
+            <div className="px-4 pb-4 pt-3">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.22)", flex: 1 }}>@Nexus Protocol sign and issue...</span>
+                    <div className="flex items-center gap-1">
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "#5e6ad2" }}>
+                            <ArrowRight style={{ width: 11, height: 11, color: "white" }} />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+// Card 3 — Updates / Notifications (purple) — like Linear's right Updates panel
+function PublicVerifyCard() {
+    const updates = [
+        { icon: CheckCircle2, color: "#34d399", dot: true,  title: "Attestation Received",   desc: "Superteam attested your grant",   time: "2h ago"  },
+        { icon: ShieldCheck,  color: "#60a5fa", dot: true,  title: "Audit Passed",            desc: "Smart contract audit passed",     time: "5h ago"  },
+        { icon: User,         color: "#a78bfa", dot: false, title: "New Attestation",         desc: "0xA34F...BCd2 attested your work", time: "1d ago" },
+        { icon: Globe,        color: "#f59e0b", dot: false, title: "Identity Verified",       desc: "Your wallet has been verified",   time: "2d ago"  },
+    ];
+    return (
+        <div style={CARD_BASE}>
+            {/* Header */}
+            <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: "rgba(167,139,250,0.12)" }}>
+                        <Globe style={{ width: 11, height: 11, color: "#a78bfa" }} />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>Updates</span>
+                </div>
+                <CardDots />
+            </div>
+
+            {/* Filter */}
+            <div className="px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>Unread</span>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                </div>
+            </div>
+
+            {/* Updates list */}
+            <div className="py-1">
+                {updates.map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                        <div key={i} className="px-4 py-3 flex items-start gap-3 hover:bg-white/[0.02] transition-colors cursor-default"
+                            style={{ borderBottom: i < updates.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                style={{ background: item.color + "14", border: `1px solid ${item.color}22` }}>
+                                <Icon style={{ width: 12, height: 12, color: item.color + "bb" }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                    <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{item.title}</span>
+                                    {item.dot && <div className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ background: "#5e6ad2" }} />}
+                                </div>
+                                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 2, lineHeight: 1.4 }}>{item.desc}</p>
+                                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.22)", marginTop: 3 }}>{item.time}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+// Block 1 — stateful wrapper so hover on left controls active card on right
+function AttestationBlock() {
+    const [active, setActive] = useState(0);
+    const [paused, setPaused] = useState(false);
+
+    // Auto-advance every 3.5 s, pauses on hover
+    useEffect(() => {
+        if (paused) return;
+        const t = setInterval(() => setActive(p => (p + 1) % 3), 3500);
+        return () => clearInterval(t);
+    }, [paused]);
+
+    const features = [
+        { icon: ShieldCheck, label: "Verifiable on-chain proof",    desc: "Each attestation is stored permanently on Solana.", color: "#14F195" },
+        { icon: Building2,   label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.",    color: "#60a5fa" },
+        { icon: Lock,        label: "Public and tamper-resistant",  desc: "Anyone can verify, no one can alter or revoke.",      color: "#a78bfa" },
+    ];
+
+    const cards = [<AttestationCard />, <OrgIssuerCard />, <PublicVerifyCard />];
+
+    // pos 0 = center (active), pos 1 = right peek, pos 2 = left peek
+    const stackAnim = (pos: number) => {
+        if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"   };
+        if (pos === 1) return { x: 160,  y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
+        return              { x: -160, y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center"
+        >
+            {/* Left — copy */}
+            <div className="space-y-10">
+                <div className="space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Core Feature</span>
+                    </div>
+                    <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                        Verifiable Work History with On-Chain Attestations
+                    </p>
+                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
+                        Proof of work,<br />not claims.
+                    </h3>
+                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
+                        Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
+                    </p>
+                </div>
+
+                {/* Feature rows — hover controls which card is centred */}
+                <div className="divide-y divide-white/[0.04]">
+                    {features.map((f, i) => (
+                        <motion.div
+                            key={i}
+                            onHoverStart={() => { setPaused(true); setActive(i); }}
+                            onHoverEnd={() => setPaused(false)}
+                            animate={{ opacity: active === i ? 1 : 0.45 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-start gap-4 py-4 cursor-default"
+                        >
+                            <motion.div
+                                animate={{
+                                    background: active === i ? f.color + "18" : f.color + "08",
+                                    borderColor: active === i ? f.color + "35" : f.color + "15",
+                                }}
+                                transition={{ duration: 0.25 }}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border"
+                            >
+                                <f.icon className="w-3.5 h-3.5" style={{ color: active === i ? f.color : f.color + "55" }} />
+                            </motion.div>
+                            <div>
+                                <p className="text-sm font-bold mb-0.5" style={{ color: active === i ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
+                                    {f.label}
+                                </p>
+                                <p className="text-xs text-white/25 leading-relaxed">{f.desc}</p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+
+                <Link href="/why" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
+                    Explore attestations
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+            </div>
+
+            {/* Right — Linear-style horizontal carousel */}
+            <div className="relative overflow-hidden" style={{ height: "560px" }}
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
+            >
+                {/* Ambient glow follows active card colour */}
+                <motion.div
+                    animate={{ background: `radial-gradient(ellipse 90% 55% at 50% 30%, ${features[active].color}12, transparent 68%)` }}
+                    transition={{ duration: 0.6 }}
+                    className="absolute inset-0 pointer-events-none"
+                />
+
+                {/* Cards — all anchored to horizontal centre */}
+                {cards.map((card, i) => {
+                    const pos = (i - active + 3) % 3;
+                    const anim = stackAnim(pos);
+                    return (
+                        <motion.div
+                            key={i}
+                            animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
+                            transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                            style={{
+                                position: "absolute",
+                                top: 28,
+                                left: "50%",
+                                marginLeft: -180,
+                                zIndex: anim.zIndex,
+                            }}
+                        >
+                            {card}
+                        </motion.div>
+                    );
+                })}
+
+                {/* Left edge fade */}
+                <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
+                    style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
+                {/* Right edge fade */}
+                <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
+                    style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
+                {/* Bottom fade */}
+                <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
+                    style={{ background: "linear-gradient(to top, black 30%, transparent)" }} />
+
+                {/* Dot indicators */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
+                    {features.map((f, i) => (
+                        <button
+                            key={i}
+                            onClick={() => { setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
+                            className="rounded-full transition-all duration-300"
+                            style={{
+                                width: active === i ? 20 : 6,
+                                height: 6,
+                                background: active === i ? features[active].color + "cc" : "rgba(255,255,255,0.18)",
+                            }}
+                        />
+                    ))}
+                </div>
+            </div>
+        </motion.div>
     );
 }
 
@@ -280,13 +787,105 @@ function FloatingVerificationCard() {
     );
 }
 
-// --- Recruiter Dashboard Preview UI V2 ---
+// --- Recruiter Dashboard Preview UI V2 (animated 3-slide) ---
 function RecruiterDashboardPreviewUI_V2() {
+    const [active, setActive] = useState(0);
+    const [paused, setPaused] = useState(false);
+
+    useEffect(() => {
+        if (paused) return;
+        const t = setInterval(() => setActive(p => (p + 1) % 3), 3500);
+        return () => clearInterval(t);
+    }, [paused]);
+
+    const slides = [
+        { label: "Filter by verified contributions", color: "#60a5fa" },
+        { label: "See who endorsed the candidate",   color: "#34d399" },
+        { label: "Reduce hiring guesswork",          color: "#a78bfa" },
+    ];
+
+    const panels = [
+        // Panel 0 — Filter by verified contributions
+        <div key={0} className="space-y-2">
+            <div className="flex items-center gap-2 mb-3">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Top Candidates with Proven Signals</p>
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)" }}>
+                    <span className="text-[8px] font-bold" style={{ color: "#60a5fa" }}>Verified</span>
+                </div>
+            </div>
+            {[
+                { name: "Alex Rivera", role: "Core Developer",     signals: 8 },
+                { name: "Sarah Chen",  role: "Smart Contract Dev", signals: 5 },
+            ].map((c, i) => (
+                <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center justify-between hover:bg-white/[0.03] transition-colors">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white/40">
+                            {c.name.split(" ").map((n: string) => n[0]).join("")}
+                        </div>
+                        <div>
+                            <h5 className="text-[11px] font-bold text-white/80">{c.name}</h5>
+                            <p className="text-[9px] text-slate-500">{c.role}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.12)" }}>
+                        <ShieldCheck className="w-2.5 h-2.5" style={{ color: "#60a5fa" }} />
+                        <span className="text-[9px] font-bold" style={{ color: "#60a5fa" }}>{c.signals}</span>
+                    </div>
+                </div>
+            ))}
+        </div>,
+
+        // Panel 1 — See who endorsed the candidate
+        <div key={1} className="space-y-2">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera · Endorsement Chain</p>
+            {[
+                { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#34d399" },
+                { initials: "ST", name: "Superteam",      type: "Grant delivery · Q3 2024", color: "#60a5fa" },
+            ].map((e, i) => (
+                <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                        style={{ background: e.color + "22", color: e.color, border: `1px solid ${e.color}33` }}>
+                        {e.initials}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                            <h5 className="text-[11px] font-bold text-white/80">{e.name}</h5>
+                            <ShieldCheck className="w-2.5 h-2.5 flex-shrink-0" style={{ color: e.color }} />
+                        </div>
+                        <p className="text-[9px] text-slate-500">{e.type}</p>
+                    </div>
+                </div>
+            ))}
+        </div>,
+
+        // Panel 2 — Reduce hiring guesswork
+        <div key={2} className="space-y-2">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera · Confidence Score</p>
+            <div className="p-3 rounded-xl bg-white/[0.01] border border-white/5 space-y-3">
+                {[
+                    { label: "Verified Work",    score: 92, color: "#34d399" },
+                    { label: "Org Attestations", score: 87, color: "#60a5fa" },
+                    { label: "Chain Activity",   score: 74, color: "#a78bfa" },
+                ].map((s, i) => (
+                    <div key={i}>
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-[9px] text-slate-400">{s.label}</span>
+                            <span className="text-[9px] font-bold" style={{ color: s.color }}>{s.score}</span>
+                        </div>
+                        <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                            <div className="h-full rounded-full" style={{ width: `${s.score}%`, background: s.color + "99" }} />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>,
+    ];
+
     return (
-        <div className="w-full h-full bg-[#0a0b0f] p-6 flex flex-col gap-6 relative overflow-hidden group">
-            {/* Ambient Background Aura (Matching OrgDashboard) */}
-            <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, #10b98110 0%, transparent 60%)` }} />
-            
+        <div className="w-full flex flex-col gap-6 relative group"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+        >
             {/* Header Section */}
             <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
@@ -303,12 +902,12 @@ function RecruiterDashboardPreviewUI_V2() {
                 </div>
             </div>
 
-            {/* Impact Pods (3-column mini version) */}
+            {/* Stat Pods */}
             <div className="grid grid-cols-3 gap-3 relative z-10">
                 {[
-                    { icon: LayoutDashboard, label: "Hiring", val: "12", col: "text-emerald-400", bg: "bg-emerald-500/10" },
-                    { icon: ShieldCheck, label: "Signals", val: "142", col: "text-blue-400", bg: "bg-blue-500/10" },
-                    { icon: FolderOpen, label: "Active", val: "4", col: "text-purple-400", bg: "bg-purple-500/10" },
+                    { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-emerald-400", bg: "bg-emerald-500/10" },
+                    { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
+                    { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
                 ].map((pod, i) => (
                     <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
                         <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
@@ -322,36 +921,100 @@ function RecruiterDashboardPreviewUI_V2() {
                 ))}
             </div>
 
-            {/* Candidate List Preview */}
-            <div className="flex-1 space-y-3 relative z-10">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Top Candidates with Proven Signals</p>
-                <div className="space-y-2">
-                    {[
-                        { name: "Alex Rivera", role: "Infra @ Solana", signals: 8 },
-                        { name: "Sarah Chen", role: "Smart Contract Dev", signals: 5 },
-                    ].map((c, i) => (
-                        <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center justify-between group/row hover:bg-white/[0.03] transition-colors">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-white/40">
-                                    {c.name.split(' ').map(n => n[0]).join('')}
-                                </div>
-                                <div>
-                                    <h5 className="text-[11px] font-bold text-white/80">{c.name}</h5>
-                                    <p className="text-[9px] text-slate-500">{c.role}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-500/5 border border-violet-500/10">
-                                <ShieldCheck className="w-2.5 h-2.5 text-violet-400" />
-                                <span className="text-[9px] font-bold text-violet-400">{c.signals}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            {/* Animated content panel */}
+            <div className="relative z-10" style={{ minHeight: 132 }}>
+                {panels.map((panel, i) => (
+                    <motion.div
+                        key={i}
+                        animate={{ opacity: active === i ? 1 : 0, y: active === i ? 0 : 6 }}
+                        transition={{ duration: 0.35, ease: "easeInOut" }}
+                        style={{ position: i === 0 ? "relative" : "absolute", inset: 0, pointerEvents: active === i ? "auto" : "none" }}
+                    >
+                        {panel}
+                    </motion.div>
+                ))}
             </div>
 
-            {/* Bottom Glow */}
-            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0a0b0f] to-transparent pointer-events-none"></div>
+            {/* Dot indicators */}
+            <div className="flex items-center justify-center gap-2 relative z-10">
+                {slides.map((s, i) => (
+                    <button
+                        key={i}
+                        onClick={() => { setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
+                        className="rounded-full transition-all duration-300"
+                        style={{
+                            width: active === i ? 20 : 6,
+                            height: 6,
+                            background: active === i ? s.color + "cc" : "rgba(255,255,255,0.18)",
+                        }}
+                    />
+                ))}
+            </div>
+
+            {/* Bottom fade */}
+            <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
         </div>
+    );
+}
+
+// Block 2 — Hiring — editorial layout wrapper for the dashboard preview
+function HiringBlock() {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center"
+        >
+            {/* Left — The interactive dashboard UI component */}
+            <div className="relative order-2 lg:order-1">
+                <div className="absolute -inset-10 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+                <RecruiterDashboardPreviewUI_V2 />
+            </div>
+
+            {/* Right — Copy & Value Prop */}
+            <div className="space-y-10 order-1 lg:order-2">
+                <div className="space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Use Case</span>
+                    </div>
+                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
+                        Hire based on real proof,<br />not profiles.
+                    </h3>
+                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
+                        Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
+                    </p>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-1">
+                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-white/80 mb-1">Verified Signal Only</p>
+                            <p className="text-xs text-white/30 leading-relaxed">Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.</p>
+                        </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-1">
+                            <Building2 className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-white/80 mb-1">Org-Backed Trust</p>
+                            <p className="text-xs text-white/30 leading-relaxed">See exactly which protocols and organizations have attested to a candidate's specific work output.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
+                    Start hiring
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+            </div>
+        </motion.div>
     );
 }
 
@@ -367,30 +1030,8 @@ const SLIDES = [
 
 // PARTNERS are now loaded dynamically from /api/logos
 
-
-function CryptoLogo({ src, name }: { src: string; name: string }) {
-    return (
-        <div className="flex-shrink-0 flex items-center gap-2.5 group/logo cursor-default">
-            <div className="h-4 flex items-center justify-center">
-                <img
-                    src={src}
-                    alt={name}
-                    className="max-h-full w-auto object-contain transition-all duration-700 opacity-50 grayscale brightness-[0.6] group-hover/logo:opacity-100 group-hover/logo:grayscale-0 group-hover/logo:brightness-110"
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                    }}
-                />
-            </div>
-            <span className="text-[9px] font-bold text-white/20 group-hover/logo:text-white/60 transition-all duration-500 tracking-[0.2em] whitespace-nowrap uppercase">
-                {name}
-            </span>
-        </div>
-    );
-}
-
 export function LandingPageClient() {
     const { publicKey, connected } = useWallet();
-    const { orgAccount: googleOrgAccount, isGoogleSignedIn } = useGoogleAuth();
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -459,7 +1100,7 @@ export function LandingPageClient() {
                         muted 
                         loop 
                         playsInline 
-                        className="w-full h-full object-cover opacity-30"
+                        className="absolute inset-0 w-full h-full object-cover opacity-20 scale-105"
                     >
                         <source src="/video-background.mp4" type="video/mp4" />
                     </video>
@@ -473,21 +1114,21 @@ export function LandingPageClient() {
                 <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-32 pb-20 px-6 z-10 flex flex-col items-center text-center">
+                <section className="relative pt-32 pb-20 px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust Layer for Web3
                         </span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl lg:text-[88px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
-                        Verifiable identity<br />
-                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">for Web3 careers.</span>
+                    <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
+                        Build a Verifiable Web3<br />
+                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">Resume That Recruiters Trust.</span>
                     </h1>
 
                     <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mb-12 leading-relaxed">
-                        Build a work history that can’t be faked. <br className="hidden md:block" />
-                        Backed by on-chain proof and attestations.
+                        Turn your work experience into verifiable on-chain proof.<br />
+                        No fake CVs. No manual checks. Just trust.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
@@ -506,10 +1147,9 @@ export function LandingPageClient() {
                     </div>
 
                     {/* HERO VISUAL - Idealized Dashboard Mockup */}
-                    <div className="relative w-full max-w-[1200px] mx-auto perspective-1000 group">
-                        <div className="relative rounded-[32px] border border-white/10 bg-white/[0.02] backdrop-blur-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] transform transition-transform duration-1000 hover:scale-[1.01]">
-                            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-                            <div className="aspect-[16/9] relative">
+                    <div className="relative w-full max-w-[1400px] mx-auto perspective-1000 group pt-4 pb-4">
+                        <div className="relative rounded-[32px] border border-white/10 overflow-hidden transition-transform duration-1000 hover:scale-[1.01] shadow-[0_0_100px_rgba(0,0,0,0.4)]">
+                            <div className="aspect-[16/8] relative">
                                 {SLIDES.map((slide, index) => (
                                     <div 
                                         key={index}
@@ -521,17 +1161,18 @@ export function LandingPageClient() {
                                             src={slide.src}
                                             alt={slide.label}
                                             fill
-                                            className="object-cover object-top"
+                                            className="object-cover object-top scale-110 origin-top -translate-y-[8%]"
                                             priority={index === 0}
                                         />
                                     </div>
                                 ))}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-80 h-full"></div>
+                                <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black to-transparent z-10"></div>
                             </div>
                         </div>
 
                         {/* Slide Caption Below Image */}
-                        <div className="mt-8 h-6 relative w-full flex justify-center">
+                        <div className="mt-4 h-6 relative w-full flex justify-center">
                             {SLIDES.map((slide, index) => (
                                 <p 
                                     key={index} 
@@ -544,18 +1185,18 @@ export function LandingPageClient() {
                             ))}
                         </div>
 
-                        {/* Glow behind visual */}
-                        <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/10 to-emerald-500/10 blur-3xl -z-10 rounded-[40px] opacity-50"></div>
+                        {/* Glow behind visual - reduced intensity */}
+                        <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
                     </div>
 
-                    <div className="mt-32 w-full max-w-[1200px]">
+                    <div className="mt-32 w-full max-w-[1400px] relative z-50">
                         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-12">
                             Powering the Web3 career stack
                         </p>
                         <div className="w-full py-4 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                                 {[...partners, ...partners].map((partner, i) => (
-                                    <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-20 hover:grayscale-0 hover:opacity-80 transition-all duration-500 cursor-default group/partner">
+                                    <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
                                         <img
                                             src={partner.src}
                                             alt={partner.name}
@@ -570,13 +1211,23 @@ export function LandingPageClient() {
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-32 px-6 relative z-10 border-t border-white/[0.02] bg-black">
+                <section className="py-32 px-6 relative z-10 bg-black">
+                    {/* Smooth Transitions to Video Background (Start of Black Block) */}
+                    <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-transparent to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-24 space-y-4">
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+                            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
+                                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
+                                    THE PROBLEM
+                                </span>
+                            </div>
+                            <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                Why Traditional CVs Can&apos;t Be Trusted
+                            </p>
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
                                 Your work is real. Your proof isn’t.
                             </h2>
-                            <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mx-auto">
+                            <p className="text-white/40 text-lg md:text-xl font-medium max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
                         </div>
@@ -589,13 +1240,13 @@ export function LandingPageClient() {
                                         src="/homepage/Broken%20Work%20History.png"
                                         alt="Broken Work History"
                                         fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
                                      />
                                 </div>
-                                <div className="space-y-4">
-                                    <h3 className="text-white font-bold text-xl">Broken Work History</h3>
+                                <div className="space-y-4 text-center">
+                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
-                                        Your experience is scattered across PDFs, portfolios, and links — with no single source of truth.
+                                        Your experience is scattered across PDFs, portfolios, and links. No single source of truth.
                                     </p>
                                 </div>
                             </div>
@@ -607,13 +1258,13 @@ export function LandingPageClient() {
                                         src="/homepage/Unverifiable%20Resumes.png"
                                         alt="Unverifiable Resumes"
                                         fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
                                      />
                                 </div>
-                                <div className="space-y-4">
-                                    <h3 className="text-white font-bold text-xl">Unverifiable Resumes</h3>
+                                <div className="space-y-4 text-center">
+                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
-                                        Without verifiable data, resumes become claims — not proof.
+                                        Without verifiable data, resumes become claims, not proof.
                                     </p>
                                 </div>
                             </div>
@@ -625,144 +1276,234 @@ export function LandingPageClient() {
                                         src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
                                         alt="Signal Lost in Noise"
                                         fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
                                      />
                                 </div>
-                                <div className="space-y-4">
-                                    <h3 className="text-white font-bold text-xl">Signal Lost in Noise</h3>
+                                <div className="space-y-4 text-center">
+                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
-                                        As a result, real talent gets buried — and hiring becomes guesswork.
+                                        Real talent gets buried. Hiring becomes guesswork.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-20 text-center">
-                            <Link href="#solution" className="text-sm font-medium text-white/20 hover:text-white/60 transition-colors inline-flex items-center gap-2 group">
-                                See how ChainVolio solves this <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                        </div>
                     </div>
                 </section>
+                
+                {/* TRUST TRANSFORMATION — Noise to Signal */}
+                <section className="relative z-10 bg-black overflow-hidden">
 
-
-                {/* THE SOLUTION SECTION */}
-                <section className="py-32 px-6 relative z-10 bg-gradient-to-b from-black via-black to-[#030303] border-t border-white/[0.02] overflow-hidden">
-                    {/* Large Section-level Bottom Fade */}
-                    <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
+                    {/* ── Top text block ── */}
+                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                        <div className="space-y-4 max-w-xl">
+                            {/* badge */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs Noise</span>
+                            </div>
+                            <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                Why Web3 Needs Verifiable Work History
+                            </p>
+                            <h2 className="text-4xl md:text-5xl lg:text-[56px] font-bold tracking-tight text-white leading-[1.06]">
+                                From Noise to<br />
+                                <span className="text-white/30">Verifiable Signal</span>
+                            </h2>
+                        </div>
+                        <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-xl md:text-right">
+                            Work history is fragmented and impossible to verify.<br />
+                            ChainVolio transforms scattered contributions<br />
+                            into a single, verifiable identity.
+                        </p>
+                    </div>
                     
-                    <div className="max-w-[1200px] mx-auto relative">
-                        <div className="text-center mb-20 space-y-6 max-w-3xl mx-auto">
-                            <h2 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.4em] mb-4 block">THE SOLUTION</h2>
-                            <h3 className="text-5xl md:text-7xl font-bold text-white tracking-tighter leading-tight mb-8">
-                                Build a reputation <br className="hidden md:block" /> that travels.
-                            </h3>
-                            <div className="space-y-3">
-                                <p className="text-white/80 text-xl md:text-2xl font-medium tracking-tight">
-                                    Turn your work into verifiable proof that anyone can trust.
-                                </p>
-                                <p className="text-white/30 text-lg font-medium">
-                                    Transparent, portable, and impossible to fake.
-                                </p>
+                    {/* Animated Divider Line */}
+                    <div className="max-w-[1240px] mx-auto px-6 mb-8">
+                        <motion.div 
+                            initial={{ scaleX: 0, opacity: 0 }}
+                            whileInView={{ scaleX: 1, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
+                            className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent origin-center"
+                        />
+                    </div>
+
+                    {/* ── Full-bleed animation canvas ── */}
+                    <div className="relative w-full h-[580px]">
+                        <SignalNoiseVisual />
+
+                        {/* Radial vignette — lines fade at edges */}
+                        <div className="absolute inset-0 pointer-events-none z-10"
+                            style={{ background: "radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #000 92%)" }}
+                        />
+
+                        {/* Top + bottom black bleed so canvas merges with section bg */}
+                        <div className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10"
+                            style={{ background: "linear-gradient(to bottom, black, transparent)" }}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
+                            style={{ background: "linear-gradient(to top, black, transparent)" }}
+                        />
+
+                        {/* ── Central Logo Node ── */}
+                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                            <div className="relative flex items-center justify-center">
+                                {/* Outer pulse rings */}
+                                <motion.div
+                                    animate={{ scale: [1, 3.2], opacity: [0.12, 0] }}
+                                    transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 0 }}
+                                    className="absolute w-16 h-16 rounded-full border border-white/20"
+                                />
+                                <motion.div
+                                    animate={{ scale: [1, 2.2], opacity: [0.18, 0] }}
+                                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
+                                    className="absolute w-16 h-16 rounded-full border border-white/25"
+                                />
+                                <motion.div
+                                    animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 1.4 }}
+                                    className="absolute w-16 h-16 rounded-full border border-white/30"
+                                />
+
+                                {/* Logo container */}
+                                <motion.div
+                                    animate={{ opacity: [0.75, 1, 0.75] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                    className="relative w-16 h-16 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_60px_rgba(255,255,255,0.06)]"
+                                >
+                                    <Image
+                                        src="/logo.png"
+                                        alt="ChainVolio"
+                                        width={36}
+                                        height={36}
+                                        className="opacity-80"
+                                    />
+                                </motion.div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Main Solution Card */}
-                        <div className="relative z-10 space-y-12">
-                            {/* 1. The Text Card - Now standalone */}
-                            <div className="relative p-12 md:p-16 space-y-6 bg-[#030303] border border-white/5 rounded-[32px] overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
-                                
-                                <div className="relative z-10">
-                                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-8">
-                                        <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                    {/* ── Bottom outcome row — the answer to the problems above ── */}
+                    <div className="max-w-[1240px] mx-auto px-6 pb-24">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
+                            {[
+                                {
+                                    label: "One Unified Profile",
+                                    desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
+                                    accent: "#14F195",
+                                },
+                                {
+                                    label: "On-Chain Attestation",
+                                    desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
+                                    accent: "#60a5fa",
+                                },
+                                {
+                                    label: "Verified Signal",
+                                    desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
+                                    accent: "#a78bfa",
+                                },
+                            ].map((item, i) => (
+                                <div key={i} className="px-8 py-7 bg-black group hover:bg-white/[0.02] transition-colors duration-300">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
+                                            style={{ background: item.accent + "60" }}
+                                        />
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
+                                            style={{ color: item.accent + "99" }}
+                                        >
+                                            {item.label}
+                                        </span>
                                     </div>
-                                    <h4 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight mb-6">Verifiable Work History</h4>
-                                    <p className="text-white/40 text-lg md:text-xl leading-relaxed font-medium max-w-3xl mb-8">
-                                        Every contribution is backed by on-chain attestations — not PDFs or claims. <br className="hidden md:block" />
-                                        Recruiters can verify your work instantly, without manual checks.
+                                    <p className="text-white/30 text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
+                                        {item.desc}
                                     </p>
-                                    
-                                    <div className="flex flex-wrap gap-4">
-                                        <div className="px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-emerald-400/80">On-Chain Proof</div>
-                                        <div className="px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-blue-400/80">Instant Verification</div>
-                                    </div>
                                 </div>
+                            ))}
+                        </div>
+                    </div>
+
+                </section>
+                <section id="solution" className="pt-24 pb-32 px-6 relative z-10 bg-black">
+                    <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
+
+                    <div className="max-w-[1200px] mx-auto relative">
+
+                        {/* ── Header: compact, left + right split ── */}
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+                            <div className="space-y-4">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
+                                        The Solution
+                                    </span>
+                                </div>
+                                <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                    Build a Verifiable Web3 Resume with On-Chain Proof
+                                </p>
+                                <h3 className="text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
+                                    Build a reputation<br />that travels.
+                                </h3>
                             </div>
+                            <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-xs md:text-right">
+                                Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
+                            </p>
+                        </div>
 
-                            {/* 2. The UI Mockup - Desktop + Mobile Overlay */}
-                            <div className="relative h-[650px] w-full flex items-center justify-center">
-                                {/* Ambient Glow */}
-                                <div className="absolute inset-0 bg-emerald-500/5 blur-[120px] rounded-full opacity-30"></div>
-                                
-                                <div className="relative w-full h-full group">
-                                    {/* Desktop Card */}
-                                    <div className="w-full h-full rounded-[32px] border border-white/10 bg-[#050505] shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-700 group-hover:border-white/20">
-                                        <MockProfileUI />
-                                    </div>
+                        {/* ── Interactive Flow ── */}
+                        <div className="relative w-full max-w-[860px] mx-auto mb-4">
+                            <div className="absolute -inset-8 bg-gradient-to-r from-emerald-500/4 to-purple-500/4 blur-[80px] pointer-events-none" />
+                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/15 mb-4 text-center">
+                                Hover each step to see the flow
+                            </p>
+                            <VerifiableWorkHistoryFlow />
+                        </div>
 
-                                    {/* Floating Verification Card - Tacked on the Right & Stacked */}
-                                    <div className="absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
-                                        <div className="[perspective:1500px]">
-                                            <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
-                                                <FloatingVerificationCard />
-                                            </div>
+                        {/* ── 3 compact attributes — replaces the old text card ── */}
+                        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-20 mt-6">
+                            {[
+                                { icon: ShieldCheck, label: "On-Chain Proof",       color: "#14F195" },
+                                { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
+                                { icon: Lock,         label: "Impossible to Fake",  color: "#a78bfa" },
+                            ].map(({ icon: Icon, label, color }, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                    <Icon className="w-3.5 h-3.5" style={{ color }} />
+                                    <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: color + "bb" }}>
+                                        {label}
+                                    </span>
+                                    {i < 2 && <span className="hidden md:block ml-8 w-px h-3 bg-white/10" />}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* ── UI Mockup ── */}
+                        <div className="relative h-[650px] w-full max-w-[1100px] mx-auto flex items-center justify-center">
+                            <div className="absolute inset-0 bg-emerald-500/4 blur-[120px] rounded-full opacity-40 pointer-events-none" />
+                            <div className="relative w-full h-full group">
+                                <div className="w-full h-full bg-[#0a0a0a] rounded-3xl border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-700 text-left">
+                                    <MockProfileUI />
+                                </div>
+                                <div className="absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                    <div className="[perspective:1500px]">
+                                        <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
+                                            <FloatingVerificationCard />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-32 px-6 relative z-10 bg-[#030303] overflow-hidden">
-                    <div className="max-w-[1200px] mx-auto space-y-48">
+                <section className="py-32 px-6 relative z-10 overflow-hidden">
+                    {/* Elegant thin line separator constrained to content width */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                    </div>
+                    
+                    <div className="max-w-[1200px] mx-auto space-y-48 relative z-10">
                         
                         {/* BLOCK 1 — ATTESTATION */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
-                        >
-                            <div className="space-y-8">
-                                <div className="space-y-4">
-                                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Core Feature</span>
-                                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
-                                        Proof of work, <br />not claims.
-                                    </h3>
-                                    <p className="text-white/40 text-lg leading-relaxed font-medium max-w-lg">
-                                        Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a transparent and trusted work history.
-                                    </p>
-                                </div>
-                                <ul className="space-y-4 text-white/60 text-sm font-medium">
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
-                                        Verifiable on-chain proof
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
-                                        Issued by real collaborators
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
-                                        Public and tamper-resistant
-                                    </li>
-                                </ul>
-                                <Link href="/why" className="inline-flex items-center gap-2 text-sm font-bold text-white/40 hover:text-white transition-colors group">
-                                    Explore attestations <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </div>
-                            
-                            <div className="relative group">
-                                <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                                <div className="relative aspect-[4/3] rounded-3xl border border-white/5 bg-[#080808] overflow-hidden shadow-2xl">
-                                    <AttestationPreviewUI />
-                                </div>
-                            </div>
-                        </motion.div>
+                        <AttestationBlock />
 
                         {/* Divider Text */}
                         <div className="flex items-center justify-center gap-8 opacity-20">
@@ -772,76 +1513,66 @@ export function LandingPageClient() {
                         </div>
 
                         {/* BLOCK 2 — HIRING */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
-                        >
-                            <div className="relative group order-2 lg:order-1">
-                                <div className="absolute inset-0 bg-blue-500/5 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                                <div className="relative aspect-[4/3] rounded-3xl border border-white/5 bg-[#0a0b0f] overflow-hidden shadow-2xl">
-                                    <RecruiterDashboardPreviewUI_V2 />
-                                </div>
-                            </div>
-
-                            <div className="space-y-8 order-1 lg:order-2">
-                                <div className="space-y-4">
-                                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Use Case</span>
-                                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
-                                        Hire based on real proof, <br />not profiles.
-                                    </h3>
-                                    <p className="text-white/40 text-lg leading-relaxed font-medium max-w-lg">
-                                        Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
-                                    </p>
-                                </div>
-                                <ul className="space-y-4 text-white/60 text-sm font-medium">
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
-                                        Filter by verified contributions
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
-                                        See who endorsed the candidate
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
-                                        Reduce hiring guesswork
-                                    </li>
-                                </ul>
-                                <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/40 hover:text-white transition-colors group">
-                                    Discover talent <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </div>
-                        </motion.div>
+                        <HiringBlock />
                     </div>
                 </section>
 
+                <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
+
                 {/* 5. FINAL CTA */}
-                <section className="py-48 px-4 md:px-8 border-t border-white/[0.02] bg-gradient-to-b from-transparent to-white/[0.01]">
-                    <div className="max-w-[800px] mx-auto text-center">
-                        <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tighter leading-[1.1]">
-                            Start building your <br />
-                            <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">verifiable profile.</span>
-                        </h2>
-                        <p className="text-white/40 text-base mb-12 max-w-lg mx-auto leading-relaxed font-light">
-                            Turn your work into proof — visible, trusted, and easy to share.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                             <button
-                                onClick={() => setIsWalletModalOpen(true)}
-                                className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
-                            >
-                                Create Your Profile
-                            </button>
-                            <Link
-                                href="/hiring/create"
-                                className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
-                            >
-                                Explore Talent <ArrowRight className="w-4 h-4" />
-                            </Link>
-                        </div>
+                <section className="relative py-48 px-6 overflow-hidden bg-black">
+                    {/* Subtle grid */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
+                        backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+                        backgroundSize: "88px 88px"
+                    }} />
+                    {/* Radial glow center */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] rounded-full pointer-events-none"
+                        style={{ background: "radial-gradient(ellipse at center, rgba(153,69,255,0.12) 0%, rgba(20,241,149,0.06) 45%, transparent 70%)" }}
+                    />
+                    {/* Top + bottom fade */}
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+
+                    <div className="relative max-w-[760px] mx-auto text-center z-10">
+                        <motion.div
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.9, ease: "easeOut" }}
+                        >
+                            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
+                                Start Building Your<br />
+                                <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Verifiable Web3 Resume.</span>
+                            </h2>
+                            <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-medium">
+                                Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
+                                <button
+                                    onClick={() => setIsWalletModalOpen(true)}
+                                    className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                                >
+                                    Create Your Profile
+                                </button>
+                                <Link
+                                    href="/hiring/create"
+                                    className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
+                                >
+                                    Explore Talent <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+
+                            {/* Trust pills */}
+                            <div className="flex items-center justify-center flex-wrap gap-3">
+                                {["No token required", "Built on Solana", "Permissionless", "Free to start"].map((pill, i) => (
+                                    <span key={i} className="px-3 py-1 rounded-full border border-white/[0.07] bg-white/[0.02] text-[10px] font-bold uppercase tracking-[0.18em] text-white/25">
+                                        {pill}
+                                    </span>
+                                ))}
+                            </div>
+                        </motion.div>
                     </div>
                 </section>
                 <Footer />
@@ -1314,4 +2045,238 @@ export function LandingPageClient() {
             )}
         </div>
     );
+}
+
+// --- Stripe-style Radial Burst: Noise Visualization ---
+const NETWORK_ICONS = [
+    // GitHub
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>`,
+    // LinkedIn
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>`,
+    // X (Twitter)
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+    // Discord
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.05.05 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>`,
+    // Mail
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+    // Globe / Web
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>`,
+    // Telegram
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M21.543 2.126c-.3-.213-.67-.267-1.015-.147L2.128 8.683c-.76.26-1.163.984-.963 1.713.187.683.793 1.156 1.5 1.187l5.247.227 1.84 5.92c.16.51.58.87 1.107.937.527.067 1.04-.183 1.343-.65l2.67-4.117 5.093 3.737c.393.287.907.34 1.353.14.447-.2.787-.6.907-1.08l3.153-12.6c.14-.56-.05-1.15-.49-1.517zM6.928 10.97l9.743-6.193-7.513 7.037-2.23-1.844zm3.93 6.06l-1.02-3.28 7.37-6.9-6.35 10.18z"/></svg>`,
+    // Instagram
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>`,
+    // Figma
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>`,
+    // Slack
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="3" height="8" x="13" y="2" rx="1.5"/><path d="M19 8.5v1a1.5 1.5 0 0 1-3 0v-1a1.5 1.5 0 0 1 3 0z"/><rect width="3" height="8" x="8" y="14" rx="1.5"/><path d="M5 15.5v-1a1.5 1.5 0 0 1 3 0v1a1.5 1.5 0 0 1-3 0z"/><rect width="8" height="3" x="14" y="13" rx="1.5"/><path d="M15.5 19h-1a1.5 1.5 0 0 1 0-3h1a1.5 1.5 0 0 1 0 3z"/><rect width="8" height="3" x="2" y="8" rx="1.5"/><path d="M8.5 5h1a1.5 1.5 0 0 1 0 3h-1a1.5 1.5 0 0 1 0-3z"/></svg>`,
+    // Resume (FileText)
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>`,
+    // Code
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    // Trophy
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+    // Briefcase
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+    // Web3 / Chain
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`
+];
+
+function SignalNoiseVisual() {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const mouseRef  = useRef({ x: -9999, y: -9999, active: false });
+    const rafRef    = useRef<number>(0);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Preload icons
+        const loadedIcons: HTMLImageElement[] = [];
+        NETWORK_ICONS.forEach(svgString => {
+            const img = new window.Image();
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+            loadedIcons.push(img);
+        });
+
+        let W = 0, H = 0;
+
+        // Three layers of rays for depth — dense short inner, mid, long sparse outer
+        const makeLayers = () => {
+            const layerA = Array.from({ length: 80 }, (_, i) => ({
+                baseAngle:   (i / 80) * Math.PI * 2 + Math.random() * 0.12,
+                length:      28 + Math.random() * 60,
+                wobbleAmp:   0.04 + Math.random() * 0.06,
+                wobbleSpeed: 0.6  + Math.random() * 1.2,
+                wobblePhase: Math.random() * Math.PI * 2,
+                opacity:     0.18 + Math.random() * 0.30,
+                thickness:   0.5  + Math.random() * 0.5,
+                dotR:        0.6  + Math.random() * 0.8,
+                iconIdx:     -1
+            }));
+
+            const layerB = Array.from({ length: 100 }, (_, i) => ({
+                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.15,
+                length:      80 + Math.random() * 130,
+                wobbleAmp:   0.03 + Math.random() * 0.07,
+                wobbleSpeed: 0.3  + Math.random() * 0.8,
+                wobblePhase: Math.random() * Math.PI * 2,
+                opacity:     0.07 + Math.random() * 0.18,
+                thickness:   0.4  + Math.random() * 0.45,
+                dotR:        0.8  + Math.random() * 1.2,
+                iconIdx:     -1
+            }));
+
+            const layerC = Array.from({ length: 60 }, (_, i) => ({
+                baseAngle:   (i / 60) * Math.PI * 2 + Math.random() * 0.2,
+                length:      180 + Math.random() * 200,
+                wobbleAmp:   0.02 + Math.random() * 0.04,
+                wobbleSpeed: 0.2  + Math.random() * 0.5,
+                wobblePhase: Math.random() * Math.PI * 2,
+                opacity:     0.03 + Math.random() * 0.09,
+                thickness:   0.3  + Math.random() * 0.35,
+                dotR:        1.0  + Math.random() * 1.5,
+                iconIdx:     -1
+            }));
+
+            // Helper to assign icons to a layer evenly across 360 degrees to prevent overlaps
+            const assignIconsToLayer = (layer: any[], iconIndices: number[], angleOffset: number = 0) => {
+                const numIcons = iconIndices.length;
+                const sectorSize = (Math.PI * 2) / numIcons;
+                
+                iconIndices.forEach((iconIdx, i) => {
+                    const targetAngle = (i * sectorSize + angleOffset) % (Math.PI * 2);
+                    let bestRay: any = null;
+                    let minDiff = Infinity;
+                    
+                    layer.forEach(ray => {
+                        if (ray.iconIdx === -1) {
+                            let diff = Math.abs((ray.baseAngle % (Math.PI * 2)) - targetAngle);
+                            diff = Math.min(diff, Math.PI * 2 - diff); // Shortest circular distance
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                bestRay = ray;
+                            }
+                        }
+                    });
+                    
+                    if (bestRay) {
+                        bestRay.iconIdx = iconIdx;
+                    }
+                });
+            };
+
+            // Important icons (0-9): GitHub, LinkedIn, X, Discord, Mail, Web, Telegram, Instagram, Figma, Slack
+            // Place evenly on Layer B (medium distance)
+            assignIconsToLayer(layerB, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 0);
+
+            // Less important icons (10-14): Resume, Code, Trophy, Briefcase, Web3
+            // Place evenly on Layer C (far distance), offset angle so they don't align perfectly with Layer B
+            assignIconsToLayer(layerC, [10, 11, 12, 13, 14], Math.PI / 5);
+
+            return [...layerA, ...layerB, ...layerC];
+        };
+
+        let rays = makeLayers();
+
+        const resize = () => {
+            const dpr  = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            W = rect.width;
+            H = rect.height;
+            canvas.width  = W * dpr;
+            canvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+
+        let t = 0;
+        const draw = () => {
+            ctx.clearRect(0, 0, W, H);
+
+            const ox = W / 2;
+            const oy = H / 2;
+
+            const mx      = mouseRef.current.x;
+            const my      = mouseRef.current.y;
+            const mActive = mouseRef.current.active;
+            const mAngle  = Math.atan2(my - oy, mx - ox);
+            const mNorm   = mActive
+                ? Math.min(Math.hypot(mx - ox, my - oy) / (Math.min(W, H) * 0.45), 1)
+                : 0;
+
+            rays.forEach(ray => {
+                const wobble = Math.sin(t * ray.wobbleSpeed + ray.wobblePhase) * ray.wobbleAmp;
+
+                let scatter = 0;
+                if (mActive && mNorm > 0.04) {
+                    const da  = ray.baseAngle - mAngle;
+                    const nda = Math.atan2(Math.sin(da), Math.cos(da));
+                    scatter   = Math.exp(-nda * nda * 5) * mNorm * 0.5;
+                }
+
+                const angle = ray.baseAngle + wobble + scatter;
+                const lMult = 1 + (mNorm * Math.exp(-Math.abs(Math.atan2(Math.sin(ray.baseAngle - mAngle), Math.cos(ray.baseAngle - mAngle))) * 1.8) * 0.3);
+                const len   = ray.length * lMult;
+
+                const ex = ox + Math.cos(angle) * len;
+                const ey = oy + Math.sin(angle) * len;
+
+                // Draw Line
+                ctx.beginPath();
+                ctx.moveTo(ox, oy);
+                ctx.lineTo(ex, ey);
+                ctx.strokeStyle = `rgba(255,255,255,${ray.opacity})`;
+                ctx.lineWidth   = ray.thickness;
+                ctx.stroke();
+
+                // Draw Endpoint (Icon or Dot)
+                if (ray.iconIdx >= 0 && loadedIcons[ray.iconIdx]?.complete) {
+                    const img = loadedIcons[ray.iconIdx];
+                    const size = 12; // Icon size in pixels
+                    ctx.globalAlpha = ray.opacity * 4; // Make icons pop a bit more than the faint lines
+                    ctx.drawImage(img, ex - size / 2, ey - size / 2, size, size);
+                    ctx.globalAlpha = 1.0; // Reset alpha
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, ray.dotR, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${ray.opacity * 1.8})`;
+                    ctx.fill();
+                }
+            });
+
+            // Soft central glow (origin point)
+            const grd = ctx.createRadialGradient(ox, oy, 0, ox, oy, 36);
+            grd.addColorStop(0, 'rgba(255,255,255,0.18)');
+            grd.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.beginPath();
+            ctx.arc(ox, oy, 36, 0, Math.PI * 2);
+            ctx.fillStyle = grd;
+            ctx.fill();
+
+            t += 0.016;
+            rafRef.current = requestAnimationFrame(draw);
+        };
+
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+
+        const onMove = (e: MouseEvent) => {
+            const r = canvas.getBoundingClientRect();
+            mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top, active: true };
+        };
+        const onLeave = () => { mouseRef.current.active = false; };
+        canvas.addEventListener('mousemove', onMove);
+        canvas.addEventListener('mouseleave', onLeave);
+
+        return () => {
+            cancelAnimationFrame(rafRef.current);
+            window.removeEventListener('resize', resize);
+            canvas.removeEventListener('mousemove', onMove);
+            canvas.removeEventListener('mouseleave', onLeave);
+        };
+    }, []);
+
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }

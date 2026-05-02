@@ -21,7 +21,7 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
     if (!sortedReceipts || sortedReceipts.length === 0) return null;
 
     return (
-        <div className="w-full mb-3 border-t border-slate-800/50 pt-4 mt-6">
+        <div className="w-full mb-3 border-t border-white/[0.05] pt-4 mt-6">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full text-left py-1 hover:opacity-80 transition-opacity group flex items-center justify-between"
@@ -82,8 +82,8 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
 
                                             return (
                                                 <div key={r.id || i} className={`flex-1 h-full relative z-0 group cursor-pointer ${!isFirst ? '-ml-[8px]' : ''}`} onClick={() => onSelectReceipt(r)}>
-                                                    <div className="absolute inset-0 bg-slate-800 transition-colors duration-300 group-hover:bg-emerald-500 flex items-center justify-center shadow-lg" style={{ clipPath: chevronClip }}>
-                                                        <span className="text-[10px] md:text-[11px] font-bold text-slate-500 group-hover:text-black pl-2 tracking-wider">{year}</span>
+                                                    <div className="absolute inset-0 bg-white/[0.06] transition-colors duration-300 group-hover:bg-emerald-500 flex items-center justify-center shadow-lg" style={{ clipPath: chevronClip }}>
+                                                        <span className="text-[10px] md:text-[11px] font-bold text-white/30 group-hover:text-black pl-2 tracking-wider">{year}</span>
                                                     </div>
                                                     <div className="absolute top-0 h-full flex flex-col items-center justify-center pointer-events-none" style={{ left: '50%', transform: 'translateX(-50%)', zIndex: isCurrent ? 50 : 10 }}>
                                                         {isTop && (
@@ -99,12 +99,12 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                                                     </p>
                                                                 </div>
                                                                 <div className={`rounded-full z-10 transition-transform duration-300 ${isCurrent ? "w-2 h-2 bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)] group-hover:scale-110" : "w-1.5 h-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover:scale-125"}`} />
-                                                                <div className={`w-px h-8 transition-colors ${isCurrent ? "bg-emerald-500/50" : "bg-slate-800 group-hover:bg-emerald-500/50"}`} />
+                                                                <div className={`w-px h-8 transition-colors ${isCurrent ? "bg-emerald-500/50" : "bg-white/[0.1] group-hover:bg-emerald-500/50"}`} />
                                                             </div>
                                                         )}
                                                         {!isTop && (
                                                             <div className="absolute top-[calc(100%+2px)] w-48 flex flex-col items-center pointer-events-auto">
-                                                                <div className={`w-px h-8 transition-colors ${isCurrent ? "bg-emerald-500/50" : "bg-slate-800 group-hover:bg-emerald-500/50"}`} />
+                                                                <div className={`w-px h-8 transition-colors ${isCurrent ? "bg-emerald-500/50" : "bg-white/[0.1] group-hover:bg-emerald-500/50"}`} />
                                                                 <div className={`rounded-full z-10 transition-transform duration-300 ${isCurrent ? "w-2 h-2 bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)] group-hover:scale-110" : "w-1.5 h-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover:scale-125"}`} />
                                                                 <div className="flex flex-col items-center text-center px-1 mt-2">
                                                                     <h4 className="text-xs md:text-sm font-bold text-emerald-400 line-clamp-2 leading-tight flex items-center justify-center gap-1 w-full text-center">
@@ -128,7 +128,7 @@ export function WorkTimeline({ receipts, onSelectReceipt }: { receipts: any[], o
                                 {/* MOBILE VERTICAL LAYOUT */}
                                 <div className="block md:hidden pb-20">
                                     <div className="space-y-8 relative">
-                                        <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-800/50" />
+                                        <div className="absolute left-4 top-0 bottom-0 w-px bg-white/[0.08]" />
                                         {sortedReceipts.slice().reverse().map((r, i) => {
                                             return (
                                                 <div key={r.id || i} className="relative pl-12" onClick={() => onSelectReceipt(r)}>

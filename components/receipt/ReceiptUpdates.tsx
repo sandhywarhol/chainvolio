@@ -114,11 +114,11 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
     if (!hasUpdates && !isOwner) return null;
 
     return (
-        <div className="mt-4 pt-4 border-t border-slate-700/50" onClick={(e) => e.stopPropagation()}>
+        <div className="mt-4 pt-4 border-t border-white/[0.05]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => setExpanded(!expanded)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 transition-all text-xs font-medium text-slate-300 group"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/50 transition-all text-xs font-medium text-slate-300 group"
                 >
                     {hasUpdates ? (
                         <>
@@ -153,13 +153,13 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Share a milestone or update for this work..."
-                                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm focus:border-emerald-500 outline-none resize-none min-h-[80px]"
+                                className="w-full bg-black/60 border border-white/[0.08] rounded-lg p-3 text-sm focus:border-emerald-500 outline-none resize-none min-h-[80px]"
                             />
 
                             {/* Evidence Preview & Inputs */}
                             <div className="space-y-3">
                                 {isAddingLink && (
-                                    <div className="flex items-center gap-2 bg-slate-800/50 p-2 rounded-lg border border-slate-700">
+                                    <div className="flex items-center gap-2 bg-white/[0.03] p-2 rounded-lg border border-white/[0.06]">
                                         <LinkIcon className="w-4 h-4 text-slate-400 shrink-0" />
                                         <input
                                             type="url"
@@ -176,7 +176,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                                 )}
 
                                 {evidencePicture && (
-                                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-slate-700 group/img">
+                                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/[0.08] group/img">
                                         <img src={evidencePicture} alt="Evidence preview" className="w-full h-full object-cover" />
                                         <button
                                             onClick={() => setEvidencePicture(null)}
@@ -192,14 +192,14 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                                         <button
                                             type="button"
                                             onClick={() => setIsAddingLink(true)}
-                                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 hover:border-slate-600 hover:bg-slate-800/50 text-[11px] font-medium text-slate-400 transition-all"
+                                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/[0.06] hover:border-white/[0.1] hover:bg-white/[0.04] text-[11px] font-medium text-slate-400 transition-all"
                                         >
                                             <LinkIcon className="w-3.5 h-3.5" />
                                             Add Link
                                         </button>
                                     )}
                                     {!evidencePicture && (
-                                        <label className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 hover:border-slate-600 hover:bg-slate-800/50 text-[11px] font-medium text-slate-400 transition-all cursor-pointer">
+                                        <label className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/[0.06] hover:border-white/[0.1] hover:bg-white/[0.04] text-[11px] font-medium text-slate-400 transition-all cursor-pointer">
                                             <ImageIcon className="w-3.5 h-3.5" />
                                             Add Picture
                                             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -233,7 +233,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                     {isOwner && hasUpdates && !isAdding && (
                         <button
                             onClick={() => setIsAdding(true)}
-                            className="w-full p-2 border border-dashed border-slate-700 rounded-lg text-xs text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-colors flex items-center justify-center gap-2"
+                            className="w-full p-2 border border-dashed border-white/[0.1] rounded-lg text-xs text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-colors flex items-center justify-center gap-2"
                         >
                             <MessageSquarePlus className="w-4 h-4" />
                             Add Another Update
@@ -245,9 +245,9 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                         {updates.map((update: any, idx: number) => (
                             <div key={update.id} className="relative group">
                                 {/* Timeline dot */}
-                                <div className="absolute -left-[21px] top-4 w-2 h-2 rounded-full bg-emerald-500/50 ring-4 ring-slate-900" />
+                                <div className="absolute -left-[21px] top-4 w-2 h-2 rounded-full bg-emerald-500/50 ring-4 ring-black" />
 
-                                <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 transition-all group-hover:bg-slate-800/60">
+                                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 transition-all group-hover:bg-white/[0.05]">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-[10px] text-slate-500 font-mono">
                                             {formatDateTime(update.createdAt)}
@@ -263,7 +263,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                                     {/* Evidence Display in Timeline */}
                                     <div className="space-y-3">
                                         {update.evidence_picture && (
-                                            <div className="rounded-lg overflow-hidden border border-slate-700/50 max-h-96">
+                                            <div className="rounded-lg overflow-hidden border border-white/[0.06] max-h-96">
                                                 <img src={update.evidence_picture} alt="Update evidence" className="w-full h-full object-contain bg-black/20" />
                                             </div>
                                         )}

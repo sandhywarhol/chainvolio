@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export default function DevelopersPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white font-sans bg-[#050505]">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white font-sans bg-black">
             <Navbar />
 
             {/* Ambient Background Glows */}
@@ -95,7 +95,7 @@ export default function DevelopersPage() {
                     </div>
                     <div className="relative group">
                         <div className="absolute -inset-10 bg-red-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative p-12 bg-[#050505] border border-white/[0.05] rounded-[40px] space-y-6 shadow-2xl">
+                        <div className="relative p-12 bg-[#050505] border border-white/[0.05] rounded-2xl space-y-6 shadow-2xl">
                             <div className="flex gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500/20" />
                                 <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
@@ -134,7 +134,7 @@ export default function DevelopersPage() {
             <section className="relative z-40 py-20 px-6 md:px-8 max-w-6xl mx-auto w-full border-t border-white/[0.03]">
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Before */}
-                    <div className="p-10 bg-white/[0.01] border border-white/[0.03] rounded-[40px] space-y-8 group">
+                    <div className="p-10 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-8 group">
                         <div className="flex items-center gap-3">
                             <ShieldAlert className="w-5 h-5 text-white/20" />
                             <h3 className="text-caption text-white/20">The Old Way</h3>
@@ -154,7 +154,7 @@ export default function DevelopersPage() {
                     </div>
 
                     {/* After */}
-                    <div className="p-10 bg-indigo-500/[0.02] border border-indigo-500/10 rounded-[40px] space-y-8 relative overflow-hidden group shadow-[0_20px_50px_rgba(79,70,229,0.05)]">
+                    <div className="p-10 bg-indigo-500/[0.02] border border-indigo-500/10 rounded-2xl space-y-8 relative overflow-hidden group shadow-[0_20px_50px_rgba(79,70,229,0.05)]">
                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                             <Zap className="w-32 h-32 text-indigo-400" />
                         </div>
@@ -191,7 +191,7 @@ export default function DevelopersPage() {
                         { icon: <Gauge className="w-8 h-8 text-teal-400" />, title: "Confidence Level", text: "Measurement of data reliability and verification depth. Know when to trust." },
                         { icon: <Zap className="w-8 h-8 text-purple-400" />, title: "Trust Score", text: "A decision-ready metric optimized for immediate application logic." }
                     ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-[32px] bg-white/[0.01] border border-white/[0.03] group hover:border-indigo-500/20 transition-all duration-500">
+                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] group hover:border-indigo-500/20 transition-all duration-500">
                             <div className="p-4 rounded-2xl bg-white/[0.02] w-fit mb-8 group-hover:bg-indigo-500/10 transition-colors">
                                 {item.icon}
                             </div>
@@ -204,7 +204,7 @@ export default function DevelopersPage() {
 
             {/* 6. SIMPLE FLOW - Visualization */}
             <section className="relative z-40 py-20 px-6 md:px-8 max-w-[1240px] mx-auto w-full text-center border-t border-white/[0.03]">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-10 bg-white/[0.01] border border-white/[0.03] rounded-[40px] hidden md:flex shadow-2xl">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-10 bg-white/[0.01] border border-white/[0.03] rounded-2xl hidden md:flex shadow-2xl">
                     <div className="flex flex-col items-center gap-4 group">
                          <div className="p-3 rounded-xl bg-white/[0.03] group-hover:bg-white/10 transition-colors">
                             <MousePointer2 className="w-5 h-5 text-white/40" />
@@ -237,7 +237,7 @@ export default function DevelopersPage() {
 
             {/* 7. REAL USE - Implementation */}
             <section className="relative z-40 py-24 px-6 md:px-8 max-w-4xl mx-auto w-full">
-                <div className="p-12 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-[48px] relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+                <div className="p-12 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-2xl relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
                     <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 via-transparent to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                     <div className="relative z-10 text-center space-y-12">
                         <div className="space-y-4">
@@ -247,7 +247,7 @@ export default function DevelopersPage() {
                             </div>
                             <h3 className="text-h1 !text-4xl md:!text-5xl">One Line of Logic.</h3>
                         </div>
-                        <div className="p-8 md:p-12 bg-[#050505] border border-white/[0.05] rounded-[32px] font-mono text-xl md:text-3xl text-indigo-300 text-left relative group/code overflow-hidden shadow-2xl">
+                        <div className="p-8 md:p-12 bg-[#050505] border border-white/[0.05] rounded-2xl font-mono text-xl md:text-3xl text-indigo-300 text-left relative group/code overflow-hidden shadow-2xl">
                              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
                             <span className="text-white/20 italic">if (</span>
                             <span className="text-indigo-400 font-bold">trust_score</span>

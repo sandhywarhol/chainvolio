@@ -81,7 +81,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
           <div
             key={i}
             id={`receipt-${r.id}`}
-            className="p-4 rounded-lg bg-slate-800/50 border border-slate-700 scroll-mt-24 transition-all duration-500"
+            className="p-4 rounded-lg bg-white/[0.03] border border-white/[0.06] scroll-mt-24 transition-all duration-500"
           >
             <div className="flex justify-between items-start gap-4">
               <div className="flex-1">
@@ -94,11 +94,11 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                 {r.status === "Attested" && r.attesterWallet && (() => {
                   const badge = getBadgeStyles(r.attesterVerificationType);
                   return (
-                    <div className="mt-3 p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-3">
+                    <div className="mt-3 p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center gap-3">
                       {r.attesterAvatar ? (
                         <img src={r.attesterAvatar} className="w-8 h-8 rounded-full border border-emerald-500/20 object-cover" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">👤</div>
+                        <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px]">👤</div>
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-slate-600"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-white/[0.08]"
                       >
                         🔗 {link.label}
                       </a>
@@ -149,14 +149,14 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
               <span
                 className={`text-[10px] md:text-xs px-2 py-0.5 rounded border flex-shrink-0 self-start transition-all ${r.status === "Attested"
                   ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.1)]"
-                  : "border-slate-700/50 text-slate-500 bg-slate-800/30"
+                  : "border-white/[0.06] text-white/30 bg-white/[0.02]"
                   }`}
                 title={r.status === "Attested" ? `Verified by ${r.attesterWallet}` : "Self-reported by candidate"}
               >
                 {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
               </span>
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <div className="mt-4 pt-4 border-t border-white/[0.05] flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => {

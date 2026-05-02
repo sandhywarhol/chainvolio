@@ -19,7 +19,7 @@ import {
 
 export default function AttestationGuide() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white bg-black">
             {/* noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -60,7 +60,7 @@ export default function AttestationGuide() {
                                 <Shield className="w-5 h-5 text-emerald-400" />
                                 <span className="text-caption text-emerald-400/80">The Attestation Primitive</span>
                             </div>
-                            <div className="space-y-8 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/10 transition-all duration-500">
+                            <div className="space-y-8 p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/10 transition-all duration-500">
                                 <p className="text-h2">Defining Proof.</p>
                                 <p className="text-body text-lg italic font-medium">An attestation is a verifiable work record confirmed by a secondary party via blockchain-anchored data.</p>
                                 <p className="text-body">It represents a shift from personal claims to peer-verified signals, creating a decentralized trust layer that is portable, interoperable, and publicly auditable across the Solana ecosystem and beyond.</p>
@@ -72,7 +72,7 @@ export default function AttestationGuide() {
                                 <Zap className="w-5 h-5 text-blue-400" />
                                 <span className="text-caption text-blue-400/80">Recruiter Insights</span>
                             </div>
-                            <div className="p-10 bg-white/[0.02] border border-white/[0.03] rounded-3xl space-y-12 relative overflow-hidden group shadow-[0_10px_40px_rgba(16,185,129,0.02)]">
+                            <div className="p-10 bg-white/[0.02] border border-white/[0.03] rounded-2xl space-y-12 relative overflow-hidden group shadow-[0_10px_40px_rgba(16,185,129,0.02)]">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-2xl opacity-50 group-hover:bg-emerald-500/10 transition-all" />
                                 <div className="space-y-6 relative z-10">
                                     <div className="flex justify-between items-end border-b border-white/[0.05] pb-6">
@@ -107,7 +107,7 @@ export default function AttestationGuide() {
                                 { step: "04", icon: <ShieldCheck className="w-5 h-5" />, title: "Issue Proof", desc: "Verifier reviews and confirms the work record directly via a secure interface." },
                                 { step: "05", icon: <Lock className="w-5 h-5" />, title: "Anchor On-Chain", desc: "The attestation is permanently recorded on-chain as immutable professional proof." }
                             ].map((s) => (
-                                <div key={s.step} className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl flex flex-col gap-8 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group">
+                                <div key={s.step} className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl flex flex-col gap-8 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group">
                                     <div className="flex justify-between items-center text-emerald-400/20">
                                         <div className="p-3 rounded-xl bg-emerald-500/5 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-all">
                                             {s.icon}
@@ -119,7 +119,7 @@ export default function AttestationGuide() {
                                             {s.title}
                                             <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
                                         </h4>
-                                        <p className="text-body text-xs font-light">{s.desc}</p>
+                                        <p className="text-body text-xs font-medium">{s.desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -133,7 +133,7 @@ export default function AttestationGuide() {
                                 <Wallet className="w-5 h-5 text-emerald-400" />
                                 <span className="text-caption text-emerald-400/80">Verification Economics</span>
                             </div>
-                            <div className="p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] group hover:border-emerald-500/20 transition-all duration-500">
+                            <div className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] group hover:border-emerald-500/20 transition-all duration-500">
                                 <div className="flex gap-8 group items-start">
                                     <div className="space-y-4 pt-1">
                                         <p className="text-h2">The Verifier-Pays Model.</p>
@@ -154,7 +154,7 @@ export default function AttestationGuide() {
                                 <Search className="w-5 h-5 text-blue-400" />
                                 <span className="text-caption text-blue-400/80">Universal Audit</span>
                             </div>
-                            <div className="p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] group hover:border-blue-500/20 transition-all duration-500">
+                            <div className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] group hover:border-blue-500/20 transition-all duration-500">
                                 <div className="flex gap-8 group items-start">
                                     <div className="space-y-6 pt-1">
                                         <p className="text-h2">Professional Accountability.</p>

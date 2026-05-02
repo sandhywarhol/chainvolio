@@ -74,6 +74,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     const guidesItems = [
         { label: "How It Works", href: "/guides/how-it-works", onClick: onHowItWorksClick },
+        { label: "Web3 Resume", href: "/web3-resume" },
         { label: "Sourcing Guide", href: "/guides/sourcing" },
         { label: "Screening Protocol", href: "/guides/screening", onClick: onScreeningClick },
         { label: "Attestation / Proof Standards", href: "/guides/attestation", onClick: onAttestationClick },

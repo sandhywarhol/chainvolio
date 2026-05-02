@@ -20,7 +20,7 @@ import Link from "next/link";
 
 export default function SourcingGuide() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white bg-black">
             {/* noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -62,11 +62,11 @@ export default function SourcingGuide() {
                                 <span className="text-caption text-emerald-400/80">The Strategic Shift</span>
                             </div>
                             <div className="space-y-6">
-                                <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-3xl group hover:border-white/10 transition-all duration-500">
+                                <div className="p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl group hover:border-white/10 transition-all duration-500">
                                     <p className="text-caption text-white/20 mb-4">Traditional Query</p>
                                     <p className="text-body italic">"Please attach your CV as a PDF."</p>
                                 </div>
-                                <div className="p-8 bg-emerald-400/[0.02] border border-emerald-400/10 rounded-3xl group hover:border-emerald-400/30 transition-all duration-500 shadow-[0_10px_40px_rgba(16,185,129,0.03)] relative overflow-hidden">
+                                <div className="p-8 bg-emerald-400/[0.02] border border-emerald-400/10 rounded-2xl group hover:border-emerald-400/30 transition-all duration-500 shadow-[0_10px_40px_rgba(16,185,129,0.03)] relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl rounded-full" />
                                     <div className="relative z-10">
                                         <p className="text-caption text-emerald-400 mb-4 flex items-center gap-2">
@@ -132,7 +132,7 @@ export default function SourcingGuide() {
                                 { step: "04", title: "Evaluate Real Work", desc: "Review verified history, contributions, and attestations instead of relying on self-claimed experience." },
                                 { step: "05", title: "Hire with Confidence", desc: "Make final decisions based on transparent, verifiable data instead of assumptions or narrative bias." }
                             ].map((s) => (
-                                <div key={s.step} className="p-8 bg-white/[0.02] border border-white/5 rounded-sm space-y-4 hover:border-white/10 transition-colors">
+                                <div key={s.step} className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4 hover:border-white/10 transition-colors">
                                     <div className="flex justify-between items-center">
                                         <span className="text-caption text-white/20">Step {s.step}</span>
                                         <div className="w-1.5 h-1.5 bg-emerald-500/40 rounded-full" />
@@ -147,7 +147,7 @@ export default function SourcingGuide() {
                     </div>
 
                     {/* Call to Action */}
-                    <div className="bg-emerald-500/5 rounded-sm p-12 border border-emerald-500/10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+                    <div className="bg-emerald-500/5 rounded-2xl p-12 border border-emerald-500/10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-50 group-hover:bg-emerald-500/10 transition-colors" />
                         <div className="space-y-2 relative z-10">
                             <h3 className="text-h2 !text-2xl">Ready to capture high-signal talent?</h3>

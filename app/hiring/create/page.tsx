@@ -240,8 +240,8 @@ export default function CreateCollection() {
     }
 
     return (
-        <main className="min-h-screen text-white selection:bg-emerald-500/30">
-            <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
+        <main className="min-h-screen text-white selection:bg-emerald-500/30 bg-black">
+            <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
                 <Link href="/" className="flex items-center gap-2 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
                     <span className="text-xl font-bold tracking-tight">ChainVolio <span className="text-emerald-500">recruit</span></span>

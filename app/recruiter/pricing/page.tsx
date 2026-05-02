@@ -176,7 +176,7 @@ export default function RecruiterPricingPage() {
     const colKeys: CK[] = ["slate", "blue", "amber"];
 
     return (
-        <main className="min-h-screen bg-[#09090b] text-white flex flex-col">
+        <main className="min-h-screen bg-black text-white flex flex-col">
             <Navbar />
             
             {/* ── Background texture ── */}
