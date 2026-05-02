@@ -1,19 +1,359 @@
 "use client";
 
+// Force re-compile: v2-floating-card
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Flame } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+    ArrowRight, 
+    ArrowUpRight, 
+    CheckCircle2, 
+    Shield, 
+    ShieldCheck,
+    Users, 
+    Zap, 
+    Flame, 
+    Wallet,
+    FileText,
+    Target,
+    Building2,
+    LayoutDashboard,
+    FolderOpen,
+    Lock,
+    Award,
+    Globe,
+    Github,
+    Terminal,
+    ExternalLink
+} from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
-import { Wallet } from "lucide-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { isRecruiterTier } from "@/lib/paymentConfig";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+
+// --- Static UI Mockup for Feature Card ---
+function MockProfileUI() {
+    return (
+        <div className="w-full h-full bg-[#080808] flex border border-white/5 rounded-2xl overflow-hidden shadow-2xl font-sans text-sm">
+            {/* 1. Sidebar (Linear Style) */}
+            <div className="w-64 border-r border-white/5 bg-white/[0.01] p-6 flex flex-col gap-8">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 p-0.5">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded-lg grayscale" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-white/90 tracking-tight">Alex Rivera</span>
+                        <span className="text-[10px] text-white/30 uppercase tracking-widest font-black">Member</span>
+                    </div>
+                </div>
+
+                <nav className="flex-1 space-y-1">
+                    {[
+                        { icon: LayoutDashboard, label: "Overview", active: true },
+                        { icon: ShieldCheck, label: "Verifications" },
+                        { icon: FolderOpen, label: "Collections" },
+                        { icon: Terminal, label: "Activity" }
+                    ].map((item, i) => (
+                        <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer ${item.active ? 'bg-white/5 text-white' : 'text-white/40 hover:bg-white/[0.02] hover:text-white/60'}`}>
+                            <item.icon className={`w-4 h-4 ${item.active ? 'text-amber-400' : ''}`} />
+                            <span className="text-[11px] font-bold uppercase tracking-widest">{item.label}</span>
+                        </div>
+                    ))}
+                </nav>
+
+                <div className="pt-6 border-t border-white/5">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Trust Signal</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                            <span className="text-[11px] font-bold text-white/70">Score: 98</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 2. Main Content Area */}
+            <div className="flex-1 flex flex-col bg-[#0a0a0a] overflow-hidden">
+                {/* Content Header */}
+                <div className="h-14 border-b border-white/5 px-8 flex items-center justify-between bg-white/[0.01]">
+                    <div className="flex items-center gap-4">
+                        <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Active Grants</span>
+                        <div className="w-[1px] h-4 bg-white/5"></div>
+                        <span className="text-[11px] font-bold text-white/80">NX-2703</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[9px] font-black text-amber-500 uppercase tracking-widest">In Progress</div>
+                    </div>
+                </div>
+
+                {/* Main Body - Fixed Size, No Scroll */}
+                <div className="p-8 space-y-6 flex-1 flex flex-col justify-between">
+                    <div className="space-y-4">
+                        <h4 className="text-2xl font-bold text-white tracking-tight leading-tight">Nexus Protocol Grant #882</h4>
+                        <p className="text-white/40 text-sm leading-relaxed max-w-2xl">
+                            Core systems development and parallel transaction processing optimization for the Nexus mainnet infrastructure.
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Detailed Activity</span>
+                        <div className="space-y-3">
+                            {[
+                                "Built staking contract module using Anchor framework",
+                                "Integrated Core optimization for Lumina mainnet nodes",
+                                "Reduced transaction latency by 30% through parallel processing"
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-start gap-4 p-3.5 rounded-xl bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-colors">
+                                    <div className="mt-0.5 flex-shrink-0">
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-500/40 group-hover:text-emerald-500 transition-colors" />
+                                    </div>
+                                    <span className="text-[12px] text-white/60 font-medium leading-none">{item}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-white/5 space-y-4">
+                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Verified Attestations</span>
+                        <div className="flex flex-wrap gap-4">
+                            {[
+                                { name: "Lumina", color: "bg-blue-500" },
+                                { name: "Apex Guild", color: "bg-orange-500" }
+                            ].map((org, i) => (
+                                <div key={i} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5">
+                                    <div className={`w-2 h-2 rounded-full ${org.color}`}></div>
+                                    <span className="text-[11px] font-bold text-white/80">{org.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer Meta */}
+                <div className="h-12 border-t border-white/5 px-8 flex items-center justify-between opacity-30 bg-white/[0.01]">
+                    <div className="flex gap-6">
+                        <code className="text-[10px] font-mono text-white/60 tracking-tighter">SIG: 5k2R...j8Wq</code>
+                        <span className="text-[10px] text-white/40 font-mono tracking-tighter">2025-03-24 14:02 UTC</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-white/60">
+                        View Proof <ExternalLink className="w-3 h-3" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    );
+}
+
+// --- Real-world Attestation Preview UI ---
+function AttestationPreviewUI() {
+    return (
+        <div className="w-full h-full bg-[#080808] p-8 flex flex-col justify-center items-center relative overflow-hidden group">
+            {/* Ambient Background Aura */}
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+            
+            {/* The Verification Card */}
+            <div className="relative w-full max-w-[340px] aspect-[1.4/1] rounded-2xl bg-[#0c0c0d] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 flex flex-col justify-between overflow-hidden group/card hover:border-violet-500/30 transition-all duration-500">
+                {/* Security Hologram Effect */}
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-violet-500/10 blur-[60px] rounded-full pointer-events-none group-hover/card:bg-violet-500/20 transition-colors"></div>
+                
+                {/* Header */}
+                <div className="flex items-start justify-between relative z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center shadow-inner">
+                            <Award className="w-5 h-5 text-violet-400" />
+                        </div>
+                        <div className="space-y-0.5">
+                            <h4 className="text-sm font-bold text-white/90">Solana Foundation</h4>
+                            <p className="text-[10px] text-white/30 font-medium">Official Issuer</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-black uppercase tracking-widest">Verified</span>
+                        <span className="text-[7px] font-mono text-white/20">#882-SF-CV</span>
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="space-y-3 relative z-10">
+                    <div className="h-[1px] w-full bg-white/5"></div>
+                    <div className="space-y-1">
+                        <h5 className="text-base font-bold text-white tracking-tight leading-tight">Infrastructure Partnership Program Grant</h5>
+                        <p className="text-[10px] text-white/40 font-medium italic">"Exceptional contribution to the Solana core ecosystem development and RPC infrastructure."</p>
+                    </div>
+                </div>
+
+                {/* Footer / Meta */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5 relative z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="space-y-0.5">
+                            <p className="text-[8px] text-white/20 uppercase tracking-widest font-bold">Issued Date</p>
+                            <p className="text-[9px] text-white/60 font-mono">MAR 24, 2026</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 group-hover/card:bg-violet-500/10 transition-colors">
+                        <ShieldCheck className="w-3 h-3 text-violet-400" />
+                        <span className="text-[9px] font-bold text-violet-400/80">On-Chain Proof</span>
+                    </div>
+                </div>
+
+                {/* Visual Polish: Scanning line animation */}
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent animate-[scan_3s_linear_infinite] pointer-events-none"></div>
+            </div>
+
+            {/* Background Details */}
+            <div className="mt-12 flex items-center gap-8 opacity-20">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
+                        <Lock className="w-3 h-3" />
+                    </div>
+                    <span className="text-[8px] uppercase tracking-widest">Encrypted</span>
+                </div>
+                <div className="h-[1px] w-12 bg-white/10"></div>
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
+                        <Globe className="w-3 h-3" />
+                    </div>
+                    <span className="text-[8px] uppercase tracking-widest">Immutable</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// --- Mobile UI Mockup for Feature Card ---
+// --- Floating Feature Card (Overlay) ---
+function FloatingVerificationCard() {
+    return (
+        <div className="w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col font-sans">
+            {/* Card Header */}
+            <div className="p-5 border-b border-white/5 flex items-center justify-between bg-emerald-500/5">
+                <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">Verified Proof</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            </div>
+            
+            {/* Card Body */}
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 p-0.5">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded grayscale" />
+                    </div>
+                    <div className="space-y-0.5">
+                        <h4 className="text-sm font-bold text-white">Alex Rivera</h4>
+                        <p className="text-[10px] text-white/30 font-medium">Nexus Protocol • Grant #882</p>
+                    </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-white/20 uppercase">On-Chain Attestation</span>
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500/60" />
+                    </div>
+                    <p className="text-[11px] text-white/70 font-medium leading-relaxed">
+                        Technical contribution verified by Lumina Systems core infrastructure audit team.
+                    </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Hash ID</span>
+                        <code className="text-[9px] text-emerald-400/60 font-mono">0x4f2d...9b1a</code>
+                    </div>
+                    <div className="w-12 h-12 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-dashed border-white/10 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Glow */}
+            <div className="h-1 w-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-30"></div>
+        </div>
+    );
+}
+
+// --- Recruiter Dashboard Preview UI V2 ---
+function RecruiterDashboardPreviewUI_V2() {
+    return (
+        <div className="w-full h-full bg-[#0a0b0f] p-6 flex flex-col gap-6 relative overflow-hidden group">
+            {/* Ambient Background Aura (Matching OrgDashboard) */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, #10b98110 0%, transparent 60%)` }} />
+            
+            {/* Header Section */}
+            <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Operations</p>
+                    </div>
+                </div>
+                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Verified Org</span>
+                </div>
+            </div>
+
+            {/* Impact Pods (3-column mini version) */}
+            <div className="grid grid-cols-3 gap-3 relative z-10">
+                {[
+                    { icon: LayoutDashboard, label: "Hiring", val: "12", col: "text-emerald-400", bg: "bg-emerald-500/10" },
+                    { icon: ShieldCheck, label: "Signals", val: "142", col: "text-blue-400", bg: "bg-blue-500/10" },
+                    { icon: FolderOpen, label: "Active", val: "4", col: "text-purple-400", bg: "bg-purple-500/10" },
+                ].map((pod, i) => (
+                    <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
+                        <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
+                            <pod.icon className={`w-3 h-3 ${pod.col}`} />
+                        </div>
+                        <div>
+                            <p className="text-lg font-black text-white leading-none">{pod.val}</p>
+                            <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">{pod.label}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Candidate List Preview */}
+            <div className="flex-1 space-y-3 relative z-10">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Top Candidates with Proven Signals</p>
+                <div className="space-y-2">
+                    {[
+                        { name: "Alex Rivera", role: "Infra @ Solana", signals: 8 },
+                        { name: "Sarah Chen", role: "Smart Contract Dev", signals: 5 },
+                    ].map((c, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center justify-between group/row hover:bg-white/[0.03] transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-white/40">
+                                    {c.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div>
+                                    <h5 className="text-[11px] font-bold text-white/80">{c.name}</h5>
+                                    <p className="text-[9px] text-slate-500">{c.role}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-500/5 border border-violet-500/10">
+                                <ShieldCheck className="w-2.5 h-2.5 text-violet-400" />
+                                <span className="text-[9px] font-bold text-violet-400">{c.signals}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Bottom Glow */}
+            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0a0b0f] to-transparent pointer-events-none"></div>
+        </div>
+    );
+}
 
 const SLIDES = [
     { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile" },
@@ -111,256 +451,370 @@ export function LandingPageClient() {
                 onAttestationClick={() => router.push('/guides/attestation')}
             />
 
-            <main className="flex-1 flex flex-col relative">
-
-                {/* DESKTOP LAYOUT (HIDDEN ON MOBILE) */}
-                <div className="hidden md:flex flex-col flex-1 relative">
-
-                <section className="flex-1 max-w-[1240px] w-full mx-auto px-12 relative z-40 flex flex-col lg:flex-row items-center justify-between pt-32 pb-12 gap-16">
-                    <div className="text-left max-w-4xl lg:w-[70%]">
-                        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
-                        </div>
-                        <h1 className="text-5xl md:text-6xl lg:text-[72px] font-extrabold font-display leading-[1.05] tracking-tight mb-8 text-white">
-                            Verifiable identity<br />
-                            for Web3.
-                        </h1>
-                        <div className="mb-16">
-                            <p className="text-white/80 text-lg md:text-xl font-medium font-display leading-relaxed max-w-xl tracking-normal">
-                                Build a work history that can’t be faked.<br />
-                                Backed by on-chain proof and attestations.
-                            </p>
-                        </div>
-                        {/* Detect recruiter context */}
-                        {(() => {
-                            // Google recruiter: signed in with Google
-                            const isGoogleRecruiter = isGoogleSignedIn;
-                            // Wallet recruiter: connected wallet and org-tier profile
-                            const isWalletRecruiter = connected && !!publicKey && !!profile && isRecruiterTier(profile.verificationTier);
-                            const isRecruiter = isGoogleRecruiter || isWalletRecruiter;
-
-                            const orgType = googleOrgAccount?.org_type
-                                ?? (profile?.verificationTier?.toLowerCase().includes("company") ? "company" : "community");
-                            const isCommunityOrg = orgType === "community";
-
-                            // Public page URL for recruiter
-                            const orgPageUrl = isGoogleRecruiter
-                                ? `/dashboard`
-                                : publicKey ? `/cv/${publicKey.toBase58()}` : `/dashboard`;
-
-                            return (
-                                <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-                                    {/* Left button */}
-                                    {isRecruiter ? (
-                                        <Link
-                                            href={orgPageUrl}
-                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
-                                        >
-                                            {isCommunityOrg ? "View Your Community" : "View Your Company"}
-                                        </Link>
-                                    ) : connected && publicKey ? (
-                                        <Link
-                                            href={`/cv/${publicKey.toBase58()}`}
-                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
-                                        >
-                                            View Your CV
-                                        </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => setIsWalletModalOpen(true)}
-                                            className="premium-shimmer-button w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(20,241,149,0.15)]"
-                                        >
-                                            Build Your Reputation
-                                        </button>
-                                    )}
-
-                                    {/* Right button */}
-                                    {isRecruiter ? (
-                                        <Link
-                                            href="/hiring/create"
-                                            className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            Discover Talent <ArrowRight className="w-4 h-4" />
-                                        </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => {
-                                                if (!connected) {
-                                                    setIsWalletModalOpen(true);
-                                                    return;
-                                                }
-                                                router.push("/hiring/create");
-                                            }}
-                                            className="w-full sm:w-auto px-8 py-3.5 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            Discover Talent <ArrowRight className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })()}
-                        
-                        <div className="mt-24">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">
-                                Powering the Web3 career stack
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="lg:w-[45%] w-full relative group lg:-mt-24" style={{ perspective: '2000px' }}>
-                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:rotate-y-[-15deg] group-hover:rotate-x-[5deg]" style={{ transform: 'rotateY(-30deg) rotateX(12deg) scale(1.1)', transformStyle: 'preserve-3d', maskImage: 'linear-gradient(to bottom, black 95%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 95%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)', maskComposite: 'intersect', WebkitMaskComposite: 'source-in', boxShadow: '0 0 100px black' }}>
-                            {SLIDES.map((slide, index) => (
-                                <div key={slide.src} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"}`}>
-                                    <Image
-                                        src={slide.src}
-                                        alt={slide.label}
-                                        fill
-                                        sizes="(max-width: 1024px) 100vw, 45vw"
-                                        className="object-cover object-top"
-                                        quality={100}
-                                        priority={index === 0}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-                            <button onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)} className="p-2 rounded-full bg-black/40 text-white/70 hover:bg-black/60 transition-colors"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
-                        </div>
-                        <div className="flex flex-col items-center mt-8 space-y-4">
-                            <div className="h-6 relative w-full flex justify-center">
-                                {SLIDES.map((slide, index) => (
-                                    <p key={index} className={`absolute text-white/90 text-[11px] font-bold font-display tracking-[0.4em] transition-all duration-700 transform ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
-                                        {slide.label}
-                                    </p>
-                                ))}
-                            </div>
-                            <div className="flex justify-center gap-2 relative z-50">
-                                {SLIDES.map((_, index) => (
-                                    <button key={index} onClick={() => setCurrentSlide(index)} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"}`} />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <div className="w-full pt-4 pb-12 overflow-hidden relative group/marquee" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-r from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to right, black, transparent)', WebkitMaskImage: 'linear-gradient(to right, black, transparent)' }}></div>
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 bottom-0 w-80 z-10 pointer-events-none bg-gradient-to-l from-black via-black/95 to-transparent backdrop-blur-xl h-full" style={{ maskImage: 'linear-gradient(to left, black, transparent)', WebkitMaskImage: 'linear-gradient(to left, black, transparent)' }}></div>
-                    <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-                        {[...partners, ...partners].map((partner, i) => (
-                            <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-20 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default">
-                                <img
-                                    src={partner.src}
-                                    alt={partner.name}
-                                    className="h-6 w-auto object-contain"
-                                    style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
-                                />
-                            </div>
-                        ))}
-                    </div>
+            <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
+                {/* Background Video */}
+                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                    <video 
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline 
+                        className="w-full h-full object-cover opacity-30"
+                    >
+                        <source src="/video-background.mp4" type="video/mp4" />
+                    </video>
+                    {/* Dark Overlay for readability */}
+                    <div className="absolute inset-0 bg-black/40"></div>
                 </div>
 
-                {/* --- NEW SECTIONS START HERE --- */}
+                {/* Background Glows */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-glow-purple opacity-20 blur-[120px] pointer-events-none"></div>
+                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-glow-teal opacity-10 blur-[120px] pointer-events-none"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
-                {/* 1. PROBLEM SECTION */}
-                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
-                    <div className="max-w-[1200px] mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                            <div>
-                                <h2 className="text-[11px] font-black uppercase text-rose-500 tracking-[0.4em] mb-6">The Problem</h2>
-                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
-                                    Traditional CVs are <br />
-                                    <span className="text-white/40">unreliable and easy to fake.</span>
-                                </h3>
-                                <div className="space-y-6">
-                                    <p className="text-white/50 text-sm leading-relaxed max-w-md font-light">
-                                        Recruiters spend months filtering through unverified portfolios, while talented individuals struggle to stand out amongst a sea of inflated claims and AI-generated resumes.
-                                    </p>
-                                    <ul className="space-y-4">
-                                        {["Endless screening cycles", "No proof of actual contribution", "Difficulty verifying soft skills"].map(item => (
-                                            <li key={item} className="flex items-center gap-3 text-white/30 text-[10px] font-black uppercase tracking-widest">
-                                                <div className="w-1.5 h-1.5 bg-rose-500/40 rounded-full" />
-                                                {item}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className="aspect-video w-full rounded-[32px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/box">
-                                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-700"></div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 relative z-10">Problem Visualization Diagram</p>
+                {/* HERO SECTION */}
+                <section className="relative pt-32 pb-20 px-6 z-10 flex flex-col items-center text-center">
+                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
+                        <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
+                            Trust Layer for Web3
+                        </span>
+                    </div>
+
+                    <h1 className="text-5xl md:text-7xl lg:text-[88px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
+                        Verifiable identity<br />
+                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">for Web3 careers.</span>
+                    </h1>
+
+                    <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mb-12 leading-relaxed">
+                        Build a work history that can’t be faked. <br className="hidden md:block" />
+                        Backed by on-chain proof and attestations.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+                        <button
+                            onClick={() => setIsWalletModalOpen(true)}
+                            className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                        >
+                            Build Your Reputation
+                        </button>
+                        <button
+                            onClick={() => router.push('/hiring/create')}
+                            className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
+                        >
+                            Discover Talent <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* HERO VISUAL - Idealized Dashboard Mockup */}
+                    <div className="relative w-full max-w-[1200px] mx-auto perspective-1000 group">
+                        <div className="relative rounded-[32px] border border-white/10 bg-white/[0.02] backdrop-blur-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] transform transition-transform duration-1000 hover:scale-[1.01]">
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
+                            <div className="aspect-[16/9] relative">
+                                {SLIDES.map((slide, index) => (
+                                    <div 
+                                        key={index}
+                                        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                                            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"
+                                        }`}
+                                    >
+                                        <Image
+                                            src={slide.src}
+                                            alt={slide.label}
+                                            fill
+                                            className="object-cover object-top"
+                                            priority={index === 0}
+                                        />
+                                    </div>
+                                ))}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
                             </div>
                         </div>
-                    </div>
-                </section>
 
-                {/* 2. SOLUTION SECTION */}
-                <section className="py-32 px-4 md:px-8 bg-white/[0.01]">
-                    <div className="max-w-[1200px] mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                            <div className="order-2 lg:order-1 aspect-video w-full rounded-[32px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/box">
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-700"></div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 relative z-10">On-Chain Proof Animation</p>
-                            </div>
-                            <div className="order-1 lg:order-2">
-                                <h2 className="text-[11px] font-black uppercase text-emerald-400 tracking-[0.4em] mb-6">The Solution</h2>
-                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
-                                    Verifiable identity <br />
-                                    <span className="text-white/40">anchored to on-chain proof.</span>
-                                </h3>
-                                <p className="text-white/50 text-sm leading-relaxed mb-10 max-w-md font-light">
-                                    ChainVolio converts professional contributions into cryptographic signals. Every skill claimed is backed by a verifier, ensuring trust without the need for manual background checks.
+                        {/* Slide Caption Below Image */}
+                        <div className="mt-8 h-6 relative w-full flex justify-center">
+                            {SLIDES.map((slide, index) => (
+                                <p 
+                                    key={index} 
+                                    className={`absolute text-[10px] font-bold uppercase tracking-[0.4em] text-white/40 transition-all duration-700 ${
+                                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+                                    }`}
+                                >
+                                    {slide.label}
                                 </p>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-                                        <p className="text-emerald-400 text-2xl font-bold mb-1 tracking-tight">100%</p>
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Verifiable Output</p>
-                                    </div>
-                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-                                        <p className="text-emerald-400 text-2xl font-bold mb-1 tracking-tight">Instant</p>
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Trust Layer</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 3. HOW IT WORKS SECTION */}
-                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
-                    <div className="max-w-[1200px] mx-auto">
-                        <div className="text-center mb-24">
-                            <h2 className="text-[11px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-6">Workflow</h2>
-                            <h3 className="text-3xl md:text-4xl font-bold text-white tracking-tight">How ChainVolio works</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {[
-                                { step: "01", title: "Build Profile", desc: "Connect your wallet and import your professional contributions to your secure ledger." },
-                                { step: "02", title: "Request Proof", desc: "Send verification requests to your project leads, founders or managers directly via Link." },
-                                { step: "03", title: "Earn Reputation", desc: "Your CV updates with on-chain attestations, creating an immutable proof of work." }
-                            ].map((item, idx) => (
-                                <div key={idx} className="relative p-10 rounded-[32px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all duration-500 group">
-                                    <div className="w-12 h-12 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center text-[11px] font-black text-indigo-400 mb-8 group-hover:scale-110 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all">
-                                        {item.step}
-                                    </div>
-                                    <h4 className="text-xl font-bold text-white mb-4 tracking-tight">{item.title}</h4>
-                                    <p className="text-white/40 text-xs leading-relaxed font-light">{item.desc}</p>
-                                </div>
                             ))}
                         </div>
+
+                        {/* Glow behind visual */}
+                        <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/10 to-emerald-500/10 blur-3xl -z-10 rounded-[40px] opacity-50"></div>
+                    </div>
+
+                    <div className="mt-32 w-full max-w-[1200px]">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-12">
+                            Powering the Web3 career stack
+                        </p>
+                        <div className="w-full py-4 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                            <div className="flex animate-marquee whitespace-nowrap items-center w-max">
+                                {[...partners, ...partners].map((partner, i) => (
+                                    <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-20 hover:grayscale-0 hover:opacity-80 transition-all duration-500 cursor-default group/partner">
+                                        <img
+                                            src={partner.src}
+                                            alt={partner.name}
+                                            className="h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
+                                            style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                {/* 4. VALUE SNAPSHOT */}
-                <section className="py-32 px-4 md:px-8 border-t border-white/[0.02]">
-                    <div className="max-w-[1200px] mx-auto">
-                        <div className="w-full h-[400px] rounded-[40px] border-2 border-dashed border-white/5 flex items-center justify-center bg-white/[0.01] relative overflow-hidden group/snapshot">
-                            <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/[0.03] to-transparent opacity-0 group-hover/snapshot:opacity-100 transition-opacity duration-1000"></div>
-                            <div className="text-center relative z-10 px-6">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-6">Value Proposition Snapshot</p>
-                                <p className="text-[11px] text-white/10 max-w-sm mx-auto leading-relaxed font-medium">Interactive ecosystem module showing the cryptographic relationship between Builders, Verifiers, and Organizations.</p>
+                {/* THE PROBLEM SECTION */}
+                <section className="py-32 px-6 relative z-10 border-t border-white/[0.02] bg-black">
+                    <div className="max-w-[1240px] mx-auto">
+                        <div className="text-center mb-24 space-y-4">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+                                Your work is real. Your proof isn’t.
+                            </h2>
+                            <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mx-auto">
+                                Hiring runs on claims, not proof. There is no reliable way to verify real work.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3">
+                            {/* Card 1 */}
+                            <div className="space-y-12 group pr-16 pb-16 md:pb-0">
+                                <div className="h-[300px] relative flex items-center justify-center">
+                                     <Image
+                                        src="/homepage/Broken%20Work%20History.png"
+                                        alt="Broken Work History"
+                                        fill
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                     />
+                                </div>
+                                <div className="space-y-4">
+                                    <h3 className="text-white font-bold text-xl">Broken Work History</h3>
+                                    <p className="text-white/40 text-base leading-relaxed">
+                                        Your experience is scattered across PDFs, portfolios, and links — with no single source of truth.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Card 2 */}
+                            <div className="space-y-12 group px-16 border-l border-white/[0.05] pb-16 md:pb-0">
+                                <div className="h-[300px] relative flex items-center justify-center">
+                                     <Image
+                                        src="/homepage/Unverifiable%20Resumes.png"
+                                        alt="Unverifiable Resumes"
+                                        fill
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                     />
+                                </div>
+                                <div className="space-y-4">
+                                    <h3 className="text-white font-bold text-xl">Unverifiable Resumes</h3>
+                                    <p className="text-white/40 text-base leading-relaxed">
+                                        Without verifiable data, resumes become claims — not proof.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Card 3 */}
+                            <div className="space-y-12 group pl-16 border-l border-white/[0.05]">
+                                <div className="h-[300px] relative flex items-center justify-center">
+                                     <Image
+                                        src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
+                                        alt="Signal Lost in Noise"
+                                        fill
+                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105"
+                                     />
+                                </div>
+                                <div className="space-y-4">
+                                    <h3 className="text-white font-bold text-xl">Signal Lost in Noise</h3>
+                                    <p className="text-white/40 text-base leading-relaxed">
+                                        As a result, real talent gets buried — and hiring becomes guesswork.
+                                    </p>
+                                </div>
                             </div>
                         </div>
+
+                        <div className="mt-20 text-center">
+                            <Link href="#solution" className="text-sm font-medium text-white/20 hover:text-white/60 transition-colors inline-flex items-center gap-2 group">
+                                See how ChainVolio solves this <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+
+                {/* THE SOLUTION SECTION */}
+                <section className="py-32 px-6 relative z-10 bg-gradient-to-b from-black via-black to-[#030303] border-t border-white/[0.02] overflow-hidden">
+                    {/* Large Section-level Bottom Fade */}
+                    <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
+                    
+                    <div className="max-w-[1200px] mx-auto relative">
+                        <div className="text-center mb-20 space-y-6 max-w-3xl mx-auto">
+                            <h2 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.4em] mb-4 block">THE SOLUTION</h2>
+                            <h3 className="text-5xl md:text-7xl font-bold text-white tracking-tighter leading-tight mb-8">
+                                Build a reputation <br className="hidden md:block" /> that travels.
+                            </h3>
+                            <div className="space-y-3">
+                                <p className="text-white/80 text-xl md:text-2xl font-medium tracking-tight">
+                                    Turn your work into verifiable proof that anyone can trust.
+                                </p>
+                                <p className="text-white/30 text-lg font-medium">
+                                    Transparent, portable, and impossible to fake.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Main Solution Card */}
+                        <div className="relative z-10 space-y-12">
+                            {/* 1. The Text Card - Now standalone */}
+                            <div className="relative p-12 md:p-16 space-y-6 bg-[#030303] border border-white/5 rounded-[32px] overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
+                                
+                                <div className="relative z-10">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-8">
+                                        <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                                    </div>
+                                    <h4 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight mb-6">Verifiable Work History</h4>
+                                    <p className="text-white/40 text-lg md:text-xl leading-relaxed font-medium max-w-3xl mb-8">
+                                        Every contribution is backed by on-chain attestations — not PDFs or claims. <br className="hidden md:block" />
+                                        Recruiters can verify your work instantly, without manual checks.
+                                    </p>
+                                    
+                                    <div className="flex flex-wrap gap-4">
+                                        <div className="px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-emerald-400/80">On-Chain Proof</div>
+                                        <div className="px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-blue-400/80">Instant Verification</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 2. The UI Mockup - Desktop + Mobile Overlay */}
+                            <div className="relative h-[650px] w-full flex items-center justify-center">
+                                {/* Ambient Glow */}
+                                <div className="absolute inset-0 bg-emerald-500/5 blur-[120px] rounded-full opacity-30"></div>
+                                
+                                <div className="relative w-full h-full group">
+                                    {/* Desktop Card */}
+                                    <div className="w-full h-full rounded-[32px] border border-white/10 bg-[#050505] shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-700 group-hover:border-white/20">
+                                        <MockProfileUI />
+                                    </div>
+
+                                    {/* Floating Verification Card - Tacked on the Right & Stacked */}
+                                    <div className="absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                        <div className="[perspective:1500px]">
+                                            <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
+                                                <FloatingVerificationCard />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* PRODUCT SECTION */}
+                <section className="py-32 px-6 relative z-10 bg-[#030303] overflow-hidden">
+                    <div className="max-w-[1200px] mx-auto space-y-48">
+                        
+                        {/* BLOCK 1 — ATTESTATION */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
+                        >
+                            <div className="space-y-8">
+                                <div className="space-y-4">
+                                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Core Feature</span>
+                                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                                        Proof of work, <br />not claims.
+                                    </h3>
+                                    <p className="text-white/40 text-lg leading-relaxed font-medium max-w-lg">
+                                        Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a transparent and trusted work history.
+                                    </p>
+                                </div>
+                                <ul className="space-y-4 text-white/60 text-sm font-medium">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
+                                        Verifiable on-chain proof
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
+                                        Issued by real collaborators
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
+                                        Public and tamper-resistant
+                                    </li>
+                                </ul>
+                                <Link href="/why" className="inline-flex items-center gap-2 text-sm font-bold text-white/40 hover:text-white transition-colors group">
+                                    Explore attestations <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+                            
+                            <div className="relative group">
+                                <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                                <div className="relative aspect-[4/3] rounded-3xl border border-white/5 bg-[#080808] overflow-hidden shadow-2xl">
+                                    <AttestationPreviewUI />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Divider Text */}
+                        <div className="flex items-center justify-center gap-8 opacity-20">
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white"></div>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] whitespace-nowrap">From proof to hiring decisions</span>
+                            <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white"></div>
+                        </div>
+
+                        {/* BLOCK 2 — HIRING */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
+                        >
+                            <div className="relative group order-2 lg:order-1">
+                                <div className="absolute inset-0 bg-blue-500/5 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                                <div className="relative aspect-[4/3] rounded-3xl border border-white/5 bg-[#0a0b0f] overflow-hidden shadow-2xl">
+                                    <RecruiterDashboardPreviewUI_V2 />
+                                </div>
+                            </div>
+
+                            <div className="space-y-8 order-1 lg:order-2">
+                                <div className="space-y-4">
+                                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Use Case</span>
+                                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                                        Hire based on real proof, <br />not profiles.
+                                    </h3>
+                                    <p className="text-white/40 text-lg leading-relaxed font-medium max-w-lg">
+                                        Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
+                                    </p>
+                                </div>
+                                <ul className="space-y-4 text-white/60 text-sm font-medium">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
+                                        Filter by verified contributions
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
+                                        See who endorsed the candidate
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40"></div>
+                                        Reduce hiring guesswork
+                                    </li>
+                                </ul>
+                                <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/40 hover:text-white transition-colors group">
+                                    Discover talent <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+                        </motion.div>
                     </div>
                 </section>
 
@@ -368,184 +822,30 @@ export function LandingPageClient() {
                 <section className="py-48 px-4 md:px-8 border-t border-white/[0.02] bg-gradient-to-b from-transparent to-white/[0.01]">
                     <div className="max-w-[800px] mx-auto text-center">
                         <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tighter leading-[1.1]">
-                            Build your <br />
-                            <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">on-chain reputation.</span>
+                            Start building your <br />
+                            <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">verifiable profile.</span>
                         </h2>
                         <p className="text-white/40 text-base mb-12 max-w-lg mx-auto leading-relaxed font-light">
-                            Join thousands of builders and organizations creating a more transparent, verifiable future for Web3 careers.
+                            Turn your work into proof — visible, trusted, and easy to share.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                              <button
                                 onClick={() => setIsWalletModalOpen(true)}
-                                className="premium-shimmer-button w-full sm:w-auto px-12 py-4.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base whitespace-nowrap rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(20,241,149,0.25)]"
+                                className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                             >
-                                Get Started Now
+                                Create Your Profile
                             </button>
                             <Link
-                                href="/why"
-                                className="w-full sm:w-auto px-12 py-4.5 bg-white/[0.02] hover:bg-white/[0.05] text-white/70 font-bold text-base whitespace-nowrap rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
+                                href="/hiring/create"
+                                className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
                             >
-                                Learn More
+                                Explore Talent <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
                     </div>
                 </section>
                 <Footer />
-            </div>
-
-            {/* MOBILE LAYOUT (HIDDEN ON DESKTOP) */}
-            <div className="block md:hidden">
-                <section className="px-6 pt-24 pb-12 flex flex-col gap-12 text-center">
-                    <div className="flex flex-col items-center">
-                        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6">
-                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-50">Trust Layer for Web3 Career</span>
-                        </div>
-                        <h1 className="text-4xl sm:text-[42px] font-black leading-[1.1] tracking-tight text-white px-2">
-                            Verifiable identity<br />
-                            for Web3.
-                        </h1>
-                        <p className="text-white/70 text-base font-medium leading-relaxed px-4 mt-8">
-                            Build a work history that can’t be faked. Backed by on-chain proof and attestations.
-                        </p>
-                    </div>
-
-                    {/* Simple Mobile Slide */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] -mt-12">
-                        <Image
-                            src={SLIDES[currentSlide].src}
-                            alt={SLIDES[currentSlide].label}
-                            fill
-                            className="object-cover object-top transition-opacity duration-500"
-                            quality={100}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                    </div>
-
-                    <div className="h-4 relative w-full flex justify-center -mt-2">
-                        {SLIDES.map((slide, index) => (
-                            <p key={index} className={`absolute text-white/90 text-[10px] font-bold font-display tracking-[0.3em] transition-all duration-500 transform ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 pointer-events-none"}`}>
-                                {slide.label}
-                            </p>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-col gap-4 px-2">
-                        {(() => {
-                            const isGoogleRecruiter = isGoogleSignedIn;
-                            const isWalletRecruiter = connected && !!publicKey && !!profile && isRecruiterTier(profile.verificationTier);
-                            const isRecruiter = isGoogleRecruiter || isWalletRecruiter;
-                            const orgType = googleOrgAccount?.org_type
-                                ?? (profile?.verificationTier?.toLowerCase().includes("company") ? "company" : "community");
-                            const isCommunityOrg = orgType === "community";
-                            const orgPageUrl = isGoogleRecruiter ? `/dashboard` : publicKey ? `/cv/${publicKey.toBase58()}` : `/dashboard`;
-
-                            return (
-                                <>
-                                    {isRecruiter ? (
-                                        <Link
-                                            href={orgPageUrl}
-                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                                        >
-                                            {isCommunityOrg ? "View Your Community" : "View Your Company"}
-                                        </Link>
-                                    ) : connected && publicKey ? (
-                                        <Link
-                                            href={`/cv/${publicKey.toBase58()}`}
-                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                                        >
-                                            View Your CV
-                                        </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => setIsWalletModalOpen(true)}
-                                            className="premium-shimmer-button w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-base text-center rounded-2xl shadow-[0_0_20px_rgba(20,241,149,0.15)] flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                                        >
-                                            Build Your Reputation
-                                        </button>
-                                    )}
-                                    {isRecruiter ? (
-                                        <Link
-                                            href="/hiring/create"
-                                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            Discover Talent <ArrowRight className="w-4 h-4" />
-                                        </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => {
-                                                if (!connected) {
-                                                    setIsWalletModalOpen(true);
-                                                    return;
-                                                }
-                                                router.push("/hiring/create");
-                                            }}
-                                            className="w-full py-4 bg-[#121214]/50 hover:bg-[#1a1a1f] text-white font-bold text-base rounded-2xl border border-white/5 transition-all flex items-center justify-center gap-2"
-                                        >
-                                            Discover Talent <ArrowRight className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                </>
-                            );
-                        })()}
-
-                        <div className="mt-12 text-left">
-                            <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20">
-                                Powering the Web3 career stack
-                            </p>
-                        </div>
-                    </div>
-
-                </section>
-
-                <div className="w-full pt-2 pb-10 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
-                    <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-                        {[...Array(2)].map((_, i) => (
-                            <div key={i} className="flex gap-16 items-center flex-shrink-0 pr-16">
-                                {partners.map((partner) => (
-                                    <CryptoLogo key={`${i}-${partner.name}`} src={partner.src} name={partner.name} />
-                                ))}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* --- MOBILE SECTIONS --- */}
-
-                <div className="px-6 py-20 space-y-32">
-                    {/* Problem */}
-                    <div>
-                        <h2 className="text-[10px] font-black uppercase text-rose-500 tracking-[0.4em] mb-4">The Problem</h2>
-                        <h3 className="text-2xl font-bold text-white mb-6">Traditional CVs are easy to fake.</h3>
-                        <p className="text-white/40 text-sm leading-relaxed font-light mb-8">Recruiters waste time on unverified claims. Talent gets lost in the noise.</p>
-                        <div className="aspect-video w-full rounded-2xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.01]">
-                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 text-center px-4">Problem Visualization</p>
-                        </div>
-                    </div>
-
-                    {/* Solution */}
-                    <div>
-                        <h2 className="text-[10px] font-black uppercase text-emerald-400 tracking-[0.4em] mb-4">The Solution</h2>
-                        <h3 className="text-2xl font-bold text-white mb-6">On-chain professional proof.</h3>
-                        <p className="text-white/40 text-sm leading-relaxed font-light mb-8">ChainVolio anchors Every skill to a verifier, creating instant trust.</p>
-                        <div className="aspect-video w-full rounded-2xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.01]">
-                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 text-center px-4">Solution Animation</p>
-                        </div>
-                    </div>
-
-                    {/* Final CTA Mobile */}
-                    <div className="text-center py-20">
-                        <h2 className="text-3xl font-bold text-white mb-6">Build your legacy.</h2>
-                        <button
-                            onClick={() => setIsWalletModalOpen(true)}
-                            className="w-full py-4 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold text-sm rounded-xl shadow-lg"
-                        >
-                            Get Started
-                        </button>
-                    </div>
-                </div>
-
-                <Footer />
-            </div>
+            </main>
 
             <CustomWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
 
@@ -1012,7 +1312,6 @@ export function LandingPageClient() {
                     </div>
                 </div>
             )}
-            </main>
         </div>
     );
 }

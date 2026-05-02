@@ -21,7 +21,7 @@
 
   /* Typography Standard Classes */
   .text-h1 {
-    @apply text-5xl md:text-6xl font-bold tracking-tight text-white leading-[0.95];
+    @apply text-5xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.03em] text-white leading-[1.05];
     color: #ffffff !important;
   }
 
@@ -36,11 +36,11 @@
   }
 
   .text-body {
-    @apply text-sm md:text-base font-normal text-white/70 leading-relaxed;
+    @apply text-sm md:text-base font-normal text-white/50 leading-relaxed;
   }
 
   .text-caption {
-    @apply text-xs font-medium uppercase tracking-[0.3em] text-white/50;
+    @apply text-xs font-medium uppercase tracking-[0.3em] text-white/40;
   }
 }
 
@@ -109,6 +109,33 @@
 
   .animate-highlight {
     animation: highlight-pulse 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Linear-style Bento Grid & Cards */
+  .bento-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+  }
+
+  .bento-card {
+    @apply relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.04];
+  }
+
+  .bento-card-glow {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100;
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+  }
+
+  /* Linear-style Background Glows */
+  .bg-glow-purple {
+    background: radial-gradient(circle at 50% 50%, rgba(153, 69, 255, 0.15) 0%, transparent 50%);
+  }
+
+  .bg-glow-teal {
+    background: radial-gradient(circle at 50% 50%, rgba(20, 241, 149, 0.15) 0%, transparent 50%);
+  }
+
+  .bg-linear-radial {
+    background: radial-gradient(circle at center, #111111 0%, #000000 100%);
   }
 }
 
@@ -343,4 +370,14 @@
   );
   animation: premium-shimmer 3s infinite linear;
   pointer-events: none;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
 }

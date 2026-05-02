@@ -36,20 +36,7 @@ export default function VerifiedOrganizationPage() {
     return (
         <div className="min-h-screen relative">
             <Navbar />
-            <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative">
-            {/* Video Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover opacity-20"
-                >
-                    <source src="/video-background.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-            </div>
+            <main className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30 relative">
 
             {/* HERO SECTION */}
             <section className="relative z-10 pt-32 pb-20 px-4 md:px-8 max-w-[1240px] mx-auto w-full">

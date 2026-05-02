@@ -167,7 +167,7 @@ export default function DashboardPage() {
   if (!publicKey) {
     // Not signed in at all
     return (
-      <main className="min-h-screen text-white bg-[#030303]">
+      <main className="min-h-screen text-white relative">
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
           <div className="text-center space-y-4">

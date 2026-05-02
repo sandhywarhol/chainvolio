@@ -166,7 +166,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 }`;
 
   return (
-    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-[#050505]">
+    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-transparent">
 
       <Navbar />
 
