@@ -65,6 +65,8 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         if (isOpen) {
             setStep("select");
             setSelectedOrgType(null);
+            setLoadingKey(null);
+            setToast(null);
             recruiterModeRef.current = false;
         }
     }, [isOpen]);
