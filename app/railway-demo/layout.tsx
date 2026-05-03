@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
 
 import { AppBackground } from "@/components/layout/AppBackground";

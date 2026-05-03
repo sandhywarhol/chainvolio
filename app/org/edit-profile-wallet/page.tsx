@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Globe, Send, Mail, MapPin, Building2, Save, Camera, Loader2 } from "lucide-react";
@@ -21,7 +21,7 @@ const COUNTRIES = [
     "Brazil", "Nigeria", "UAE", "Other",
 ];
 
-export default function OrgEditProfileWalletPage() {
+function OrgEditProfileWalletContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const presetOrgType = searchParams.get("type"); // "company" | "community" — set by recruiter modal flow
@@ -417,5 +417,17 @@ export default function OrgEditProfileWalletPage() {
                 <ImageCropModal image={cropModal.image} onCropComplete={handleCroppedImage} onClose={() => setCropModal({ isOpen: false, image: null })} />
             )}
         </main>
+    );
+}
+
+export default function OrgEditProfileWalletPage() {
+    return (
+        <Suspense fallback={
+            <main className="min-h-screen flex items-center justify-center bg-black">
+                <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+            </main>
+        }>
+            <OrgEditProfileWalletContent />
+        </Suspense>
     );
 }

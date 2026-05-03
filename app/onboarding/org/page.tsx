@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
@@ -9,7 +9,7 @@ const ORG_TYPES = [
     { value: "company", label: "Company / Agency", description: "Businesses, recruitment agencies, or commercial organizations" },
 ];
 
-export default function OrgOnboardingPage() {
+function OrgOnboardingContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const isEdit = searchParams.get("edit") === "1";
@@ -132,5 +132,17 @@ export default function OrgOnboardingPage() {
                 </form>
             </div>
         </main>
+    );
+}
+
+export default function OrgOnboardingPage() {
+    return (
+        <Suspense fallback={
+            <main className="min-h-screen flex items-center justify-center bg-black">
+                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </main>
+        }>
+            <OrgOnboardingContent />
+        </Suspense>
     );
 }
