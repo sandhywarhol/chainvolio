@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import ProblemCardEffect from "./ProblemCardEffect";
 import {
     ArrowRight,
     CheckCircle2,
@@ -1235,14 +1236,10 @@ export function LandingPageClient() {
                         <div className="grid grid-cols-1 md:grid-cols-3">
                             {/* Card 1 */}
                             <div className="space-y-12 group pr-16 pb-16 md:pb-0">
-                                <div className="h-[300px] relative flex items-center justify-center">
-                                     <Image
-                                        src="/homepage/Broken%20Work%20History.png"
-                                        alt="Broken Work History"
-                                        fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
-                                     />
-                                </div>
+                                <ProblemCardEffect
+                                    src="/homepage/Broken%20Work%20History.png"
+                                    alt="Broken Work History"
+                                />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
@@ -1253,14 +1250,10 @@ export function LandingPageClient() {
 
                             {/* Card 2 */}
                             <div className="space-y-12 group px-16 border-l border-white/[0.05] pb-16 md:pb-0">
-                                <div className="h-[300px] relative flex items-center justify-center">
-                                     <Image
-                                        src="/homepage/Unverifiable%20Resumes.png"
-                                        alt="Unverifiable Resumes"
-                                        fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
-                                     />
-                                </div>
+                                <ProblemCardEffect
+                                    src="/homepage/Unverifiable%20Resumes.png"
+                                    alt="Unverifiable Resumes"
+                                />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
@@ -1271,14 +1264,10 @@ export function LandingPageClient() {
 
                             {/* Card 3 */}
                             <div className="space-y-12 group pl-16 border-l border-white/[0.05]">
-                                <div className="h-[300px] relative flex items-center justify-center">
-                                     <Image
-                                        src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
-                                        alt="Signal Lost in Noise"
-                                        fill
-                                        className="object-contain transition-all duration-700 opacity-100 group-hover:scale-105 mix-blend-screen"
-                                     />
-                                </div>
+                                <ProblemCardEffect
+                                    src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
+                                    alt="Signal Lost in Noise"
+                                />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
