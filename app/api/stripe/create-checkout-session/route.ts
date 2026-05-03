@@ -8,6 +8,9 @@ const err = (code: string, message: string, status = 400) =>
     NextResponse.json({ ok: false, error: { code, message } }, { status });
 
 export async function POST(request: Request) {
+    // Temporarily disabled as per user request
+    return err("ERR_DISABLED", "Payment services are currently under maintenance. Please try again later.", 503);
+
     if (!supabase) return err("ERR_CONFIG", "Service unavailable", 503);
 
     // Verify JWT

@@ -411,11 +411,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           {isGooglePath ? (
             isPaidPlan ? (
               <button
-                onClick={handleManageSubscription}
-                disabled={managingSubscription}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium transition-colors disabled:opacity-50"
+                disabled={true}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 text-xs font-medium cursor-not-allowed opacity-50"
+                title="Billing management is currently under maintenance"
               >
-                {managingSubscription ? "Loading..." : "Manage Subscription"}
+                Billing Unavailable
               </button>
             ) : null
           ) : profile.isVerified ? (

@@ -299,26 +299,19 @@ export default function RecruiterPricingPage() {
                                     {/* CTA */}
                                     <button
                                         onClick={() => handleSubscribe(tier.id)}
-                                        disabled={isCurrent || isLoading || loading}
+                                        disabled={true}
                                         className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all flex items-center justify-center gap-2 ${
-                                            isCurrent
+                                            isCurrent || tier.id === "free"
                                                 ? "bg-slate-800 text-slate-500 cursor-default border border-slate-700"
-                                                : tier.id === "free"
-                                                ? "bg-white/5 hover:bg-white/10 text-white/70 border border-white/10"
-                                                : "bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                                                : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
                                         }`}
-                                        style={(!isCurrent && tier.id !== "free") ? { background: col.hex, color: "black", border: "none" } : undefined}
                                     >
                                         {isLoading ? (
                                             <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                                        ) : isCurrent ? (
+                                        ) : isCurrent || tier.id === "free" ? (
                                             "Current Plan"
-                                        ) : tier.id === "free" ? (
-                                            "Current Plan" // Assuming they are free initially or they can't downgrade to free from here
-                                        ) : !session ? (
-                                            <><Zap className="w-4 h-4" /> Sign In to Subscribe</>
                                         ) : (
-                                            <><Zap className="w-4 h-4" /> Subscribe — {tier.price}{tier.billing}</>
+                                            <><Zap className="w-4 h-4" /> Coming Soon</>
                                         )}
                                     </button>
                                 </div>

@@ -6,6 +6,9 @@ const err = (code: string, message: string, status = 400) =>
     NextResponse.json({ ok: false, error: { code, message } }, { status });
 
 export async function POST(request: Request) {
+    // Temporarily disabled as per user request
+    return err("ERR_DISABLED", "Billing management is currently under maintenance. Please try again later.", 503);
+
     if (!supabase) return err("ERR_CONFIG", "Service unavailable", 503);
 
     const token = request.headers.get("Authorization")?.replace("Bearer ", "").trim();
