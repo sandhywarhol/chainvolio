@@ -25,7 +25,11 @@ export function useWalletConnect() {
     const { select, connect, wallet, wallets, connecting, connected, publicKey } = useWallet();
     const [isConnecting, setIsConnecting] = useState(false);
     const [pendingWallet, setPendingWallet] = useState<string | null>(null);
+    const [connectionError, setConnectionError] = useState<string | null>(null);
     const connectingRef = useRef(false);
+    // Ref to the current connect fn so the retry closure always calls the latest version
+    const connectRef = useRef(connect);
+    useEffect(() => { connectRef.current = connect; }, [connect]);
 
     // Step 2: React has re-rendered with the new adapter — now call connect()
     useEffect(() => {
@@ -36,16 +40,37 @@ export function useWalletConnect() {
             if (connectingRef.current) return;
             connectingRef.current = true;
             setIsConnecting(true);
+            setConnectionError(null);
             try {
-                await connect();
+                await connectRef.current();
                 localStorage.removeItem("cv_connecting");
             } catch (err: any) {
-                if (
-                    err?.name !== "WalletWindowClosedError" &&
-                    err?.name !== "WalletConnectionError"
-                ) {
+                const msg: string = err?.message ?? "";
+                // User closed the popup — silent, not an error
+                if (err?.name === "WalletWindowClosedError") return;
+
+                // Chrome suspended the extension's MV3 service worker.
+                // Sending the failed message wakes it up — retry once after a short delay.
+                if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
+                    connectingRef.current = false;
+                    await new Promise(r => setTimeout(r, 900));
+                    try {
+                        await connectRef.current();
+                        localStorage.removeItem("cv_connecting");
+                        // Retry succeeded — fall through to finally without setting error
+                        return;
+                    } catch {
+                        // Retry also failed — give up and show error
+                        setConnectionError("extension_dead");
+                        return;
+                    }
+                }
+
+                // Any other unexpected error
+                if (err?.name !== "WalletConnectionError") {
                     console.error("[WalletConnect] Failed:", err);
                 }
+                setConnectionError("unknown");
             } finally {
                 setIsConnecting(false);
                 connectingRef.current = false;
@@ -54,7 +79,7 @@ export function useWalletConnect() {
         };
 
         doConnect();
-    }, [wallet, pendingWallet, connect]);
+    }, [wallet, pendingWallet]);
 
     const connectWallet = useCallback(
         async (walletName: string, isMobile = false) => {
@@ -99,5 +124,6 @@ export function useWalletConnect() {
         isConnecting: isConnecting || connecting,
         connected,
         publicKey,
+        connectionError,
     };
 }

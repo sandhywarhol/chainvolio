@@ -26,6 +26,7 @@ export default function OrgEditProfileWalletPage() {
     const searchParams = useSearchParams();
     const presetOrgType = searchParams.get("type"); // "company" | "community" — set by recruiter modal flow
     const { publicKey, connected, signMessage } = useWallet();
+    const [walletReady, setWalletReady] = useState(false);
     const [profileExists, setProfileExists] = useState(false);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -45,6 +46,9 @@ export default function OrgEditProfileWalletPage() {
         telegram: "",
         country: "",
     });
+
+    // Wallet adapter hydrates client-side — wait one tick before showing the gate
+    useEffect(() => { setWalletReady(true); }, []);
 
     useEffect(() => {
         if (!publicKey) return;
@@ -180,6 +184,14 @@ export default function OrgEditProfileWalletPage() {
             setSaving(false);
         }
     };
+
+    if (!walletReady) {
+        return (
+            <main className="min-h-screen flex items-center justify-center bg-black">
+                <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
+            </main>
+        );
+    }
 
     if (!connected || !publicKey) {
         return (

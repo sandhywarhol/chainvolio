@@ -33,8 +33,8 @@ const ORG_TYPES = [
 
 export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const router = useRouter();
-    const { wallets, connected } = useWallet();
-    const { connectWallet } = useWalletConnect();
+    const { wallets, connected, publicKey, disconnect } = useWallet();
+    const { connectWallet, connectionError } = useWalletConnect();
     const { signInWithGoogle } = useGoogleAuth();
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
@@ -69,52 +69,58 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         }
     }, [isOpen]);
 
-    // Handle wallet connection completion
+    // Detects when the wallet extension fails silently (e.g. Chrome suspended its service worker).
+    // Without this, loadingKey stays set and the spinner hangs forever.
     useEffect(() => {
-        if (connected && isOpen && !loadingKey) {
-            const verifyAndReload = async () => {
-                const address = useWallet.getState?.().publicKey?.toBase58() || wallets.find(w => w.adapter.connected)?.adapter.publicKey?.toBase58();
-                
-                if (address) {
-                    const mode = recruiterModeRef.current ? 'recruiter' : 'builder';
-                    const res = await fetch(`/api/check-wallet?wallet=${address}&mode=${mode}`);
-                    const check = await res.json();
-                    
-                    if (check.allowed === false) {
-                        setToast({ message: check.reason, type: "error" });
-                        const { disconnect } = useWallet.getState?.() || {};
-                        if (disconnect) disconnect();
-                        return;
-                    }
-                }
-                
-                window.location.reload();
-            };
-            
-            verifyAndReload();
+        if (!connectionError || !loadingKey) return;
+        if (connectionError === "extension_dead") {
+            const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
+            setToast({
+                message: `${walletName} extension is not responding. Click the ${walletName} icon in your browser toolbar to wake it up, then try again.`,
+                type: "error",
+            });
+        } else {
+            setToast({ message: "Connection failed. Please try again.", type: "error" });
+        }
+        setLoadingKey(null);
+    }, [connectionError, loadingKey]);
+
+    // Fires when a new wallet connection completes.
+    // loadingKey guard prevents this from firing when a returning user opens the modal while already connected.
+    useEffect(() => {
+        if (!connected || !isOpen || step !== "select" || !loadingKey) return;
+
+        if (recruiterModeRef.current) {
+            setLoadingKey(null);
+            setStep("org-type");
             return;
         }
-    }, [connected, isOpen, wallets, loadingKey]);
 
-    useEffect(() => {
-        if (connected && isOpen && step === "select") {
-            if (recruiterModeRef.current) {
-                setStep("org-type");
-            } else {
-                // Pre-check for Builder to avoid accidental login
-                const verifyBuilder = async () => {
-                   const address = wallets.find(w => w.adapter.connected)?.adapter.publicKey?.toBase58();
-                   if (address) {
-                       const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
-                       const check = await res.json();
-                       if (check.allowed === false) return; // verifyAndReload will handle toast/disconnect
-                   }
-                   onClose();
-                };
-                verifyBuilder();
+        const handleConnected = async () => {
+            const address = publicKey?.toBase58();
+            if (address) {
+                try {
+                    const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
+                    const check = await res.json();
+                    if (check.allowed === false) {
+                        setToast({ message: check.reason, type: "error" });
+                        disconnect();
+                        setLoadingKey(null);
+                        return;
+                    }
+                } catch {
+                    // Allow on API error — don't block login
+                }
             }
-        }
-    }, [connected, isOpen, step, wallets]);
+            setLoadingKey(null);
+            onClose();
+            router.refresh();
+        };
+
+        handleConnected();
+    // onClose and router are stable refs — intentionally omitted from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connected, isOpen, step, loadingKey, publicKey, disconnect]);
 
     if (!mounted || !isOpen) return null;
 
@@ -146,11 +152,17 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             const address = targetWallet?.adapter.publicKey?.toBase58();
 
             if (address) {
+                // Wallet already connected — verify then close directly
                 const allowed = await checkRoleAllowed(address, 'builder');
                 if (!allowed) return;
+                setLoadingKey(null);
+                onClose();
+                router.refresh();
+                return;
             }
 
             await connectWallet(walletName, isMobile);
+            // The useEffect above takes over once `connected` becomes true
         } catch (error) {
             console.error("Connection failed", error);
             setLoadingKey(null);
@@ -166,11 +178,16 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             const address = targetWallet?.adapter.publicKey?.toBase58();
 
             if (address) {
+                // Wallet already connected — verify then proceed to org-type step directly
                 const allowed = await checkRoleAllowed(address, 'recruiter');
                 if (!allowed) return;
+                setLoadingKey(null);
+                setStep("org-type");
+                return;
             }
 
             await connectWallet(walletName, isMobile);
+            // The useEffect above takes over once `connected` becomes true
         } catch (error) {
             console.error("Connection failed", error);
             recruiterModeRef.current = false;
@@ -184,9 +201,8 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleOrgTypeConfirm = () => {
         if (!selectedOrgType) return;
-        setLoadingKey("confirm-org");
+        onClose();
         router.push(`/org/edit-profile-wallet?type=${selectedOrgType}`);
-        // Page navigation will handle the "loading" feel
     };
 
     const handleGoogleSignIn = async () => {
@@ -259,17 +275,11 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
                         <button
                             onClick={handleOrgTypeConfirm}
-                            disabled={!selectedOrgType || loadingKey === "confirm-org"}
+                            disabled={!selectedOrgType}
                             className="w-full mt-2 py-3.5 rounded-[18px] bg-teal-500 hover:bg-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                         >
-                            {loadingKey === "confirm-org" ? (
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <>
-                                    Continue to Profile Setup
-                                    <ChevronRight className="w-4 h-4" />
-                                </>
-                            )}
+                            Continue to Profile Setup
+                            <ChevronRight className="w-4 h-4" />
                         </button>
 
                         <button
