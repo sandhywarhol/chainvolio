@@ -14,7 +14,7 @@ import {
 const mockReceipts = [
     {
         id: "1", role: "Senior Protocol Engineer", org: "Nexus Protocol",
-        dateRange: "Jan 2024 – Mar 2025 · 1y 3m", status: "Attested",
+        dateRange: "Jan 2024 – Mar 2025, 1y 3m", status: "Attested",
         attesterInitials: "MC", attesterName: "Marcus Chen", attesterRole: "CTO",
         desc: "Core systems development and parallel transaction optimization for the Nexus mainnet.",
         impact: ["Reduced tx latency 40%", "Shipped 3 mainnet upgrades"],
@@ -22,7 +22,7 @@ const mockReceipts = [
     },
     {
         id: "2", role: "Smart Contract Auditor", org: "Apex Security Guild",
-        dateRange: "Jun 2023 – Dec 2023 · 7m", status: "Attested",
+        dateRange: "Jun 2023 – Dec 2023, 7m", status: "Attested",
         attesterInitials: "SK", attesterName: "Sarah Kim", attesterRole: "Lead Auditor",
         desc: "Security audit of DeFi protocol suite. Identified 3 critical vulnerabilities.",
         impact: ["Found 3 critical vulns", "Audited $200M TVL"],
@@ -579,7 +579,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
                     <div className="space-y-6 max-w-2xl">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                            <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WEB3 RESUME</span>
+                            <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WEB3 RESUME</span>
                         </div>
                         <div className="space-y-3">
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">What is a Web3 Resume?</p>
@@ -613,7 +613,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
                     {/* Foreground: CV Card floating on top */}
-                    <div className="absolute inset-0 flex items-center justify-center z-20 px-6 pointer-events-none">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-6">
                         <motion.div
                             initial={{ opacity: 0, y: 32, scale: 0.97 }}
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -623,6 +623,21 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         >
                             <PublicCVCardMockup />
                         </motion.div>
+
+                        {/* View Live CV button — floats directly below the card */}
+                        <motion.a
+                            href="https://www.chainvolio.xyz/vivian-maier/27"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, y: 8 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+                            className="pointer-events-auto group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-white/10 bg-black/40 backdrop-blur-sm hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200"
+                        >
+                            <span className="text-xs font-bold text-white/50 group-hover:text-white/90 transition-colors uppercase tracking-[0.18em]">View Live CV</span>
+                            <ExternalLink className="w-3 h-3 text-white/30 group-hover:text-white/70 transition-colors" />
+                        </motion.a>
                     </div>
                 </div>
 

@@ -29,11 +29,7 @@ export function Footer() {
                         </div>
                     </div>
 
-                    {/* Subtitle (Center on Desktop, 1st on Mobile) */}
                     <div className="flex flex-col items-center gap-1 w-full md:w-1/3 text-center order-1 md:order-2">
-                        <p className="text-white/20 md:text-white/40 text-[8px] md:text-[10px] uppercase tracking-[0.2em] whitespace-nowrap">
-                            Built on Solana · Permissionless · No token required
-                        </p>
                     </div>
 
                     {/* Terms & Privacy (Right on Desktop, 2nd on Mobile) */}
@@ -90,11 +86,7 @@ export function Footer() {
                         </a>
                     </div>
 
-                    {/* CENTER Column: Branding & Legal */}
                     <div className="flex flex-col items-center gap-2 w-1/3 text-center">
-                        <p className="text-white/40 text-[9px] uppercase tracking-[0.2em] whitespace-nowrap">
-                            Built on Solana, Permissionless, No Token Required
-                        </p>
                         {/* Legal Links */}
                         <div className="flex items-center gap-4 text-[9px] font-semibold text-white/30">
                             <Link href="/terms" className="hover:text-white/80 transition-colors">Terms of Service</Link>

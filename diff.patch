@@ -1,0 +1,516 @@
+﻿diff --git a/components/landing/LandingPageClient.tsx b/components/landing/LandingPageClient.tsx
+index ee7ff9b..47280b0 100644
+--- a/components/landing/LandingPageClient.tsx
++++ b/components/landing/LandingPageClient.tsx
+@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
+ import Link from "next/link";
+ import Image from "next/image";
+ import { motion } from "framer-motion";
+-import ProblemCardEffect from "./ProblemCardEffect";
++import ProblemVideoCard from "./ProblemVideoCard";
+ import {
+     ArrowRight,
+     CheckCircle2,
+@@ -252,8 +252,8 @@ function MockProfileUI() {
+             {/* 1. Sidebar (Linear Style) */}
+             <div className="w-64 border-r border-white/5 bg-white/[0.01] p-6 flex flex-col gap-8">
+                 <div className="flex items-center gap-3">
+-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 p-0.5">
+-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded-lg grayscale" />
++                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
++                        <span className="text-xs font-bold text-white/50">AR</span>
+                     </div>
+                     <div className="flex flex-col">
+                         <span className="font-bold text-white/90 tracking-tight">Alex Rivera</span>
+@@ -752,8 +752,8 @@ function FloatingVerificationCard() {
+             {/* Card Body */}
+             <div className="p-6 space-y-6">
+                 <div className="flex items-center gap-4">
+-                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 p-0.5">
+-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded grayscale" />
++                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
++                        <span className="text-sm font-bold text-white/40">AR</span>
+                     </div>
+                     <div className="space-y-0.5">
+                         <h4 className="text-sm font-bold text-white">Alex Rivera</h4>
+@@ -1029,6 +1029,307 @@ const SLIDES = [
+     { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification status" },
+ ];
+ 
++// ΓöÇΓöÇΓöÇ Competitive Network Diagram (PCB / Circuit Board style) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++
++const PCB_LEFT: { label: string; sub: string; color: string }[] = [
++    { label: "DAO Work",             sub: "On-chain contributions",  color: "#a78bfa" },
++    { label: "Grant Delivery",       sub: "Superteam ┬╖ Solana Fnd.", color: "#60a5fa" },
++    { label: "Smart Contract Audit", sub: "Security verified",       color: "#f59e0b" },
++    { label: "Protocol Engineering", sub: "Core infrastructure",     color: "#14F195" },
++    { label: "Open Source Work",     sub: "GitHub ┬╖ Colosseum",      color: "#34d399" },
++];
++const PCB_RIGHT: { label: string; sub: string; color: string }[] = [
++    { label: "Recruiter",       sub: "Instant verified hire",  color: "#14F195" },
++    { label: "On-Chain Proof",  sub: "Permanent attestation",  color: "#60a5fa" },
++    { label: "Trust Score",     sub: "Automated signal",       color: "#9945FF" },
++    { label: "Public Profile",  sub: "Shareable everywhere",   color: "#f59e0b" },
++    { label: "DAO / Protocol",  sub: "Credentialed access",    color: "#a78bfa" },
++];
++const SVW = 1100, SVH = 512, SCY = 256;
++const CHIP_X = 470, CHIP_Y = 206, CHIP_W = 160, CHIP_H = 100;
++const L_BUS = 370, R_BUS = 730;
++const L_NX  = 182, R_NX  = 918;
++const N_YS  = [66, 161, 256, 351, 446];
++const lpp = (i: number) => {
++    const y = N_YS[i];
++    return `M ${L_NX} ${y} L ${L_BUS} ${y} L ${L_BUS} ${SCY} L ${CHIP_X} ${SCY}`;
++};
++const rpp = (i: number) => {
++    const y = N_YS[i];
++    return `M ${CHIP_X + CHIP_W} ${SCY} L ${R_BUS} ${SCY} L ${R_BUS} ${y} L ${R_NX} ${y}`;
++};
++
++function CompetitiveNetworkDiagram() {
++    const [active, setActive] = useState(false);
++    const svgRef = useRef<SVGSVGElement>(null);
++
++    useEffect(() => {
++        const el = svgRef.current;
++        if (!el) return;
++        const obs = new IntersectionObserver(
++            ([e]) => { if (e.isIntersecting) setActive(true); },
++            { threshold: 0.15 }
++        );
++        obs.observe(el);
++        return () => obs.disconnect();
++    }, []);
++
++    const pinYs = [CHIP_Y + 14, CHIP_Y + 34, CHIP_Y + 66, CHIP_Y + 86];
++
++    return (
++        <svg ref={svgRef} viewBox={`0 0 ${SVW} ${SVH}`} width="100%" height="auto"
++            className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
++
++            <defs>
++                <radialGradient id="pcb-glow" cx="50%" cy="50%" r="50%">
++                    <stop offset="0%"   stopColor="#14F195" stopOpacity="0.12" />
++                    <stop offset="55%"  stopColor="#9945FF" stopOpacity="0.04" />
++                    <stop offset="100%" stopColor="#000000" stopOpacity="0" />
++                </radialGradient>
++                {PCB_LEFT.map((_, i) => (
++                    <path key={`ldef${i}`} id={`lpp${i}`} d={lpp(i)} fill="none" />
++                ))}
++                {PCB_RIGHT.map((_, i) => (
++                    <path key={`rdef${i}`} id={`rpp${i}`} d={rpp(i)} fill="none" />
++                ))}
++            </defs>
++
++            {/* ΓöÇΓöÇ Column labels ΓöÇΓöÇ */}
++            <text x={91} y={22} textAnchor="middle" fill="rgba(255,255,255,0.18)"
++                fontSize={10} fontWeight={700} letterSpacing={3} fontFamily="Inter,sans-serif">YOUR WORK</text>
++            <text x={SVW - 91} y={22} textAnchor="middle" fill="rgba(255,255,255,0.18)"
++                fontSize={10} fontWeight={700} letterSpacing={3} fontFamily="Inter,sans-serif">VERIFIED OUTPUT</text>
++
++            {/* ΓöÇΓöÇ Dim base traces (always visible) ΓöÇΓöÇ */}
++            {N_YS.map((y, i) => (
++                <g key={`bt${i}`}>
++                    <line x1={L_NX} y1={y} x2={L_BUS} y2={y}
++                        stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++                    <line x1={R_BUS} y1={y} x2={R_NX} y2={y}
++                        stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++                </g>
++            ))}
++            <line x1={L_BUS} y1={N_YS[0]} x2={L_BUS} y2={N_YS[4]}
++                stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++            <line x1={R_BUS} y1={N_YS[0]} x2={R_BUS} y2={N_YS[4]}
++                stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++            <line x1={L_BUS} y1={SCY} x2={CHIP_X} y2={SCY}
++                stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++            <line x1={CHIP_X + CHIP_W} y1={SCY} x2={R_BUS} y2={SCY}
++                stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 7" />
++
++            {/* ΓöÇΓöÇ Animated glow traces (draw-in on scroll entry) ΓöÇΓöÇ */}
++            {PCB_LEFT.map((n, i) => (
++                <motion.path key={`lg${i}`}
++                    d={`M ${L_NX} ${N_YS[i]} L ${L_BUS} ${N_YS[i]}`}
++                    fill="none" stroke={n.color + "55"} strokeWidth={1.5}
++                    initial={{ pathLength: 0, opacity: 0 }}
++                    animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                    transition={{ duration: 0.55, delay: 0.15 + i * 0.1, ease: "easeOut" }}
++                />
++            ))}
++            <motion.path d={`M ${L_BUS} ${N_YS[0]} L ${L_BUS} ${N_YS[4]}`}
++                fill="none" stroke="rgba(20,241,149,0.32)" strokeWidth={1.5}
++                initial={{ pathLength: 0, opacity: 0 }}
++                animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                transition={{ duration: 0.7, delay: 0.8, ease: "easeOut" }}
++            />
++            <motion.path d={`M ${L_BUS} ${SCY} L ${CHIP_X} ${SCY}`}
++                fill="none" stroke="rgba(20,241,149,0.65)" strokeWidth={2}
++                initial={{ pathLength: 0, opacity: 0 }}
++                animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                transition={{ duration: 0.4, delay: 1.0, ease: "easeOut" }}
++            />
++            <motion.path d={`M ${CHIP_X + CHIP_W} ${SCY} L ${R_BUS} ${SCY}`}
++                fill="none" stroke="rgba(153,69,255,0.65)" strokeWidth={2}
++                initial={{ pathLength: 0, opacity: 0 }}
++                animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                transition={{ duration: 0.4, delay: 1.1, ease: "easeOut" }}
++            />
++            <motion.path d={`M ${R_BUS} ${N_YS[0]} L ${R_BUS} ${N_YS[4]}`}
++                fill="none" stroke="rgba(153,69,255,0.32)" strokeWidth={1.5}
++                initial={{ pathLength: 0, opacity: 0 }}
++                animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                transition={{ duration: 0.7, delay: 1.25, ease: "easeOut" }}
++            />
++            {PCB_RIGHT.map((n, i) => (
++                <motion.path key={`rg${i}`}
++                    d={`M ${R_BUS} ${N_YS[i]} L ${R_NX} ${N_YS[i]}`}
++                    fill="none" stroke={n.color + "55"} strokeWidth={1.5}
++                    initial={{ pathLength: 0, opacity: 0 }}
++                    animate={active ? { pathLength: 1, opacity: 1 } : {}}
++                    transition={{ duration: 0.55, delay: 1.45 + i * 0.1, ease: "easeOut" }}
++                />
++            ))}
++
++            {/* ΓöÇΓöÇ Junction pads where branches meet bus rails ΓöÇΓöÇ */}
++            {N_YS.map((y, i) => (
++                <g key={`jp${i}`}>
++                    <motion.rect x={L_BUS - 4} y={y - 4} width={8} height={8}
++                        fill={PCB_LEFT[i].color} opacity={0}
++                        animate={active ? { opacity: 0.75 } : {}}
++                        transition={{ duration: 0.2, delay: 0.80 + i * 0.05 }}
++                    />
++                    <motion.rect x={R_BUS - 4} y={y - 4} width={8} height={8}
++                        fill={PCB_RIGHT[i].color} opacity={0}
++                        animate={active ? { opacity: 0.75 } : {}}
++                        transition={{ duration: 0.2, delay: 1.25 + i * 0.05 }}
++                    />
++                </g>
++            ))}
++            {/* Trunk / bus junction pads (larger) */}
++            <motion.rect x={L_BUS - 5} y={SCY - 5} width={10} height={10}
++                fill="#14F195" opacity={0}
++                animate={active ? { opacity: 1 } : {}}
++                transition={{ duration: 0.2, delay: 0.98 }}
++            />
++            <motion.rect x={R_BUS - 5} y={SCY - 5} width={10} height={10}
++                fill="#9945FF" opacity={0}
++                animate={active ? { opacity: 1 } : {}}
++                transition={{ duration: 0.2, delay: 1.22 }}
++            />
++
++            {/* ΓöÇΓöÇ Data packets traveling along orthogonal traces ΓöÇΓöÇ */}
++            {active && PCB_LEFT.map((n, i) => (
++                <rect key={`lpt${i}`} x="-2" y="-2" width={4} height={4}
++                    fill={n.color} style={{ filter: `drop-shadow(0 0 4px ${n.color})` }}>
++                    <animateMotion dur={`${2.1 + i * 0.28}s`}
++                        repeatCount="indefinite" begin={`${0.5 + i * 0.3}s`}>
++                        <mpath xlinkHref={`#lpp${i}`} />
++                    </animateMotion>
++                </rect>
++            ))}
++            {active && PCB_RIGHT.map((n, i) => (
++                <rect key={`rpt${i}`} x="-2" y="-2" width={4} height={4}
++                    fill={n.color} style={{ filter: `drop-shadow(0 0 4px ${n.color})` }}>
++                    <animateMotion dur={`${2.1 + i * 0.28}s`}
++                        repeatCount="indefinite" begin={`${1.05 + i * 0.3}s`}>
++                        <mpath xlinkHref={`#rpp${i}`} />
++                    </animateMotion>
++                </rect>
++            ))}
++
++            {/* ΓöÇΓöÇ Left node blocks ΓöÇΓöÇ */}
++            {PCB_LEFT.map((n, i) => (
++                <motion.g key={`ln${i}`}
++                    initial={{ opacity: 0, x: -18 }}
++                    animate={active ? { opacity: 1, x: 0 } : {}}
++                    transition={{ duration: 0.45, delay: i * 0.08 }}>
++                    <rect x={2} y={N_YS[i] - 25} width={175} height={50} rx={2}
++                        fill="#0b0b0b" stroke={n.color + "2a"} strokeWidth={1} />
++                    <rect x={5} y={N_YS[i] - 22} width={169} height={44} rx={1}
++                        fill="none" stroke={n.color + "12"} strokeWidth={0.5} />
++                    <rect x={14} y={N_YS[i] - 5} width={5} height={10} rx={1}
++                        fill={n.color} opacity={0.70} />
++                    <text x={28} y={N_YS[i] - 5} fill="rgba(255,255,255,0.82)"
++                        fontSize={11} fontWeight={600} fontFamily="Inter,sans-serif">{n.label}</text>
++                    <text x={28} y={N_YS[i] + 11} fill="rgba(255,255,255,0.28)"
++                        fontSize={9} fontFamily="Inter,sans-serif">{n.sub}</text>
++                    {/* Connector pad at trace start */}
++                    <rect x={L_NX - 4} y={N_YS[i] - 3} width={8} height={6}
++                        fill={n.color} opacity={0.45} />
++                </motion.g>
++            ))}
++
++            {/* ΓöÇΓöÇ Right node blocks ΓöÇΓöÇ */}
++            {PCB_RIGHT.map((n, i) => (
++                <motion.g key={`rn${i}`}
++                    initial={{ opacity: 0, x: 18 }}
++                    animate={active ? { opacity: 1, x: 0 } : {}}
++                    transition={{ duration: 0.45, delay: 0.45 + i * 0.08 }}>
++                    <rect x={R_NX} y={N_YS[i] - 25} width={175} height={50} rx={2}
++                        fill="#0b0b0b" stroke={n.color + "2a"} strokeWidth={1} />
++                    <rect x={R_NX + 3} y={N_YS[i] - 22} width={169} height={44} rx={1}
++                        fill="none" stroke={n.color + "12"} strokeWidth={0.5} />
++                    <rect x={R_NX + 14} y={N_YS[i] - 5} width={5} height={10} rx={1}
++                        fill={n.color} opacity={0.70} />
++                    <text x={R_NX + 28} y={N_YS[i] - 5} fill="rgba(255,255,255,0.82)"
++                        fontSize={11} fontWeight={600} fontFamily="Inter,sans-serif">{n.label}</text>
++                    <text x={R_NX + 28} y={N_YS[i] + 11} fill="rgba(255,255,255,0.28)"
++                        fontSize={9} fontFamily="Inter,sans-serif">{n.sub}</text>
++                    <rect x={R_NX - 4} y={N_YS[i] - 3} width={8} height={6}
++                        fill={n.color} opacity={0.45} />
++                </motion.g>
++            ))}
++
++            {/* ΓöÇΓöÇ Center IC chip ΓöÇΓöÇ */}
++            <motion.g
++                initial={{ opacity: 0, scale: 0.88 }}
++                animate={active ? { opacity: 1, scale: 1 } : {}}
++                style={{ transformOrigin: `${CHIP_X + CHIP_W / 2}px ${CHIP_Y + CHIP_H / 2}px` }}
++                transition={{ duration: 0.6, delay: 0.9 }}>
++
++                {/* Ambient glow blob */}
++                <circle cx={CHIP_X + CHIP_W / 2} cy={CHIP_Y + CHIP_H / 2} r={88}
++                    fill="url(#pcb-glow)" />
++
++                {/* Pin stubs ΓÇö left side */}
++                {pinYs.map((py, j) => (
++                    <g key={`lpin${j}`}>
++                        <rect x={CHIP_X - 12} y={py - 3} width={12} height={6}
++                            fill="#111" stroke="rgba(20,241,149,0.28)" strokeWidth={0.75} />
++                        <rect x={CHIP_X - 4} y={py - 1} width={4} height={2}
++                            fill="#14F195" opacity={0.4} />
++                    </g>
++                ))}
++
++                {/* Pin stubs ΓÇö right side */}
++                {pinYs.map((py, j) => (
++                    <g key={`rpin${j}`}>
++                        <rect x={CHIP_X + CHIP_W} y={py - 3} width={12} height={6}
++                            fill="#111" stroke="rgba(153,69,255,0.28)" strokeWidth={0.75} />
++                        <rect x={CHIP_X + CHIP_W + 8} y={py - 1} width={4} height={2}
++                            fill="#9945FF" opacity={0.4} />
++                    </g>
++                ))}
++
++                {/* Chip body ΓÇö outer border */}
++                <rect x={CHIP_X} y={CHIP_Y} width={CHIP_W} height={CHIP_H} rx={2}
++                    fill="#060606" stroke="rgba(255,255,255,0.20)" strokeWidth={1.5} />
++                {/* Chip body ΓÇö inner frame */}
++                <rect x={CHIP_X + 6} y={CHIP_Y + 6} width={CHIP_W - 12} height={CHIP_H - 12} rx={1}
++                    fill="none" stroke="rgba(20,241,149,0.08)" strokeWidth={0.75} />
++
++                {/* IC reference designator */}
++                <text x={CHIP_X + 8} y={CHIP_Y + 13}
++                    fill="rgba(255,255,255,0.15)" fontSize={7}
++                    fontFamily="monospace" letterSpacing={1}>U1</text>
++
++                {/* IC orientation notch */}
++                <circle cx={CHIP_X + 13} cy={CHIP_Y + 9} r={4}
++                    fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth={0.75} />
++
++                {/* Trunk entry pads at chip edges */}
++                <rect x={CHIP_X - 2} y={SCY - 4} width={9} height={8}
++                    fill="#14F195" opacity={0.75} />
++                <rect x={CHIP_X + CHIP_W - 7} y={SCY - 4} width={9} height={8}
++                    fill="#9945FF" opacity={0.75} />
++
++                {/* Logo */}
++                <image href="/logo.png"
++                    x={CHIP_X + CHIP_W / 2 - 18} y={CHIP_Y + CHIP_H / 2 - 22}
++                    width={36} height={36} opacity={0.90} />
++
++                {/* Labels */}
++                <text x={CHIP_X + CHIP_W / 2} y={CHIP_Y + CHIP_H / 2 + 24}
++                    textAnchor="middle" fill="rgba(255,255,255,0.65)"
++                    fontSize={10} fontWeight={700} letterSpacing={2.5} fontFamily="Inter,sans-serif">CHAINVOLIO</text>
++                <text x={CHIP_X + CHIP_W / 2} y={CHIP_Y + CHIP_H / 2 + 37}
++                    textAnchor="middle" fill="rgba(255,255,255,0.20)"
++                    fontSize={8} letterSpacing={1.5} fontFamily="Inter,sans-serif">Trust Layer</text>
++
++                {/* Pulsing inner highlight */}
++                <motion.rect x={CHIP_X + 20} y={CHIP_Y + 20} width={CHIP_W - 40} height={CHIP_H - 40} rx={1}
++                    fill="none" stroke="rgba(20,241,149,0.15)" strokeWidth={1}
++                    animate={{ opacity: [0.15, 0.45, 0.15] }}
++                    transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
++                />
++            </motion.g>
++
++        </svg>
++    );
++}
++
+ // PARTNERS are now loaded dynamically from /api/logos
+ 
+ export function LandingPageClient() {
+@@ -1097,10 +1398,11 @@ export function LandingPageClient() {
+                 {/* Background Video */}
+                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                     <video 
+-                        autoPlay 
+-                        muted 
+-                        loop 
+-                        playsInline 
++                        autoPlay
++                        muted
++                        loop
++                        playsInline
++                        preload="metadata"
+                         className="absolute inset-0 w-full h-full object-cover opacity-20 scale-105"
+                     >
+                         <source src="/video-background.mp4" type="video/mp4" />
+@@ -1236,9 +1538,9 @@ export function LandingPageClient() {
+                         <div className="grid grid-cols-1 md:grid-cols-3">
+                             {/* Card 1 */}
+                             <div className="space-y-12 group pr-16 pb-16 md:pb-0">
+-                                <ProblemCardEffect
+-                                    src="/homepage/Broken%20Work%20History.png"
+-                                    alt="Broken Work History"
++                                <ProblemVideoCard
++                                    idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=5"
++                                    hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=5"
+                                 />
+                                 <div className="space-y-4 text-center">
+                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
+@@ -1250,9 +1552,9 @@ export function LandingPageClient() {
+ 
+                             {/* Card 2 */}
+                             <div className="space-y-12 group px-16 border-l border-white/[0.05] pb-16 md:pb-0">
+-                                <ProblemCardEffect
+-                                    src="/homepage/Unverifiable%20Resumes.png"
+-                                    alt="Unverifiable Resumes"
++                                <ProblemVideoCard
++                                    idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
++                                    hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
+                                 />
+                                 <div className="space-y-4 text-center">
+                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
+@@ -1264,9 +1566,9 @@ export function LandingPageClient() {
+ 
+                             {/* Card 3 */}
+                             <div className="space-y-12 group pl-16 border-l border-white/[0.05]">
+-                                <ProblemCardEffect
+-                                    src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
+-                                    alt="Signal Lost in Noise"
++                                <ProblemVideoCard
++                                    idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
++                                    hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
+                                 />
+                                 <div className="space-y-4 text-center">
+                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
+@@ -1280,6 +1582,71 @@ export function LandingPageClient() {
+                     </div>
+                 </section>
+                 
++                {/* COMPETITIVE POSITIONING */}
++                <section className="py-24 px-6 relative z-10 bg-black">
++                    <div className="max-w-[1240px] mx-auto">
++
++                        {/* Header */}
++                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-14">
++                            <div className="space-y-4 max-w-xl">
++                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
++                                    <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Why ChainVolio</span>
++                                </div>
++                                <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
++                                    Traditional tools created isolated silos.
++                                </p>
++                                <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
++                                    One trust layer.<br />
++                                    <span className="text-white/30">Everything connects.</span>
++                                </h2>
++                            </div>
++                            <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-sm md:text-right">
++                                LinkedIn can&apos;t verify it. A PDF can&apos;t prove it. ChainVolio turns every Web3 contribution into a verifiable signal ΓÇö permanently, without asking anyone&apos;s permission.
++                            </p>
++                        </div>
++
++                        {/* Network Diagram ΓÇö scrollable on mobile */}
++                        <div className="relative overflow-x-auto -mx-2">
++                            <div className="min-w-[700px] px-2">
++                                <CompetitiveNetworkDiagram />
++                            </div>
++                        </div>
++
++                        {/* Bottom callouts ΓÇö vs competitors */}
++                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-14 pt-12 border-t border-white/[0.05]">
++                            {[
++                                {
++                                    against: "Unlike LinkedIn",
++                                    color: "#60a5fa",
++                                    point: "No platform lock-in. Your identity lives in your wallet, not on a server that can be shut down or changed.",
++                                },
++                                {
++                                    against: "Unlike a PDF Resume",
++                                    color: "#14F195",
++                                    point: "Not a claim ΓÇö a cryptographic proof. Every entry is signed by the organization that issued it, on-chain.",
++                                },
++                                {
++                                    against: "Unlike DeWork / task boards",
++                                    color: "#a78bfa",
++                                    point: "Not just task completions. A full, portable career record: roles, audits, grants, and protocol contributions.",
++                                },
++                            ].map((item, i) => (
++                                <div key={i} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] space-y-3 group hover:bg-white/[0.04] transition-colors">
++                                    <div className="flex items-center gap-2">
++                                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: item.color }} />
++                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]"
++                                            style={{ color: item.color + "bb" }}>{item.against}</span>
++                                    </div>
++                                    <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors">
++                                        {item.point}
++                                    </p>
++                                </div>
++                            ))}
++                        </div>
++
++                    </div>
++                </section>
++
+                 {/* TRUST TRANSFORMATION ΓÇö Noise to Signal */}
+                 <section className="relative z-10 bg-black overflow-hidden">
+ 
+@@ -2071,9 +2438,10 @@ const NETWORK_ICONS = [
+ ];
+ 
+ function SignalNoiseVisual() {
+-    const canvasRef = useRef<HTMLCanvasElement>(null);
+-    const mouseRef  = useRef({ x: -9999, y: -9999, active: false });
+-    const rafRef    = useRef<number>(0);
++    const canvasRef  = useRef<HTMLCanvasElement>(null);
++    const mouseRef   = useRef({ x: -9999, y: -9999, active: false });
++    const rafRef     = useRef<number>(0);
++    const visibleRef = useRef(false);
+ 
+     useEffect(() => {
+         const canvas = canvasRef.current;
+@@ -2081,6 +2449,12 @@ function SignalNoiseVisual() {
+         const ctx = canvas.getContext('2d');
+         if (!ctx) return;
+ 
++        const visObserver = new IntersectionObserver(
++            ([entry]) => { visibleRef.current = entry.isIntersecting; },
++            { threshold: 0.05 }
++        );
++        visObserver.observe(canvas);
++
+         // Preload icons
+         const loadedIcons: HTMLImageElement[] = [];
+         NETWORK_ICONS.forEach(svgString => {
+@@ -2181,6 +2555,10 @@ function SignalNoiseVisual() {
+ 
+         let t = 0;
+         const draw = () => {
++            if (!visibleRef.current) {
++                rafRef.current = requestAnimationFrame(draw);
++                return;
++            }
+             ctx.clearRect(0, 0, W, H);
+ 
+             const ox = W / 2;
+@@ -2261,6 +2639,7 @@ function SignalNoiseVisual() {
+ 
+         return () => {
+             cancelAnimationFrame(rafRef.current);
++            visObserver.disconnect();
+             window.removeEventListener('resize', resize);
+             canvas.removeEventListener('mousemove', onMove);
+             canvas.removeEventListener('mouseleave', onLeave);

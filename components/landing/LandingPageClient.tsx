@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import ProblemCardEffect from "./ProblemCardEffect";
+import ProblemVideoCard from "./ProblemVideoCard";
 import {
     ArrowRight,
     CheckCircle2,
@@ -252,8 +252,8 @@ function MockProfileUI() {
             {/* 1. Sidebar (Linear Style) */}
             <div className="w-64 border-r border-white/5 bg-white/[0.01] p-6 flex flex-col gap-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 p-0.5">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded-lg grayscale" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
+                        <span className="text-xs font-bold text-white/50">AR</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-white/90 tracking-tight">Alex Rivera</span>
@@ -665,7 +665,7 @@ function AttestationBlock() {
                     ))}
                 </div>
 
-                <Link href="/why" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
+                <Link href="/guides/attestation" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
                     Explore attestations
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
@@ -752,8 +752,8 @@ function FloatingVerificationCard() {
             {/* Card Body */}
             <div className="p-6 space-y-6">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 p-0.5">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Avatar" className="w-full h-full object-cover rounded grayscale" />
+                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                        <span className="text-sm font-bold text-white/40">AR</span>
                     </div>
                     <div className="space-y-0.5">
                         <h4 className="text-sm font-bold text-white">Alex Rivera</h4>
@@ -788,25 +788,27 @@ function FloatingVerificationCard() {
     );
 }
 
-// --- Recruiter Dashboard Preview UI V2 (animated 3-slide) ---
-function RecruiterDashboardPreviewUI_V2() {
-    const [active, setActive] = useState(0);
-    const [paused, setPaused] = useState(false);
-
-    useEffect(() => {
-        if (paused) return;
-        const t = setInterval(() => setActive(p => (p + 1) % 3), 3500);
-        return () => clearInterval(t);
-    }, [paused]);
-
+// --- Recruiter Dashboard Preview UI V2 (carousel — state lifted to HiringBlock) ---
+function RecruiterDashboardPreviewUI_V2({
+    active,
+    setActive,
+    paused,
+    setPaused,
+}: {
+    active: number;
+    setActive: React.Dispatch<React.SetStateAction<number>>;
+    paused: boolean;
+    setPaused: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
     const slides = [
-        { label: "Filter by verified contributions", color: "#60a5fa" },
-        { label: "See who endorsed the candidate",   color: "#34d399" },
-        { label: "Reduce hiring guesswork",          color: "#a78bfa" },
+        { label: "Verified signal candidates",  color: "#60a5fa" },
+        { label: "Org-backed endorsements",     color: "#34d399" },
+        { label: "Post your job link anywhere", color: "#f59e0b" },
+        { label: "Reduce hiring guesswork",     color: "#a78bfa" },
     ];
 
     const panels = [
-        // Panel 0 — Filter by verified contributions
+        // Panel 0 — Verified Signal (bullet 0)
         <div key={0} className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
                 <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Top Candidates with Proven Signals</p>
@@ -818,7 +820,7 @@ function RecruiterDashboardPreviewUI_V2() {
                 { name: "Alex Rivera", role: "Core Developer",     signals: 8 },
                 { name: "Sarah Chen",  role: "Smart Contract Dev", signals: 5 },
             ].map((c, i) => (
-                <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center justify-between hover:bg-white/[0.03] transition-colors">
+                <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white/40">
                             {c.name.split(" ").map((n: string) => n[0]).join("")}
@@ -836,14 +838,14 @@ function RecruiterDashboardPreviewUI_V2() {
             ))}
         </div>,
 
-        // Panel 1 — See who endorsed the candidate
+        // Panel 1 — Org-Backed Trust (bullet 1)
         <div key={1} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera · Endorsement Chain</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Endorsement Chain</p>
             {[
                 { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#34d399" },
-                { initials: "ST", name: "Superteam",      type: "Grant delivery · Q3 2024", color: "#60a5fa" },
+                { initials: "ST", name: "Superteam",      type: "Grant delivery, Q3 2024",  color: "#60a5fa" },
             ].map((e, i) => (
-                <div key={i} className="p-3 rounded-xl bg-white/[0.01] border border-white/5 flex items-center gap-3">
+                <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 flex items-center gap-3 shadow-xl">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                         style={{ background: e.color + "22", color: e.color, border: `1px solid ${e.color}33` }}>
                         {e.initials}
@@ -859,10 +861,43 @@ function RecruiterDashboardPreviewUI_V2() {
             ))}
         </div>,
 
-        // Panel 2 — Reduce hiring guesswork
+        // Panel 2 — Post Anywhere (bullet 2)
         <div key={2} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera · Confidence Score</p>
-            <div className="p-3 rounded-xl bg-white/[0.01] border border-white/5 space-y-3">
+            <div className="flex items-center justify-between mb-3">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Share Job Post</p>
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
+                    <span className="text-[8px] font-bold" style={{ color: "#f59e0b" }}>Portable Link</span>
+                </div>
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#111111] border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
+                <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <Share2 className="w-2.5 h-2.5 text-amber-400" />
+                </div>
+                <span className="text-[9px] text-white/30 font-mono truncate flex-1">chainvolio.xyz/hire/nexus-rust-dev</span>
+                <span className="text-[8px] font-bold text-amber-400/70 flex-shrink-0">Copy</span>
+            </div>
+            {[
+                { platform: "LinkedIn",  icon: "in", color: "#60a5fa", status: "Posted",    statusColor: "#34d399" },
+                { platform: "Twitter/X", icon: "X",  color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
+                { platform: "Discord",   icon: "D",  color: "#a78bfa", status: "Posted",    statusColor: "#34d399" },
+            ].map((p, i) => (
+                <div key={i} className="p-2.5 rounded-xl bg-[#111111] border border-white/5 flex items-center justify-between shadow-xl">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0"
+                            style={{ background: p.color + "18", color: p.color, border: `1px solid ${p.color}25` }}>
+                            {p.icon}
+                        </div>
+                        <span className="text-[9px] text-white/50 font-medium">{p.platform}</span>
+                    </div>
+                    <span className="text-[8px] font-bold" style={{ color: p.statusColor }}>{p.status}</span>
+                </div>
+            ))}
+        </div>,
+
+        // Panel 3 — Confidence Score (auto-only, no bullet)
+        <div key={3} className="space-y-2">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Confidence Score</p>
+            <div className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-3 shadow-xl">
                 {[
                     { label: "Verified Work",    score: 92, color: "#34d399" },
                     { label: "Org Attestations", score: 87, color: "#60a5fa" },
@@ -882,12 +917,19 @@ function RecruiterDashboardPreviewUI_V2() {
         </div>,
     ];
 
+    const cardAnim = (pos: number) => {
+        if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"  };
+        if (pos === 1) return { x: 210,  y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
+        if (pos === 2) return { x: -210, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
+        return              { x: 0,    y: 40, scale: 0.78, opacity: 0,    zIndex: 10, filter: "blur(4px)" };
+    };
+
     return (
         <div className="w-full flex flex-col gap-6 relative group"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
-            {/* Header Section */}
+            {/* Header */}
             <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -910,7 +952,7 @@ function RecruiterDashboardPreviewUI_V2() {
                     { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
                     { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
                 ].map((pod, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
+                    <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-1.5 shadow-xl">
                         <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
                             <pod.icon className={`w-3 h-3 ${pod.col}`} />
                         </div>
@@ -922,18 +964,24 @@ function RecruiterDashboardPreviewUI_V2() {
                 ))}
             </div>
 
-            {/* Animated content panel */}
-            <div className="relative z-10" style={{ minHeight: 132 }}>
-                {panels.map((panel, i) => (
-                    <motion.div
-                        key={i}
-                        animate={{ opacity: active === i ? 1 : 0, y: active === i ? 0 : 6 }}
-                        transition={{ duration: 0.35, ease: "easeInOut" }}
-                        style={{ position: i === 0 ? "relative" : "absolute", inset: 0, pointerEvents: active === i ? "auto" : "none" }}
-                    >
-                        {panel}
-                    </motion.div>
-                ))}
+            {/* Carousel */}
+            <div className="relative overflow-hidden" style={{ height: 170 }}>
+                {panels.map((panel, i) => {
+                    const pos = (i - active + 4) % 4;
+                    const anim = cardAnim(pos);
+                    return (
+                        <motion.div
+                            key={i}
+                            animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
+                            transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                            style={{ position: "absolute", top: 0, left: "50%", marginLeft: -160, width: 320, zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
+                        >
+                            {panel}
+                        </motion.div>
+                    );
+                })}
+                <div className="absolute inset-y-0 left-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
+                <div className="absolute inset-y-0 right-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
             </div>
 
             {/* Dot indicators */}
@@ -943,23 +991,33 @@ function RecruiterDashboardPreviewUI_V2() {
                         key={i}
                         onClick={() => { setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
                         className="rounded-full transition-all duration-300"
-                        style={{
-                            width: active === i ? 20 : 6,
-                            height: 6,
-                            background: active === i ? s.color + "cc" : "rgba(255,255,255,0.18)",
-                        }}
+                        style={{ width: active === i ? 20 : 6, height: 6, background: active === i ? s.color + "cc" : "rgba(255,255,255,0.18)" }}
                     />
                 ))}
             </div>
 
-            {/* Bottom fade */}
-            <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
+            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
         </div>
     );
 }
 
-// Block 2 — Hiring — editorial layout wrapper for the dashboard preview
+// Block 2 — Hiring — state lifted here, controls both bullets and carousel
 function HiringBlock() {
+    const [active, setActive] = useState(0);
+    const [paused, setPaused] = useState(false);
+
+    useEffect(() => {
+        if (paused) return;
+        const t = setInterval(() => setActive(p => (p + 1) % 4), 3500);
+        return () => clearInterval(t);
+    }, [paused]);
+
+    const features = [
+        { icon: ShieldCheck, label: "Verified Signal Only",     desc: "Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.",              color: "#60a5fa", slide: 0 },
+        { icon: Building2,   label: "Org-Backed Trust",         desc: "See exactly which protocols and organizations have attested to a candidate's specific work output.",              color: "#34d399", slide: 1 },
+        { icon: Share2,      label: "Post Anywhere, Instantly", desc: "Share a portable job link to LinkedIn, Twitter, Discord, or any platform. One link, verified by ChainVolio.", color: "#f59e0b", slide: 2 },
+    ];
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -968,13 +1026,18 @@ function HiringBlock() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center"
         >
-            {/* Left — The interactive dashboard UI component */}
+            {/* Left — interactive dashboard */}
             <div className="relative order-2 lg:order-1">
                 <div className="absolute -inset-10 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
-                <RecruiterDashboardPreviewUI_V2 />
+                <RecruiterDashboardPreviewUI_V2
+                    active={active}
+                    setActive={setActive}
+                    paused={paused}
+                    setPaused={setPaused}
+                />
             </div>
 
-            {/* Right — Copy & Value Prop */}
+            {/* Right — copy & hover-controlled feature rows */}
             <div className="space-y-10 order-1 lg:order-2">
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
@@ -989,25 +1052,37 @@ function HiringBlock() {
                     </p>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-1">
-                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-white/80 mb-1">Verified Signal Only</p>
-                            <p className="text-xs text-white/30 leading-relaxed">Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.</p>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-1">
-                            <Building2 className="w-4 h-4 text-blue-400" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-white/80 mb-1">Org-Backed Trust</p>
-                            <p className="text-xs text-white/30 leading-relaxed">See exactly which protocols and organizations have attested to a candidate's specific work output.</p>
-                        </div>
-                    </div>
+                {/* Feature rows — hover controls carousel */}
+                <div className="divide-y divide-white/[0.04]">
+                    {features.map((f, i) => (
+                        <motion.div
+                            key={i}
+                            onHoverStart={() => { setPaused(true); setActive(f.slide); }}
+                            onHoverEnd={() => setPaused(false)}
+                            animate={{ opacity: active === f.slide ? 1 : 0.4 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-start gap-4 py-4 cursor-default"
+                        >
+                            <motion.div
+                                animate={{
+                                    background: active === f.slide ? f.color + "18" : f.color + "08",
+                                    borderColor: active === f.slide ? f.color + "35" : f.color + "15",
+                                }}
+                                transition={{ duration: 0.25 }}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border"
+                            >
+                                <f.icon className="w-3.5 h-3.5" style={{ color: active === f.slide ? f.color : f.color + "55" }} />
+                            </motion.div>
+                            <div>
+                                <p className="text-sm font-bold mb-1" style={{ color: active === f.slide ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
+                                    {f.label}
+                                </p>
+                                <p className="text-xs leading-relaxed" style={{ color: active === f.slide ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)" }}>
+                                    {f.desc}
+                                </p>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
 
                 <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
@@ -1019,6 +1094,7 @@ function HiringBlock() {
     );
 }
 
+
 const SLIDES = [
     { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile" },
     { src: "/homepage/image%20slide%202/dashboard%202.png?v=2", label: "Recruiter dashboard" },
@@ -1028,6 +1104,421 @@ const SLIDES = [
     { src: "/homepage/image%20slide%202/attestation.png?v=2", label: "On-chain attestations" },
     { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification status" },
 ];
+
+// ─── Why ChainVolio — Circuit Board Diagram ─────────────────────────────────
+
+const CATEGORY_COLORS = {
+    purple: "#9945FF",
+    green:  "#14F195",
+    blue:   "#60a5fa",
+    amber:  "#f59e0b",
+    violet: "#a78bfa",
+    teal:   "#2dd4bf",
+};
+
+function CompetitiveNetworkDiagram() {
+    const [active, setActive] = useState(false);
+    const svgRef = useRef<SVGSVGElement>(null);
+
+    useEffect(() => {
+        const el = svgRef.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([e]) => { if (e.isIntersecting) setActive(true); },
+            { threshold: 0.15 }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+
+    const SVW = 1100, SVH = 720;
+    const CX = 550, CY = 375;
+
+    // Top input sources
+    const COL_XS = [248, 424, 600];
+    const ROW_YS = [52, 112, 172];
+    const N_W = 148;
+    const COLLECTOR_Y = 224;
+    const INGEST_X = 470, INGEST_Y = 240, INGEST_W = 160, INGEST_H = 26;
+
+    // Center chip
+    const CHIP_X = 440, CHIP_Y = 330, CHIP_W = 220, CHIP_H = 90;
+
+    // Left verification
+    const N_H = 26;
+    const LN_X = 20, LN_W = 148, LN_H = 26;
+    const LN_YS = [315, 375, 435];
+    const L_BUS_X = 256;
+    const VERIFY_X = 274, VERIFY_W = 116, VERIFY_H = 30;
+
+    // Right outputs
+    const RO_X = 920, RO_W = 168, RO_H = 26;
+    const RO_YS = [195, 255, 315, 375];
+    const R_BUS_X = 710;
+
+    // Bottom consumers
+    const BC_XS = [340, 480, 620, 760];
+    const BC_Y = 574;
+    const BC_W = 118, BC_H = 26;
+    const MATCH_Y = 490;
+
+    const TOP_SOURCES = [
+        [
+            { label: "Code Contributions",     color: CATEGORY_COLORS.purple, sub: "repos & commits" },
+            { label: "Project Documentation", color: CATEGORY_COLORS.purple, sub: "docs & specs"    },
+            { label: "Design Output",        color: CATEGORY_COLORS.purple, sub: "design work"     },
+        ],
+        [
+            { label: "On-chain Activity",      color: CATEGORY_COLORS.green,  sub: "tx history"      },
+            { label: "Ecosystem Contributions", color: CATEGORY_COLORS.green,  sub: "bounties"         },
+            { label: "Hackathon Work",        color: CATEGORY_COLORS.green,  sub: "hackathons"       },
+        ],
+        [
+            { label: "Public Signals",        color: CATEGORY_COLORS.blue,   sub: "threads"         },
+            { label: "Community Activity",    color: CATEGORY_COLORS.blue,   sub: "community"       },
+            { label: "Peer Interaction",      color: CATEGORY_COLORS.blue,   sub: "channels"        },
+        ],
+    ];
+    const ROW_LABELS = ["DEV TOOLS", "ON-CHAIN", "SOCIAL"];
+    const ROW_COLORS = [CATEGORY_COLORS.purple, CATEGORY_COLORS.green, CATEGORY_COLORS.blue];
+
+    const LEFT_NODES = [
+        { label: "SMART CONTRACT", sub: "audit trace",      color: CATEGORY_COLORS.green },
+        { label: "WORK HISTORY",   sub: "on-chain proof",   color: CATEGORY_COLORS.green },
+        { label: "ATTESTATIONS",   sub: "verified by DAOs", color: CATEGORY_COLORS.green },
+    ];
+
+    const RIGHT_OUTPUTS = [
+        { label: "Verifiable CV",     sub: "permanent record",   color: CATEGORY_COLORS.teal },
+        { label: "Reputation Score",  sub: "credibility rating", color: CATEGORY_COLORS.teal },
+        { label: "Skill Proof",       sub: "verified skills",    color: CATEGORY_COLORS.teal },
+        { label: "Public Identity",   sub: "shareable link",     color: CATEGORY_COLORS.teal },
+    ];
+
+    const CONSUMERS = [
+        { label: "DAO Access",       sub: "Protocol admin",  color: CATEGORY_COLORS.amber },
+        { label: "Talent Discovery", sub: "Instant hire",    color: CATEGORY_COLORS.amber },
+        { label: "Hiring",           sub: "HR verification", color: CATEGORY_COLORS.amber },
+        { label: "Collaboration",    sub: "Team builder",    color: CATEGORY_COLORS.amber },
+    ];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anim = (opts: any): any => active ? opts : {};
+
+    return (
+        <svg ref={svgRef} viewBox={`0 0 ${SVW} ${SVH}`} width="100%" height="auto"
+            className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
+
+            <defs>
+                <pattern id="dotGrid" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <circle cx="1" cy="1" r="0.8" fill="rgba(255,255,255,0.055)" />
+                </pattern>
+                <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="node-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#111111" />
+                    <stop offset="100%" stopColor="#000000" />
+                </linearGradient>
+            </defs>
+
+            {/* dot grid */}
+            <rect width="100%" height="100%" fill="url(#dotGrid)"
+                opacity={active ? 1 : 0.4} style={{ transition: 'opacity 1.5s ease-in-out' }} />
+
+            {/* ══ SECTION LABELS ══ */}
+            <text x={424} y={30} textAnchor="middle" fill="rgba(255,255,255,0.14)"
+                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">INPUT SOURCES</text>
+            
+            <text x={194} y={LN_YS[0] - 30} textAnchor="middle" fill="rgba(255,255,255,0.14)"
+                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">VERIFICATION</text>
+
+            <text x={772} y={RO_YS[0] - 30} textAnchor="middle"
+                fill="rgba(255,255,255,0.14)" fontSize={7.5} fontWeight={700}
+                letterSpacing={3} fontFamily="monospace">VERIFIED OUTPUT</text>
+
+            <text x={CX} y={544} textAnchor="middle" fill="rgba(255,255,255,0.14)"
+                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">CONSUMERS</text>
+
+            {/* ══ TOP INPUT SOURCES ══ */}
+
+            {/* row category labels */}
+            {ROW_LABELS.map((label, ri) => (
+                <motion.text key={`rl${ri}`} x={174} y={ROW_YS[ri] + N_H / 2 + 1}
+                    textAnchor="end" fill="rgba(255,255,255,0.4)" fontSize={6.5}
+                    fontWeight={700} letterSpacing={2.5} opacity={0}
+                    animate={anim({ opacity: 0.65 })}
+                    transition={{ delay: 0.1 + ri * 0.06 }}
+                    fontFamily="monospace">{label}</motion.text>
+            ))}
+
+            {/* ══ ANIMATED DATA PACKETS ══ */}
+            {active && [
+                // TOP SOURCES (9 nodes)
+                { d: `M ${COL_XS[0]} ${ROW_YS[0] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '4.8s', delay: '0s'   },
+                { d: `M ${COL_XS[1]} ${ROW_YS[0] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.0s', delay: '0.4s' },
+                { d: `M ${COL_XS[2]} ${ROW_YS[0] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.2s', delay: '0.8s' },
+                
+                { d: `M ${COL_XS[0]} ${ROW_YS[1] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '4.9s', delay: '1.2s' },
+                { d: `M ${COL_XS[1]} ${ROW_YS[1] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.1s', delay: '0.3s' },
+                { d: `M ${COL_XS[2]} ${ROW_YS[1] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.3s', delay: '0.7s' },
+                
+                { d: `M ${COL_XS[0]} ${ROW_YS[2] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.0s', delay: '1.5s' },
+                { d: `M ${COL_XS[1]} ${ROW_YS[2] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.4s', delay: '1.1s' },
+                { d: `M ${COL_XS[2]} ${ROW_YS[2] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.6s', delay: '0.9s' },
+
+                // INGESTION TO CHIP
+                { d: `M ${CX} ${INGEST_Y + INGEST_H} L ${CX} ${CHIP_Y}`, dur: '1.4s', delay: '1.3s' },
+
+                // LEFT NODES (3 nodes)
+                { d: `M ${LN_X + LN_W} ${LN_YS[0]} L ${L_BUS_X} ${LN_YS[0]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.4s', delay: '0.6s' },
+                { d: `M ${LN_X + LN_W} ${LN_YS[1]} L ${L_BUS_X} ${LN_YS[1]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.6s', delay: '1.0s' },
+                { d: `M ${LN_X + LN_W} ${LN_YS[2]} L ${L_BUS_X} ${LN_YS[2]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.9s', delay: '1.4s' },
+
+                // CHIP TO RIGHT (4 nodes)
+                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[0]} L ${R_BUS_X + 12} ${RO_YS[0]}`, dur: '3.0s', delay: '1.6s' },
+                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[1]} L ${R_BUS_X + 12} ${RO_YS[1]}`, dur: '3.2s', delay: '1.9s' },
+                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[2]} L ${R_BUS_X + 12} ${RO_YS[2]}`, dur: '3.4s', delay: '2.2s' },
+                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[3]} L ${R_BUS_X + 12} ${RO_YS[3]}`, dur: '3.6s', delay: '2.5s' },
+
+                // CHIP TO MATCHING
+                { d: `M ${CX} ${CHIP_Y + CHIP_H} L ${CX} ${MATCH_Y - 18}`, dur: '1.4s', delay: '1.9s' },
+
+                // MATCHING TO CONSUMERS (4 nodes)
+                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[0]} ${BC_Y - 52} L ${BC_XS[0]} ${BC_Y - BC_H/2}`, dur: '3.8s', delay: '2.3s' },
+                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[1]} ${BC_Y - 52} L ${BC_XS[1]} ${BC_Y - BC_H/2}`, dur: '4.0s', delay: '2.6s' },
+                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[2]} ${BC_Y - 52} L ${BC_XS[2]} ${BC_Y - BC_H/2}`, dur: '4.2s', delay: '2.9s' },
+                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[3]} ${BC_Y - 52} L ${BC_XS[3]} ${BC_Y - BC_H/2}`, dur: '4.4s', delay: '3.2s' },
+            ].map((p, i) => (
+                <rect key={`pkt-${i}`} x="-1.5" y="-1.5" width={3} height={3} rx={0.5}
+                    fill="white" style={{ filter: `drop-shadow(0 0 3px white)` }}>
+                    <animateMotion dur={p.dur} repeatCount="indefinite" begin={p.delay} path={p.d} />
+                </rect>
+            ))}
+
+            {/* 9 source nodes */}
+            {TOP_SOURCES.map((row, ri) => row.map((node, ci) => {
+                const nw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
+                const nx = COL_XS[ci] - nw / 2;
+                const ny = ROW_YS[ri];
+                return (
+                    <motion.g key={`tn${ri}${ci}`}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={anim({ opacity: 1, y: 0 })}
+                        transition={{ delay: 0.12 + ri * 0.07 + ci * 0.04 }}>
+                        <rect x={nx} y={ny} width={nw} height={N_H} rx={3}
+                            fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
+                        
+                        {/* Terminal via */}
+                        <circle cx={COL_XS[ci]} cy={ny + N_H} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
+                        
+                        <text x={COL_XS[ci]} y={ny + N_H / 2 - 1.5} textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)" fontSize={8} fontWeight={600}
+                            fontFamily="Inter, sans-serif">{node.label}</text>
+                        <text x={COL_XS[ci]} y={ny + N_H / 2 + 7.5} textAnchor="middle"
+                            fill="rgba(255,255,255,0.3)" fontSize={6}
+                            fontFamily="Inter, sans-serif">{node.sub}</text>
+
+                        {/* vertical trace to collector */}
+                        <line x1={COL_XS[ci]} y1={ny + N_H} x2={COL_XS[ci]} y2={COLLECTOR_Y}
+                            stroke="rgba(255,255,255,0.12)" strokeWidth={0.75} strokeDasharray="3 5" />
+                        
+                        {/* junction via at collector line */}
+                        <g opacity={active ? 0.4 : 0}>
+                            <circle cx={COL_XS[ci]} cy={COLLECTOR_Y} r={2.5} fill="#000" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
+                            <circle cx={COL_XS[ci]} cy={COLLECTOR_Y} r={1} fill="rgba(255,255,255,0.5)" />
+                        </g>
+                    </motion.g>
+                );
+            }))}
+
+            {/* horizontal collector rail */}
+            <motion.line x1={COL_XS[0]} y1={COLLECTOR_Y} x2={COL_XS[2]} y2={COLLECTOR_Y}
+                stroke="rgba(255,255,255,0.10)" strokeWidth={1} strokeDasharray="4 6"
+                opacity={0} animate={anim({ opacity: 1 })}
+                transition={{ delay: 0.55 }} />
+
+            {/* collector → ingestion trunk */}
+            <motion.line x1={CX} y1={COLLECTOR_Y} x2={CX} y2={INGEST_Y}
+                stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} strokeDasharray="3 4"
+                opacity={0} animate={anim({ opacity: 1 })}
+                transition={{ delay: 0.65 }} />
+
+            {/* ── DATA INGESTION node ── */}
+            <motion.g initial={{ opacity: 0 }} animate={anim({ opacity: 1 })} transition={{ delay: 0.85 }}>
+                <rect x={INGEST_X} y={INGEST_Y} width={INGEST_W} height={26} rx={3}
+                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
+                <text x={CX} y={INGEST_Y + 11} textAnchor="middle"
+                    fill="rgba(255,255,255,0.9)" fontSize={8.5} fontWeight={800} letterSpacing={1}
+                    fontFamily="Inter, sans-serif">DATA INGESTION</text>
+                <text x={CX} y={INGEST_Y + 20} textAnchor="middle"
+                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">collecting all signals</text>
+                <rect x={CX - 3} y={INGEST_Y - 4} width={6} height={6} fill="none" />
+                <rect x={CX - 3} y={INGEST_Y + INGEST_H - 2} width={6} height={6} fill="none" />
+                {/* ingestion → chip */}
+                <line x1={CX} y1={INGEST_Y + INGEST_H + 2} x2={CX} y2={CHIP_Y}
+                    stroke="rgba(255,255,255,0.2)" strokeWidth={2} strokeDasharray="4 4" />
+                <g opacity={active ? 0.5 : 0}>
+                    <circle cx={CX} cy={CHIP_Y} r={3} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+                    <circle cx={CX} cy={CHIP_Y} r={1.2} fill="white" />
+                </g>
+            </motion.g>
+
+            {/* ══ LEFT: WORK VERIFICATION ══ */}
+            <motion.g initial={{ opacity: 0, x: -18 }} animate={anim({ opacity: 1, x: 0 })} transition={{ delay: 0.38 }}>
+                {LEFT_NODES.map((node, i) => {
+                    const lnw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
+                    const center_x = L_BUS_X - 12 - lnw / 2;
+                    return (
+                        <g key={`ln${i}`}>
+                            <rect x={L_BUS_X - 12 - lnw} y={LN_YS[i] - 13} width={lnw} height={26} rx={3}
+                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
+                            <text x={center_x} y={LN_YS[i] - 1.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.9)" fontSize={8} fontWeight={600}
+                                fontFamily="Inter, sans-serif">{node.label}</text>
+                            <text x={center_x} y={LN_YS[i] + 7.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.3)" fontSize={6}
+                                fontFamily="Inter, sans-serif">{node.sub}</text>
+                            <line x1={L_BUS_X - 12} y1={LN_YS[i]} x2={L_BUS_X} y2={LN_YS[i]}
+                                stroke="rgba(255,255,255,0.15)" strokeWidth={0.75} strokeDasharray="3 5" />
+                            <circle cx={L_BUS_X - 12} cy={LN_YS[i]} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
+                        </g>
+                    );
+                })}
+                {/* left vertical bus */}
+                <line x1={L_BUS_X} y1={LN_YS[0]} x2={L_BUS_X} y2={LN_YS[LN_YS.length - 1]}
+                    stroke="rgba(255,255,255,0.1)" strokeWidth={1.5} strokeDasharray="4 4" />
+                {/* horizontal trunk (bus → verify engine → chip) */}
+                <line x1={L_BUS_X} y1={CY} x2={CHIP_X} y2={CY}
+                    stroke="rgba(255,255,255,0.15)" strokeWidth={1.5} strokeDasharray="4 4" />
+                {/* VERIFICATION ENGINE (sits on trunk) */}
+                <rect x={VERIFY_X} y={CY - 13} width={VERIFY_W} height={26} rx={3}
+                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
+                <text x={VERIFY_X + VERIFY_W / 2} y={CY - 1.5} textAnchor="middle"
+                    fill="rgba(255,255,255,0.85)" fontSize={8.5} fontWeight={800} letterSpacing={1}
+                    fontFamily="Inter, sans-serif">VERIFICATION</text>
+                <text x={VERIFY_X + VERIFY_W / 2} y={CY + 7.5} textAnchor="middle"
+                    fill="rgba(255,255,255,0.3)" fontSize={6} fontFamily="Inter, sans-serif">ENGINE</text>
+                <rect x={L_BUS_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.2)" rx={1} />
+                <rect x={CHIP_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.2)" rx={1} />
+                {/* Vias at L-bus junctions */}
+                {active && LN_YS.map((y, i) => (
+                    <g key={`lvia${i}`}>
+                        <circle cx={L_BUS_X} cy={y} r={2.5} fill="#000" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
+                        <circle cx={L_BUS_X} cy={y} r={1} fill="rgba(255,255,255,0.5)" />
+                    </g>
+                ))}
+                {active && (
+                    <g>
+                        <circle cx={L_BUS_X} cy={CY} r={3.5} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.8} />
+                        <circle cx={L_BUS_X} cy={CY} r={1.5} fill="white" />
+                    </g>
+                )}
+            </motion.g>
+
+            {/* ══ CENTER: ChainVolio Chip ══ */}
+            <motion.g
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={anim({ opacity: 1, scale: 1 })}
+                style={{ transformOrigin: `${CX}px ${CY}px` }}
+                transition={{ duration: 0.8, delay: 0.7 }}>
+                <circle cx={CX} cy={CY} r={82} fill="url(#hub-glow)" />
+                <rect x={CHIP_X} y={CHIP_Y} width={CHIP_W} height={CHIP_H} rx={8}
+                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.15)" strokeWidth={0.6} />
+                
+                <image href="/logo.png" x={CX - 22} y={CY - 34} width={44} height={44}
+                    style={{ filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.2))' }} />
+                <text x={CX} y={CY + 26} textAnchor="middle" fill="white"
+                    fontSize={11} fontWeight={800} letterSpacing={2.5} fontFamily="Inter, sans-serif">CHAINVOLIO</text>
+            </motion.g>
+
+            {/* ══ RIGHT: VERIFIED OUTPUT ══ */}
+            <motion.g initial={{ opacity: 0, x: 18 }} animate={anim({ opacity: 1, x: 0 })} transition={{ delay: 0.5 }}>
+                {/* chip → right bus trunk */}
+                <line x1={CHIP_X + CHIP_W} y1={CY} x2={R_BUS_X} y2={CY}
+                    stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="4 4" />
+                <rect x={CHIP_X + CHIP_W - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
+                <rect x={R_BUS_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
+                {/* right vertical bus */}
+                <line x1={R_BUS_X} y1={RO_YS[0]} x2={R_BUS_X} y2={RO_YS[RO_YS.length - 1]}
+                    stroke="rgba(255,255,255,0.1)" strokeWidth={1.5} strokeDasharray="4 4" />
+
+                {/* output nodes */}
+                {RIGHT_OUTPUTS.map((node, i) => {
+                    const row = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
+                    const center_x = R_BUS_X + 12 + row / 2;
+                    return (
+                        <g key={`ro${i}`}>
+                            <line x1={R_BUS_X} y1={RO_YS[i]} x2={R_BUS_X + 12} y2={RO_YS[i]}
+                                stroke="rgba(255,255,255,0.1)" strokeWidth={0.75} strokeDasharray="3 5" />
+                            <g opacity={active ? 1 : 0}>
+                                <circle cx={R_BUS_X} cy={RO_YS[i]} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
+                            </g>
+                            <rect x={R_BUS_X + 12} y={RO_YS[i] - 13} width={row} height={26} rx={3}
+                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
+                            <text x={center_x} y={RO_YS[i] - 1.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.95)" fontSize={8} fontWeight={700}
+                                fontFamily="Inter, sans-serif">{node.label}</text>
+                            <text x={center_x} y={RO_YS[i] + 7.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.35)" fontSize={6}
+                                fontFamily="Inter, sans-serif">{node.sub}</text>
+                        </g>
+                    );
+                })}
+                {active && (
+                    <g>
+                        <circle cx={R_BUS_X} cy={CY} r={3.5} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.8} />
+                        <circle cx={R_BUS_X} cy={CY} r={1.5} fill="white" />
+                    </g>
+                )}
+            </motion.g>
+
+            {/* ══ BOTTOM: SMART MATCHING & CONSUMERS ══ */}
+            <motion.g initial={{ opacity: 0, y: 18 }} animate={anim({ opacity: 1, y: 0 })} transition={{ delay: 0.6 }}>
+                {/* chip → matching trunk */}
+                <line x1={CX} y1={CHIP_Y + CHIP_H} x2={CX} y2={MATCH_Y - 18}
+                    stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="4 4" />
+                <rect x={CX - 4} y={CHIP_Y + CHIP_H - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
+                {/* SMART MATCHING box */}
+                <rect x={CX - 82} y={MATCH_Y - 13} width={164} height={26} rx={3}
+                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
+                <text x={CX} y={MATCH_Y} textAnchor="middle"
+                    fill="rgba(255,255,255,0.85)" fontSize={8.5} fontWeight={800} letterSpacing={1}
+                    fontFamily="Inter, sans-serif">SMART MATCHING</text>
+                <text x={CX} y={MATCH_Y + 9} textAnchor="middle"
+                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">connects talent to opportunities</text>
+                {/* horizontal distribution rail */}
+                <line x1={BC_XS[0]} y1={BC_Y - 52} x2={BC_XS[BC_XS.length - 1]} y2={BC_Y - 52}
+                    stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="3 6" />
+                {/* consumer nodes */}
+                {CONSUMERS.map((node, i) => {
+                    const bcw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
+                    const bcx = BC_XS[i];
+                    return (
+                        <g key={`bc${i}`}>
+                             <path
+                                d={`M ${CX} ${MATCH_Y + 16} L ${CX} ${BC_Y - 52} L ${bcx} ${BC_Y - 52} L ${bcx} ${BC_Y - 13}`}
+                                fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="3 6" />
+                            <circle cx={bcx} cy={BC_Y - 52} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
+                            <rect x={bcx - bcw / 2} y={BC_Y - 13} width={bcw} height={26} rx={3}
+                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
+                            <text x={bcx} y={BC_Y - 1.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.9)" fontSize={8.5} fontWeight={800}
+                                letterSpacing={1} fontFamily="Inter, sans-serif">{node.label}</text>
+                            <text x={bcx} y={BC_Y + 7.5} textAnchor="middle"
+                                fill="rgba(255,255,255,0.3)" fontSize={6}
+                                fontFamily="Inter, sans-serif">{node.sub}</text>
+                        </g>
+                    );
+                })}
+            </motion.g>
+
+
+        </svg>
+    );
+}
+
 
 // PARTNERS are now loaded dynamically from /api/logos
 
@@ -1039,8 +1530,15 @@ export function LandingPageClient() {
     const [partners, setPartners] = useState<{ src: string; name: string; scale?: number }[]>([]);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
+    const heroVideoRef = useRef<HTMLVideoElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter();
+
+    useEffect(() => {
+        if (heroVideoRef.current) {
+            heroVideoRef.current.playbackRate = 0.5;
+        }
+    }, []);
 
     useEffect(() => {
         const modal = searchParams.get('modal');
@@ -1097,10 +1595,12 @@ export function LandingPageClient() {
                 {/* Background Video */}
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                     <video 
-                        autoPlay 
-                        muted 
-                        loop 
-                        playsInline 
+                        ref={heroVideoRef}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
                         className="absolute inset-0 w-full h-full object-cover opacity-20 scale-105"
                     >
                         <source src="/video-background.mp4" type="video/mp4" />
@@ -1123,8 +1623,10 @@ export function LandingPageClient() {
                     </div>
 
                     <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
-                        Build a Verifiable Web3<br />
-                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">Resume That Recruiters Trust.</span>
+                        <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
+                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
+                            Resume That Recruiters Trust.
+                        </span>
                     </h1>
 
                     <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mb-12 leading-relaxed">
@@ -1215,6 +1717,9 @@ export function LandingPageClient() {
                 <section className="py-32 px-6 relative z-10 bg-black">
                     {/* Smooth Transitions to Video Background (Start of Black Block) */}
                     <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-transparent to-black -translate-y-full pointer-events-none"></div>
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    </div>
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-24 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
@@ -1226,9 +1731,9 @@ export function LandingPageClient() {
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
-                                Your work is real. Your proof isn’t.
+                                Your work is real. <span className="text-white/30">Your proof isn’t.</span>
                             </h2>
-                            <p className="text-white/40 text-lg md:text-xl font-medium max-w-4xl mx-auto">
+                            <p className="text-white/40 text-base md:text-lg font-medium max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
                         </div>
@@ -1236,9 +1741,9 @@ export function LandingPageClient() {
                         <div className="grid grid-cols-1 md:grid-cols-3">
                             {/* Card 1 */}
                             <div className="space-y-12 group pr-16 pb-16 md:pb-0">
-                                <ProblemCardEffect
-                                    src="/homepage/Broken%20Work%20History.png"
-                                    alt="Broken Work History"
+                                <ProblemVideoCard
+                                    idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=11"
+                                    hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=5"
                                 />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
@@ -1250,11 +1755,11 @@ export function LandingPageClient() {
 
                             {/* Card 2 */}
                             <div className="space-y-12 group px-16 border-l border-white/[0.05] pb-16 md:pb-0">
-                                <ProblemCardEffect
-                                    src="/homepage/Unverifiable%20Resumes.png"
-                                    alt="Unverifiable Resumes"
+                                <ProblemVideoCard
+                                    idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
+                                    hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
                                 />
-                                <div className="space-y-4 text-center">
+                                <div className="space-y-4 text-center pt-2">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
                                     <p className="text-white/40 text-base leading-relaxed">
                                         Without verifiable data, resumes become claims, not proof.
@@ -1264,9 +1769,9 @@ export function LandingPageClient() {
 
                             {/* Card 3 */}
                             <div className="space-y-12 group pl-16 border-l border-white/[0.05]">
-                                <ProblemCardEffect
-                                    src="/homepage/Signal%20Lost%20in%20Noise%20(2).png"
-                                    alt="Signal Lost in Noise"
+                                <ProblemVideoCard
+                                    idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
+                                    hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
                                 />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
@@ -1276,24 +1781,94 @@ export function LandingPageClient() {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </section>
-                
+
+                {/* COMPETITIVE POSITIONING */}
+                <section className="py-24 px-6 relative z-10 bg-black">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    </div>
+                    <div className="max-w-[1240px] mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                            {/* Left side: Network Diagram */}
+                            <div className="lg:col-span-8 relative">
+                                <div className="w-full scale-[1.35] origin-top-left lg:-ml-24">
+                                    <CompetitiveNetworkDiagram />
+                                </div>
+                            </div>
+
+                            {/* Right side: Why ChainVolio copy */}
+                            <div className="lg:col-span-4 space-y-8 pt-8">
+                                <div className="space-y-4">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Why ChainVolio</span>
+                                    </div>
+                                    <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                        Traditional tools created isolated silos.
+                                    </p>
+                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.06]">
+                                        One trust layer.<br />
+                                        <span className="text-white/30">Everything connects.</span>
+                                    </h2>
+                                </div>
+                                <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed">
+                                    LinkedIn can't verify it. A PDF can't prove it. ChainVolio turns every Web3 contribution into a verifiable signal, permanently, without asking anyone's permission.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Bottom callouts — vs competitors */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-14 pt-12">
+                            {[
+                                {
+                                    against: "Beyond Profiles",
+                                    color: "#60a5fa",
+                                    point: "LinkedIn shows who you are. ChainVolio proves what you’ve done. Every contribution is backed by verifiable signals, not just self-reported claims.",
+                                },
+                                {
+                                    against: "From Claims to Proof",
+                                    color: "#14F195",
+                                    point: "Traditional resumes rely on trust. ChainVolio anchors work history with attestations and on-chain records, making every entry independently verifiable.",
+                                },
+                                {
+                                    against: "A Portable Trust Layer",
+                                    color: "#a78bfa",
+                                    point: "ChainVolio works across platforms. Your verified work history can be shared anywhere, including LinkedIn, as a trusted source of proof.",
+                                },
+                            ].map((item, i) => (
+                                <div key={i} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] space-y-3 group hover:bg-white/[0.04] transition-colors">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: item.color }} />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]"
+                                            style={{ color: item.color + "bb" }}>{item.against}</span>
+                                    </div>
+                                    <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors">
+                                        {item.point}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section className="relative z-10 bg-black overflow-hidden">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    </div>
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-0 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs Noise</span>
+                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs Noise</span>
                             </div>
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
                                 Why Web3 Needs Verifiable Work History
                             </p>
-                            <h2 className="text-4xl md:text-5xl lg:text-[56px] font-bold tracking-tight text-white leading-[1.06]">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.06]">
                                 From Noise to<br />
                                 <span className="text-white/30">Verifiable Signal</span>
                             </h2>
@@ -1303,17 +1878,6 @@ export function LandingPageClient() {
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
                         </p>
-                    </div>
-                    
-                    {/* Animated Divider Line */}
-                    <div className="max-w-[1240px] mx-auto px-6 mb-8">
-                        <motion.div 
-                            initial={{ scaleX: 0, opacity: 0 }}
-                            whileInView={{ scaleX: 1, opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
-                            className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent origin-center"
-                        />
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
@@ -1411,7 +1975,11 @@ export function LandingPageClient() {
                     </div>
 
                 </section>
+
                 <section id="solution" className="pt-24 pb-32 px-6 relative z-10 bg-black">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    </div>
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1484,11 +2052,10 @@ export function LandingPageClient() {
 
                 {/* PRODUCT SECTION */}
                 <section className="py-32 px-6 relative z-10 overflow-hidden">
-                    {/* Elegant thin line separator constrained to content width */}
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
-                    
+
                     <div className="max-w-[1200px] mx-auto space-y-48 relative z-10">
                         
                         {/* BLOCK 1 — ATTESTATION */}
@@ -1510,6 +2077,9 @@ export function LandingPageClient() {
 
                 {/* 5. FINAL CTA */}
                 <section className="relative py-48 px-6 overflow-hidden bg-black">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    </div>
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -1531,8 +2101,8 @@ export function LandingPageClient() {
                             transition={{ duration: 0.9, ease: "easeOut" }}
                         >
                             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
-                                Start Building Your<br />
-                                <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Verifiable Web3 Resume.</span>
+                                 Start Building Your<br />
+                                 <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Verifiable Web3 Resume.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-medium">
                                 Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
@@ -1553,14 +2123,6 @@ export function LandingPageClient() {
                                 </Link>
                             </div>
 
-                            {/* Trust pills */}
-                            <div className="flex items-center justify-center flex-wrap gap-3">
-                                {["No token required", "Built on Solana", "Permissionless", "Free to start"].map((pill, i) => (
-                                    <span key={i} className="px-3 py-1 rounded-full border border-white/[0.07] bg-white/[0.02] text-[10px] font-bold uppercase tracking-[0.18em] text-white/25">
-                                        {pill}
-                                    </span>
-                                ))}
-                            </div>
                         </motion.div>
                     </div>
                 </section>
@@ -2071,15 +2633,22 @@ const NETWORK_ICONS = [
 ];
 
 function SignalNoiseVisual() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const mouseRef  = useRef({ x: -9999, y: -9999, active: false });
-    const rafRef    = useRef<number>(0);
+    const canvasRef  = useRef<HTMLCanvasElement>(null);
+    const mouseRef   = useRef({ x: -9999, y: -9999, active: false });
+    const rafRef     = useRef<number>(0);
+    const visibleRef = useRef(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        const visObserver = new IntersectionObserver(
+            ([entry]) => { visibleRef.current = entry.isIntersecting; },
+            { threshold: 0.05 }
+        );
+        visObserver.observe(canvas);
 
         // Preload icons
         const loadedIcons: HTMLImageElement[] = [];
@@ -2093,9 +2662,9 @@ function SignalNoiseVisual() {
 
         // Three layers of rays for depth — dense short inner, mid, long sparse outer
         const makeLayers = () => {
-            const layerA = Array.from({ length: 80 }, (_, i) => ({
-                baseAngle:   (i / 80) * Math.PI * 2 + Math.random() * 0.12,
-                length:      28 + Math.random() * 60,
+            const layerA = Array.from({ length: 100 }, (_, i) => ({
+                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.12,
+                length:      40 + Math.random() * 80,
                 wobbleAmp:   0.04 + Math.random() * 0.06,
                 wobbleSpeed: 0.6  + Math.random() * 1.2,
                 wobblePhase: Math.random() * Math.PI * 2,
@@ -2105,25 +2674,25 @@ function SignalNoiseVisual() {
                 iconIdx:     -1
             }));
 
-            const layerB = Array.from({ length: 100 }, (_, i) => ({
-                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.15,
-                length:      80 + Math.random() * 130,
+            const layerB = Array.from({ length: 140 }, (_, i) => ({
+                baseAngle:   (i / 140) * Math.PI * 2 + Math.random() * 0.15,
+                length:      150 + Math.random() * 180,
                 wobbleAmp:   0.03 + Math.random() * 0.07,
                 wobbleSpeed: 0.3  + Math.random() * 0.8,
                 wobblePhase: Math.random() * Math.PI * 2,
-                opacity:     0.07 + Math.random() * 0.18,
+                opacity:     0.08 + Math.random() * 0.20,
                 thickness:   0.4  + Math.random() * 0.45,
                 dotR:        0.8  + Math.random() * 1.2,
                 iconIdx:     -1
             }));
 
-            const layerC = Array.from({ length: 60 }, (_, i) => ({
-                baseAngle:   (i / 60) * Math.PI * 2 + Math.random() * 0.2,
-                length:      180 + Math.random() * 200,
+            const layerC = Array.from({ length: 100 }, (_, i) => ({
+                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.2,
+                length:      320 + Math.random() * 230,
                 wobbleAmp:   0.02 + Math.random() * 0.04,
                 wobbleSpeed: 0.2  + Math.random() * 0.5,
                 wobblePhase: Math.random() * Math.PI * 2,
-                opacity:     0.03 + Math.random() * 0.09,
+                opacity:     0.05 + Math.random() * 0.12,
                 thickness:   0.3  + Math.random() * 0.35,
                 dotR:        1.0  + Math.random() * 1.5,
                 iconIdx:     -1
@@ -2181,6 +2750,10 @@ function SignalNoiseVisual() {
 
         let t = 0;
         const draw = () => {
+            if (!visibleRef.current) {
+                rafRef.current = requestAnimationFrame(draw);
+                return;
+            }
             ctx.clearRect(0, 0, W, H);
 
             const ox = W / 2;
@@ -2261,6 +2834,7 @@ function SignalNoiseVisual() {
 
         return () => {
             cancelAnimationFrame(rafRef.current);
+            visObserver.disconnect();
             window.removeEventListener('resize', resize);
             canvas.removeEventListener('mousemove', onMove);
             canvas.removeEventListener('mouseleave', onLeave);
