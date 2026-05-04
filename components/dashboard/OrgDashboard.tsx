@@ -177,7 +177,13 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const data = await res.json();
-      if (data.ok && data.url) window.location.href = data.url;
+      if (data.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        setToastMessage(data.error?.message ?? "Billing management is currently under maintenance. Please try again later.");
+      }
+    } catch {
+      setToastMessage("Something went wrong. Please try again.");
     } finally {
       setManagingSubscription(false);
     }

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Users, Building, Shield, ArrowLeft, Zap, Briefcase, Award, Loader2, Building2 } from "lucide-react";
+import { CheckCircle, XCircle, Users, Building, Wrench, X, Building2, Briefcase, Award, Zap } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
@@ -136,62 +135,67 @@ function Cell({ value, colKey }: { value: string | boolean; colKey: CK }) {
     return <span className={`text-[11px] font-bold ${col.text}`}>{value}</span>;
 }
 
+function MaintenanceModal({ onClose }: { onClose: () => void }) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onClose}>
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <div
+                className="relative w-full max-w-sm rounded-2xl bg-[#0d0d0d] border border-white/10 p-8 text-center shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-white/30 hover:text-white/60 transition-colors"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
+                    <Wrench className="w-7 h-7 text-amber-400" />
+                </div>
+
+                <h2 className="text-xl font-black text-white mb-2">Under Maintenance</h2>
+                <p className="text-white/40 text-sm leading-relaxed mb-6">
+                    Payment services are currently unavailable in your region. We&apos;re working on bringing subscription support soon.
+                </p>
+
+                <button
+                    onClick={onClose}
+                    className="w-full py-2.5 rounded-xl bg-white/8 hover:bg-white/12 border border-white/10 text-white/70 text-sm font-bold transition-all"
+                >
+                    Got it
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function RecruiterPricingPage() {
-    const router = useRouter();
-    const { session, orgAccount, loading, signInWithGoogle } = useGoogleAuth();
-    const [subscribing, setSubscribing] = useState<StripePlanName | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const { orgAccount } = useGoogleAuth();
+    const [showMaintenance, setShowMaintenance] = useState(false);
 
     const currentPlan = (orgAccount?.plan_name ?? "free") as StripePlanName;
-
-    const handleSubscribe = async (planKey: StripePlanName) => {
-        if (planKey === "free") return;
-
-        if (!session) {
-            signInWithGoogle();
-            return;
-        }
-
-        setSubscribing(planKey);
-        setError(null);
-
-        try {
-            const res = await fetch("/api/stripe/create-checkout-session", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session.access_token}`,
-                },
-                body: JSON.stringify({ planName: planKey }),
-            });
-            const data = await res.json();
-            if (!data.ok) throw new Error(data.error?.message || "Failed to start checkout");
-            window.location.href = data.url;
-        } catch (err: any) {
-            setError(err.message || "Something went wrong. Please try again.");
-            setSubscribing(null);
-        }
-    };
-
     const colKeys: CK[] = ["slate", "blue", "amber"];
 
     return (
         <main className="min-h-screen bg-black text-white flex flex-col">
             <Navbar />
-            
-            {/* ── Background texture ── */}
+
+            {showMaintenance && <MaintenanceModal onClose={() => setShowMaintenance(false)} />}
+
+            {/* Background texture */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.05),transparent)]" />
                 <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
             </div>
 
             <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20 w-full flex-1">
-                
-                {/* ── Hero ── */}
+
+                {/* Hero */}
                 <div className="text-center mb-16 md:mb-20">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-5">
                         <Building2 className="w-3 h-3" />
-                        For Organizations & Recruiters
+                        For Organizations &amp; Recruiters
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-none">
                         Get Your Organization{" "}
@@ -204,19 +208,13 @@ export default function RecruiterPricingPage() {
                     </p>
                 </div>
 
-                {error && (
-                    <div className="max-w-2xl mx-auto mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
-                        {error}
-                    </div>
-                )}
-
-                {/* ── Tier cards ── */}
+                {/* Tier cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-20">
                     {TIERS.map((tier) => {
                         const col = C[tier.colorKey];
                         const isCurrent = currentPlan === tier.id;
-                        const isLoading = subscribing === tier.id;
-                        
+                        const isPaid = tier.id !== "free";
+
                         return (
                             <div
                                 key={tier.id}
@@ -297,30 +295,28 @@ export default function RecruiterPricingPage() {
                                     </div>
 
                                     {/* CTA */}
-                                    <button
-                                        onClick={() => handleSubscribe(tier.id)}
-                                        disabled={true}
-                                        className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all flex items-center justify-center gap-2 ${
-                                            isCurrent || tier.id === "free"
-                                                ? "bg-slate-800 text-slate-500 cursor-default border border-slate-700"
-                                                : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
-                                        }`}
-                                    >
-                                        {isLoading ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                                        ) : isCurrent || tier.id === "free" ? (
-                                            "Current Plan"
-                                        ) : (
-                                            <><Zap className="w-4 h-4" /> Coming Soon</>
-                                        )}
-                                    </button>
+                                    {isCurrent || !isPaid ? (
+                                        <button
+                                            disabled
+                                            className="w-full py-3 rounded-xl text-[12px] font-bold tracking-wide flex items-center justify-center gap-2 bg-slate-800 text-slate-500 cursor-default border border-slate-700"
+                                        >
+                                            Current Plan
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => setShowMaintenance(true)}
+                                            className={`w-full py-3 rounded-xl text-[12px] font-bold tracking-wide transition-all flex items-center justify-center gap-2 border ${col.border} ${col.bg} ${col.text} hover:opacity-80`}
+                                        >
+                                            <Zap className="w-4 h-4" /> Subscribe
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* ── Comparison table ── */}
+                {/* Comparison table */}
                 <div className="mb-20">
                     <div className="text-center mb-10">
                         <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-2">Full Feature Comparison</h2>
@@ -346,7 +342,6 @@ export default function RecruiterPricingPage() {
                         {/* Comparison rows */}
                         {COMPARISON.map((section, si) => (
                             <div key={section.category}>
-                                {/* Section header */}
                                 <div className="grid grid-cols-4 bg-white/[0.02]">
                                     <div className="col-span-4 px-4 md:px-5 py-2.5">
                                         <span className="text-[9px] font-black text-white/25 uppercase tracking-[0.2em]">{section.category}</span>
@@ -374,7 +369,7 @@ export default function RecruiterPricingPage() {
                 </div>
 
             </div>
-            
+
             <Footer />
         </main>
     );
