@@ -7,6 +7,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import ProblemVideoCard from "./ProblemVideoCard";
+import SimpleDiagram from "./SimpleDiagram";
+import GlobeCanvas from "./GlobeCanvas";
+import CompetitiveNetworkDiagram from "./CompetitiveNetworkDiagram";
 import {
     ArrowRight,
     CheckCircle2,
@@ -25,6 +28,8 @@ import {
     Share2,
     Boxes,
     Hash,
+    Linkedin,
+    FileText,
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -1105,674 +1110,6 @@ const SLIDES = [
     { src: "/homepage/image%20slide%202/status.svg", label: "Verification status" },
 ];
 
-// ─── Why ChainVolio — Circuit Board Diagram ─────────────────────────────────
-
-const CATEGORY_COLORS = {
-    purple: "#9945FF",
-    green:  "#14F195",
-    blue:   "#60a5fa",
-    amber:  "#f59e0b",
-    violet: "#a78bfa",
-    teal:   "#2dd4bf",
-};
-
-function CompetitiveNetworkDiagram() {
-    const [active, setActive] = useState(false);
-    const svgRef = useRef<SVGSVGElement>(null);
-
-    useEffect(() => {
-        const el = svgRef.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) setActive(true); },
-            { threshold: 0.15 }
-        );
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, []);
-
-    const SVW = 1100, SVH = 720;
-    const CX = 550, CY = 375;
-
-    // Top input sources
-    const COL_XS = [248, 424, 600];
-    const ROW_YS = [52, 112, 172];
-    const N_W = 148;
-    const COLLECTOR_Y = 224;
-    const INGEST_X = 470, INGEST_Y = 240, INGEST_W = 160, INGEST_H = 26;
-
-    // Center chip
-    const CHIP_X = 440, CHIP_Y = 330, CHIP_W = 220, CHIP_H = 90;
-
-    // Left verification
-    const N_H = 26;
-    const LN_X = 20, LN_W = 148, LN_H = 26;
-    const LN_YS = [315, 375, 435];
-    const L_BUS_X = 256;
-    const VERIFY_X = 274, VERIFY_W = 116, VERIFY_H = 30;
-
-    // Right outputs
-    const RO_X = 920, RO_W = 168, RO_H = 26;
-    const RO_YS = [195, 255, 315, 375];
-    const R_BUS_X = 710;
-
-    // Bottom consumers
-    const BC_XS = [340, 480, 620, 760];
-    const BC_Y = 574;
-    const BC_W = 118, BC_H = 26;
-    const MATCH_Y = 490;
-
-    const TOP_SOURCES = [
-        [
-            { label: "Code Contributions",     color: CATEGORY_COLORS.purple, sub: "repos & commits" },
-            { label: "Project Documentation", color: CATEGORY_COLORS.purple, sub: "docs & specs"    },
-            { label: "Design Output",        color: CATEGORY_COLORS.purple, sub: "design work"     },
-        ],
-        [
-            { label: "On-chain Activity",      color: CATEGORY_COLORS.green,  sub: "tx history"      },
-            { label: "Ecosystem Contributions", color: CATEGORY_COLORS.green,  sub: "bounties"         },
-            { label: "Hackathon Work",        color: CATEGORY_COLORS.green,  sub: "hackathons"       },
-        ],
-        [
-            { label: "Public Signals",        color: CATEGORY_COLORS.blue,   sub: "threads"         },
-            { label: "Community Activity",    color: CATEGORY_COLORS.blue,   sub: "community"       },
-            { label: "Peer Interaction",      color: CATEGORY_COLORS.blue,   sub: "channels"        },
-        ],
-    ];
-    const ROW_LABELS = ["DEV TOOLS", "ON-CHAIN", "SOCIAL"];
-    const ROW_COLORS = [CATEGORY_COLORS.purple, CATEGORY_COLORS.green, CATEGORY_COLORS.blue];
-
-    const LEFT_NODES = [
-        { label: "SMART CONTRACT", sub: "audit trace",      color: CATEGORY_COLORS.green },
-        { label: "WORK HISTORY",   sub: "on-chain proof",   color: CATEGORY_COLORS.green },
-        { label: "ATTESTATIONS",   sub: "verified by DAOs", color: CATEGORY_COLORS.green },
-    ];
-
-    const RIGHT_OUTPUTS = [
-        { label: "Verifiable CV",     sub: "permanent record",   color: CATEGORY_COLORS.teal },
-        { label: "Reputation Score",  sub: "credibility rating", color: CATEGORY_COLORS.teal },
-        { label: "Skill Proof",       sub: "verified skills",    color: CATEGORY_COLORS.teal },
-        { label: "Public Identity",   sub: "shareable link",     color: CATEGORY_COLORS.teal },
-    ];
-
-    const CONSUMERS = [
-        { label: "DAO Access",       sub: "Protocol admin",  color: CATEGORY_COLORS.amber },
-        { label: "Talent Discovery", sub: "Instant hire",    color: CATEGORY_COLORS.amber },
-        { label: "Hiring",           sub: "HR verification", color: CATEGORY_COLORS.amber },
-        { label: "Collaboration",    sub: "Team builder",    color: CATEGORY_COLORS.amber },
-    ];
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const anim = (opts: any): any => active ? opts : {};
-
-    return (
-        <svg ref={svgRef} viewBox={`0 0 ${SVW} ${SVH}`} width="100%" height="auto"
-            className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
-
-            <defs>
-                <pattern id="dotGrid" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <circle cx="1" cy="1" r="0.8" fill="rgba(255,255,255,0.055)" />
-                </pattern>
-                <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
-                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                </radialGradient>
-                <linearGradient id="node-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#111111" />
-                    <stop offset="100%" stopColor="#000000" />
-                </linearGradient>
-            </defs>
-
-            {/* dot grid */}
-            <rect width="100%" height="100%" fill="url(#dotGrid)"
-                opacity={active ? 1 : 0.4} style={{ transition: 'opacity 1.5s ease-in-out' }} />
-
-            {/* ══ SECTION LABELS ══ */}
-            <text x={424} y={30} textAnchor="middle" fill="rgba(255,255,255,0.14)"
-                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">INPUT SOURCES</text>
-            
-            <text x={194} y={LN_YS[0] - 30} textAnchor="middle" fill="rgba(255,255,255,0.14)"
-                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">VERIFICATION</text>
-
-            <text x={772} y={RO_YS[0] - 30} textAnchor="middle"
-                fill="rgba(255,255,255,0.14)" fontSize={7.5} fontWeight={700}
-                letterSpacing={3} fontFamily="monospace">VERIFIED OUTPUT</text>
-
-            <text x={CX} y={544} textAnchor="middle" fill="rgba(255,255,255,0.14)"
-                fontSize={7.5} fontWeight={700} letterSpacing={3} fontFamily="monospace">CONSUMERS</text>
-
-            {/* ══ TOP INPUT SOURCES ══ */}
-
-            {/* row category labels */}
-            {ROW_LABELS.map((label, ri) => (
-                <motion.text key={`rl${ri}`} x={174} y={ROW_YS[ri] + N_H / 2 + 1}
-                    textAnchor="end" fill="rgba(255,255,255,0.4)" fontSize={6.5}
-                    fontWeight={700} letterSpacing={2.5} opacity={0}
-                    animate={anim({ opacity: 0.65 })}
-                    transition={{ delay: 0.1 + ri * 0.06 }}
-                    fontFamily="monospace">{label}</motion.text>
-            ))}
-
-            {/* ══ ANIMATED DATA PACKETS ══ */}
-            {active && [
-                // TOP SOURCES (9 nodes)
-                { d: `M ${COL_XS[0]} ${ROW_YS[0] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '4.8s', delay: '0s'   },
-                { d: `M ${COL_XS[1]} ${ROW_YS[0] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.0s', delay: '0.4s' },
-                { d: `M ${COL_XS[2]} ${ROW_YS[0] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.2s', delay: '0.8s' },
-                
-                { d: `M ${COL_XS[0]} ${ROW_YS[1] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '4.9s', delay: '1.2s' },
-                { d: `M ${COL_XS[1]} ${ROW_YS[1] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.1s', delay: '0.3s' },
-                { d: `M ${COL_XS[2]} ${ROW_YS[1] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.3s', delay: '0.7s' },
-                
-                { d: `M ${COL_XS[0]} ${ROW_YS[2] + N_H} L ${COL_XS[0]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.0s', delay: '1.5s' },
-                { d: `M ${COL_XS[1]} ${ROW_YS[2] + N_H} L ${COL_XS[1]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.4s', delay: '1.1s' },
-                { d: `M ${COL_XS[2]} ${ROW_YS[2] + N_H} L ${COL_XS[2]} ${COLLECTOR_Y} L ${CX} ${COLLECTOR_Y} L ${CX} ${INGEST_Y}`, dur: '5.6s', delay: '0.9s' },
-
-                // INGESTION TO CHIP
-                { d: `M ${CX} ${INGEST_Y + INGEST_H} L ${CX} ${CHIP_Y}`, dur: '1.4s', delay: '1.3s' },
-
-                // LEFT NODES (3 nodes)
-                { d: `M ${LN_X + LN_W} ${LN_YS[0]} L ${L_BUS_X} ${LN_YS[0]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.4s', delay: '0.6s' },
-                { d: `M ${LN_X + LN_W} ${LN_YS[1]} L ${L_BUS_X} ${LN_YS[1]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.6s', delay: '1.0s' },
-                { d: `M ${LN_X + LN_W} ${LN_YS[2]} L ${L_BUS_X} ${LN_YS[2]} L ${L_BUS_X} ${CY} L ${CHIP_X} ${CY}`, dur: '3.9s', delay: '1.4s' },
-
-                // CHIP TO RIGHT (4 nodes)
-                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[0]} L ${R_BUS_X + 12} ${RO_YS[0]}`, dur: '3.0s', delay: '1.6s' },
-                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[1]} L ${R_BUS_X + 12} ${RO_YS[1]}`, dur: '3.2s', delay: '1.9s' },
-                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[2]} L ${R_BUS_X + 12} ${RO_YS[2]}`, dur: '3.4s', delay: '2.2s' },
-                { d: `M ${CHIP_X + CHIP_W} ${CY} L ${R_BUS_X} ${CY} L ${R_BUS_X} ${RO_YS[3]} L ${R_BUS_X + 12} ${RO_YS[3]}`, dur: '3.6s', delay: '2.5s' },
-
-                // CHIP TO MATCHING
-                { d: `M ${CX} ${CHIP_Y + CHIP_H} L ${CX} ${MATCH_Y - 18}`, dur: '1.4s', delay: '1.9s' },
-
-                // MATCHING TO CONSUMERS (4 nodes)
-                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[0]} ${BC_Y - 52} L ${BC_XS[0]} ${BC_Y - BC_H/2}`, dur: '3.8s', delay: '2.3s' },
-                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[1]} ${BC_Y - 52} L ${BC_XS[1]} ${BC_Y - BC_H/2}`, dur: '4.0s', delay: '2.6s' },
-                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[2]} ${BC_Y - 52} L ${BC_XS[2]} ${BC_Y - BC_H/2}`, dur: '4.2s', delay: '2.9s' },
-                { d: `M ${CX} ${MATCH_Y + 18} L ${CX} ${BC_Y - 52} L ${BC_XS[3]} ${BC_Y - 52} L ${BC_XS[3]} ${BC_Y - BC_H/2}`, dur: '4.4s', delay: '3.2s' },
-            ].map((p, i) => (
-                <rect key={`pkt-${i}`} x="-1.5" y="-1.5" width={3} height={3} rx={0.5}
-                    fill="white" style={{ filter: `drop-shadow(0 0 3px white)` }}>
-                    <animateMotion dur={p.dur} repeatCount="indefinite" begin={p.delay} path={p.d} />
-                </rect>
-            ))}
-
-            {/* 9 source nodes */}
-            {TOP_SOURCES.map((row, ri) => row.map((node, ci) => {
-                const nw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
-                const nx = COL_XS[ci] - nw / 2;
-                const ny = ROW_YS[ri];
-                return (
-                    <motion.g key={`tn${ri}${ci}`}
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={anim({ opacity: 1, y: 0 })}
-                        transition={{ delay: 0.12 + ri * 0.07 + ci * 0.04 }}>
-                        <rect x={nx} y={ny} width={nw} height={N_H} rx={3}
-                            fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
-                        
-                        {/* Terminal via */}
-                        <circle cx={COL_XS[ci]} cy={ny + N_H} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
-                        
-                        <text x={COL_XS[ci]} y={ny + N_H / 2 - 1.5} textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)" fontSize={8} fontWeight={600}
-                            fontFamily="Inter, sans-serif">{node.label}</text>
-                        <text x={COL_XS[ci]} y={ny + N_H / 2 + 7.5} textAnchor="middle"
-                            fill="rgba(255,255,255,0.3)" fontSize={6}
-                            fontFamily="Inter, sans-serif">{node.sub}</text>
-
-                        {/* vertical trace to collector */}
-                        <line x1={COL_XS[ci]} y1={ny + N_H} x2={COL_XS[ci]} y2={COLLECTOR_Y}
-                            stroke="rgba(255,255,255,0.12)" strokeWidth={0.75} strokeDasharray="3 5" />
-                        
-                        {/* junction via at collector line */}
-                        <g opacity={active ? 0.4 : 0}>
-                            <circle cx={COL_XS[ci]} cy={COLLECTOR_Y} r={2.5} fill="#000" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
-                            <circle cx={COL_XS[ci]} cy={COLLECTOR_Y} r={1} fill="rgba(255,255,255,0.5)" />
-                        </g>
-                    </motion.g>
-                );
-            }))}
-
-            {/* horizontal collector rail */}
-            <motion.line x1={COL_XS[0]} y1={COLLECTOR_Y} x2={COL_XS[2]} y2={COLLECTOR_Y}
-                stroke="rgba(255,255,255,0.10)" strokeWidth={1} strokeDasharray="4 6"
-                opacity={0} animate={anim({ opacity: 1 })}
-                transition={{ delay: 0.55 }} />
-
-            {/* collector → ingestion trunk */}
-            <motion.line x1={CX} y1={COLLECTOR_Y} x2={CX} y2={INGEST_Y}
-                stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} strokeDasharray="3 4"
-                opacity={0} animate={anim({ opacity: 1 })}
-                transition={{ delay: 0.65 }} />
-
-            {/* ── DATA INGESTION node ── */}
-            <motion.g initial={{ opacity: 0 }} animate={anim({ opacity: 1 })} transition={{ delay: 0.85 }}>
-                <rect x={INGEST_X} y={INGEST_Y} width={INGEST_W} height={26} rx={3}
-                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
-                <text x={CX} y={INGEST_Y + 11} textAnchor="middle"
-                    fill="rgba(255,255,255,0.9)" fontSize={8.5} fontWeight={800} letterSpacing={1}
-                    fontFamily="Inter, sans-serif">DATA INGESTION</text>
-                <text x={CX} y={INGEST_Y + 20} textAnchor="middle"
-                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">collecting all signals</text>
-                <rect x={CX - 3} y={INGEST_Y - 4} width={6} height={6} fill="none" />
-                <rect x={CX - 3} y={INGEST_Y + INGEST_H - 2} width={6} height={6} fill="none" />
-                {/* ingestion → chip */}
-                <line x1={CX} y1={INGEST_Y + INGEST_H + 2} x2={CX} y2={CHIP_Y}
-                    stroke="rgba(255,255,255,0.2)" strokeWidth={2} strokeDasharray="4 4" />
-                <g opacity={active ? 0.5 : 0}>
-                    <circle cx={CX} cy={CHIP_Y} r={3} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
-                    <circle cx={CX} cy={CHIP_Y} r={1.2} fill="white" />
-                </g>
-            </motion.g>
-
-            {/* ══ LEFT: WORK VERIFICATION ══ */}
-            <motion.g initial={{ opacity: 0, x: -18 }} animate={anim({ opacity: 1, x: 0 })} transition={{ delay: 0.38 }}>
-                {LEFT_NODES.map((node, i) => {
-                    const lnw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
-                    const center_x = L_BUS_X - 12 - lnw / 2;
-                    return (
-                        <g key={`ln${i}`}>
-                            <rect x={L_BUS_X - 12 - lnw} y={LN_YS[i] - 13} width={lnw} height={26} rx={3}
-                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
-                            <text x={center_x} y={LN_YS[i] - 1.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.9)" fontSize={8} fontWeight={600}
-                                fontFamily="Inter, sans-serif">{node.label}</text>
-                            <text x={center_x} y={LN_YS[i] + 7.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.3)" fontSize={6}
-                                fontFamily="Inter, sans-serif">{node.sub}</text>
-                            <line x1={L_BUS_X - 12} y1={LN_YS[i]} x2={L_BUS_X} y2={LN_YS[i]}
-                                stroke="rgba(255,255,255,0.15)" strokeWidth={0.75} strokeDasharray="3 5" />
-                            <circle cx={L_BUS_X - 12} cy={LN_YS[i]} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
-                        </g>
-                    );
-                })}
-                {/* left vertical bus */}
-                <line x1={L_BUS_X} y1={LN_YS[0]} x2={L_BUS_X} y2={LN_YS[LN_YS.length - 1]}
-                    stroke="rgba(255,255,255,0.1)" strokeWidth={1.5} strokeDasharray="4 4" />
-                {/* horizontal trunk (bus → verify engine → chip) */}
-                <line x1={L_BUS_X} y1={CY} x2={CHIP_X} y2={CY}
-                    stroke="rgba(255,255,255,0.15)" strokeWidth={1.5} strokeDasharray="4 4" />
-                {/* VERIFICATION ENGINE (sits on trunk) */}
-                <rect x={VERIFY_X} y={CY - 13} width={VERIFY_W} height={26} rx={3}
-                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
-                <text x={VERIFY_X + VERIFY_W / 2} y={CY - 1.5} textAnchor="middle"
-                    fill="rgba(255,255,255,0.85)" fontSize={8.5} fontWeight={800} letterSpacing={1}
-                    fontFamily="Inter, sans-serif">VERIFICATION</text>
-                <text x={VERIFY_X + VERIFY_W / 2} y={CY + 7.5} textAnchor="middle"
-                    fill="rgba(255,255,255,0.3)" fontSize={6} fontFamily="Inter, sans-serif">ENGINE</text>
-                <rect x={L_BUS_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.2)" rx={1} />
-                <rect x={CHIP_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.2)" rx={1} />
-                {/* Vias at L-bus junctions */}
-                {active && LN_YS.map((y, i) => (
-                    <g key={`lvia${i}`}>
-                        <circle cx={L_BUS_X} cy={y} r={2.5} fill="#000" stroke="rgba(255,255,255,0.3)" strokeWidth={0.5} />
-                        <circle cx={L_BUS_X} cy={y} r={1} fill="rgba(255,255,255,0.5)" />
-                    </g>
-                ))}
-                {active && (
-                    <g>
-                        <circle cx={L_BUS_X} cy={CY} r={3.5} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.8} />
-                        <circle cx={L_BUS_X} cy={CY} r={1.5} fill="white" />
-                    </g>
-                )}
-            </motion.g>
-
-            {/* ══ CENTER: ChainVolio Chip ══ */}
-            <motion.g
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={anim({ opacity: 1, scale: 1 })}
-                style={{ transformOrigin: `${CX}px ${CY}px` }}
-                transition={{ duration: 0.8, delay: 0.7 }}>
-                <circle cx={CX} cy={CY} r={82} fill="url(#hub-glow)" />
-                <rect x={CHIP_X} y={CHIP_Y} width={CHIP_W} height={CHIP_H} rx={8}
-                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.15)" strokeWidth={0.6} />
-                
-                <image href="/logo.png" x={CX - 22} y={CY - 34} width={44} height={44}
-                    style={{ filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.2))' }} />
-                <text x={CX} y={CY + 26} textAnchor="middle" fill="white"
-                    fontSize={11} fontWeight={800} letterSpacing={2.5} fontFamily="Inter, sans-serif">CHAINVOLIO</text>
-            </motion.g>
-
-            {/* ══ RIGHT: VERIFIED OUTPUT ══ */}
-            <motion.g initial={{ opacity: 0, x: 18 }} animate={anim({ opacity: 1, x: 0 })} transition={{ delay: 0.5 }}>
-                {/* chip → right bus trunk */}
-                <line x1={CHIP_X + CHIP_W} y1={CY} x2={R_BUS_X} y2={CY}
-                    stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="4 4" />
-                <rect x={CHIP_X + CHIP_W - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
-                <rect x={R_BUS_X - 4} y={CY - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
-                {/* right vertical bus */}
-                <line x1={R_BUS_X} y1={RO_YS[0]} x2={R_BUS_X} y2={RO_YS[RO_YS.length - 1]}
-                    stroke="rgba(255,255,255,0.1)" strokeWidth={1.5} strokeDasharray="4 4" />
-
-                {/* output nodes */}
-                {RIGHT_OUTPUTS.map((node, i) => {
-                    const row = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
-                    const center_x = R_BUS_X + 12 + row / 2;
-                    return (
-                        <g key={`ro${i}`}>
-                            <line x1={R_BUS_X} y1={RO_YS[i]} x2={R_BUS_X + 12} y2={RO_YS[i]}
-                                stroke="rgba(255,255,255,0.1)" strokeWidth={0.75} strokeDasharray="3 5" />
-                            <g opacity={active ? 1 : 0}>
-                                <circle cx={R_BUS_X} cy={RO_YS[i]} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
-                            </g>
-                            <rect x={R_BUS_X + 12} y={RO_YS[i] - 13} width={row} height={26} rx={3}
-                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
-                            <text x={center_x} y={RO_YS[i] - 1.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.95)" fontSize={8} fontWeight={700}
-                                fontFamily="Inter, sans-serif">{node.label}</text>
-                            <text x={center_x} y={RO_YS[i] + 7.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.35)" fontSize={6}
-                                fontFamily="Inter, sans-serif">{node.sub}</text>
-                        </g>
-                    );
-                })}
-                {active && (
-                    <g>
-                        <circle cx={R_BUS_X} cy={CY} r={3.5} fill="#000" stroke="rgba(255,255,255,0.4)" strokeWidth={0.8} />
-                        <circle cx={R_BUS_X} cy={CY} r={1.5} fill="white" />
-                    </g>
-                )}
-            </motion.g>
-
-            {/* ══ BOTTOM: SMART MATCHING & CONSUMERS ══ */}
-            <motion.g initial={{ opacity: 0, y: 18 }} animate={anim({ opacity: 1, y: 0 })} transition={{ delay: 0.6 }}>
-                {/* chip → matching trunk */}
-                <line x1={CX} y1={CHIP_Y + CHIP_H} x2={CX} y2={MATCH_Y - 18}
-                    stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="4 4" />
-                <rect x={CX - 4} y={CHIP_Y + CHIP_H - 4} width={8} height={8} fill="rgba(255,255,255,0.18)" rx={1} />
-                {/* SMART MATCHING box */}
-                <rect x={CX - 82} y={MATCH_Y - 13} width={164} height={26} rx={3}
-                    fill="url(#node-grad)" stroke="rgba(255,255,255,0.12)" strokeWidth={0.5} />
-                <text x={CX} y={MATCH_Y} textAnchor="middle"
-                    fill="rgba(255,255,255,0.85)" fontSize={8.5} fontWeight={800} letterSpacing={1}
-                    fontFamily="Inter, sans-serif">SMART MATCHING</text>
-                <text x={CX} y={MATCH_Y + 9} textAnchor="middle"
-                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">verified credentials, trusted anywhere</text>
-                {/* horizontal distribution rail */}
-                <line x1={BC_XS[0]} y1={BC_Y - 52} x2={BC_XS[BC_XS.length - 1]} y2={BC_Y - 52}
-                    stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="3 6" />
-                {/* consumer nodes */}
-                {CONSUMERS.map((node, i) => {
-                    const bcw = Math.max(node.label.length * 6.2, node.sub.length * 4.6) + 10;
-                    const bcx = BC_XS[i];
-                    return (
-                        <g key={`bc${i}`}>
-                             <path
-                                d={`M ${CX} ${MATCH_Y + 16} L ${CX} ${BC_Y - 52} L ${bcx} ${BC_Y - 52} L ${bcx} ${BC_Y - 13}`}
-                                fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="3 6" />
-                            <circle cx={bcx} cy={BC_Y - 52} r={1.5} fill="#000" stroke="rgba(255,255,255,0.2)" strokeWidth={0.5} />
-                            <rect x={bcx - bcw / 2} y={BC_Y - 13} width={bcw} height={26} rx={3}
-                                fill="url(#node-grad)" stroke="rgba(255,255,255,0.1)" strokeWidth={0.5} />
-                            <text x={bcx} y={BC_Y - 1.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.9)" fontSize={8.5} fontWeight={800}
-                                letterSpacing={1} fontFamily="Inter, sans-serif">{node.label}</text>
-                            <text x={bcx} y={BC_Y + 7.5} textAnchor="middle"
-                                fill="rgba(255,255,255,0.3)" fontSize={6}
-                                fontFamily="Inter, sans-serif">{node.sub}</text>
-                        </g>
-                    );
-                })}
-            </motion.g>
-
-
-        </svg>
-    );
-}
-
-// ─── Simple Flow Diagram ──────────────────────────────────────────────────────
-function SimpleDiagram() {
-    const [active, setActive] = useState(false);
-    const svgRef = useRef<SVGSVGElement>(null);
-
-    useEffect(() => {
-        const el = svgRef.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) setActive(true); },
-            { threshold: 0.1 }
-        );
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, []);
-
-    const W = 920, H = 600;
-    const f = (d: number) => ({ opacity: active ? 1 : 0, transition: `opacity 0.5s ease ${d}s` });
-
-    return (
-        <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" height="auto"
-            className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="s-node-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#111111" />
-                    <stop offset="100%" stopColor="#000000" />
-                </linearGradient>
-            </defs>
-
-            {/* ─── ANIMATED DOTS (DATA PACKETS) ─── */}
-            {active && [
-                { d: "M 155 134 L 155 145 L 460 145 L 460 185", dur: '4s', delay: '0s' },
-                { d: "M 460 134 L 460 145 L 460 185", dur: '3s', delay: '0.5s' },
-                { d: "M 765 134 L 765 145 L 460 145 L 460 185", dur: '4s', delay: '1s' },
-                { d: "M 460 225 L 460 270", dur: '2s', delay: '0.2s' },
-                { d: "M 144 320 L 204 320", dur: '2s', delay: '0.4s' },
-                { d: "M 314 320 L 375 320", dur: '1s', delay: '1.2s' },
-                { d: "M 545 320 L 776 320", dur: '3s', delay: '1.5s' },
-                { d: "M 460 370 L 460 415", dur: '2s', delay: '1.2s' },
-                { d: "M 460 455 L 460 475 L 127 475 L 127 495", dur: '4s', delay: '2.2s' },
-                { d: "M 460 455 L 460 475 L 349 475 L 349 495", dur: '4s', delay: '2.4s' },
-                { d: "M 460 455 L 460 475 L 571 475 L 571 495", dur: '4s', delay: '2.6s' },
-                { d: "M 460 455 L 460 475 L 793 475 L 793 495", dur: '4s', delay: '2.8s' },
-            ].map((p, i) => (
-                <rect key={`spkt-${i}`} x="-1" y="-1" width={2} height={2} rx={0.5}
-                    fill="white" style={{ filter: `drop-shadow(0 0 2px white)` }}>
-                    <animateMotion dur={p.dur} repeatCount="indefinite" begin={p.delay} path={p.d} />
-                </rect>
-            ))}
-
-            {/* ─── INPUT SOURCES ────────────────────────────────────── */}
-            <g style={f(0.05)}>
-                <text x={W / 2} y={12} textAnchor="middle" fill="rgba(255,255,255,0.3)"
-                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">INPUT SOURCE</text>
-                
-                {[
-                    { cx: 155, items: ["Code Contributions", "Project Documentation", "Design Output"] },
-                    { cx: 460, items: ["On-chain Activity", "Ecosystem Contributions", "Hackathon Work"] },
-                    { cx: 765, items: ["Public Signals", "Community Activity", "Peer Interaction"] }
-                ].map((box, i) => (
-                    <g key={i}>
-                        <rect x={box.cx - 75} y={24} width={150} height={110} rx={12} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-                        {box.items.map((it, j) => (
-                            <g key={j}>
-                                <text x={box.cx} y={48 + j * 16} textAnchor="middle" fill="white" fontSize="9.5" fontWeight="600">{it}</text>
-                                {j < 2 && <line x1={box.cx - 50} y1={53 + j * 16} x2={box.cx + 50} y2={53 + j * 16} stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />}
-                            </g>
-                        ))}
-                        <g transform={`translate(${box.cx}, 98)`} opacity="0.8">
-                            {i === 0 && (
-                                <g>
-                                    <g transform="translate(-40,0)">
-                                        <path d="M-4,0 L-8,4 L-4,8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M1,-2 L-2,10" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M4,0 L8,4 L4,8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                    </g>
-                                    <g transform="translate(0,-4)">
-                                        <path d="M-6,0 H2 L6,4 V12 H-6 Z" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <path d="M2,0 V4 H6" fill="none" stroke="white" strokeWidth="1" />
-                                    </g>
-                                    <g transform="translate(40,-2)">
-                                        <circle cx="0" cy="4" r="7" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <circle cx="-3" cy="2" r="1" fill="white" />
-                                        <circle cx="1" cy="1" r="1" fill="white" />
-                                        <circle cx="4" cy="4" r="1" fill="white" />
-                                        <path d="M4,1 L9,-4" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
-                                    </g>
-                                </g>
-                            )}
-                            {i === 1 && (
-                                <g>
-                                    <g transform="translate(-40,0)">
-                                        <path d="M4,-8 A8,8 0 0,1 4,8" fill="none" stroke="white" strokeWidth="1.5" />
-                                        <circle cx="-6" cy="0" r="0.8" fill="white" />
-                                        <circle cx="-4" cy="-4" r="0.8" fill="white" />
-                                        <circle cx="-4" cy="4" r="0.8" fill="white" />
-                                        <path d="M4,0 V-4 M4,0 L1,3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                    </g>
-                                    <g transform="translate(0,-4)">
-                                        <circle cx="0" cy="4" r="8" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <path d="M0,12 V4" stroke="white" strokeWidth="1" />
-                                        <circle cx="-3" cy="3" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
-                                        <circle cx="3" cy="3" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
-                                        <circle cx="0" cy="1" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
-                                    </g>
-                                    <g transform="translate(40,-4)">
-                                        <rect x="-8" y="0" width="16" height="11" rx="1.5" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <path d="M-3,0 V-2 H3 V0" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <rect x="-2" y="4" width="4" height="2.5" rx="0.5" fill="none" stroke="white" strokeWidth="0.8" />
-                                    </g>
-                                </g>
-                            )}
-                            {i === 2 && (
-                                <g>
-                                    <g transform="translate(-40,0)">
-                                        <circle cx="0" cy="0" r="1.5" fill="white" />
-                                        <path d="M-4,-4 A6,6 0 0,0 -4,4 M4,-4 A6,6 0 0,1 4,4" fill="none" stroke="white" strokeWidth="1.2" />
-                                        <path d="M-8,-8 A12,12 0 0,0 -8,8 M8,-8 A12,12 0 0,1 8,8" fill="none" stroke="white" strokeWidth="1.2" />
-                                    </g>
-                                    <g transform="translate(0,0)">
-                                        <circle cx="-5" cy="-3" r="2.5" fill="white" />
-                                        <circle cx="5" cy="-3" r="2.5" fill="white" />
-                                        <circle cx="0" cy="0" r="3.5" fill="white" stroke="black" strokeWidth="0.5" />
-                                        <path d="M-7,6 A4,4 0 0,1 7,6 Z" fill="white" stroke="black" strokeWidth="0.5" transform="translate(0,2)" />
-                                    </g>
-                                    <g transform="translate(40,-2)">
-                                        <path d="M-8,2 V8 H-5 L2,12 V-2 L-5,2 Z" fill="white" />
-                                        <path d="M5,1 A6,6 0 0,1 5,9 M8,-2 A10,10 0 0,1 8,12" fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
-                                    </g>
-                                </g>
-                            )}
-                        </g>
-                    </g>
-                ))}
-            </g>
-
-            {/* ─── CONNECTORS ────────────────────────────────────────── */}
-            <g style={f(0.2)}>
-                <path d="M 155 134 L 155 145 L 765 145 M 460 134 L 460 185 M 765 134 L 765 145" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-                <line x1="460" y1="145" x2="460" y2="185" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-            </g>
-
-            {/* ─── CENTER COLUMN ─────────────────────────────────────── */}
-            <g style={f(0.12)}>
-                <rect x={355} y={185} width={210} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
-                <text x={460} y={203} textAnchor="middle" fill="white" fontSize="10" fontWeight="800">DATA INGESTION</text>
-                <text x={460} y={218} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7.5">collecting all signals</text>
-                <line x1="460" y1="225" x2="460" y2="270" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeDasharray="3 3" />
-
-                <rect x={375} y={270} width={170} height={100} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
-                <image href="/logo.png" x={438} y={288} width={44} height={44} style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }} />
-                <text x={460} y={348} textAnchor="middle" fill="white" fontSize="13" fontWeight="900" letterSpacing="3">CHAINVOLIO</text>
-
-                <line x1="460" y1="370" x2="460" y2="415" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeDasharray="3 3" />
-                <rect x={355} y={415} width={210} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
-                <text x={460} y={433} textAnchor="middle" fill="white" fontSize="10" fontWeight="800">SMART MATCHING</text>
-                <text x={460} y={448} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7.5">verified credentials, trusted anywhere</text>
-            </g>
-
-            {/* ─── SIDE PANELS ───────────────────────────────────────── */}
-            <g style={f(0.25)}>
-                <text x={79} y={236} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">VERIFICATION</text>
-                <rect x={14} y={245} width={130} height={150} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
-                <g transform="translate(14, 261)">
-                    {/* Item 1: Smart Contract */}
-                    <g transform="translate(12, 10)">
-                        <g transform="scale(0.85) rotate(-45, 6, 6)" opacity="0.9">
-                            <rect x="0" y="3" width="9" height="5" rx="2" fill="none" stroke="white" strokeWidth="1.5" />
-                            <rect x="5" y="3" width="9" height="5" rx="2" fill="none" stroke="white" strokeWidth="1.5" />
-                        </g>
-                        <g transform="translate(20, 5)">
-                            <text fill="white" fontSize="9" fontWeight="800">SMART CONTRACT</text>
-                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">audit trace</text>
-                        </g>
-                    </g>
-                    <line x1="10" y1="30" x2="120" y2="30" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
-                    
-                    {/* Item 2: Work History */}
-                    <g transform="translate(12, 50)">
-                        <g transform="scale(0.7) translate(-2, -2)" opacity="0.9">
-                            <path d="M10,0 L12.5,2 L15.5,1.5 L16,4.5 L19,6 L17.5,9 L19,12 L16,13.5 L15.5,16.5 L12.5,16 L10,18 L7.5,16 L4.5,16.5 L4,13.5 L1,12 L2.5,9 L1,6 L4,4.5 L4.5,1.5 L7.5,2 Z" fill="white" opacity="0.2" />
-                            <path d="M10,0 L12.5,2 L15.5,1.5 L16,4.5 L19,6 L17.5,9 L19,12 L16,13.5 L15.5,16.5 L12.5,16 L10,18 L7.5,16 L4.5,16.5 L4,13.5 L1,12 L2.5,9 L1,6 L4,4.5 L4.5,1.5 L7.5,2 Z" fill="none" stroke="white" strokeWidth="1.5" />
-                            <path d="M6,9 L9,12 L14,7" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                        </g>
-                        <g transform="translate(20, 5)">
-                            <text fill="white" fontSize="9" fontWeight="800">WORK HISTORY</text>
-                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">on-chain proof</text>
-                        </g>
-                    </g>
-                    <line x1="10" y1="70" x2="120" y2="70" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
-
-                    {/* Item 3: Attestations */}
-                    <g transform="translate(12, 90)">
-                        <g transform="scale(0.85) translate(0, 0)" opacity="0.9">
-                            <circle cx="6" cy="6" r="3" fill="none" stroke="white" strokeWidth="1.5" />
-                            <path d="M6,0 V2 M6,10 V12 M0,6 H2 M10,6 H12 M2,2 L3.5,3.5 M8.5,8.5 L10,10 M2,10 L3.5,8.5 M8.5,3.5 L10,2" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
-                        </g>
-                        <g transform="translate(20, 5)">
-                            <text fill="white" fontSize="9" fontWeight="800">ATTESTATIONS</text>
-                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">verified by DAOs</text>
-                        </g>
-                    </g>
-                </g>
-
-                {/* Verification Engine Node */}
-                <rect x={204} y={300} width={110} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
-                <text x={259} y={318} textAnchor="middle" fill="white" fontSize="9" fontWeight="800">VERIFICATION</text>
-                <text x={259} y={330} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7">engine</text>
-                
-                {/* Connector from Verification to Engine */}
-                <line x1="144" y1="320" x2="204" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-                <line x1="314" y1="320" x2="375" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-
-                {/* Verified Output Section */}
-                <text x={841} y={211} textAnchor="middle" fill="rgba(255,255,255,0.3)" 
-                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">VERIFIED OUTPUT</text>
-                <rect x={776} y={220} width={130} height={200} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
-                <g transform="translate(841, 251)" textAnchor="middle">
-                    {["Verifiable CV", "Reputation Score", "Skill Proof", "Public Identity"].map((t, i) => (
-                        <g key={i} transform={`translate(0, ${i * 45})`}>
-                            <text fill="white" fontSize="10" fontWeight="800">{t}</text>
-                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">{["permanent record", "credibility rating", "verified skills", "shareable link"][i]}</text>
-                            {i < 3 && <line x1="-50" y1="20" x2="50" y2="20" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />}
-                        </g>
-                    ))}
-                </g>
-                <line x1="545" y1="320" x2="776" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-            </g>
-
-            {/* ─── CONSUMERS ─────────────────────────────────────────── */}
-            <g style={f(0.35)}>
-                <path d="M 460 455 L 460 475 L 127 475 L 127 495 M 460 475 L 349 475 L 349 495 M 460 475 L 571 475 L 571 495 M 460 475 L 793 475 L 793 495" 
-                      fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
-                
-                {[
-                    { cx: 127, label: "DAO Acces", sub: "Protocol Admin" }, 
-                    { cx: 349, label: "Talent Discovery", sub: "Instant hire" },
-                    { cx: 571, label: "Hiring", sub: "HR verification" }, 
-                    { cx: 793, label: "Collaboration", sub: "Team builder" }
-                ].map((box, i) => (
-                    <g key={i}>
-                        <rect x={box.cx - 60} y={495} width={120} height={50} rx={12} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
-                        <text x={box.cx} y={520} textAnchor="middle" fill="white" fontSize="10" fontWeight="700">{box.label}</text>
-                        <text x={box.cx} y={535} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="8">{box.sub}</text>
-                    </g>
-                ))}
-                <text x={W / 2} y={H - 5} textAnchor="middle" fill="rgba(255,255,255,0.3)" 
-                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">CONSUMERS</text>
-            </g>
-        </svg>
-    );
-}
-
-
 
 // PARTNERS are now loaded dynamically from /api/logos
 
@@ -1783,7 +1120,6 @@ export function LandingPageClient() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [partners, setPartners] = useState<{ src: string; name: string; scale?: number }[]>([]);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-    const [showFullDiagram, setShowFullDiagram] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const heroVideoRef = useRef<HTMLVideoElement>(null);
     const searchParams = useSearchParams();
@@ -1872,8 +1208,8 @@ export function LandingPageClient() {
                 {/* HERO SECTION */}
                 <section className="relative pt-32 pb-20 px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                        <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
-                            Trust Layer for Web3
+                        <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
+                            Trust layer for Web3
                         </span>
                     </div>
 
@@ -2001,8 +1337,8 @@ export function LandingPageClient() {
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-24 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
-                                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
-                                    THE PROBLEM
+                                <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
+                                    The problem
                                 </span>
                             </div>
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
@@ -2063,53 +1399,99 @@ export function LandingPageClient() {
                 </section>
 
                 {/* COMPETITIVE POSITIONING */}
-                <section className="py-24 px-6 relative z-10 bg-black">
+                <section className="py-16 px-6 relative z-10 bg-black">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                            {/* Left side: Network Diagram */}
-                            <div className="lg:col-span-8 relative">
-                                <div className="w-full">
-                                    <SimpleDiagram />
-                                </div>
-                                <div className="flex justify-center mt-6">
-                                    <button
-                                        onClick={() => setShowFullDiagram(true)}
-                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-white/40 hover:text-white/70 text-[11px] font-bold uppercase tracking-widest transition-all"
-                                    >
-                                        View full architecture
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                                            <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Right side: Why ChainVolio copy */}
-                            <div className="lg:col-span-4 space-y-8 pt-8">
-                                <div className="space-y-4">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Why ChainVolio</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-3 gap-1.5">
+                            {/* Hero text box — col 1-2, row 1-2 */}
+                            <div className="lg:col-span-2 lg:row-span-2 p-0 flex flex-col justify-between gap-6">
+                                <div className="space-y-6">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] w-fit">
+                                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WHY CHAINVOLIO</span>
                                     </div>
-                                    <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
-                                        Traditional tools created isolated silos.
-                                    </p>
-                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.06]">
-                                        One trust layer.<br />
-                                        <span className="text-white/30">Everything connects.</span>
-                                    </h2>
+                                    <div className="space-y-3">
+                                        <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                            Traditional tools created isolated silos.
+                                        </p>
+                                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.02]">
+                                            One trust layer.<br />
+                                            <span className="text-white/30">Everything connects.</span>
+                                        </h2>
+                                    </div>
                                 </div>
-                                <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed">
-                                    LinkedIn can't verify it. A PDF can't prove it. ChainVolio turns every Web3 contribution into a verifiable signal, permanently, without asking anyone's permission.
-                                </p>
+                                <div className="space-y-6">
+                                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-lg">
+                                        LinkedIn can&apos;t verify it. A PDF can&apos;t prove it. ChainVolio turns every Web3 contribution into a verifiable signal, permanently, without asking anyone&apos;s permission.
+                                    </p>
+                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.18em] uppercase text-white/30 hover:text-white/70 transition-colors group">
+                                        Explore the architecture
+                                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Bottom callouts — vs competitors */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-24 pt-12">
+                            <div className="lg:col-start-3 lg:row-start-1">
+                                <div className="rounded-2xl bg-[#0c0c0c] border border-white/[0.05] p-4 flex flex-col h-full min-h-[85px] relative overflow-hidden group">
+                                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+                                    <div className="absolute -bottom-14 -right-14 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform rotate-12 pointer-events-none">
+                                        <Linkedin className="w-48 h-48 text-white fill-white" />
+                                    </div>
+                                    <div className="relative z-10 space-y-1">
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 block">Legacy Platform</span>
+                                        <p className="text-sm text-white/35 leading-snug max-w-[95%]">
+                                            LinkedIn shows who you are. ChainVolio proves what you’ve done.
+                                        </p>
+                                    </div>
+                                    <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                                </div>
+                            </div>
+
+                            <div className="lg:col-start-3 lg:row-start-2">
+                                <div className="rounded-2xl bg-[#0c0c0c] border border-white/[0.05] p-4 flex flex-col h-full min-h-[85px] relative overflow-hidden group">
+                                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+                                    <div className="absolute -bottom-14 -right-14 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform -rotate-12 pointer-events-none">
+                                        <FileText className="w-48 h-48 text-white" />
+                                    </div>
+                                    <div className="relative z-10 space-y-1">
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 block">Static Record</span>
+                                        <p className="text-sm text-white/35 leading-snug max-w-[95%]">
+                                            Traditional resumes rely on trust. ChainVolio anchors work history.
+                                        </p>
+                                    </div>
+                                    <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                                </div>
+                            </div>
+
+                            {/* Tamper Proof globe — col 4, spans all 3 rows */}
+                            <div className="lg:col-start-4 lg:row-start-1 lg:row-span-3 rounded-2xl bg-[#0c0c0c] border border-white/[0.05] relative overflow-hidden flex flex-col justify-end">
+                                {/* Background Video — Full Height */}
+                                <video 
+                                    autoPlay 
+                                    loop 
+                                    muted 
+                                    playsInline 
+                                    className="absolute inset-0 w-full h-full object-cover z-0 grayscale contrast-[1.1] brightness-[0.8]"
+                                >
+                                    <source src="/homepage/globe.mp4" type="video/mp4" />
+                                </video>
+
+                                {/* Text content overlay — Positioned at bottom */}
+                                <div className="p-5 flex flex-col gap-2 relative z-10 mb-2">
+                                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/[0.1] backdrop-blur-md border border-white/[0.1] w-fit mb-1">
+                                        <span className="text-[11px] font-bold text-white/60 tracking-wider leading-tight">Global · Permanent</span>
+                                    </div>
+                                    <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-tight drop-shadow-md">Tamper Proof</h3>
+                                    <p className="text-sm text-white/40 mt-1 leading-snug drop-shadow-md">
+                                        Every attestation anchored on-chain.
+                                    </p>
+                                </div>
+
+                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/40 to-transparent z-0 pointer-events-none" />
+                            </div>
+
+                            {/* Row 3: three callout cards — col 1, 2, 3 */}
                             {[
                                 {
                                     against: "Beyond Profiles",
@@ -2127,55 +1509,22 @@ export function LandingPageClient() {
                                     point: "ChainVolio works across platforms. Your verified work history can be shared anywhere, including LinkedIn, as a trusted source of proof.",
                                 },
                             ].map((item, i) => (
-                                <div key={i} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] space-y-3 group hover:bg-white/[0.04] transition-colors">
-                                    <div className="flex items-center gap-2">
+                                <div key={i} className="p-4 rounded-2xl bg-[#0c0c0c] border border-white/[0.05] space-y-2 group hover:bg-white/[0.04] transition-colors flex flex-col justify-between min-h-[120px] relative overflow-hidden">
+                                    <div className="flex items-center gap-2 relative z-10">
                                         <div className="w-1.5 h-1.5 rounded-full" style={{ background: item.color }} />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]"
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em]"
                                             style={{ color: item.color + "bb" }}>{item.against}</span>
                                     </div>
-                                    <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors">
+                                    <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors relative z-10 flex-1">
                                         {item.point}
                                     </p>
+                                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
                                 </div>
                             ))}
+
                         </div>
                     </div>
                 </section>
-
-                {/* Full Diagram Modal */}
-                {showFullDiagram && (
-                    <div
-                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md"
-                        onClick={() => setShowFullDiagram(false)}
-                    >
-                        <div
-                            className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Header */}
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                    <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/40">Full Architecture</span>
-                                </div>
-                                <button
-                                    onClick={() => setShowFullDiagram(false)}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            {/* Diagram */}
-                            <div className="p-6 overflow-x-auto">
-                                <div className="min-w-[800px]">
-                                    <CompetitiveNetworkDiagram />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section className="relative z-10 bg-black overflow-hidden">
@@ -2188,7 +1537,7 @@ export function LandingPageClient() {
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs Noise</span>
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs noise</span>
                             </div>
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
                                 Why Web3 Needs Verifiable Work History

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import SimpleDiagram from "@/components/landing/SimpleDiagram";
+import CompetitiveNetworkDiagram from "@/components/landing/CompetitiveNetworkDiagram";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { 
@@ -30,6 +32,8 @@ import {
 import Link from "next/link";
 
 export default function HowItWorksPage() {
+  const [showFullDiagram, setShowFullDiagram] = useState(false);
+
   return (
     <main className="h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white overflow-x-hidden bg-black">
 
@@ -52,6 +56,7 @@ export default function HowItWorksPage() {
               </p>
               {[
                   { label: "Overview", href: "#overview" },
+                  { label: "Architecture", href: "#architecture" },
                   { label: "Workflow", href: "#workflow" },
                   { label: "Features", href: "#features" }
               ].map((item, i) => (
@@ -114,6 +119,74 @@ export default function HowItWorksPage() {
                 </p>
               </div>
             </header>
+
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
+
+            {/* ARCHITECTURE DIAGRAMS */}
+            <section id="architecture" className="space-y-16 scroll-mt-[120px]">
+              <div className="flex items-center gap-4">
+                <Cpu className="w-5 h-5 text-purple-400" />
+                <h2 className="text-h2">System Architecture</h2>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-white tracking-tight">Flow Overview</h3>
+                <p className="text-body opacity-60 text-sm leading-relaxed max-w-2xl">
+                  How your work signals travel from source through verification into a portable, trusted reputation.
+                </p>
+              </div>
+
+              <div className="overflow-x-auto">
+                <div className="min-w-[640px]">
+                  <SimpleDiagram />
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowFullDiagram(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-white/40 hover:text-white/70 text-[11px] font-bold tracking-wider transition-all"
+                >
+                  View full architecture
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                  </svg>
+                </button>
+              </div>
+            </section>
+
+            {showFullDiagram && (
+              <div
+                className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md"
+                onClick={() => setShowFullDiagram(false)}
+              >
+                <div
+                  className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span className="text-[11px] font-black tracking-[0.15em] text-white/40">Full architecture</span>
+                    </div>
+                    <button
+                      onClick={() => setShowFullDiagram(false)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="p-6 overflow-x-auto">
+                    <div className="min-w-[800px]">
+                      <CompetitiveNetworkDiagram />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
