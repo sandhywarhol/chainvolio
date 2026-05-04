@@ -1522,7 +1522,6 @@ function CompetitiveNetworkDiagram() {
 // ─── Simple Flow Diagram ──────────────────────────────────────────────────────
 function SimpleDiagram() {
     const [active, setActive] = useState(false);
-    const [hovered, setHovered] = useState<number | null>(null);
     const svgRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
@@ -1536,214 +1535,244 @@ function SimpleDiagram() {
         return () => obs.disconnect();
     }, []);
 
-    const W = 1100, H = 300;
-    const MID_Y = 148;
-
-    const NODES = [
-        {
-            x: 12, y: 92, w: 192, h: 88,
-            label: "Signals",
-            sub: "Code · On-chain · Social",
-            color: "#9945FF",
-            icon: (
-                <g>
-                    <polygon points="16,6 10,14 14,14 8,22 18,12 13,12" fill="#9945FF" opacity="0.9"/>
-                </g>
-            ),
-        },
-        {
-            x: 252, y: 92, w: 192, h: 88,
-            label: "Verification",
-            sub: "Smart contracts · DAOs",
-            color: "#14F195",
-            icon: (
-                <g>
-                    <path d="M12 2 L20 6 L20 13 C20 17.4 16.4 21.4 12 22 C7.6 21.4 4 17.4 4 13 L4 6 Z" fill="none" stroke="#14F195" strokeWidth="1.5" opacity="0.9"/>
-                    <polyline points="8,13 11,16 16,10" stroke="#14F195" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.9"/>
-                </g>
-            ),
-        },
-        {
-            x: 487, y: 68, w: 126, h: 136,
-            label: "ChainVolio",
-            sub: "Trust Layer",
-            color: "#ffffff",
-            isCenter: true,
-            icon: (
-                <g>
-                    <circle cx="12" cy="12" r="2.5" fill="white"/>
-                    <line x1="12" y1="2" x2="12" y2="6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="2" y1="12" x2="6" y2="12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="18" y1="12" x2="22" y2="12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="4.9" y1="4.9" x2="7.8" y2="7.8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="16.2" y1="16.2" x2="19.1" y2="19.1" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="19.1" y1="4.9" x2="16.2" y2="7.8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="7.8" y1="16.2" x2="4.9" y2="19.1" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                </g>
-            ),
-        },
-        {
-            x: 661, y: 92, w: 192, h: 88,
-            label: "Trusted Identity",
-            sub: "CV · Score · Proof",
-            color: "#2dd4bf",
-            icon: (
-                <g>
-                    <rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="#2dd4bf" strokeWidth="1.5" opacity="0.9"/>
-                    <circle cx="8.5" cy="10" r="2" fill="none" stroke="#2dd4bf" strokeWidth="1.3" opacity="0.9"/>
-                    <line x1="13" y1="9" x2="19" y2="9" stroke="#2dd4bf" strokeWidth="1.3" strokeLinecap="round" opacity="0.7"/>
-                    <line x1="13" y1="12" x2="17" y2="12" stroke="#2dd4bf" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
-                    <line x1="5" y1="16" x2="19" y2="16" stroke="#2dd4bf" strokeWidth="1" strokeLinecap="round" opacity="0.3"/>
-                </g>
-            ),
-        },
-        {
-            x: 901, y: 92, w: 192, h: 88,
-            label: "Opportunities",
-            sub: "DAO · Hiring · Collab",
-            color: "#f59e0b",
-            icon: (
-                <g>
-                    <rect x="2" y="9" width="20" height="13" rx="2" fill="none" stroke="#f59e0b" strokeWidth="1.5" opacity="0.9"/>
-                    <path d="M8 9 L8 6 C8 4.3 16 4.3 16 6 L16 9" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.9"/>
-                    <line x1="12" y1="13" x2="12" y2="17" stroke="#f59e0b" strokeWidth="1.3" strokeLinecap="round" opacity="0.7"/>
-                </g>
-            ),
-        },
-    ];
-
-    const ARROWS = [
-        { x1: 204, x2: 252 },
-        { x1: 444, x2: 487 },
-        { x1: 613, x2: 661 },
-        { x1: 853, x2: 901 },
-    ];
+    const W = 920, H = 600;
+    const f = (d: number) => ({ opacity: active ? 1 : 0, transition: `opacity 0.5s ease ${d}s` });
 
     return (
         <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" height="auto"
             className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <pattern id="sdotGrid" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <circle cx="1" cy="1" r="0.7" fill="rgba(255,255,255,0.04)" />
-                </pattern>
-                {NODES.map((n, i) => (
-                    <radialGradient key={i} id={`sg${i}`} cx="50%" cy="50%" r="60%">
-                        <stop offset="0%" stopColor={n.color} stopOpacity="0.12" />
-                        <stop offset="100%" stopColor={n.color} stopOpacity="0.03" />
-                    </radialGradient>
-                ))}
-                {NODES.map((n, i) => (
-                    <linearGradient key={i} id={`sb${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={n.color} stopOpacity="0.6" />
-                        <stop offset="100%" stopColor={n.color} stopOpacity="0.15" />
-                    </linearGradient>
-                ))}
-                <filter id="sglow">
-                    <feGaussianBlur stdDeviation="6" result="blur"/>
-                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                </filter>
-                <marker id="sarrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-                    <polygon points="0 1, 6 3.5, 0 6" fill="rgba(255,255,255,0.25)" />
-                </marker>
+                <linearGradient id="s-node-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#111111" />
+                    <stop offset="100%" stopColor="#000000" />
+                </linearGradient>
             </defs>
 
-            {/* Background */}
-            <rect width={W} height={H} fill="url(#sdotGrid)" />
-
-            {/* Arrows */}
-            {ARROWS.map((a, i) => (
-                <line key={i}
-                    x1={a.x1} y1={MID_Y} x2={a.x2} y2={MID_Y}
-                    stroke="rgba(255,255,255,0.18)"
-                    strokeWidth="1.5"
-                    strokeDasharray={active ? "none" : "4 4"}
-                    markerEnd="url(#sarrow)"
-                    style={{ transition: active ? `opacity 0.6s ease ${0.3 + i * 0.15}s` : undefined, opacity: active ? 1 : 0 }}
-                />
+            {/* ─── ANIMATED DOTS (DATA PACKETS) ─── */}
+            {active && [
+                { d: "M 155 134 L 155 145 L 460 145 L 460 185", dur: '4s', delay: '0s' },
+                { d: "M 460 134 L 460 145 L 460 185", dur: '3s', delay: '0.5s' },
+                { d: "M 765 134 L 765 145 L 460 145 L 460 185", dur: '4s', delay: '1s' },
+                { d: "M 460 225 L 460 270", dur: '2s', delay: '0.2s' },
+                { d: "M 144 320 L 204 320", dur: '2s', delay: '0.4s' },
+                { d: "M 314 320 L 375 320", dur: '1s', delay: '1.2s' },
+                { d: "M 545 320 L 776 320", dur: '3s', delay: '1.5s' },
+                { d: "M 460 370 L 460 415", dur: '2s', delay: '1.2s' },
+                { d: "M 460 455 L 460 475 L 127 475 L 127 495", dur: '4s', delay: '2.2s' },
+                { d: "M 460 455 L 460 475 L 349 475 L 349 495", dur: '4s', delay: '2.4s' },
+                { d: "M 460 455 L 460 475 L 571 475 L 571 495", dur: '4s', delay: '2.6s' },
+                { d: "M 460 455 L 460 475 L 793 475 L 793 495", dur: '4s', delay: '2.8s' },
+            ].map((p, i) => (
+                <rect key={`spkt-${i}`} x="-1" y="-1" width={2} height={2} rx={0.5}
+                    fill="white" style={{ filter: `drop-shadow(0 0 2px white)` }}>
+                    <animateMotion dur={p.dur} repeatCount="indefinite" begin={p.delay} path={p.d} />
+                </rect>
             ))}
 
-            {/* Nodes */}
-            {NODES.map((n, i) => {
-                const isHov = hovered === i;
-                const cx = n.x + n.w / 2;
-                const cy = n.y + n.h / 2;
-                const iconSize = 24;
-                const iconX = cx - iconSize / 2;
-                const iconY = n.isCenter ? n.y + 22 : n.y + 16;
-                const labelY = n.isCenter ? n.y + 64 : n.y + 52;
-                const subY = n.isCenter ? n.y + 82 : n.y + 68;
-
-                return (
-                    <g key={i}
-                        onMouseEnter={() => setHovered(i)}
-                        onMouseLeave={() => setHovered(null)}
-                        style={{
-                            transition: `opacity 0.5s ease ${0.1 + i * 0.12}s, transform 0.3s ease`,
-                            opacity: active ? 1 : 0,
-                            cursor: "default",
-                        }}
-                    >
-                        {/* Glow for center node */}
-                        {n.isCenter && (
-                            <rect x={n.x - 8} y={n.y - 8} width={n.w + 16} height={n.h + 16}
-                                rx="20" fill={n.color} opacity={isHov ? 0.06 : 0.035}
-                                style={{ transition: "opacity 0.3s ease" }}
-                                filter="url(#sglow)"
-                            />
-                        )}
-
-                        {/* Node background */}
-                        <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="14"
-                            fill={n.isCenter ? "rgba(255,255,255,0.06)" : `url(#sg${i})`}
-                            style={{ transition: "opacity 0.3s ease" }}
-                        />
-
-                        {/* Border */}
-                        <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="14"
-                            fill="none"
-                            stroke={n.isCenter ? `rgba(255,255,255,${isHov ? 0.5 : 0.3})` : `url(#sb${i})`}
-                            strokeWidth={n.isCenter ? "1.5" : "1"}
-                            style={{ transition: "stroke-opacity 0.3s ease" }}
-                        />
-
-                        {/* Icon */}
-                        <g transform={`translate(${iconX}, ${iconY})`}>
-                            {n.icon}
+            {/* ─── INPUT SOURCES ────────────────────────────────────── */}
+            <g style={f(0.05)}>
+                <text x={W / 2} y={12} textAnchor="middle" fill="rgba(255,255,255,0.3)"
+                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">INPUT SOURCE</text>
+                
+                {[
+                    { cx: 155, items: ["Code Contributions", "Project Documentation", "Design Output"] },
+                    { cx: 460, items: ["On-chain Activity", "Ecosystem Contributions", "Hackathon Work"] },
+                    { cx: 765, items: ["Public Signals", "Community Activity", "Peer Interaction"] }
+                ].map((box, i) => (
+                    <g key={i}>
+                        <rect x={box.cx - 75} y={24} width={150} height={110} rx={12} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        {box.items.map((it, j) => (
+                            <g key={j}>
+                                <text x={box.cx} y={48 + j * 16} textAnchor="middle" fill="white" fontSize="9.5" fontWeight="600">{it}</text>
+                                {j < 2 && <line x1={box.cx - 50} y1={53 + j * 16} x2={box.cx + 50} y2={53 + j * 16} stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />}
+                            </g>
+                        ))}
+                        <g transform={`translate(${box.cx}, 98)`} opacity="0.8">
+                            {i === 0 && (
+                                <g>
+                                    <g transform="translate(-40,0)">
+                                        <path d="M-4,0 L-8,4 L-4,8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                        <path d="M1,-2 L-2,10" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                        <path d="M4,0 L8,4 L4,8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                    </g>
+                                    <g transform="translate(0,-4)">
+                                        <path d="M-6,0 H2 L6,4 V12 H-6 Z" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <path d="M2,0 V4 H6" fill="none" stroke="white" strokeWidth="1" />
+                                    </g>
+                                    <g transform="translate(40,-2)">
+                                        <circle cx="0" cy="4" r="7" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <circle cx="-3" cy="2" r="1" fill="white" />
+                                        <circle cx="1" cy="1" r="1" fill="white" />
+                                        <circle cx="4" cy="4" r="1" fill="white" />
+                                        <path d="M4,1 L9,-4" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+                                    </g>
+                                </g>
+                            )}
+                            {i === 1 && (
+                                <g>
+                                    <g transform="translate(-40,0)">
+                                        <path d="M4,-8 A8,8 0 0,1 4,8" fill="none" stroke="white" strokeWidth="1.5" />
+                                        <circle cx="-6" cy="0" r="0.8" fill="white" />
+                                        <circle cx="-4" cy="-4" r="0.8" fill="white" />
+                                        <circle cx="-4" cy="4" r="0.8" fill="white" />
+                                        <path d="M4,0 V-4 M4,0 L1,3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                    </g>
+                                    <g transform="translate(0,-4)">
+                                        <circle cx="0" cy="4" r="8" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <path d="M0,12 V4" stroke="white" strokeWidth="1" />
+                                        <circle cx="-3" cy="3" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
+                                        <circle cx="3" cy="3" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
+                                        <circle cx="0" cy="1" r="1.5" fill="none" stroke="white" strokeWidth="0.8" />
+                                    </g>
+                                    <g transform="translate(40,-4)">
+                                        <rect x="-8" y="0" width="16" height="11" rx="1.5" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <path d="M-3,0 V-2 H3 V0" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <rect x="-2" y="4" width="4" height="2.5" rx="0.5" fill="none" stroke="white" strokeWidth="0.8" />
+                                    </g>
+                                </g>
+                            )}
+                            {i === 2 && (
+                                <g>
+                                    <g transform="translate(-40,0)">
+                                        <circle cx="0" cy="0" r="1.5" fill="white" />
+                                        <path d="M-4,-4 A6,6 0 0,0 -4,4 M4,-4 A6,6 0 0,1 4,4" fill="none" stroke="white" strokeWidth="1.2" />
+                                        <path d="M-8,-8 A12,12 0 0,0 -8,8 M8,-8 A12,12 0 0,1 8,8" fill="none" stroke="white" strokeWidth="1.2" />
+                                    </g>
+                                    <g transform="translate(0,0)">
+                                        <circle cx="-5" cy="-3" r="2.5" fill="white" />
+                                        <circle cx="5" cy="-3" r="2.5" fill="white" />
+                                        <circle cx="0" cy="0" r="3.5" fill="white" stroke="black" strokeWidth="0.5" />
+                                        <path d="M-7,6 A4,4 0 0,1 7,6 Z" fill="white" stroke="black" strokeWidth="0.5" transform="translate(0,2)" />
+                                    </g>
+                                    <g transform="translate(40,-2)">
+                                        <path d="M-8,2 V8 H-5 L2,12 V-2 L-5,2 Z" fill="white" />
+                                        <path d="M5,1 A6,6 0 0,1 5,9 M8,-2 A10,10 0 0,1 8,12" fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+                                    </g>
+                                </g>
+                            )}
                         </g>
-
-                        {/* Label */}
-                        <text x={cx} y={labelY}
-                            textAnchor="middle" fill={n.isCenter ? "#ffffff" : n.color}
-                            fontSize={n.isCenter ? 13 : 12} fontWeight={800}
-                            fontFamily="Inter, sans-serif" letterSpacing="0.5">
-                            {n.label}
-                        </text>
-
-                        {/* Sub label */}
-                        <text x={cx} y={subY}
-                            textAnchor="middle"
-                            fill={n.isCenter ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.3)"}
-                            fontSize={8.5} fontWeight={500}
-                            fontFamily="Inter, sans-serif"
-                            style={{ transition: "opacity 0.3s ease", opacity: isHov ? 1 : 0.7 }}>
-                            {n.sub}
-                        </text>
                     </g>
-                );
-            })}
+                ))}
+            </g>
 
-            {/* Row label */}
-            <text x={W / 2} y={H - 8}
-                textAnchor="middle" fill="rgba(255,255,255,0.12)"
-                fontSize={8} fontWeight={600} letterSpacing={3}
-                fontFamily="monospace"
-                style={{ opacity: active ? 1 : 0, transition: "opacity 0.8s ease 0.8s" }}>
-                CHAINVOLIO TRUST ARCHITECTURE
-            </text>
+            {/* ─── CONNECTORS ────────────────────────────────────────── */}
+            <g style={f(0.2)}>
+                <path d="M 155 134 L 155 145 L 765 145 M 460 134 L 460 185 M 765 134 L 765 145" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+                <line x1="460" y1="145" x2="460" y2="185" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+            </g>
+
+            {/* ─── CENTER COLUMN ─────────────────────────────────────── */}
+            <g style={f(0.12)}>
+                <rect x={355} y={185} width={210} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
+                <text x={460} y={203} textAnchor="middle" fill="white" fontSize="10" fontWeight="800">DATA INGESTION</text>
+                <text x={460} y={218} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7.5">collecting all signals</text>
+                <line x1="460" y1="225" x2="460" y2="270" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeDasharray="3 3" />
+
+                <rect x={375} y={270} width={170} height={100} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
+                <image href="/logo.png" x={438} y={288} width={44} height={44} style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }} />
+                <text x={460} y={348} textAnchor="middle" fill="white" fontSize="13" fontWeight="900" letterSpacing="3">CHAINVOLIO</text>
+
+                <line x1="460" y1="370" x2="460" y2="415" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeDasharray="3 3" />
+                <rect x={355} y={415} width={210} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
+                <text x={460} y={433} textAnchor="middle" fill="white" fontSize="10" fontWeight="800">SMART MATCHING</text>
+                <text x={460} y={448} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7.5">verified credentials, trusted anywhere</text>
+            </g>
+
+            {/* ─── SIDE PANELS ───────────────────────────────────────── */}
+            <g style={f(0.25)}>
+                <text x={79} y={236} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">VERIFICATION</text>
+                <rect x={14} y={245} width={130} height={150} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
+                <g transform="translate(14, 261)">
+                    {/* Item 1: Smart Contract */}
+                    <g transform="translate(12, 10)">
+                        <g transform="scale(0.85) rotate(-45, 6, 6)" opacity="0.9">
+                            <rect x="0" y="3" width="9" height="5" rx="2" fill="none" stroke="white" strokeWidth="1.5" />
+                            <rect x="5" y="3" width="9" height="5" rx="2" fill="none" stroke="white" strokeWidth="1.5" />
+                        </g>
+                        <g transform="translate(20, 5)">
+                            <text fill="white" fontSize="9" fontWeight="800">SMART CONTRACT</text>
+                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">audit trace</text>
+                        </g>
+                    </g>
+                    <line x1="10" y1="30" x2="120" y2="30" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
+                    
+                    {/* Item 2: Work History */}
+                    <g transform="translate(12, 50)">
+                        <g transform="scale(0.7) translate(-2, -2)" opacity="0.9">
+                            <path d="M10,0 L12.5,2 L15.5,1.5 L16,4.5 L19,6 L17.5,9 L19,12 L16,13.5 L15.5,16.5 L12.5,16 L10,18 L7.5,16 L4.5,16.5 L4,13.5 L1,12 L2.5,9 L1,6 L4,4.5 L4.5,1.5 L7.5,2 Z" fill="white" opacity="0.2" />
+                            <path d="M10,0 L12.5,2 L15.5,1.5 L16,4.5 L19,6 L17.5,9 L19,12 L16,13.5 L15.5,16.5 L12.5,16 L10,18 L7.5,16 L4.5,16.5 L4,13.5 L1,12 L2.5,9 L1,6 L4,4.5 L4.5,1.5 L7.5,2 Z" fill="none" stroke="white" strokeWidth="1.5" />
+                            <path d="M6,9 L9,12 L14,7" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+                        </g>
+                        <g transform="translate(20, 5)">
+                            <text fill="white" fontSize="9" fontWeight="800">WORK HISTORY</text>
+                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">on-chain proof</text>
+                        </g>
+                    </g>
+                    <line x1="10" y1="70" x2="120" y2="70" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />
+
+                    {/* Item 3: Attestations */}
+                    <g transform="translate(12, 90)">
+                        <g transform="scale(0.85) translate(0, 0)" opacity="0.9">
+                            <circle cx="6" cy="6" r="3" fill="none" stroke="white" strokeWidth="1.5" />
+                            <path d="M6,0 V2 M6,10 V12 M0,6 H2 M10,6 H12 M2,2 L3.5,3.5 M8.5,8.5 L10,10 M2,10 L3.5,8.5 M8.5,3.5 L10,2" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+                        </g>
+                        <g transform="translate(20, 5)">
+                            <text fill="white" fontSize="9" fontWeight="800">ATTESTATIONS</text>
+                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">verified by DAOs</text>
+                        </g>
+                    </g>
+                </g>
+
+                {/* Verification Engine Node */}
+                <rect x={204} y={300} width={110} height={40} rx={20} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.1)" />
+                <text x={259} y={318} textAnchor="middle" fill="white" fontSize="9" fontWeight="800">VERIFICATION</text>
+                <text x={259} y={330} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="7">engine</text>
+                
+                {/* Connector from Verification to Engine */}
+                <line x1="144" y1="320" x2="204" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+                <line x1="314" y1="320" x2="375" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+
+                {/* Verified Output Section */}
+                <text x={841} y={211} textAnchor="middle" fill="rgba(255,255,255,0.3)" 
+                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">VERIFIED OUTPUT</text>
+                <rect x={776} y={220} width={130} height={200} rx={16} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
+                <g transform="translate(841, 251)" textAnchor="middle">
+                    {["Verifiable CV", "Reputation Score", "Skill Proof", "Public Identity"].map((t, i) => (
+                        <g key={i} transform={`translate(0, ${i * 45})`}>
+                            <text fill="white" fontSize="10" fontWeight="800">{t}</text>
+                            <text y={10} fill="rgba(255,255,255,0.4)" fontSize="7">{["permanent record", "credibility rating", "verified skills", "shareable link"][i]}</text>
+                            {i < 3 && <line x1="-50" y1="20" x2="50" y2="20" stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" />}
+                        </g>
+                    ))}
+                </g>
+                <line x1="545" y1="320" x2="776" y2="320" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+            </g>
+
+            {/* ─── CONSUMERS ─────────────────────────────────────────── */}
+            <g style={f(0.35)}>
+                <path d="M 460 455 L 460 475 L 127 475 L 127 495 M 460 475 L 349 475 L 349 495 M 460 475 L 571 475 L 571 495 M 460 475 L 793 475 L 793 495" 
+                      fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" strokeDasharray="4 4" />
+                
+                {[
+                    { cx: 127, label: "DAO Acces", sub: "Protocol Admin" }, 
+                    { cx: 349, label: "Talent Discovery", sub: "Instant hire" },
+                    { cx: 571, label: "Hiring", sub: "HR verification" }, 
+                    { cx: 793, label: "Collaboration", sub: "Team builder" }
+                ].map((box, i) => (
+                    <g key={i}>
+                        <rect x={box.cx - 60} y={495} width={120} height={50} rx={12} fill="url(#s-node-grad)" stroke="rgba(255,255,255,0.08)" />
+                        <text x={box.cx} y={520} textAnchor="middle" fill="white" fontSize="10" fontWeight="700">{box.label}</text>
+                        <text x={box.cx} y={535} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="8">{box.sub}</text>
+                    </g>
+                ))}
+                <text x={W / 2} y={H - 5} textAnchor="middle" fill="rgba(255,255,255,0.3)" 
+                    fontSize="8" fontWeight="800" letterSpacing="4" fontFamily="monospace">CONSUMERS</text>
+            </g>
         </svg>
     );
 }
+
+
 
 // PARTNERS are now loaded dynamically from /api/logos
 
