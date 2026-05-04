@@ -53,7 +53,7 @@ const TIERS = [
             { label: "Unlimited hiring collections" },
             { label: "Verified Community Identity badge" },
             { label: "20 recognized attestations / month" },
-            { label: "Jobs listed as Trusted Community Opportunity" },
+            { label: "Hiring links marked as Trusted Community Opportunity" },
             { label: "Candidates can verify your community is legit" },
         ],
     },
@@ -74,7 +74,7 @@ const TIERS = [
             { label: "Unlimited hiring collections" },
             { label: "Verified Organization Badge for maximum institutional trust" },
             { label: "40 attestations / month" },
-            { label: "Jobs appear as verified institutional hiring sources" },
+            { label: "Hiring links appear as verified institutional sources" },
             { label: "\"Institutional Trust\" signal visible to every candidate" },
         ],
     },
@@ -93,7 +93,7 @@ const COMPARISON = [
         rows: [
             { label: "Hiring collections", values: ["1", "Unlimited", "Unlimited"] },
             { label: "Saved candidates", values: ["10", "Unlimited", "Unlimited"] },
-            { label: "Job listed as trusted source", values: [false, true, true] },
+            { label: "Hiring link as trusted source", values: [false, true, true] },
         ]
     },
     {

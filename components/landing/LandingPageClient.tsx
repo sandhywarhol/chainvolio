@@ -627,7 +627,7 @@ function AttestationBlock() {
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Proof of work,<br />not claims.
+                        Proof of work,<br /><span className="text-white/30">not claims.</span>
                     </h3>
                     <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
                         Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
@@ -1045,7 +1045,7 @@ function HiringBlock() {
                         <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Use Case</span>
                     </div>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Hire based on real proof,<br />not profiles.
+                        Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
                     <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
@@ -1096,13 +1096,13 @@ function HiringBlock() {
 
 
 const SLIDES = [
-    { src: "/homepage/image%20slide%202/cv%20view2.png?v=2", label: "Professional Profile" },
-    { src: "/homepage/image%20slide%202/dashboard%202.png?v=2", label: "Recruiter dashboard" },
-    { src: "/homepage/image%20slide%202/edit%20profile%202.png?v=2", label: "Profile customization" },
-    { src: "/homepage/image%20slide%202/proof%20of%20work%202.png?v=2", label: "Verifiable work" },
-    { src: "/homepage/image%20slide%202/apply.png?v=2", label: "Talent application" },
-    { src: "/homepage/image%20slide%202/attestation.png?v=2", label: "On-chain attestations" },
-    { src: "/homepage/image%20slide%202/status.png?v=2", label: "Verification status" },
+    { src: "/homepage/image%20slide%202/cv%20view2.svg", label: "Professional Profile" },
+    { src: "/homepage/image%20slide%202/dashboard%202.svg", label: "Recruiter dashboard" },
+    { src: "/homepage/image%20slide%202/edit%20profile%202.svg", label: "Profile customization" },
+    { src: "/homepage/image%20slide%202/proof%20of%20work%202.svg", label: "Verifiable work" },
+    { src: "/homepage/image%20slide%202/apply.svg", label: "Talent application" },
+    { src: "/homepage/image%20slide%202/attestation.svg", label: "On-chain attestations" },
+    { src: "/homepage/image%20slide%202/status.svg", label: "Verification status" },
 ];
 
 // ─── Why ChainVolio — Circuit Board Diagram ─────────────────────────────────
@@ -1487,7 +1487,7 @@ function CompetitiveNetworkDiagram() {
                     fill="rgba(255,255,255,0.85)" fontSize={8.5} fontWeight={800} letterSpacing={1}
                     fontFamily="Inter, sans-serif">SMART MATCHING</text>
                 <text x={CX} y={MATCH_Y + 9} textAnchor="middle"
-                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">connects talent to opportunities</text>
+                    fill="rgba(255,255,255,0.35)" fontSize={6.5} fontFamily="Inter, sans-serif">verified credentials, trusted anywhere</text>
                 {/* horizontal distribution rail */}
                 <line x1={BC_XS[0]} y1={BC_Y - 52} x2={BC_XS[BC_XS.length - 1]} y2={BC_Y - 52}
                     stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="3 6" />
@@ -1625,7 +1625,7 @@ export function LandingPageClient() {
                     <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume That Recruiters Trust.
+                            Resume <span className="text-white/30">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1634,7 +1634,7 @@ export function LandingPageClient() {
                         No fake CVs. No manual checks. Just trust.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0">
                         <button
                             onClick={() => setIsWalletModalOpen(true)}
                             className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
@@ -1649,54 +1649,76 @@ export function LandingPageClient() {
                         </button>
                     </div>
 
-                    {/* HERO VISUAL - Idealized Dashboard Mockup */}
-                    <div className="relative w-full max-w-[1400px] mx-auto perspective-1000 group pt-4 pb-4">
-                        <div className="relative rounded-[32px] border border-white/10 overflow-hidden transition-transform duration-1000 hover:scale-[1.01] shadow-[0_0_100px_rgba(0,0,0,0.4)]">
-                            <div className="aspect-[16/8] relative">
+                    {/* HERO VISUAL - Clean Slide Preview */}
+                    <div className="relative w-full max-w-4xl mx-auto group -mt-12 pt-4 pb-4">
+                        <div className="relative overflow-hidden transition-all duration-1000">
+                            <div className="aspect-[16/10] relative">
                                 {SLIDES.map((slide, index) => (
                                     <div 
                                         key={index}
                                         className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                                            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105 pointer-events-none"
+                                            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                                         }`}
                                     >
                                         <Image
                                             src={slide.src}
                                             alt={slide.label}
                                             fill
-                                            className="object-cover object-top scale-110 origin-top -translate-y-[8%]"
+                                            className="object-contain"
                                             priority={index === 0}
                                         />
                                     </div>
                                 ))}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-80 h-full"></div>
-                                <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black to-transparent z-10"></div>
+                                {/* Multi-layered Bottom Gradient for Smooth Blending */}
+                                <div className="absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
+                                <div className="absolute bottom-0 left-0 w-full h-12 bg-black z-20 pointer-events-none"></div>
                             </div>
                         </div>
 
-                        {/* Slide Caption Below Image */}
-                        <div className="mt-4 h-6 relative w-full flex justify-center">
-                            {SLIDES.map((slide, index) => (
-                                <p 
-                                    key={index} 
-                                    className={`absolute text-[10px] font-bold uppercase tracking-[0.4em] text-white/40 transition-all duration-700 ${
-                                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
-                                    }`}
-                                >
-                                    {slide.label}
-                                </p>
-                            ))}
+                        {/* Slide Caption & Navigation */}
+                        <div className="mt-4 space-y-6 flex flex-col items-center">
+                            <div className="h-10 relative w-full flex justify-center">
+                                {SLIDES.map((slide, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`absolute transition-all duration-700 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${
+                                            index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+                                        }`}
+                                    >
+                                        <div className="w-1 h-1 rounded-full bg-emerald-500/60" />
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+                                            {slide.label}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Dot Indicators */}
+                            <div className="flex items-center gap-3">
+                                {SLIDES.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentSlide(index)}
+                                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                                            index === currentSlide 
+                                                ? "w-8 bg-white" 
+                                                : "w-1.5 bg-white/20 hover:bg-white/40"
+                                        }`}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
                         </div>
 
                         {/* Glow behind visual - reduced intensity */}
                         <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
                     </div>
 
-                    <div className="mt-32 w-full max-w-[1400px] relative z-50">
+                    <div className="mt-16 w-full max-w-[1400px] relative z-50">
                         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-12">
                             Powering the Web3 career stack
                         </p>
-                        <div className="w-full py-4 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                        <div className="w-full py-4 overflow-hidden relative mb-12" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                                 {[...partners, ...partners].map((partner, i) => (
                                     <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
@@ -1710,16 +1732,17 @@ export function LandingPageClient() {
                                 ))}
                             </div>
                         </div>
+                        {/* Separator Line Below Logos */}
+                        <div className="w-full max-w-[1240px] mx-auto px-6">
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                        </div>
                     </div>
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-32 px-6 relative z-10 bg-black">
-                    {/* Smooth Transitions to Video Background (Start of Black Block) */}
-                    <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-transparent to-black -translate-y-full pointer-events-none"></div>
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    </div>
+                <section className="py-32 pt-48 px-6 relative z-10 bg-black -mt-32">
+                    {/* Extended Smooth Transitions to reach the image slides */}
+                    <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-24 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
@@ -1742,8 +1765,8 @@ export function LandingPageClient() {
                             {/* Card 1 */}
                             <div className="space-y-12 group pr-16 pb-16 md:pb-0">
                                 <ProblemVideoCard
-                                    idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=11"
-                                    hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=5"
+                                    idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12"
+                                    hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6"
                                 />
                                 <div className="space-y-4 text-center">
                                     <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
@@ -1819,7 +1842,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Bottom callouts — vs competitors */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-14 pt-12">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-24 pt-12">
                             {[
                                 {
                                     against: "Beyond Profiles",
@@ -1859,7 +1882,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-0 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
@@ -1868,7 +1891,7 @@ export function LandingPageClient() {
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
                                 Why Web3 Needs Verifiable Work History
                             </p>
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.06]">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                 From Noise to<br />
                                 <span className="text-white/30">Verifiable Signal</span>
                             </h2>
@@ -1996,7 +2019,7 @@ export function LandingPageClient() {
                                     Build a Verifiable Web3 Resume with On-Chain Proof
                                 </p>
                                 <h3 className="text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                    Build a reputation<br />that travels.
+                                    Build a reputation<br /><span className="text-white/30">that travels.</span>
                                 </h3>
                             </div>
                             <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-xs md:text-right">
@@ -2119,8 +2142,17 @@ export function LandingPageClient() {
                                     href="/hiring/create"
                                     className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
                                 >
-                                    Explore Talent <ArrowRight className="w-4 h-4" />
+                                    Create Hiring Link <ArrowRight className="w-4 h-4" />
                                 </Link>
+                            </div>
+
+                            {/* Trust pills */}
+                            <div className="flex items-center justify-center flex-wrap gap-3">
+                                {["No token required", "Built on Solana", "Permissionless", "Free to start"].map((pill, i) => (
+                                    <span key={i} className="px-3 py-1 rounded-full border border-white/[0.07] bg-white/[0.02] text-[10px] font-bold uppercase tracking-[0.18em] text-white/25">
+                                        {pill}
+                                    </span>
+                                ))}
                             </div>
 
                         </motion.div>

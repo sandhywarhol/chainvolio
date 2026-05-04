@@ -75,10 +75,10 @@ const TIERS = [
         hiringCollections: "Unlimited",
         popular: false,
         benefits: [
-            { label: "Verified Community Identity badge on all listings" },
-            { label: "Job listings marked as Trusted Community Opportunity" },
+            { label: "Verified Community Identity badge on all hiring links" },
+            { label: "Hiring links marked as Trusted Community Opportunity" },
             { label: "20 recognized attestations/month (4× more than Builder)" },
-            { label: "Unlimited hiring collections with no cap on job postings" },
+            { label: "Unlimited hiring collections with no cap on hiring links" },
             { label: "Collective Authority (4/5 attestation power)" },
             { label: "Candidates can verify your community is legitimate" },
             { label: "Verified identity publicly auditable on Solana" },
@@ -100,7 +100,7 @@ const TIERS = [
         popular: true,
         benefits: [
             { label: "Verified Organization Badge for maximum institutional trust" },
-            { label: "Job listings appear as verified institutional hiring sources" },
+            { label: "Hiring links appear as verified institutional sources" },
             { label: "40 attestations/month, highest quota on the platform" },
             { label: "Unlimited hiring collections" },
             { label: "Institutional Authority at 5/5 bars, maximum power" },
@@ -133,8 +133,8 @@ const COMPARISON = [
         category: "Hiring",
         rows: [
             { label: "Hiring collections", values: ["5", "10", "Unlimited", "Unlimited"] },
-            { label: "Job listed as trusted source", values: [false, false, true, true] },
-            { label: "Trust badge on job listings", values: [false, false, true, true] },
+            { label: "Hiring link marked as trusted source", values: [false, false, true, true] },
+            { label: "Trust badge on hiring links", values: [false, false, true, true] },
         ]
     },
     {
