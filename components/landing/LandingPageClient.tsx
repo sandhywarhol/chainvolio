@@ -1519,6 +1519,231 @@ function CompetitiveNetworkDiagram() {
     );
 }
 
+// ─── Simple Flow Diagram ──────────────────────────────────────────────────────
+function SimpleDiagram() {
+    const [active, setActive] = useState(false);
+    const [hovered, setHovered] = useState<number | null>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
+
+    useEffect(() => {
+        const el = svgRef.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([e]) => { if (e.isIntersecting) setActive(true); },
+            { threshold: 0.1 }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+
+    const W = 1100, H = 300;
+    const MID_Y = 148;
+
+    const NODES = [
+        {
+            x: 12, y: 92, w: 192, h: 88,
+            label: "Signals",
+            sub: "Code · On-chain · Social",
+            color: "#9945FF",
+            icon: (
+                <g>
+                    <polygon points="16,6 10,14 14,14 8,22 18,12 13,12" fill="#9945FF" opacity="0.9"/>
+                </g>
+            ),
+        },
+        {
+            x: 252, y: 92, w: 192, h: 88,
+            label: "Verification",
+            sub: "Smart contracts · DAOs",
+            color: "#14F195",
+            icon: (
+                <g>
+                    <path d="M12 2 L20 6 L20 13 C20 17.4 16.4 21.4 12 22 C7.6 21.4 4 17.4 4 13 L4 6 Z" fill="none" stroke="#14F195" strokeWidth="1.5" opacity="0.9"/>
+                    <polyline points="8,13 11,16 16,10" stroke="#14F195" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.9"/>
+                </g>
+            ),
+        },
+        {
+            x: 487, y: 68, w: 126, h: 136,
+            label: "ChainVolio",
+            sub: "Trust Layer",
+            color: "#ffffff",
+            isCenter: true,
+            icon: (
+                <g>
+                    <circle cx="12" cy="12" r="2.5" fill="white"/>
+                    <line x1="12" y1="2" x2="12" y2="6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="2" y1="12" x2="6" y2="12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="18" y1="12" x2="22" y2="12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="4.9" y1="4.9" x2="7.8" y2="7.8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="16.2" y1="16.2" x2="19.1" y2="19.1" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="19.1" y1="4.9" x2="16.2" y2="7.8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="7.8" y1="16.2" x2="4.9" y2="19.1" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                </g>
+            ),
+        },
+        {
+            x: 661, y: 92, w: 192, h: 88,
+            label: "Trusted Identity",
+            sub: "CV · Score · Proof",
+            color: "#2dd4bf",
+            icon: (
+                <g>
+                    <rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="#2dd4bf" strokeWidth="1.5" opacity="0.9"/>
+                    <circle cx="8.5" cy="10" r="2" fill="none" stroke="#2dd4bf" strokeWidth="1.3" opacity="0.9"/>
+                    <line x1="13" y1="9" x2="19" y2="9" stroke="#2dd4bf" strokeWidth="1.3" strokeLinecap="round" opacity="0.7"/>
+                    <line x1="13" y1="12" x2="17" y2="12" stroke="#2dd4bf" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
+                    <line x1="5" y1="16" x2="19" y2="16" stroke="#2dd4bf" strokeWidth="1" strokeLinecap="round" opacity="0.3"/>
+                </g>
+            ),
+        },
+        {
+            x: 901, y: 92, w: 192, h: 88,
+            label: "Opportunities",
+            sub: "DAO · Hiring · Collab",
+            color: "#f59e0b",
+            icon: (
+                <g>
+                    <rect x="2" y="9" width="20" height="13" rx="2" fill="none" stroke="#f59e0b" strokeWidth="1.5" opacity="0.9"/>
+                    <path d="M8 9 L8 6 C8 4.3 16 4.3 16 6 L16 9" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.9"/>
+                    <line x1="12" y1="13" x2="12" y2="17" stroke="#f59e0b" strokeWidth="1.3" strokeLinecap="round" opacity="0.7"/>
+                </g>
+            ),
+        },
+    ];
+
+    const ARROWS = [
+        { x1: 204, x2: 252 },
+        { x1: 444, x2: 487 },
+        { x1: 613, x2: 661 },
+        { x1: 853, x2: 901 },
+    ];
+
+    return (
+        <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" height="auto"
+            className="overflow-visible" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="sdotGrid" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <circle cx="1" cy="1" r="0.7" fill="rgba(255,255,255,0.04)" />
+                </pattern>
+                {NODES.map((n, i) => (
+                    <radialGradient key={i} id={`sg${i}`} cx="50%" cy="50%" r="60%">
+                        <stop offset="0%" stopColor={n.color} stopOpacity="0.12" />
+                        <stop offset="100%" stopColor={n.color} stopOpacity="0.03" />
+                    </radialGradient>
+                ))}
+                {NODES.map((n, i) => (
+                    <linearGradient key={i} id={`sb${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={n.color} stopOpacity="0.6" />
+                        <stop offset="100%" stopColor={n.color} stopOpacity="0.15" />
+                    </linearGradient>
+                ))}
+                <filter id="sglow">
+                    <feGaussianBlur stdDeviation="6" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+                <marker id="sarrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                    <polygon points="0 1, 6 3.5, 0 6" fill="rgba(255,255,255,0.25)" />
+                </marker>
+            </defs>
+
+            {/* Background */}
+            <rect width={W} height={H} fill="url(#sdotGrid)" />
+
+            {/* Arrows */}
+            {ARROWS.map((a, i) => (
+                <line key={i}
+                    x1={a.x1} y1={MID_Y} x2={a.x2} y2={MID_Y}
+                    stroke="rgba(255,255,255,0.18)"
+                    strokeWidth="1.5"
+                    strokeDasharray={active ? "none" : "4 4"}
+                    markerEnd="url(#sarrow)"
+                    style={{ transition: active ? `opacity 0.6s ease ${0.3 + i * 0.15}s` : undefined, opacity: active ? 1 : 0 }}
+                />
+            ))}
+
+            {/* Nodes */}
+            {NODES.map((n, i) => {
+                const isHov = hovered === i;
+                const cx = n.x + n.w / 2;
+                const cy = n.y + n.h / 2;
+                const iconSize = 24;
+                const iconX = cx - iconSize / 2;
+                const iconY = n.isCenter ? n.y + 22 : n.y + 16;
+                const labelY = n.isCenter ? n.y + 64 : n.y + 52;
+                const subY = n.isCenter ? n.y + 82 : n.y + 68;
+
+                return (
+                    <g key={i}
+                        onMouseEnter={() => setHovered(i)}
+                        onMouseLeave={() => setHovered(null)}
+                        style={{
+                            transition: `opacity 0.5s ease ${0.1 + i * 0.12}s, transform 0.3s ease`,
+                            opacity: active ? 1 : 0,
+                            cursor: "default",
+                        }}
+                    >
+                        {/* Glow for center node */}
+                        {n.isCenter && (
+                            <rect x={n.x - 8} y={n.y - 8} width={n.w + 16} height={n.h + 16}
+                                rx="20" fill={n.color} opacity={isHov ? 0.06 : 0.035}
+                                style={{ transition: "opacity 0.3s ease" }}
+                                filter="url(#sglow)"
+                            />
+                        )}
+
+                        {/* Node background */}
+                        <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="14"
+                            fill={n.isCenter ? "rgba(255,255,255,0.06)" : `url(#sg${i})`}
+                            style={{ transition: "opacity 0.3s ease" }}
+                        />
+
+                        {/* Border */}
+                        <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="14"
+                            fill="none"
+                            stroke={n.isCenter ? `rgba(255,255,255,${isHov ? 0.5 : 0.3})` : `url(#sb${i})`}
+                            strokeWidth={n.isCenter ? "1.5" : "1"}
+                            style={{ transition: "stroke-opacity 0.3s ease" }}
+                        />
+
+                        {/* Icon */}
+                        <g transform={`translate(${iconX}, ${iconY})`}>
+                            {n.icon}
+                        </g>
+
+                        {/* Label */}
+                        <text x={cx} y={labelY}
+                            textAnchor="middle" fill={n.isCenter ? "#ffffff" : n.color}
+                            fontSize={n.isCenter ? 13 : 12} fontWeight={800}
+                            fontFamily="Inter, sans-serif" letterSpacing="0.5">
+                            {n.label}
+                        </text>
+
+                        {/* Sub label */}
+                        <text x={cx} y={subY}
+                            textAnchor="middle"
+                            fill={n.isCenter ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.3)"}
+                            fontSize={8.5} fontWeight={500}
+                            fontFamily="Inter, sans-serif"
+                            style={{ transition: "opacity 0.3s ease", opacity: isHov ? 1 : 0.7 }}>
+                            {n.sub}
+                        </text>
+                    </g>
+                );
+            })}
+
+            {/* Row label */}
+            <text x={W / 2} y={H - 8}
+                textAnchor="middle" fill="rgba(255,255,255,0.12)"
+                fontSize={8} fontWeight={600} letterSpacing={3}
+                fontFamily="monospace"
+                style={{ opacity: active ? 1 : 0, transition: "opacity 0.8s ease 0.8s" }}>
+                CHAINVOLIO TRUST ARCHITECTURE
+            </text>
+        </svg>
+    );
+}
 
 // PARTNERS are now loaded dynamically from /api/logos
 
@@ -1529,6 +1754,7 @@ export function LandingPageClient() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [partners, setPartners] = useState<{ src: string; name: string; scale?: number }[]>([]);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+    const [showFullDiagram, setShowFullDiagram] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const heroVideoRef = useRef<HTMLVideoElement>(null);
     const searchParams = useSearchParams();
@@ -1816,8 +2042,20 @@ export function LandingPageClient() {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                             {/* Left side: Network Diagram */}
                             <div className="lg:col-span-8 relative">
-                                <div className="w-full scale-[1.35] origin-top-left lg:-ml-24">
-                                    <CompetitiveNetworkDiagram />
+                                <div className="w-full">
+                                    <SimpleDiagram />
+                                </div>
+                                <div className="flex justify-center mt-6">
+                                    <button
+                                        onClick={() => setShowFullDiagram(true)}
+                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-white/40 hover:text-white/70 text-[11px] font-bold uppercase tracking-widest transition-all"
+                                    >
+                                        View full architecture
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                                            <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
 
@@ -1874,6 +2112,41 @@ export function LandingPageClient() {
                         </div>
                     </div>
                 </section>
+
+                {/* Full Diagram Modal */}
+                {showFullDiagram && (
+                    <div
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md"
+                        onClick={() => setShowFullDiagram(false)}
+                    >
+                        <div
+                            className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                    <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/40">Full Architecture</span>
+                                </div>
+                                <button
+                                    onClick={() => setShowFullDiagram(false)}
+                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            {/* Diagram */}
+                            <div className="p-6 overflow-x-auto">
+                                <div className="min-w-[800px]">
+                                    <CompetitiveNetworkDiagram />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section className="relative z-10 bg-black overflow-hidden">
