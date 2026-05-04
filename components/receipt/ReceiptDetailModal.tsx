@@ -19,8 +19,8 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
     const badge = getBadgeStyles(receipt.attesterVerificationType);
 
     return (
-        <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-lg bg-[#0d0d10] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+            <div className="relative w-full max-w-lg bg-[#0d0d10] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
                     <div className="flex items-center gap-2">

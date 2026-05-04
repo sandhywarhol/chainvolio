@@ -207,7 +207,7 @@ export default function PricingPage() {
                 <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-28 md:pt-32 pb-12 md:pb-20">
 
                 {/* ── Back link ── */}
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-[11px] font-bold text-white/30 hover:text-white/70 uppercase tracking-widest transition-colors mb-12">

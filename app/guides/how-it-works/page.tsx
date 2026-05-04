@@ -42,7 +42,7 @@ export default function HowItWorksPage() {
 
       <Navbar />
       
-      <div className="flex-1 flex overflow-hidden relative z-10 pt-20">
+      <div className="flex-1 flex overflow-hidden relative z-10 pt-24">
         <div className="max-w-6xl mx-auto w-full flex overflow-hidden px-6">
           {/* Navigation Sidebar */}
           <aside className="hidden lg:block w-1/4 space-y-8 overflow-y-auto h-full py-12 pr-8 scrollbar-hide">

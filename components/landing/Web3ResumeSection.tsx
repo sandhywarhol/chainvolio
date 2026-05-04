@@ -584,7 +584,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         <div className="space-y-3">
                             <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">What is a Web3 Resume?</p>
                             <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.02]">
-                                A resume you don't<br />have to explain.
+                                A resume you don't<br /><span className="text-white/30">have to explain.</span>
                             </h2>
                         </div>
                     </div>

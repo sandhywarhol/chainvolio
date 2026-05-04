@@ -448,8 +448,8 @@ export function VerificationRequestModal({
     const isPendingUpgrade = currentStatus === "verified" && pendingUpgradeStatus === "pending";
     if (currentStatus === "pending" || isPendingUpgrade) {
         return (
-            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-                <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
+            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={onClose}>
+                <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
                     {/* Video background */}
                     <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60">
                         <source src="/box%20navigation.mp4" type="video/mp4" />
@@ -483,8 +483,8 @@ export function VerificationRequestModal({
 
     if (currentStatus === "verified" && !canUpgrade) {
         return (
-            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-                <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl">
+            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={onClose}>
+                <div className="border border-white/20 rounded-2xl w-full max-w-sm overflow-hidden relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
                     {/* Video background */}
                     <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60">
                         <source src="/box%20navigation.mp4" type="video/mp4" />
@@ -533,8 +533,8 @@ export function VerificationRequestModal({
 
     // ── Main modal ──
     return (
-        <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
-            <div className={`relative border border-white/15 rounded-2xl shadow-2xl overflow-y-auto md:overflow-hidden max-h-[92vh] md:max-h-none transition-all duration-300 w-full ${modalWidth}`}>
+        <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+            <div className={`relative border border-white/15 rounded-2xl shadow-2xl overflow-y-auto md:overflow-hidden max-h-[92vh] md:max-h-none transition-all duration-300 w-full ${modalWidth}`} onClick={(e) => e.stopPropagation()}>
                 {/* Video background */}
                 <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none">
                     <source src="/box%20navigation.mp4" type="video/mp4" />

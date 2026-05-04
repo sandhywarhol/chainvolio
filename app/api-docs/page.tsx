@@ -177,7 +177,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[160px] rounded-full" />
       </div>
       
-      <div className="flex-1 flex overflow-hidden relative z-10 pt-20">
+      <div className="flex-1 flex overflow-hidden relative z-10 pt-24">
         <div className="max-w-6xl mx-auto w-full flex overflow-hidden px-6">
           {/* Navigation Sidebar */}
           <aside className="hidden lg:block w-1/4 space-y-8 overflow-y-auto h-full py-12 pr-8 scrollbar-hide">
