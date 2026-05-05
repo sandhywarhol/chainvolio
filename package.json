@@ -18,8 +18,10 @@
     "@solana/wallet-adapter-solflare": "0.6.32",
     "@solana/web3.js": "1.91.0",
     "@supabase/supabase-js": "^2.45.0",
+    "@types/topojson-client": "^3.1.5",
     "browser-image-compression": "2.0.2",
     "bs58": "6.0.0",
+    "cobe": "^2.0.1",
     "date-fns": "4.1.0",
     "dotenv": "17.3.1",
     "framer-motion": "^12.38.0",
@@ -34,8 +36,10 @@
     "react-qr-code": "2.0.18",
     "rpc-websockets": "^7.11.0",
     "stripe": "^22.1.0",
+    "topojson-client": "^3.1.0",
     "tweetnacl": "1.0.3",
-    "viem": "2.46.3"
+    "viem": "2.46.3",
+    "world-atlas": "^2.0.2"
   },
   "devDependencies": {
     "@types/node": "20.19.33",

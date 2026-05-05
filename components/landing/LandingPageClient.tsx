@@ -6,10 +6,16 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import ProblemVideoCard from "./ProblemVideoCard";
-import SimpleDiagram from "./SimpleDiagram";
-import GlobeCanvas from "./GlobeCanvas";
-import CompetitiveNetworkDiagram from "./CompetitiveNetworkDiagram";
+
+// Dynamic imports for heavy components to improve LCP and initial bundle size
+const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), { 
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-black/20 animate-pulse rounded-full" />
+});
+const SimpleDiagram = dynamic(() => import("./SimpleDiagram"), { ssr: false });
+const CompetitiveNetworkDiagram = dynamic(() => import("./CompetitiveNetworkDiagram"), { ssr: false });
 import {
     ArrowRight,
     CheckCircle2,
@@ -372,8 +378,8 @@ const CARD_BASE: React.CSSProperties = {
     borderRadius: "14px",
     overflow: "hidden",
     position: "relative",
-    background: "#111115",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#080808",
+    border: "1px solid rgba(255,255,255,0.06)",
     boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 24px 64px rgba(0,0,0,0.95), 0 4px 16px rgba(0,0,0,0.7)",
 };
 
@@ -628,13 +634,13 @@ function AttestationBlock() {
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
                         <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Core Feature</span>
                     </div>
-                    <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Proof of work,<br /><span className="text-white/30">not claims.</span>
                     </h3>
-                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
+                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal max-w-md">
                         Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
                     </p>
                 </div>
@@ -1052,7 +1058,7 @@ function HiringBlock() {
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
-                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-md">
+                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
                     </p>
                 </div>
@@ -1206,7 +1212,7 @@ export function LandingPageClient() {
                 <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-32 pb-20 px-6 z-20 flex flex-col items-center text-center">
+                <section className="relative pt-32 pb-32 px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust layer for Web3
@@ -1220,7 +1226,7 @@ export function LandingPageClient() {
                         </span>
                     </h1>
 
-                    <p className="text-white/40 text-lg md:text-xl font-medium max-w-2xl mb-12 leading-relaxed">
+                    <p className="text-white/40 text-lg md:text-xl font-normal max-w-2xl mb-12 leading-relaxed">
                         Turn your work experience into verifiable on-chain proof.<br />
                         No fake CVs. No manual checks. Just trust.
                     </p>
@@ -1341,13 +1347,13 @@ export function LandingPageClient() {
                                     The problem
                                 </span>
                             </div>
-                            <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
                                 Your work is real. <span className="text-white/30">Your proof isn’t.</span>
                             </h2>
-                            <p className="text-white/40 text-base md:text-lg font-medium max-w-4xl mx-auto">
+                            <p className="text-white/40 text-base md:text-lg font-normal max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
                         </div>
@@ -1398,148 +1404,130 @@ export function LandingPageClient() {
                     </div>
                 </section>
 
-                {/* COMPETITIVE POSITIONING */}
-                <section className="py-16 px-6 relative z-10 bg-black">
+                {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
+                <section className="py-20 px-6 relative z-10 bg-black overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     </div>
+
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-3 gap-1.5">
-                            {/* Hero text box — col 1-2, row 1-2 */}
-                            <div className="lg:col-span-2 lg:row-span-2 p-0 flex flex-col justify-between gap-6">
+                        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                            
+                            {/* Left: Content Block */}
+                            <div className="space-y-12">
                                 <div className="space-y-6">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] w-fit">
-                                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WHY CHAINVOLIO</span>
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent uppercase">Why ChainVolio</span>
                                     </div>
-                                    <div className="space-y-3">
-                                        <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
-                                            Traditional tools created isolated silos.
-                                        </p>
-                                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.02]">
-                                            One trust layer.<br />
-                                            <span className="text-white/30">Everything connects.</span>
-                                        </h2>
-                                    </div>
-                                </div>
-                                <div className="space-y-6">
-                                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium max-w-lg">
-                                        LinkedIn can&apos;t verify it. A PDF can&apos;t prove it. ChainVolio turns every Web3 contribution into a verifiable signal, permanently, without asking anyone&apos;s permission.
+                                    
+                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                        One trust layer.<br />
+                                        <span className="text-white/30">Everything connects.</span>
+                                    </h2>
+                                    
+                                    <p className="text-white/40 text-lg md:text-xl leading-relaxed max-w-xl font-normal">
+                                        Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
                                     </p>
-                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.18em] uppercase text-white/30 hover:text-white/70 transition-colors group">
+                                </div>
+
+                                <div className="flex flex-wrap gap-8 items-center">
+                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white transition-colors group">
                                         Explore the architecture
                                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                     </Link>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Built on</span>
+                                        <div className="flex items-center gap-2 px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05]">
+                                            <div className="w-2 h-2 rounded-full bg-[#14F195]" />
+                                            <span className="text-[9px] font-bold text-white/60">SOLANA</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="lg:col-start-3 lg:row-start-1">
-                                <div className="rounded-2xl bg-[#0c0c0c] border border-white/[0.05] p-4 flex flex-col h-full min-h-[85px] relative overflow-hidden group">
-                                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
-                                    <div className="absolute -bottom-14 -right-14 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform rotate-12 pointer-events-none">
-                                        <Linkedin className="w-48 h-48 text-white fill-white" />
-                                    </div>
-                                    <div className="relative z-10 space-y-1">
-                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 block">Legacy Platform</span>
-                                        <p className="text-sm text-white/35 leading-snug max-w-[95%]">
-                                            LinkedIn shows who you are. ChainVolio proves what you’ve done.
-                                        </p>
-                                    </div>
-                                    <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-                                </div>
-                            </div>
-
-                            <div className="lg:col-start-3 lg:row-start-2">
-                                <div className="rounded-2xl bg-[#0c0c0c] border border-white/[0.05] p-4 flex flex-col h-full min-h-[85px] relative overflow-hidden group">
-                                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
-                                    <div className="absolute -bottom-14 -right-14 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity transform -rotate-12 pointer-events-none">
-                                        <FileText className="w-48 h-48 text-white" />
-                                    </div>
-                                    <div className="relative z-10 space-y-1">
-                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 block">Static Record</span>
-                                        <p className="text-sm text-white/35 leading-snug max-w-[95%]">
-                                            Traditional resumes rely on trust. ChainVolio anchors work history.
-                                        </p>
-                                    </div>
-                                    <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-                                </div>
-                            </div>
-
-                            {/* Tamper Proof globe — col 4, spans all 3 rows */}
-                            <div className="lg:col-start-4 lg:row-start-1 lg:row-span-3 rounded-2xl bg-[#0c0c0c] border border-white/[0.05] relative overflow-hidden flex flex-col justify-end">
-                                {/* Background Video — Full Height */}
-                                <video 
-                                    autoPlay 
-                                    loop 
-                                    muted 
-                                    playsInline 
-                                    className="absolute inset-0 w-full h-full object-cover z-0 grayscale contrast-[1.1] brightness-[0.8]"
-                                >
-                                    <source src="/homepage/globe.mp4" type="video/mp4" />
-                                </video>
-
-                                {/* Text content overlay — Positioned at bottom */}
-                                <div className="p-5 flex flex-col gap-2 relative z-10 mb-2">
-                                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/[0.1] backdrop-blur-md border border-white/[0.1] w-fit mb-1">
-                                        <span className="text-[11px] font-bold text-white/60 tracking-wider leading-tight">Global · Permanent</span>
-                                    </div>
-                                    <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-tight drop-shadow-md">Tamper Proof</h3>
-                                    <p className="text-sm text-white/40 mt-1 leading-snug drop-shadow-md">
-                                        Every attestation anchored on-chain.
-                                    </p>
+                            {/* Right: Globe Visual — Aligned with text height */}
+                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[450px]">
+                                {/* Subtle Glow behind globe */}
+                                <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-1000" />
+                                
+                                {/* Title Overlay */}
+                                <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
+                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
+                                </div>                                
+                                <div className="flex-1 relative z-10 w-full">
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.85]" />
                                 </div>
 
-                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/40 to-transparent z-0 pointer-events-none" />
-                            </div>
+                                {/* Top/Bottom Gradients to mask clipping */}
+                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black via-black/40 to-transparent z-10 pointer-events-none" />
+                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
-                            {/* Row 3: three callout cards — col 1, 2, 3 */}
+                                {/* Floating Stats Overlay — Refined Metrics */}
+                                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8 px-8 py-4 rounded-xl border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-black/80 whitespace-nowrap">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
+                                        <span className="text-[11px] font-bold text-emerald-400/80 tracking-tight">Low-cost attestations (~$0.001)</span>
+                                    </div>
+                                    <div className="w-px h-6 bg-white/10" />
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
+                                        <span className="text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Features Row — Minimal & Clean */}
+                        <div className="grid md:grid-cols-3 gap-px bg-white/[0.03] border border-white/[0.03] rounded-3xl overflow-hidden mt-24">
                             {[
                                 {
-                                    against: "Beyond Profiles",
-                                    color: "#60a5fa",
-                                    point: "LinkedIn shows who you are. ChainVolio proves what you’ve done. Every contribution is backed by verifiable signals, not just self-reported claims.",
+                                    title: "Beyond Profiles",
+                                    desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you’ve done.",
+                                    color: "#60a5fa"
                                 },
                                 {
-                                    against: "From Claims to Proof",
-                                    color: "#14F195",
-                                    point: "Traditional resumes rely on trust. ChainVolio anchors work history with attestations and on-chain records, making every entry independently verifiable.",
+                                    title: "Claims to Proof",
+                                    desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
+                                    color: "#14F195"
                                 },
                                 {
-                                    against: "A Portable Trust Layer",
-                                    color: "#a78bfa",
-                                    point: "ChainVolio works across platforms. Your verified work history can be shared anywhere, including LinkedIn, as a trusted source of proof.",
-                                },
-                            ].map((item, i) => (
-                                <div key={i} className="p-4 rounded-2xl bg-[#0c0c0c] border border-white/[0.05] space-y-2 group hover:bg-white/[0.04] transition-colors flex flex-col justify-between min-h-[120px] relative overflow-hidden">
-                                    <div className="flex items-center gap-2 relative z-10">
-                                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: item.color }} />
-                                        <span className="text-[11px] font-black uppercase tracking-[0.2em]"
-                                            style={{ color: item.color + "bb" }}>{item.against}</span>
+                                    title: "Portable Trust",
+                                    desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                    color: "#a78bfa"
+                                }
+                            ].map((feature, i) => (
+                                <div key={i} className="p-10 bg-black hover:bg-white/[0.02] transition-colors group relative">
+                                    <div className="space-y-4 relative z-10">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: feature.color }} />
+                                            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
+                                        </div>
+                                        <p className="text-white/40 text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
+                                            {feature.desc}
+                                        </p>
                                     </div>
-                                    <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors relative z-10 flex-1">
-                                        {item.point}
-                                    </p>
-                                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
+                                    <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <ArrowRight className="w-4 h-4 text-white/20 -rotate-45" />
+                                    </div>
                                 </div>
                             ))}
-
                         </div>
                     </div>
                 </section>
 
+
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section className="relative z-10 bg-black overflow-hidden">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    </div>
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pt-28 pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                    <div className="max-w-[1240px] mx-auto px-6 pt-20 pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                 <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs noise</span>
                             </div>
-                            <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Web3 Needs Verifiable Work History
                             </p>
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
@@ -1547,7 +1535,7 @@ export function LandingPageClient() {
                                 <span className="text-white/30">Verifiable Signal</span>
                             </h2>
                         </div>
-                        <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-xl md:text-right">
+                        <p className="text-white/40 text-base md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
                             Work history is fragmented and impossible to verify.<br />
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
@@ -1610,7 +1598,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pb-24">
+                    <div className="max-w-[1240px] mx-auto px-6 pb-32">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
                             {[
                                 {
@@ -1650,10 +1638,7 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="pt-24 pb-32 px-6 relative z-10 bg-black">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    </div>
+                <section id="solution" className="pt-20 pb-24 px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1666,14 +1651,14 @@ export function LandingPageClient() {
                                         The Solution
                                     </span>
                                 </div>
-                                <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">
+                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                     Build a Verifiable Web3 Resume with On-Chain Proof
                                 </p>
                                 <h3 className="text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
                                     Build a reputation<br /><span className="text-white/30">that travels.</span>
                                 </h3>
                             </div>
-                            <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed max-w-xs md:text-right">
+                            <p className="text-white/40 text-base md:text-lg font-normal leading-relaxed max-w-xs md:text-right">
                                 Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
                             </p>
                         </div>
@@ -1725,21 +1710,21 @@ export function LandingPageClient() {
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-32 px-6 relative z-10 overflow-hidden">
+                <section className="py-20 px-6 relative z-10 overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
 
-                    <div className="max-w-[1200px] mx-auto space-y-48 relative z-10">
+                    <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
                         
                         {/* BLOCK 1 — ATTESTATION */}
                         <AttestationBlock />
 
-                        {/* Divider Text */}
-                        <div className="flex items-center justify-center gap-8 opacity-20">
-                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white"></div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] whitespace-nowrap">From proof to hiring decisions</span>
-                            <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white"></div>
+                        {/* Refined Divider Text */}
+                        <div className="flex items-center justify-center gap-8 opacity-10">
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white" />
+                            <span className="text-[9px] font-bold uppercase tracking-[0.4em] whitespace-nowrap">From proof to hiring decisions</span>
+                            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white" />
                         </div>
 
                         {/* BLOCK 2 — HIRING */}
@@ -1751,9 +1736,6 @@ export function LandingPageClient() {
 
                 {/* 5. FINAL CTA */}
                 <section className="relative py-48 px-6 overflow-hidden bg-black">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    </div>
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -1778,7 +1760,7 @@ export function LandingPageClient() {
                                  Start Building Your<br />
                                  <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Verifiable Web3 Resume.</span>
                             </h2>
-                            <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-medium">
+                            <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                             </p>
 

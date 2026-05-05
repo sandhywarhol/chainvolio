@@ -52,7 +52,7 @@ export default function VerifiedOrganizationPage() {
                         Verified <span className="text-emerald-400">Organization</span>
                     </h1>
 
-                    <p className="text-sm md:text-xl text-white/50 leading-relaxed font-medium tracking-tight">
+                    <p className="text-sm md:text-xl text-white/50 leading-relaxed font-normal tracking-tight">
                         Issue high-trust attestations and strengthen your organization's credibility on-chain. Verified organizations issue credentials with higher weight, making candidate profiles more credible and evaluated faster.
                     </p>
 
@@ -88,7 +88,7 @@ export default function VerifiedOrganizationPage() {
             <section className="relative z-10 py-16 md:py-24 px-4 md:px-8 max-w-[1240px] mx-auto w-full border-t border-white/5">
                 <div className="mb-16 max-w-2xl">
                     <h2 className="text-2xl md:text-4xl font-bold tracking-tight mb-6">Why Upgrade to Verified</h2>
-                    <p className="text-white/40 font-medium text-sm md:text-lg">
+                    <p className="text-white/40 font-normal text-sm md:text-lg">
                         Verification transforms your organization from a participant into a trusted issuer within the ChainVolio network.
                     </p>
                 </div>
@@ -146,7 +146,7 @@ export default function VerifiedOrganizationPage() {
 
                 <div className="mt-20 p-6 md:p-12 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10 text-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <p className="text-2xl md:text-3xl font-medium text-white italic tracking-tight relative z-10">
+                    <p className="text-2xl md:text-3xl font-normal text-white italic tracking-tight relative z-10">
                         "Companies don't pay to give attestations - they pay to become <span className="text-emerald-400 font-bold not-italic">trusted issuers</span>."
                     </p>
                 </div>
@@ -186,7 +186,7 @@ export default function VerifiedOrganizationPage() {
                                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xs font-bold text-emerald-400">
                                         {i + 1}
                                     </div>
-                                    <p className="text-white/60 font-medium pt-1">{step}</p>
+                                    <p className="text-white/60 font-normal pt-1">{step}</p>
                                 </div>
                             ))}
                         </div>
@@ -199,7 +199,7 @@ export default function VerifiedOrganizationPage() {
                 <div className="space-y-12">
                     <div className="space-y-6">
                         <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight">Upgrade your organization and start scaling trust today.</h2>
-                        <p className="text-sm md:text-xl text-white/40 font-medium italic max-w-xl mx-auto border-l-2 border-emerald-500/20 pl-6 text-left">
+                        <p className="text-sm md:text-xl text-white/40 font-normal italic max-w-xl mx-auto border-l-2 border-emerald-500/20 pl-6 text-left">
                             Secure the future of professional trust by verifying your identity directly on-chain.
                         </p>
                     </div>

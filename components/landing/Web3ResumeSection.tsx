@@ -582,14 +582,14 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                             <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WEB3 RESUME</span>
                         </div>
                         <div className="space-y-3">
-                            <p className="text-lg md:text-xl font-semibold text-white/60 tracking-tight">What is a Web3 Resume?</p>
-                            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.02]">
+                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                 A resume you don't<br /><span className="text-white/30">have to explain.</span>
                             </h2>
                         </div>
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-base md:text-lg leading-relaxed font-medium lg:text-right">
+                        <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal lg:text-right">
                             Turn your work experience into verifiable proof that recruiters can instantly trust. Transparent, portable, and impossible to fake.
                         </p>
                     </div>
