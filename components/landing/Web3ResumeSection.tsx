@@ -420,21 +420,20 @@ function PublicCVCardMockup() {
             {/* Card */}
             <div className="relative rounded-[24px] overflow-hidden border border-white/[0.08]"
                 style={{
-                    background: "black",
+                    background: "linear-gradient(160deg, #0d0d0d 0%, #000000 100%)",
                     boxShadow: "0 40px 80px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05)"
                 }}>
 
                 {/* Lightning shine */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-20 rounded-[24px]">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 rounded-[24px]">
                     <motion.div
                         animate={{ x: ["-120%", "220%"] }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 4 }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent skew-x-12"
+                        transition={{ duration: 2.8, repeat: Infinity, ease: "linear", repeatDelay: 6 }}
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent skew-x-12"
                     />
                 </div>
 
-                {/* Bottom black gradient overlay */}
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
+
 
                 <div className="p-4 sm:p-8 flex flex-col md:flex-row gap-4 md:gap-8">
                     

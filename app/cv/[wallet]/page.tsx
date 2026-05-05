@@ -275,8 +275,17 @@ function WorkRecordCard({
   return (
     <div
       onClick={() => onSelect(r)}
-      className="p-4 md:p-5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/50 transition-all cursor-pointer group/work relative"
+      className="p-4 md:p-5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/50 transition-all cursor-pointer group/work relative overflow-hidden"
     >
+      {/* 3D Rim Light (Inner Edge Highlight) */}
+      <div className="absolute inset-0 rounded-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_1px_0_0_0_rgba(255,255,255,0.02)] pointer-events-none z-10" />
+
+      {/* Specular corner highlights */}
+      <div className="absolute top-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none z-10" />
+      <div className="absolute top-0 right-0 w-16 h-16 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
+      <div className="absolute bottom-0 right-0 w-16 h-16 bg-[radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none z-10" />
+      <div className="absolute bottom-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
+
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0 max-w-full">
           {/* Primary: Role + Organization */}
@@ -798,23 +807,36 @@ export default function CVPage(props: any) {
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
-              {/* Main Card Background: Pure Black */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-black pointer-events-none"></div>
+              {/* Main Card Background: Very Dark Grey */}
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[#0d0d0d] border border-white/10 pointer-events-none"></div>
 
-              {/* Lightning shine effect - intensified diagonal sweep */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl md:rounded-3xl z-20">
+              {/* Top-Center Spotlight Effect (Conical Spread) */}
+              <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl md:rounded-3xl">
+                <div 
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[120%] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08)_0%,transparent_60%)]"
+                />
+                <div 
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                />
+                {/* Diagonal lightning shine back again */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine"></div>
               </div>
 
               {/* Bottom black gradient overlay */}
               <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
+              {/* 3D Rim Light (Inner Edge Highlight) */}
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),inset_1px_0_0_0_rgba(255,255,255,0.05)] pointer-events-none z-30" />
+
               {/* Outer glow with silver accent */}
               <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl pointer-events-none"></div>
 
-              {/* Sparkle effect on corners */}
-              <div className="absolute top-4 right-4 w-2 h-2 bg-white/60 rounded-full blur-sm animate-pulse"></div>
-              <div className="absolute bottom-4 left-4 w-2 h-2 bg-slate-300/60 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              {/* Specular corner highlights */}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none z-30" />
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-[radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none z-30" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none z-30" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.04)_0%,transparent_70%)] pointer-events-none z-30" />
+
 
               <div className="absolute top-6 right-6 z-50 flex flex-col gap-4 items-center pointer-events-auto">
                 {profile?.isVerified && (
@@ -1144,7 +1166,7 @@ export default function CVPage(props: any) {
             </div>
 
             {/* Recruiter Trust Disclaimer */}
-            <div className="mt-8 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-start gap-3">
+            <div className="mt-8 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Recruiter Note: Verified Integrity</p>

@@ -1358,46 +1358,48 @@ export function LandingPageClient() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3">
-                            {/* Card 1 */}
-                            <div className="space-y-8 md:space-y-12 group md:pr-16 pb-12 md:pb-0">
-                                <ProblemVideoCard
-                                    idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12"
-                                    hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6"
-                                />
-                                <div className="space-y-4 text-center">
-                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
-                                    <p className="text-white/40 text-base leading-relaxed">
-                                        Your experience is scattered across PDFs, portfolios, and links. No single source of truth.
-                                    </p>
+                        <div className="max-w-5xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-3">
+                                {/* Card 1 */}
+                                <div className="space-y-8 md:space-y-12 group md:pr-12 pb-12 md:pb-0">
+                                    <ProblemVideoCard
+                                        idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12"
+                                        hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6"
+                                    />
+                                    <div className="space-y-4 text-center">
+                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
+                                        <p className="text-white/40 text-base leading-relaxed">
+                                            Your experience is scattered across PDFs, portfolios, and links. No single source of truth.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Card 2 */}
-                            <div className="space-y-8 md:space-y-12 group md:px-16 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0 pb-12 md:pb-0">
-                                <ProblemVideoCard
-                                    idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
-                                    hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
-                                />
-                                <div className="space-y-4 text-center pt-2">
-                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
-                                    <p className="text-white/40 text-base leading-relaxed">
-                                        Without verifiable data, resumes become claims, not proof.
-                                    </p>
+                                {/* Card 2 */}
+                                <div className="space-y-8 md:space-y-12 group md:px-12 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0 pb-12 md:pb-0">
+                                    <ProblemVideoCard
+                                        idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
+                                        hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
+                                    />
+                                    <div className="space-y-4 text-center pt-2">
+                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
+                                        <p className="text-white/40 text-base leading-relaxed">
+                                            Without verifiable data, resumes become claims, not proof.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Card 3 */}
-                            <div className="space-y-8 md:space-y-12 group md:pl-16 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0">
-                                <ProblemVideoCard
-                                    idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
-                                    hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
-                                />
-                                <div className="space-y-4 text-center">
-                                    <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
-                                    <p className="text-white/40 text-base leading-relaxed">
-                                        Real talent gets buried. Hiring becomes guesswork.
-                                    </p>
+                                {/* Card 3 */}
+                                <div className="space-y-8 md:space-y-12 group md:pl-12 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0">
+                                    <ProblemVideoCard
+                                        idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
+                                        hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
+                                    />
+                                    <div className="space-y-4 text-center">
+                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
+                                        <p className="text-white/40 text-base leading-relaxed">
+                                            Real talent gets buried. Hiring becomes guesswork.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
