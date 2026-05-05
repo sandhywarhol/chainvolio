@@ -28,8 +28,8 @@ function MobileReturnHandler() {
  * The failed attempt itself wakes the service worker up — so retrying after
  * a short delay almost always succeeds without any user interaction.
  */
-function AutoConnectRetry() {
-    const { connected, connecting, connect, wallet, error } = useWallet();
+function AutoConnectRetry({ error }: { error: Error | null }) {
+    const { connected, connecting, connect, wallet } = useWallet();
     const retriedRef = useRef(false);
 
     useEffect(() => {
@@ -50,6 +50,7 @@ function AutoConnectRetry() {
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
     const network = WalletAdapterNetwork.Mainnet;
+    const [lastError, setLastError] = useState<Error | null>(null);
 
     // REQUIREMENT 8: Disable autoConnect on mobile to prevent automatic
     // reconnect attempts that can cause redirect loops.
@@ -77,10 +78,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <ConnProv endpoint={endpoint}>
-            <SolWallProv wallets={wallets} autoConnect={autoConnect}>
+            <SolWallProv wallets={wallets} autoConnect={autoConnect} onError={(err: Error) => setLastError(err)}>
                 <ModalProv>
                     <MobileReturnHandler />
-                    <AutoConnectRetry />
+                    <AutoConnectRetry error={lastError} />
                     {children}
                 </ModalProv>
             </SolWallProv>

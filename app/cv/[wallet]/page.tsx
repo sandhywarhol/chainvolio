@@ -798,32 +798,16 @@ export default function CVPage(props: any) {
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
-              {/* Dark solid background */}
-              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-slate-800/80 pointer-events-none"></div>
+              {/* Main Card Background: Pure Black */}
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-black pointer-events-none"></div>
 
-              {/* Main Card Background Image */}
-              <div
-                className="absolute inset-[1px] rounded-2xl md:rounded-3xl opacity-60 bg-cover bg-center mix-blend-overlay pointer-events-none"
-                style={{
-                  backgroundImage: 'url("/card%20background.jpeg")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              ></div>
-
-              {/* Dark gradient overlay */}
-              <div className="absolute inset-[1px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-900/80 pointer-events-none"></div>
-
-              {/* Lightning shine effect - diagonal sweep (Always active) */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl md:rounded-3xl z-10">
+              {/* Lightning shine effect - intensified diagonal sweep */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl md:rounded-3xl z-20">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine"></div>
               </div>
 
-              {/* Subtle silver shimmer overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-300/5 via-transparent to-white/5 pointer-events-none"></div>
-
-              {/* Inner silver glow */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(241,245,249,0.1),inset_0_-1px_0_0_rgba(241,245,249,0.05)] pointer-events-none"></div>
+              {/* Bottom black gradient overlay */}
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
               {/* Outer glow with silver accent */}
               <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl pointer-events-none"></div>
