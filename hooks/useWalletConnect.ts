@@ -22,7 +22,7 @@ import { WalletReadyState, WalletName } from "@solana/wallet-adapter-base";
  * leaving `connected` stuck at false until a page refresh.
  */
 export function useWalletConnect() {
-    const { select, connect, wallet, wallets, connecting, connected, publicKey, error: walletAdapterError } = useWallet();
+    const { select, connect, wallet, wallets, connecting, connected, publicKey } = useWallet();
     const [isConnecting, setIsConnecting] = useState(false);
     const [pendingWallet, setPendingWallet] = useState<string | null>(null);
     const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -33,26 +33,7 @@ export function useWalletConnect() {
     const connectRef = useRef(connect);
     useEffect(() => { connectRef.current = connect; }, [connect]);
 
-    // Catch errors fired as adapter events (not as promise rejections).
-    // Phantom's MV3 service worker error surfaces this way and bypasses the try-catch.
-    // Guard: only act when we're mid-connection AND the error is new (not a stale auto-connect error).
-    useEffect(() => {
-        if (!walletAdapterError) return;
-        if (!connectingRef.current) return;                          // not our attempt
-        if (walletAdapterError === lastHandledErrorRef.current) return; // already handled
-        lastHandledErrorRef.current = walletAdapterError;
 
-        const msg = walletAdapterError.message ?? "";
-        if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
-            setConnectionError("extension_dead");
-        } else if (walletAdapterError.name === "WalletWindowClosedError") {
-            setConnectionError("cancelled");
-        } else {
-            setConnectionError("unknown");
-        }
-        connectingRef.current = false;
-        setPendingWallet(null);
-    }, [walletAdapterError]);
 
     // Step 2: React has re-rendered with the new adapter — now call connect()
     useEffect(() => {
