@@ -1212,22 +1212,22 @@ export function LandingPageClient() {
                 <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-32 pb-32 px-6 z-20 flex flex-col items-center text-center">
+                <section className="relative pt-16 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust layer for Web3
                         </span>
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-8 text-white max-w-5xl">
+                    <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-6 sm:mb-8 text-white max-w-5xl">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
                             Resume <span className="text-white/30">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
-                    <p className="text-white/40 text-lg md:text-xl font-normal max-w-2xl mb-12 leading-relaxed">
-                        Turn your work experience into verifiable on-chain proof.<br />
+                    <p className="text-white/40 text-base md:text-xl font-normal max-w-2xl mb-10 sm:mb-12 leading-relaxed">
+                        Turn your work experience into verifiable on-chain proof.<br className="hidden sm:block" />
                         No fake CVs. No manual checks. Just trust.
                     </p>
 
@@ -1337,11 +1337,11 @@ export function LandingPageClient() {
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-32 pt-48 px-6 relative z-10 bg-black -mt-32">
+                <section className="py-16 sm:py-24 md:py-32 pt-24 sm:pt-32 md:pt-48 px-4 sm:px-6 relative z-10 bg-black -mt-16 sm:-mt-24 md:-mt-32">
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="text-center mb-24 space-y-4">
+                        <div className="text-center mb-12 md:mb-24 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
                                 <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
                                     The problem
@@ -1350,7 +1350,7 @@ export function LandingPageClient() {
                             <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
+                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
                                 Your work is real. <span className="text-white/30">Your proof isn’t.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg font-normal max-w-4xl mx-auto">
@@ -1360,7 +1360,7 @@ export function LandingPageClient() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3">
                             {/* Card 1 */}
-                            <div className="space-y-12 group pr-16 pb-16 md:pb-0">
+                            <div className="space-y-8 md:space-y-12 group md:pr-16 pb-12 md:pb-0">
                                 <ProblemVideoCard
                                     idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12"
                                     hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6"
@@ -1374,7 +1374,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Card 2 */}
-                            <div className="space-y-12 group px-16 border-l border-white/[0.05] pb-16 md:pb-0">
+                            <div className="space-y-8 md:space-y-12 group md:px-16 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0 pb-12 md:pb-0">
                                 <ProblemVideoCard
                                     idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
                                     hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
@@ -1388,7 +1388,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Card 3 */}
-                            <div className="space-y-12 group pl-16 border-l border-white/[0.05]">
+                            <div className="space-y-8 md:space-y-12 group md:pl-16 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0">
                                 <ProblemVideoCard
                                     idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
                                     hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
@@ -1405,13 +1405,13 @@ export function LandingPageClient() {
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-20 px-6 relative z-10 bg-black overflow-hidden">
+                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     </div>
 
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                        <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-center">
                             
                             {/* Left: Content Block */}
                             <div className="space-y-12">
@@ -1420,7 +1420,7 @@ export function LandingPageClient() {
                                         <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent uppercase">Why ChainVolio</span>
                                     </div>
                                     
-                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                    <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
                                         <span className="text-white/30">Everything connects.</span>
                                     </h2>
@@ -1446,7 +1446,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[450px]">
+                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[280px] sm:min-h-[360px] md:min-h-[450px]">
                                 {/* Subtle Glow behind globe */}
                                 <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-1000" />
                                 
@@ -1479,7 +1479,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Features Row — Minimal & Clean */}
-                        <div className="grid md:grid-cols-3 gap-px bg-white/[0.03] border border-white/[0.03] rounded-3xl overflow-hidden mt-24">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.03] border border-white/[0.03] rounded-3xl overflow-hidden mt-10 md:mt-24">
                             {[
                                 {
                                     title: "Beyond Profiles",
@@ -1521,7 +1521,7 @@ export function LandingPageClient() {
                 <section className="relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pt-20 pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
@@ -1530,7 +1530,7 @@ export function LandingPageClient() {
                             <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Web3 Needs Verifiable Work History
                             </p>
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                 From Noise to<br />
                                 <span className="text-white/30">Verifiable Signal</span>
                             </h2>
@@ -1543,7 +1543,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
-                    <div className="relative w-full h-[580px]">
+                    <div className="relative w-full h-[280px] sm:h-[400px] md:h-[580px]">
                         <SignalNoiseVisual />
 
                         {/* Radial vignette — lines fade at edges */}
@@ -1598,7 +1598,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
-                    <div className="max-w-[1240px] mx-auto px-6 pb-32">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-16 md:pb-32">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
                             {[
                                 {
@@ -1638,7 +1638,7 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="pt-20 pb-24 px-6 relative z-10 bg-black">
+                <section id="solution" className="pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1654,7 +1654,7 @@ export function LandingPageClient() {
                                 <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                     Build a Verifiable Web3 Resume with On-Chain Proof
                                 </p>
-                                <h3 className="text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
+                                <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
                                     Build a reputation<br /><span className="text-white/30">that travels.</span>
                                 </h3>
                             </div>
@@ -1690,13 +1690,13 @@ export function LandingPageClient() {
                         </div>
 
                         {/* ── UI Mockup ── */}
-                        <div className="relative h-[650px] w-full max-w-[1100px] mx-auto flex items-center justify-center">
+                        <div className="relative h-[380px] sm:h-[500px] md:h-[650px] w-full max-w-[1100px] mx-auto flex items-center justify-center">
                             <div className="absolute inset-0 bg-emerald-500/4 blur-[120px] rounded-full opacity-40 pointer-events-none" />
                             <div className="relative w-full h-full group">
                                 <div className="w-full h-full bg-[#0a0a0a] rounded-3xl border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-700 text-left">
                                     <MockProfileUI />
                                 </div>
-                                <div className="absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                <div className="hidden sm:block absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
                                     <div className="[perspective:1500px]">
                                         <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
                                             <FloatingVerificationCard />
@@ -1710,7 +1710,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-20 px-6 relative z-10 overflow-hidden">
+                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>

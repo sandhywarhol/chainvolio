@@ -22,14 +22,37 @@ import { WalletReadyState, WalletName } from "@solana/wallet-adapter-base";
  * leaving `connected` stuck at false until a page refresh.
  */
 export function useWalletConnect() {
-    const { select, connect, wallet, wallets, connecting, connected, publicKey } = useWallet();
+    const { select, connect, wallet, wallets, connecting, connected, publicKey, error: walletAdapterError } = useWallet();
     const [isConnecting, setIsConnecting] = useState(false);
     const [pendingWallet, setPendingWallet] = useState<string | null>(null);
     const [connectionError, setConnectionError] = useState<string | null>(null);
     const connectingRef = useRef(false);
+    // Tracks which error we already forwarded so stale auto-connect errors are ignored
+    const lastHandledErrorRef = useRef<unknown>(null);
     // Ref to the current connect fn so the retry closure always calls the latest version
     const connectRef = useRef(connect);
     useEffect(() => { connectRef.current = connect; }, [connect]);
+
+    // Catch errors fired as adapter events (not as promise rejections).
+    // Phantom's MV3 service worker error surfaces this way and bypasses the try-catch.
+    // Guard: only act when we're mid-connection AND the error is new (not a stale auto-connect error).
+    useEffect(() => {
+        if (!walletAdapterError) return;
+        if (!connectingRef.current) return;                          // not our attempt
+        if (walletAdapterError === lastHandledErrorRef.current) return; // already handled
+        lastHandledErrorRef.current = walletAdapterError;
+
+        const msg = walletAdapterError.message ?? "";
+        if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
+            setConnectionError("extension_dead");
+        } else if (walletAdapterError.name === "WalletWindowClosedError") {
+            setConnectionError("cancelled");
+        } else {
+            setConnectionError("unknown");
+        }
+        connectingRef.current = false;
+        setPendingWallet(null);
+    }, [walletAdapterError]);
 
     // Step 2: React has re-rendered with the new adapter — now call connect()
     useEffect(() => {
@@ -46,24 +69,35 @@ export function useWalletConnect() {
                 localStorage.removeItem("cv_connecting");
             } catch (err: any) {
                 const msg: string = err?.message ?? "";
-                // User closed the popup — silent, not an error
-                if (err?.name === "WalletWindowClosedError") return;
+                // User closed/dismissed the popup — clear spinner but no error toast
+                if (err?.name === "WalletWindowClosedError") {
+                    setConnectionError("cancelled");
+                    return;
+                }
 
                 // Chrome suspended the extension's MV3 service worker.
-                // Sending the failed message wakes it up — retry once after a short delay.
+                // The failed message wakes it up — retry with increasing delays.
                 if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
                     connectingRef.current = false;
-                    await new Promise(r => setTimeout(r, 900));
-                    try {
-                        await connectRef.current();
-                        localStorage.removeItem("cv_connecting");
-                        // Retry succeeded — fall through to finally without setting error
-                        return;
-                    } catch {
-                        // Retry also failed — give up and show error
-                        setConnectionError("extension_dead");
-                        return;
+                    const delays = [1500, 2500, 3500];
+                    for (const delay of delays) {
+                        await new Promise(r => setTimeout(r, delay));
+                        try {
+                            await connectRef.current();
+                            localStorage.removeItem("cv_connecting");
+                            return; // succeeded
+                        } catch (retryErr: any) {
+                            const retryMsg: string = retryErr?.message ?? "";
+                            if (!retryMsg.includes("Receiving end does not exist") &&
+                                !retryMsg.includes("Could not establish connection")) {
+                                // Different error — stop retrying
+                                break;
+                            }
+                            // Still sleeping — try next delay
+                        }
                     }
+                    setConnectionError("extension_dead");
+                    return;
                 }
 
                 // Any other unexpected error

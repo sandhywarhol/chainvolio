@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
-import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
+import { useMemo, useEffect, useRef, useState } from "react";
+import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
@@ -18,6 +18,32 @@ function MobileReturnHandler() {
         if (!isMobile) return;
         localStorage.removeItem("cv_connecting");
     }, []);
+
+    return null;
+}
+
+/**
+ * When Chrome suspends the Phantom MV3 service worker, autoConnect fails with
+ * "Could not establish connection. Receiving end does not exist."
+ * The failed attempt itself wakes the service worker up — so retrying after
+ * a short delay almost always succeeds without any user interaction.
+ */
+function AutoConnectRetry() {
+    const { connected, connecting, connect, wallet, error } = useWallet();
+    const retriedRef = useRef(false);
+
+    useEffect(() => {
+        if (!error || retriedRef.current || connected || connecting || !wallet) return;
+        const msg = error.message ?? "";
+        if (!msg.includes("Receiving end does not exist") && !msg.includes("Could not establish connection")) return;
+
+        retriedRef.current = true;
+        const timer = setTimeout(async () => {
+            try { await connect(); } catch { /* silent — user can still connect manually */ }
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, [error, connected, connecting, connect, wallet]);
 
     return null;
 }
@@ -54,6 +80,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
             <SolWallProv wallets={wallets} autoConnect={autoConnect}>
                 <ModalProv>
                     <MobileReturnHandler />
+                    <AutoConnectRetry />
                     {children}
                 </ModalProv>
             </SolWallProv>

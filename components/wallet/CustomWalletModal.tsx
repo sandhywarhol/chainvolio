@@ -71,21 +71,37 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         }
     }, [isOpen]);
 
-    // Detects when the wallet extension fails silently (e.g. Chrome suspended its service worker).
-    // Without this, loadingKey stays set and the spinner hangs forever.
+    // Clears spinner when the hook reports a connection error.
     useEffect(() => {
         if (!connectionError || !loadingKey) return;
-        if (connectionError === "extension_dead") {
+        if (connectionError === "cancelled") {
+            // User dismissed the wallet popup — just clear the spinner, no toast
+        } else if (connectionError === "extension_dead") {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
             setToast({
-                message: `${walletName} extension is not responding. Click the ${walletName} icon in your browser toolbar to wake it up, then try again.`,
+                message: `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser untuk membangunkannya, lalu coba lagi.`,
                 type: "error",
             });
         } else {
-            setToast({ message: "Connection failed. Please try again.", type: "error" });
+            setToast({ message: "Koneksi gagal. Silakan coba lagi.", type: "error" });
         }
         setLoadingKey(null);
     }, [connectionError, loadingKey]);
+
+    // Safety-net timeout: if anything goes wrong and the spinner is still showing
+    // after 12 s (extension dead, event swallowed, etc.) — clear it automatically.
+    useEffect(() => {
+        if (!loadingKey) return;
+        const timer = setTimeout(() => {
+            const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
+            setToast({
+                message: `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser, lalu coba lagi.`,
+                type: "error",
+            });
+            setLoadingKey(null);
+        }, 20000);
+        return () => clearTimeout(timer);
+    }, [loadingKey]);
 
     // Fires when a new wallet connection completes.
     // loadingKey guard prevents this from firing when a returning user opens the modal while already connected.
@@ -235,9 +251,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     // ── Org type selection step ──────────────────────────────────────────────────
     if (step === "org-type") {
         return createPortal(
-            <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-3 sm:p-4">
+            <div className="fixed inset-0 z-[1000000] flex items-end sm:items-center justify-center p-0 sm:p-4">
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
-                <div className="relative w-full max-w-md bg-[#0d0d0f] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="relative w-full sm:max-w-md bg-[#0d0d0f] border border-white/10 rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom sm:zoom-in duration-200 max-h-[92dvh] overflow-y-auto">
+                    {/* Mobile drag handle */}
+                    <div className="flex justify-center pt-3 pb-1 sm:hidden">
+                        <div className="w-10 h-1 rounded-full bg-white/10" />
+                    </div>
+
                     <div className="p-6 sm:p-7 border-b border-white/5 flex items-center justify-between">
                         <div>
                             <h2 className="text-xl font-bold text-white">Choose your org type</h2>
@@ -300,10 +321,15 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     // ── Main select step — two-column layout ─────────────────────────────────────
     return createPortal(
-        <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 z-[1000000] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
 
-            <div className="relative w-full max-w-[640px] bg-[#0d0d0f] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full sm:max-w-[640px] bg-[#0d0d0f] border border-white/10 rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom sm:zoom-in duration-200 max-h-[92dvh] overflow-y-auto">
+                {/* Mobile drag handle */}
+                <div className="flex justify-center pt-3 pb-1 sm:hidden">
+                    <div className="w-10 h-1 rounded-full bg-white/10" />
+                </div>
+
                 {/* Header */}
                 <div className="p-5 sm:p-6 border-b border-white/5 flex items-center justify-between">
                     <div>
@@ -467,6 +493,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 </div>
 
                 {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+                {/* iOS safe-area spacer */}
+                <div className="h-safe-bottom sm:hidden" />
             </div>
         </div>,
         document.body

@@ -16,26 +16,33 @@ export async function GET(request: NextRequest) {
 
     try {
         if (mode === 'builder') {
-            // Check if this wallet is already registered as an ORG
-            const { data: orgData, error: orgErr } = await supabase
-                .from("organization_verifications")
-                .select("id")
-                .eq("wallet_address", wallet)
-                .maybeSingle();
+            // Run both queries in parallel for speed
+            const [profileResult, orgResult] = await Promise.all([
+                supabase.from("profiles").select("wallet_address").eq("wallet_address", wallet).maybeSingle(),
+                supabase.from("organization_verifications").select("wallet_address").eq("wallet_address", wallet).eq("status", "verified").maybeSingle(),
+            ]);
 
-            if (orgErr) throw orgErr;
+            // If the profiles query itself errors (e.g. RLS / permission), fail open — don't block
+            if (profileResult.error) {
+                return NextResponse.json({ allowed: true });
+            }
 
-            if (orgData) {
-                return NextResponse.json({ 
-                    allowed: false, 
-                    reason: "This wallet is already registered as a Recruiter. You cannot use it to create a Builder profile." 
+            // Wallet already has a builder profile → always allow (returning builder)
+            if (profileResult.data) {
+                return NextResponse.json({ allowed: true });
+            }
+
+            // New wallet — only block if it's a verified org
+            if (!orgResult.error && orgResult.data) {
+                return NextResponse.json({
+                    allowed: false,
+                    reason: "This wallet is already registered as a Recruiter. You cannot use it to create a Builder profile."
                 });
             }
         } else if (mode === 'recruiter') {
-            // Check if this wallet is already registered as a BUILDER
             const { data: profileData, error: profileErr } = await supabase
                 .from("profiles")
-                .select("id")
+                .select("wallet_address")
                 .eq("wallet_address", wallet)
                 .maybeSingle();
 
