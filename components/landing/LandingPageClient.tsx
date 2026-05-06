@@ -1211,7 +1211,7 @@ export function LandingPageClient() {
                         No fake CVs. No manual checks. Just trust.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
                         <button
                             onClick={() => setIsWalletModalOpen(true)}
                             className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
