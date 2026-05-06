@@ -9,6 +9,24 @@ import {
     MessageSquare, Linkedin
 } from "lucide-react";
 
+const LinkedinSquare = (props: any) => (
+    <svg {...props} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a2.48 2.48 0 0 0-2.45-2.47c-1.37 0-2 .53-2.35 1.17v-1h-3.07v7.6h3.07v-4.1c0-.21.15-.53.54-.53.38 0 .53.32.53.53v4.1h3.11M8.13 8.13c0-.85-.68-1.53-1.53-1.53-.85 0-1.53.68-1.53 1.53 0 .85.68 1.53 1.53 1.53.85 0 1.53-.68 1.53-1.53M6.7 18.5h3.1V9.4H6.7v9.1z"/>
+    </svg>
+);
+
+const XIcon = (props: any) => (
+    <svg {...props} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+        <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+    </svg>
+);
+
+const TelegramIcon = (props: any) => (
+    <svg {...props} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+        <path d="M11.944 0C5.346 0 0 5.346 0 11.944s5.346 11.944 11.944 11.944 11.944-5.346 11.944-11.944S18.542 0 11.944 0zm5.206 8.334l-1.742 8.216c-.131.58-.474.723-.961.45l-2.651-1.954-1.279 1.23c-.142.142-.261.261-.534.261l.191-2.704 4.922-4.447c.214-.19-.047-.296-.331-.107l-6.084 3.832-2.62-0.819c-.569-.178-.58-.569.119-.842l10.233-3.942c.474-.178.889.107.736.666z"/>
+    </svg>
+);
+
 // ─── MOCK DATA ───────────────────────────────────────────────────────────────
 
 const mockReceipts = [
@@ -425,9 +443,18 @@ function PublicCVCardMockup() {
                 {/* Main Card Background: Very Dark Grey */}
                 <div className="absolute inset-0 rounded-[32px] bg-[#0d0d0d] border border-white/10 pointer-events-none"></div>
 
-                {/* Top-Center Spotlight Effect */}
+                {/* Lighting Effects: Corners, Center, and Darkening */}
                 <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-[32px]">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[120%] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+                    
+                    {/* Darken Top Right Corner */}
+                    <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.4)_0%,transparent_70%)]" />
+                    
+                    {/* Symmetric Circular Specular Accents — Bottom Corners & Center — Refined & Lower */}
+                    <div className="absolute bottom-0 left-0 w-40 h-40 -translate-x-1/2 translate-y-1/2 bg-[radial-gradient(circle,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
+                    <div className="absolute bottom-0 right-0 w-40 h-40 translate-x-1/2 translate-y-1/2 bg-[radial-gradient(circle,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[40%] h-[8%] bg-[radial-gradient(ellipse_at_50%_100%,rgba(255,255,255,0.04)_0%,transparent_90%)] pointer-events-none" />
+
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     {/* Diagonal lightning shine */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine opacity-50"></div>
@@ -538,7 +565,7 @@ function PublicCVCardMockup() {
                         {/* Footer area inside card */}
                         <div className="pt-6 mt-auto border-t border-white/[0.05] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                {[Github, Linkedin, Mail, Globe].map((Icon, i) => (
+                                {[Github, LinkedinSquare, Mail, XIcon, Instagram, TelegramIcon].map((Icon, i) => (
                                     <div key={i} className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-slate-500">
                                         <Icon className="w-4 h-4" />
                                     </div>
@@ -575,21 +602,23 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
             <div className="max-w-[1240px] mx-auto space-y-4 sm:space-y-6 lg:space-y-12 relative">
 
                 {/* ── HEADER ──────────────────────────────────────────────── */}
-                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
-                    <div className="space-y-6 max-w-2xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                            <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">WEB3 RESUME</span>
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
+                    <div className="space-y-6 md:flex-1">
+                        <div className="max-w-2xl space-y-6">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-amber-200/60">WEB3 RESUME</span>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>
+                                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                    A resume you don't<br /><span className="text-white/30">have to explain.</span>
+                                </h2>
+                            </div>
                         </div>
-                        <div className="space-y-3">
-                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>
-                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-                                A resume you don't<br /><span className="text-white/30">have to explain.</span>
-                            </h2>
-                            <div className="h-0.5 w-full bg-white/15" />
-                        </div>
+                        <div className="h-0.5 w-full md:w-[140%] bg-white/15 relative z-10" />
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed text-right">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed text-right lg:pt-24">
                             Turn your work into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                         </p>
                     </div>

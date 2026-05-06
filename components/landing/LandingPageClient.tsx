@@ -64,12 +64,12 @@ function VerifiableWorkHistoryFlow() {
         color: string;
     }[] = [
         { icon: "profile",   label: "Your Profile",  sublabel: "Identity",    color: "#ffffff"  },
-        { icon: FileCheck2,  label: "Work Recorded", sublabel: "Contribution",color: "#60a5fa"  },
-        { icon: ShieldCheck, label: "Attested",       sublabel: "By Org",      color: "#14F195"  },
-        { icon: PenLine,     label: "Signed",         sublabel: "Crypto Sig",  color: "#a78bfa"  },
-        { icon: Boxes,       label: "On-Chain",       sublabel: "Solana",      color: "#34d399"  },
-        { icon: Hash,        label: "Hash Created",   sublabel: "Immutable",   color: "#9945FF"  },
-        { icon: Share2,      label: "Shareable",      sublabel: "To Recruiters",color: "#f59e0b" },
+        { icon: FileCheck2,  label: "Work Recorded", sublabel: "Contribution",color: "#94a3b8"  },
+        { icon: ShieldCheck, label: "Attested",       sublabel: "By Org",      color: "#94a3b8"  },
+        { icon: PenLine,     label: "Signed",         sublabel: "Crypto Sig",  color: "#94a3b8"  },
+        { icon: Boxes,       label: "On-Chain",       sublabel: "Solana",      color: "#94a3b8"  },
+        { icon: Hash,        label: "Hash Created",   sublabel: "Immutable",   color: "#94a3b8"  },
+        { icon: Share2,      label: "Shareable",      sublabel: "To Recruiters",color: "#94a3b8" },
     ];
 
     const isLineActive = (lineIndex: number) =>
@@ -79,7 +79,7 @@ function VerifiableWorkHistoryFlow() {
         <>
             {/* ── DESKTOP VERSION (100% Original from GitHub) ── */}
             <div className="hidden md:flex relative w-full items-center justify-center py-12 pb-16 select-none origin-center">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(153,69,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+
                 <div className="flex items-center w-full max-w-4xl mx-auto px-4">
                     {nodes.map((node, i) => {
                         const isHovered = hoveredIndex === i;
@@ -522,7 +522,7 @@ function AttestationBlock() {
     }, [paused]);
 
     const features = [
-        { icon: ShieldCheck, label: "Verifiable on-chain proof",    desc: "Each attestation is stored permanently on Solana.", color: "#14F195" },
+        { icon: ShieldCheck, label: "Verifiable on-chain proof",    desc: "Each attestation is stored permanently on Solana.", color: "#94a3b8" },
         { icon: Building2,   label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.",    color: "#60a5fa" },
         { icon: Lock,        label: "Public and tamper-resistant",  desc: "Anyone can verify, no one can alter or revoke.",      color: "#a78bfa" },
     ];
@@ -551,8 +551,8 @@ function AttestationBlock() {
             <div className="space-y-10">
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Core Feature</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Core Feature</span>
                     </div>
                     <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                         Verifiable Work History with On-Chain Attestations
@@ -605,12 +605,7 @@ function AttestationBlock() {
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
                 >
-                    {/* Ambient glow follows active card colour */}
-                    <motion.div
-                        animate={{ background: `radial-gradient(ellipse 90% 55% at 50% 30%, ${features[active].color}12, transparent 68%)` }}
-                        transition={{ duration: 0.6 }}
-                        className="absolute inset-0 pointer-events-none"
-                    />
+
 
                     {/* Cards — all anchored to horizontal centre */}
                     {cards.map((card, i) => {
@@ -736,7 +731,7 @@ function RecruiterDashboardPreviewUI_V2({
 }) {
     const slides = [
         { label: "Verified signal candidates",  color: "#60a5fa" },
-        { label: "Org-backed endorsements",     color: "#34d399" },
+        { label: "Org-backed endorsements",     color: "#94a3b8" },
         { label: "Post your job link anywhere", color: "#f59e0b" },
         { label: "Reduce hiring guesswork",     color: "#a78bfa" },
     ];
@@ -776,7 +771,7 @@ function RecruiterDashboardPreviewUI_V2({
         <div key={1} className="space-y-2">
             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Endorsement Chain</p>
             {[
-                { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#34d399" },
+                { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#94a3b8" },
                 { initials: "ST", name: "Superteam",      type: "Grant delivery, Q3 2024",  color: "#60a5fa" },
             ].map((e, i) => (
                 <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center gap-3 shadow-xl">
@@ -811,9 +806,9 @@ function RecruiterDashboardPreviewUI_V2({
                 <span className="text-[8px] font-bold text-amber-400/70 flex-shrink-0">Copy</span>
             </div>
             {[
-                { platform: "LinkedIn",  icon: "in", color: "#60a5fa", status: "Posted",    statusColor: "#34d399" },
+                { platform: "LinkedIn",  icon: "in", color: "#60a5fa", status: "Posted",    statusColor: "#94a3b8" },
                 { platform: "Twitter/X", icon: "X",  color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
-                { platform: "Discord",   icon: "D",  color: "#a78bfa", status: "Posted",    statusColor: "#34d399" },
+                { platform: "Discord",   icon: "D",  color: "#a78bfa", status: "Posted",    statusColor: "#94a3b8" },
             ].map((p, i) => (
                 <div key={i} className="p-2.5 rounded-xl bg-black border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-2">
@@ -833,7 +828,7 @@ function RecruiterDashboardPreviewUI_V2({
             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Confidence Score</p>
             <div className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-3 shadow-xl">
                 {[
-                    { label: "Verified Work",    score: 92, color: "#34d399" },
+                    { label: "Verified Work",    score: 92, color: "#94a3b8" },
                     { label: "Org Attestations", score: 87, color: "#60a5fa" },
                     { label: "Chain Activity",   score: 74, color: "#a78bfa" },
                 ].map((s, i) => (
@@ -870,23 +865,23 @@ function RecruiterDashboardPreviewUI_V2({
                 {/* Header */}
                 <div className="flex items-center justify-between relative z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-emerald-400" />
+                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                            <Building2 className="w-5 h-5 text-white/60" />
                         </div>
                         <div>
                             <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Operations</p>
                         </div>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Verified Org</span>
+                    <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Verified Org</span>
                     </div>
                 </div>
 
                 {/* Stat Pods */}
                 <div className="grid grid-cols-3 gap-3 relative z-10">
                     {[
-                        { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-emerald-400", bg: "bg-emerald-500/10" },
+                        { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-white/60", bg: "bg-white/5" },
                         { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
                         { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
                     ].map((pod, i) => (
@@ -964,7 +959,7 @@ function HiringBlock() {
 
     const features = [
         { icon: ShieldCheck, label: "Verified Signal Only",     desc: "Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.",              color: "#60a5fa", slide: 0 },
-        { icon: Building2,   label: "Org-Backed Trust",         desc: "See exactly which protocols and organizations have attested to a candidate's specific work output.",              color: "#34d399", slide: 1 },
+        { icon: Building2,   label: "Org-Backed Trust",         desc: "See exactly which protocols and organizations have attested to a candidate's specific work output.",              color: "#94a3b8", slide: 1 },
         { icon: Share2,      label: "Post Anywhere, Instantly", desc: "Share a portable job link to LinkedIn, Twitter, Discord, or any platform. One link, verified by ChainVolio.", color: "#f59e0b", slide: 2 },
     ];
 
@@ -978,7 +973,7 @@ function HiringBlock() {
         >
             {/* Left — interactive dashboard */}
             <div className="relative order-2 lg:order-1">
-                <div className="absolute -inset-10 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+
                 <RecruiterDashboardPreviewUI_V2
                     active={active}
                     setActive={setActive}
@@ -998,8 +993,8 @@ function HiringBlock() {
             <div className="space-y-10 order-1 lg:order-2">
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Use Case</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Use Case</span>
                     </div>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
@@ -1189,27 +1184,12 @@ export function LandingPageClient() {
             />
 
             <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
-                {/* Background Video */}
-                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                    <video 
-                        ref={heroVideoRef}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className="absolute inset-0 w-full h-full object-cover opacity-20 scale-105"
-                    >
-                        <source src="/video-background.mp4" type="video/mp4" />
-                    </video>
-                    {/* Dark Overlay for readability */}
-                    <div className="absolute inset-0 bg-black/40"></div>
-                </div>
+
 
                 {/* Background Glows */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-glow-purple opacity-20 blur-[120px] pointer-events-none"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-glow-teal opacity-10 blur-[120px] pointer-events-none"></div>
-                <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/[0.03] blur-[120px] pointer-events-none"></div>
+                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-white/[0.02] blur-[120px] pointer-events-none"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-white/[0.02] blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
                 <section className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
@@ -1221,8 +1201,8 @@ export function LandingPageClient() {
 
                     <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
-                        <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className="text-white/30">That Recruiters Trust.</span>
+                        <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
+                            Resume <span className="text-white">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1453,7 +1433,7 @@ export function LandingPageClient() {
                             <div className="space-y-6 md:space-y-12">
                                 <div className="space-y-3 md:space-y-6">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent uppercase">Why ChainVolio</span>
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-amber-200/60 uppercase">Why ChainVolio</span>
                                     </div>
                                     
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
@@ -1484,8 +1464,6 @@ export function LandingPageClient() {
 
                             {/* Right: Globe Visual — Aligned with text height */}
                             <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[240px] sm:min-h-[360px] md:min-h-[450px]">
-                                {/* Subtle Glow behind globe */}
-                                <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-1000" />
                                 
                                 {/* Title Overlay */}
                                 <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
@@ -1597,26 +1575,30 @@ export function LandingPageClient() {
                 <section id="problems" className="pt-8 pb-8 sm:py-12 md:py-16 relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
-                        <div className="space-y-2 md:space-y-4 max-w-xl">
-                            {/* badge */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs noise</span>
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
+                        <div className="space-y-2 md:space-y-4 md:flex-1">
+                            <div className="max-w-xl space-y-2 md:space-y-4">
+                                {/* badge */}
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-amber-200/60">Signal vs noise</span>
+                                </div>
+                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                    Why Web3 Needs Verifiable Work History
+                                </p>
+                                <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                    From Noise to<br />
+                                    <span className="text-white/30">Verifiable Signal</span>
+                                </h2>
                             </div>
-                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                Why Web3 Needs Verifiable Work History
-                            </p>
-                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-                                From Noise to<br />
-                                <span className="text-white/30">Verifiable Signal</span>
-                            </h2>
-                            <div className="h-0.5 w-full bg-white/15" />
                         </div>
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-right md:pt-20">
                             Work history is fragmented and impossible to verify.<br />
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
                         </p>
+                    </div>
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mb-4">
+                        <div className="h-0.5 w-full bg-white/15" />
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
@@ -1763,32 +1745,32 @@ export function LandingPageClient() {
                     <div className="max-w-[1200px] mx-auto relative">
 
                         {/* ── Header: compact, left + right split ── */}
-                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-4">
-                            <div className="space-y-2 md:space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
-                                        The Solution
-                                    </span>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-4">
+                            <div className="space-y-2 md:space-y-4 md:flex-1">
+                                <div className="max-w-xl space-y-2 md:space-y-4">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">
+                                             The Solution
+                                        </span>
+                                    </div>
+                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                        Build a Verifiable Web3 Resume with On-Chain Proof
+                                    </p>
+                                    <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
+                                        Build a reputation<br /><span className="text-white/30">that travels.</span>
+                                    </h3>
                                 </div>
-                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                    Build a Verifiable Web3 Resume with On-Chain Proof
-                                </p>
-                                <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                    Build a reputation<br /><span className="text-white/30">that travels.</span>
-                                </h3>
-                                <div className="h-0.5 w-full bg-white/15" />
+                                <div className="h-0.5 w-full md:w-[140%] bg-white/15 relative z-10" />
                             </div>
-                            <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xs md:text-right">
+                            <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xs md:text-right md:pt-20">
                                 Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
                             </p>
                         </div>
 
                         {/* ── Interactive Flow ── */}
                         <div className="relative w-full max-w-[860px] mx-auto mb-4">
-                            <div className="absolute -inset-8 bg-gradient-to-r from-emerald-500/4 to-purple-500/4 blur-[80px] pointer-events-none" />
-                            <p className="hidden md:block text-[10px] font-bold uppercase tracking-[0.25em] text-white/15 mb-4 text-center">
-                                Hover each step to see the flow
-                            </p>
+                            <div className="absolute -inset-8 bg-white/[0.03] blur-[80px] pointer-events-none" />
+
                             <VerifiableWorkHistoryFlow />
                         </div>
 
@@ -1811,7 +1793,7 @@ export function LandingPageClient() {
 
                         {/* ── UI Mockup ── */}
                         <div className="relative h-[220px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
-                            <div className="absolute inset-0 bg-emerald-500/4 blur-[120px] rounded-full opacity-40 pointer-events-none" />
+                            <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full opacity-40 pointer-events-none" />
                             
                             {/* Unified Scaling Container for the entire assembly */}
                             <div className="relative scale-[0.31] min-[440px]:scale-[0.4] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[1200px] h-[650px]">
@@ -1870,7 +1852,7 @@ export function LandingPageClient() {
                     }} />
                     {/* Radial glow center */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] rounded-full pointer-events-none"
-                        style={{ background: "radial-gradient(ellipse at center, rgba(153,69,255,0.12) 0%, rgba(20,241,149,0.06) 45%, transparent 70%)" }}
+                        style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
                     />
                     {/* Top + bottom fade */}
                     <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
@@ -1885,7 +1867,7 @@ export function LandingPageClient() {
                         >
                             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
                                  Start Building Your<br />
-                                 <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Verifiable Web3 Resume.</span>
+                                 <span className="text-white/30">Verifiable Web3 Resume.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.

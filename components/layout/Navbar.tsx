@@ -113,10 +113,10 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         />
 
                         <Link
-                            href="/security"
-                            className={`transition-colors py-2 ${isActive('/security') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
+                            href="/blog"
+                            className={`transition-colors py-2 ${isActive('/blog') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
                         >
-                            Security
+                            Blog
                         </Link>
 
                         <NavDropdown
@@ -257,9 +257,9 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                     onClick={() => setActiveMobilePanel('guides')} 
                                                 />
                                                 <MobileNavLink 
-                                                    href="/security" 
-                                                    icon={<Shield className="w-5 h-5 text-rose-400" />} 
-                                                    label="Security" 
+                                                    href="/blog" 
+                                                    icon={<HelpCircle className="w-5 h-5 text-amber-400" />} 
+                                                    label="Blog" 
                                                     onClick={() => setIsMobileMenuOpen(false)} 
                                                 />
                                                 <MobileNavLink 
