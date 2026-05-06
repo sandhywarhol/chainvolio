@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: "ChainVolio - Verifiable Identity for Web3",
     template: "%s | ChainVolio"
   },
-  description: "Build a work history that can’t be faked. Backed by on-chain proof and attestations.",
+  description: "Build a work history that cannot be faked. Backed by on-chain proof and attestations.",
   applicationName: "ChainVolio",
   generator: "ChainVolio",
   keywords: ["Web3", "Solana", "Professional Identity", "On-chain Resume", "Verifiable Credentials", "Trust Infrastructure", "Career", "Blockchain"],
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ChainVolio - Verifiable Identity for Web3",
-    description: "Build a work history that can’t be faked. Backed by on-chain proof and attestations.",
+    description: "Build a work history that cannot be faked. Backed by on-chain proof and attestations.",
     url: "https://www.chainvolio.xyz/",
     siteName: "ChainVolio",
     images: [
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ChainVolio - Verifiable Identity for Web3",
-    description: "Build a work history that can’t be faked. Backed by on-chain proof and attestations.",
+    description: "Build a work history that cannot be faked. Backed by on-chain proof and attestations.",
     images: ["/homepage/og%20image%20for%20all.jpg?v=5"],
     creator: "@chainvolio",
     site: "@chainvolio",
@@ -97,7 +97,7 @@ export default function RootLayout({
               "name": "ChainVolio",
               "url": "https://www.chainvolio.xyz/",
               "logo": "https://www.chainvolio.xyz/logo.png",
-              "description": "Build a work history that can’t be faked. Backed by on-chain proof and attestations.",
+              "description": "Build a work history that cannot be faked. Backed by on-chain proof and attestations.",
               "sameAs": [
                 "https://x.com/chainvolio",
                 "https://github.com/sandhywarhol/chainvolio"

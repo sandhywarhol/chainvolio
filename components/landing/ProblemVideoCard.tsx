@@ -86,22 +86,23 @@ export default function ProblemVideoCard({ idleSrc, hoverSrc }: Props) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[300px] flex items-center justify-center cursor-pointer"
+      className="relative w-full h-[150px] sm:h-[300px] flex items-center justify-center cursor-pointer"
       onMouseEnter={playForward}
       onMouseLeave={playBackward}
     >
       <motion.div
         animate={{ scale: isHovered ? 1.3 : 1, zIndex: isHovered ? 10 : 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="relative w-full h-full min-h-[250px]"
+        className="relative w-full h-full min-h-[150px] sm:min-h-[250px]"
       >
         <video
           ref={idleVideoRef}
           src={idleSrc}
-          preload="none"
+          preload="auto"
           loop
           muted
           playsInline
+          autoPlay
           className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
             showHover ? "opacity-0" : "opacity-100"
           }`}
@@ -111,7 +112,7 @@ export default function ProblemVideoCard({ idleSrc, hoverSrc }: Props) {
         <video
           ref={hoverVideoRef}
           src={hoverSrc}
-          preload="none"
+          preload="auto"
           muted
           playsInline
           className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${

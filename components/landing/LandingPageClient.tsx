@@ -67,7 +67,7 @@ function VerifiableWorkHistoryFlow() {
         hoveredIndex !== null && lineIndex < hoveredIndex;
 
     return (
-        <div className="relative w-full flex items-center justify-center py-12 pb-16 select-none">
+        <div className="relative w-full flex items-center justify-center py-12 pb-16 select-none scale-[0.38] min-[400px]:scale-[0.5] sm:scale-75 md:scale-100 origin-center">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(153,69,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
             <div className="flex items-center w-full max-w-4xl mx-auto px-4">
@@ -76,9 +76,9 @@ function VerifiableWorkHistoryFlow() {
                     const isActive  = hoveredIndex !== null && i <= hoveredIndex;
                     const IconComp  = node.icon === "profile" ? null : node.icon;
                     const isProfile = node.icon === "profile";
-                    const chipW     = "52px";
-                    const chipH     = "52px";
-                    const r         = "16px";
+                    const chipW     = typeof window !== 'undefined' && window.innerWidth < 768 ? "36px" : "52px";
+                    const chipH     = typeof window !== 'undefined' && window.innerWidth < 768 ? "36px" : "52px";
+                    const r         = typeof window !== 'undefined' && window.innerWidth < 768 ? "12px" : "16px";
 
                     return (
                         <div key={i} className="contents">
@@ -153,13 +153,13 @@ function VerifiableWorkHistoryFlow() {
                                         {/* Content */}
                                         {isProfile ? (
                                             <User
-                                                className="relative z-10 w-6 h-6"
+                                                className="relative z-10 w-4 h-4 md:w-6 md:h-6"
                                                 style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.4)" }}
                                             />
                                         ) : (
                                             IconComp && (
                                                 <IconComp
-                                                    className="relative z-10 w-7 h-7"
+                                                    className="relative z-10 w-4 h-4 md:w-7 md:h-7"
                                                     style={{ color: isActive ? node.color : "rgba(255,255,255,0.2)" }}
                                                 />
                                             )
@@ -259,9 +259,9 @@ function VerifiableWorkHistoryFlow() {
 // --- Static UI Mockup for Feature Card ---
 function MockProfileUI() {
     return (
-        <div className="w-full h-full flex font-sans text-sm">
+        <div className="w-[850px] md:w-full h-full flex font-sans text-sm scale-[0.32] min-[400px]:scale-[0.4] sm:scale-[0.7] md:scale-100 origin-top-left">
             {/* 1. Sidebar (Linear Style) */}
-            <div className="w-64 border-r border-white/5 bg-white/[0.01] p-6 flex flex-col gap-8">
+            <div className="w-48 md:w-64 border-r border-white/5 bg-white/[0.01] p-4 md:p-6 flex flex-col gap-6 md:gap-8">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
                         <span className="text-xs font-bold text-white/50">AR</span>
@@ -374,7 +374,7 @@ function MockProfileUI() {
 
 // Linear-style card shell
 const CARD_BASE: React.CSSProperties = {
-    width: "360px",
+    width: "min(300px, calc(100vw - 48px))",
     borderRadius: "14px",
     overflow: "hidden",
     position: "relative",
@@ -614,9 +614,12 @@ function AttestationBlock() {
 
     // pos 0 = center (active), pos 1 = right peek, pos 2 = left peek
     const stackAnim = (pos: number) => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        const xOffset = isMobile ? (window.innerWidth < 400 ? 30 : 50) : 160;
+        
         if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"   };
-        if (pos === 1) return { x: 160,  y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
-        return              { x: -160, y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
+        if (pos === 1) return { x: xOffset,  y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
+        return              { x: -xOffset, y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
     };
 
     return (
@@ -664,7 +667,7 @@ function AttestationBlock() {
                                 transition={{ duration: 0.25 }}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border"
                             >
-                                <f.icon className="w-3.5 h-3.5" style={{ color: active === i ? f.color : f.color + "55" }} />
+                                <f.icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: active === i ? f.color : f.color + "55" }} />
                             </motion.div>
                             <div>
                                 <p className="text-sm font-bold mb-0.5" style={{ color: active === i ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
@@ -703,11 +706,8 @@ function AttestationBlock() {
                             key={i}
                             animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
                             transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                            className="absolute top-7 left-1/2 -ml-[min(150px,calc(50vw-24px))]"
                             style={{
-                                position: "absolute",
-                                top: 28,
-                                left: "50%",
-                                marginLeft: -180,
                                 zIndex: anim.zIndex,
                             }}
                         >
@@ -929,14 +929,17 @@ function RecruiterDashboardPreviewUI_V2({
     ];
 
     const cardAnim = (pos: number) => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        const xOffset = isMobile ? (window.innerWidth < 400 ? 50 : 80) : 210;
+
         if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"  };
-        if (pos === 1) return { x: 210,  y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
+        if (pos === 1) return { x: xOffset,  y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
         if (pos === 2) return { x: -210, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
         return              { x: 0,    y: 40, scale: 0.78, opacity: 0,    zIndex: 10, filter: "blur(4px)" };
     };
 
     return (
-        <div className="w-full flex flex-col gap-6 relative group"
+        <div className="w-[1000px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.68] min-[400px]:scale-[0.75] sm:scale-90 md:scale-100 origin-top h-[520px] sm:h-auto"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -985,7 +988,8 @@ function RecruiterDashboardPreviewUI_V2({
                             key={i}
                             animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
                             transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                            style={{ position: "absolute", top: 0, left: "50%", marginLeft: -160, width: 320, zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
+                            className="absolute top-0 left-1/2 -ml-[min(150px,calc(50vw-24px))] w-[min(300px,calc(100vw-48px))]"
+                            style={{ zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
                         >
                             {panel}
                         </motion.div>
@@ -1082,7 +1086,7 @@ function HiringBlock() {
                                 transition={{ duration: 0.25 }}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border"
                             >
-                                <f.icon className="w-3.5 h-3.5" style={{ color: active === f.slide ? f.color : f.color + "55" }} />
+                                <f.icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: active === f.slide ? f.color : f.color + "55" }} />
                             </motion.div>
                             <div>
                                 <p className="text-sm font-bold mb-1" style={{ color: active === f.slide ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
@@ -1212,14 +1216,14 @@ export function LandingPageClient() {
                 <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-16 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
+                <section className="relative pt-24 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust layer for Web3
                         </span>
                     </div>
 
-                    <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-6 sm:mb-8 text-white max-w-5xl">
+                    <h1 className="text-[36px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
                             Resume <span className="text-white/30">That Recruiters Trust.</span>
@@ -1247,9 +1251,9 @@ export function LandingPageClient() {
                     </div>
 
                     {/* HERO VISUAL - Clean Slide Preview */}
-                    <div className="relative w-full max-w-4xl mx-auto group -mt-12 pt-4 pb-4">
+                    <div className="relative w-full max-w-4xl mx-auto group mt-4 sm:-mt-12 pt-4 pb-4">
                         <div className="relative overflow-hidden transition-all duration-1000">
-                            <div className="aspect-[16/10] relative">
+                            <div className="aspect-[16/10] sm:aspect-[16/10] relative min-h-[220px]">
                                 {SLIDES.map((slide, index) => (
                                     <div 
                                         key={index}
@@ -1322,7 +1326,7 @@ export function LandingPageClient() {
                                         <img
                                             src={partner.src}
                                             alt={partner.name}
-                                            className="h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
+                                            className="h-4 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
                                             style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
                                         />
                                     </div>
@@ -1337,7 +1341,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-16 sm:py-24 md:py-32 pt-24 sm:pt-32 md:pt-48 px-4 sm:px-6 relative z-10 bg-black -mt-16 sm:-mt-24 md:-mt-32">
+                <section className="py-16 sm:py-24 md:py-32 pt-32 sm:pt-32 md:pt-48 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
@@ -1350,8 +1354,8 @@ export function LandingPageClient() {
                             <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
-                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
-                                Your work is real. <span className="text-white/30">Your proof isn’t.</span>
+                            <h2 className="text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
+                                Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg font-normal max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
@@ -1458,7 +1462,7 @@ export function LandingPageClient() {
                                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
                                 </div>                                
                                 <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.85]" />
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.6] sm:scale-[0.85]" />
                                 </div>
 
                                 {/* Top/Bottom Gradients to mask clipping */}
@@ -1485,7 +1489,7 @@ export function LandingPageClient() {
                             {[
                                 {
                                     title: "Beyond Profiles",
-                                    desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you’ve done.",
+                                    desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
                                     color: "#60a5fa"
                                 },
                                 {
@@ -1545,7 +1549,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
-                    <div className="relative w-full h-[280px] sm:h-[400px] md:h-[580px]">
+                    <div className="relative w-full h-[220px] sm:h-[400px] md:h-[580px]">
                         <SignalNoiseVisual />
 
                         {/* Radial vignette — lines fade at edges */}
@@ -1568,31 +1572,31 @@ export function LandingPageClient() {
                                 <motion.div
                                     animate={{ scale: [1, 3.2], opacity: [0.12, 0] }}
                                     transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 0 }}
-                                    className="absolute w-16 h-16 rounded-full border border-white/20"
+                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/20"
                                 />
                                 <motion.div
                                     animate={{ scale: [1, 2.2], opacity: [0.18, 0] }}
                                     transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                                    className="absolute w-16 h-16 rounded-full border border-white/25"
+                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/25"
                                 />
                                 <motion.div
                                     animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
                                     transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 1.4 }}
-                                    className="absolute w-16 h-16 rounded-full border border-white/30"
+                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30"
                                 />
 
                                 {/* Logo container */}
                                 <motion.div
                                     animate={{ opacity: [0.75, 1, 0.75] }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative w-16 h-16 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_60px_rgba(255,255,255,0.06)]"
+                                    className="relative w-12 h-12 md:w-16 md:h-16 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_60px_rgba(255,255,255,0.06)]"
                                 >
                                     <Image
                                         src="/logo.png"
                                         alt="ChainVolio"
-                                        width={36}
-                                        height={36}
-                                        className="opacity-80"
+                                        width={24}
+                                        height={24}
+                                        className="md:w-[36px] md:h-[36px] opacity-80"
                                     />
                                 </motion.div>
                             </div>
@@ -1695,10 +1699,12 @@ export function LandingPageClient() {
                         <div className="relative h-[380px] sm:h-[500px] md:h-[650px] w-full max-w-[1100px] mx-auto flex items-center justify-center">
                             <div className="absolute inset-0 bg-emerald-500/4 blur-[120px] rounded-full opacity-40 pointer-events-none" />
                             <div className="relative w-full h-full group">
-                                <div className="w-full h-full bg-[#0a0a0a] rounded-3xl border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-700 text-left">
-                                    <MockProfileUI />
+                                <div className="w-full h-full bg-[#0a0a0a] rounded-3xl border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-700 text-left relative">
+                                    <div className="absolute inset-0 w-full h-full">
+                                        <MockProfileUI />
+                                    </div>
                                 </div>
-                                <div className="hidden sm:block absolute -right-4 md:-right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                <div className="hidden md:block absolute -right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
                                     <div className="[perspective:1500px]">
                                         <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
                                             <FloatingVerificationCard />
@@ -1712,7 +1718,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 overflow-hidden">
+                <section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
@@ -1811,7 +1817,7 @@ export function LandingPageClient() {
                     <div className="relative border border-white/20 rounded-sm max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden group" onClick={(e) => e.stopPropagation()}>
                         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>
                         <div className="relative z-10 p-5 sm:p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[90vh] sm:max-h-[80vh] overflow-y-auto custom-scrollbar">
-                            <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">×</button>
+                            <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">&times;</button>
                             {activeModal === 'recruiters' && (
                                 <div className="space-y-16 py-4">
                                     <div className="space-y-4">

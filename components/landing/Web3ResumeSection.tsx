@@ -413,7 +413,7 @@ function DashboardBg() {
 // ─── CV CARD MOCKUP (reference-matched) ─────────────────────────────────────
 function PublicCVCardMockup() {
     return (
-        <div className="relative w-full max-w-[850px] mx-auto">
+        <div className="relative w-full max-w-[850px] mx-auto overflow-hidden scale-[0.58] min-[400px]:scale-[0.65] sm:scale-75 md:scale-100 origin-top">
             {/* Outer ambient glow */}
             <div className="absolute -inset-8 bg-white/[0.02] blur-[80px] rounded-full pointer-events-none -z-10" />
 
@@ -480,7 +480,7 @@ function PublicCVCardMockup() {
                                     <Globe className="w-3.5 h-3.5" />
                                     Open to remote as Protocol Engineer
                                 </div>
-                                <h3 className="text-[32px] font-bold text-white tracking-tight leading-tight">Alex Rivera</h3>
+                                <h3 className="text-[20px] sm:text-[24px] md:text-[32px] font-bold text-white tracking-tight leading-tight">Alex Rivera</h3>
                                 <p className="text-[14px] text-white/40 font-medium mt-1">Senior Engineer at Nexus Protocol</p>
                             </div>
                             <div className="flex flex-col items-center gap-4">
@@ -488,7 +488,7 @@ function PublicCVCardMockup() {
                                     <Check className="w-5 h-5 text-emerald-400" strokeWidth={2.5} />
                                 </div>
                                 <div className="text-center">
-                                    <span className="block text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-[#a855f7] leading-none">98</span>
+                                    <span className="block text-[24px] sm:text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-[#a855f7] leading-none">98</span>
                                     <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#a855f7] block mt-1">CV Score</span>
                                 </div>
                             </div>
@@ -567,7 +567,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+        <section className="py-10 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
             {/* Elegant thin line separator constrained to content width */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -598,7 +598,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                 </div>
 
                 {/* ── SHOWCASE: Seamless blended container ─── */}
-                <div className="relative w-full min-h-[420px] sm:min-h-[580px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
+                <div className="relative w-full min-h-[480px] sm:min-h-[580px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
 
                     {/* Background: blurred dashboard grid */}
                     <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
@@ -609,10 +609,10 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     <div className="absolute inset-0 pointer-events-none"
                         style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent 40%, black 95%)" }}
                     />
-                    {/* Bottom fade */}
-                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
-                    {/* Top fade */}
-                    <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
+                    {/* Bottom fade — reduced on mobile to prevent covering the card */}
+                    <div className="absolute inset-x-0 bottom-0 h-16 sm:h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
+                    {/* Top fade — reduced on mobile */}
+                    <div className="absolute inset-x-0 top-0 h-16 sm:h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
                     {/* Foreground: CV Card floating on top */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-6">
