@@ -136,7 +136,7 @@ function VerifiableWorkHistoryFlow() {
             </div>
 
             {/* ── MOBILE VERSION (Optimized Swipeable) ── */}
-            <div className="md:hidden relative w-full pt-0 pb-24 select-none overflow-x-auto no-scrollbar">
+            <div className="md:hidden relative w-full pt-0 pb-24 overflow-x-auto no-scrollbar active:cursor-grabbing">
                 <div className="flex items-center w-max px-12">
                     {nodes.map((node, i) => {
                         const IconComp  = node.icon === "profile" ? null : node.icon;
@@ -754,7 +754,7 @@ function RecruiterDashboardPreviewUI_V2({
                 { name: "Alex Rivera", role: "Core Developer",     signals: 8 },
                 { name: "Sarah Chen",  role: "Smart Contract Dev", signals: 5 },
             ].map((c, i) => (
-                <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 flex items-center justify-between shadow-xl">
+                <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white/40">
                             {c.name.split(" ").map((n: string) => n[0]).join("")}
@@ -779,7 +779,7 @@ function RecruiterDashboardPreviewUI_V2({
                 { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#34d399" },
                 { initials: "ST", name: "Superteam",      type: "Grant delivery, Q3 2024",  color: "#60a5fa" },
             ].map((e, i) => (
-                <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 flex items-center gap-3 shadow-xl">
+                <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center gap-3 shadow-xl">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                         style={{ background: e.color + "22", color: e.color, border: `1px solid ${e.color}33` }}>
                         {e.initials}
@@ -803,7 +803,7 @@ function RecruiterDashboardPreviewUI_V2({
                     <span className="text-[8px] font-bold" style={{ color: "#f59e0b" }}>Portable Link</span>
                 </div>
             </div>
-            <div className="p-2.5 rounded-xl bg-[#111111] border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
+            <div className="p-2.5 rounded-xl bg-black border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
                 <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
                     <Share2 className="w-2.5 h-2.5 text-amber-400" />
                 </div>
@@ -815,7 +815,7 @@ function RecruiterDashboardPreviewUI_V2({
                 { platform: "Twitter/X", icon: "X",  color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
                 { platform: "Discord",   icon: "D",  color: "#a78bfa", status: "Posted",    statusColor: "#34d399" },
             ].map((p, i) => (
-                <div key={i} className="p-2.5 rounded-xl bg-[#111111] border border-white/5 flex items-center justify-between shadow-xl">
+                <div key={i} className="p-2.5 rounded-xl bg-black border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0"
                             style={{ background: p.color + "18", color: p.color, border: `1px solid ${p.color}25` }}>
@@ -831,7 +831,7 @@ function RecruiterDashboardPreviewUI_V2({
         // Panel 3 — Confidence Score (auto-only, no bullet)
         <div key={3} className="space-y-2">
             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Confidence Score</p>
-            <div className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-3 shadow-xl">
+            <div className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-3 shadow-xl">
                 {[
                     { label: "Verified Work",    score: 92, color: "#34d399" },
                     { label: "Org Attestations", score: 87, color: "#60a5fa" },
@@ -863,7 +863,7 @@ function RecruiterDashboardPreviewUI_V2({
 
     return (
         <>
-            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-[#080808]/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_32px_64px_rgba(0,0,0,0.6)]"
+            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-black border border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_32px_64px_rgba(0,0,0,0.6)]"
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
             >
@@ -890,7 +890,7 @@ function RecruiterDashboardPreviewUI_V2({
                         { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
                         { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
                     ].map((pod, i) => (
-                        <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-1.5 shadow-xl">
+                        <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-1.5 shadow-xl">
                             <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
                                 <pod.icon className={`w-3 h-3 ${pod.col}`} />
                             </div>
@@ -921,6 +921,18 @@ function RecruiterDashboardPreviewUI_V2({
                     })}
                     <div className="absolute inset-y-0 left-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
                     <div className="absolute inset-y-0 right-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
+                    
+                    {/* Swipe Overlay for Mobile */}
+                    <motion.div 
+                        className="absolute inset-0 z-50 md:hidden"
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.1}
+                        onDragEnd={(e, info) => {
+                            if (info.offset.x < -30) setActive((prev) => (prev + 1) % 4);
+                            if (info.offset.x > 30) setActive((prev) => (prev - 1 + 4) % 4);
+                        }}
+                    />
                 </div>
             </div>
 
@@ -993,7 +1005,7 @@ function HiringBlock() {
                         Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
                     <div className="h-0.5 w-full bg-white/15" />
-                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal max-w-md">
+                    <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
                     </p>
                 </div>
@@ -1214,8 +1226,8 @@ export function LandingPageClient() {
                         </span>
                     </h1>
 
-                    <p className="text-white/40 text-base md:text-xl font-normal max-w-2xl mb-10 sm:mb-12 leading-relaxed">
-                        Turn your work experience into verifiable on-chain proof.<br className="hidden sm:block" />
+                    <p className="text-white/40 text-[13px] md:text-xl font-normal max-w-[310px] sm:max-w-2xl mb-10 sm:mb-12 leading-relaxed mx-auto">
+                        Turn your work experience into verifiable on-chain proof.<br />
                         No fake CVs. No manual checks. Just trust.
                     </p>
 
@@ -1235,9 +1247,9 @@ export function LandingPageClient() {
                     </div>
 
                     {/* HERO VISUAL - Clean Slide Preview */}
-                    <div className="relative w-full max-w-4xl mx-auto group mt-0 sm:-mt-12 pt-4 pb-4">
+                    <div className="relative w-full max-w-4xl mx-auto group mt-0 sm:-mt-12 pt-4 pb-4 px-4 sm:px-0">
                         <div className="relative overflow-hidden transition-all duration-1000">
-                            <div className="aspect-[16/10] sm:aspect-[16/10] relative min-h-[220px]">
+                            <div className="aspect-[14/10] sm:aspect-[16/10] relative min-h-[160px] sm:min-h-[220px] scale-[0.85] sm:scale-100">
                                 {SLIDES.map((slide, index) => (
                                     <div 
                                         key={index}
@@ -1254,6 +1266,19 @@ export function LandingPageClient() {
                                         />
                                     </div>
                                 ))}
+
+                                {/* Swipe Detection for Mobile Hero */}
+                                <motion.div 
+                                    className="absolute inset-0 z-30 md:hidden cursor-grab active:cursor-grabbing"
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={0.2}
+                                    onDragEnd={(e, info) => {
+                                        if (info.offset.x < -40) setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+                                        if (info.offset.x > 40) setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+                                    }}
+                                />
+
                                 {/* Multi-layered Bottom Gradient for Smooth Blending */}
                                 <div className="absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
                                 <div className="absolute bottom-0 left-0 w-full h-12 bg-black z-20 pointer-events-none"></div>
@@ -1325,11 +1350,11 @@ export function LandingPageClient() {
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="pt-8 pb-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
+                <section className="py-12 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="text-center mb-12 md:mb-24 space-y-4">
+                        <div className="text-center mb-8 md:mb-24 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
                                 <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
                                     The problem
@@ -1342,7 +1367,7 @@ export function LandingPageClient() {
                                 Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
                             </h2>
                             <div className="h-0.5 w-full bg-white/15" />
-                            <p className="text-white/40 text-sm md:text-lg font-normal max-w-4xl mx-auto">
+                            <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
                             
@@ -1358,14 +1383,14 @@ export function LandingPageClient() {
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.7}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -50) handleProblemLoop(problemIdx + 1);
-                                    else if (info.offset.x > 50) handleProblemLoop(problemIdx - 1);
+                                    if (info.offset.x < -30) handleProblemLoop(problemIdx + 1);
+                                    else if (info.offset.x > 30) handleProblemLoop(problemIdx - 1);
                                 }}
                             >
                                 {clonedProblems.map((prob, i) => (
                                     <div 
                                         key={`${prob.id}-${i}`} 
-                                        className={`w-[85vw] md:w-auto flex-shrink-0 space-y-8 md:space-y-12 group transition-all duration-300 px-2 md:px-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''} ${
+                                        className={`w-[85vw] md:w-auto flex-shrink-0 space-y-3 md:space-y-12 group transition-all duration-300 px-2 md:px-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''} ${
                                             prob.id === 0 ? 'md:pr-12 md:pb-0' : 
                                             prob.id === 1 ? 'md:px-12 md:border-l border-white/[0.05] md:pt-0 md:pb-0' : 
                                             'md:pl-12 md:border-l border-white/[0.05] md:pt-0'
@@ -1384,10 +1409,10 @@ export function LandingPageClient() {
                                             }
                                         />
                                         <div className="space-y-4 text-center">
-                                            <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">
+                                            <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-[15px] md:text-xl">
                                                 {prob.id === 0 ? "Broken Work History" : prob.id === 1 ? "Unverifiable Resumes" : "Signal Lost in Noise"}
                                             </h3>
-                                            <p className="text-white/40 text-base leading-relaxed">
+                                            <p className="text-white/40 text-[12px] md:text-base leading-relaxed">
                                                 {prob.id === 0 ? "Your experience is scattered across PDFs, portfolios, and links. No single source of truth." :
                                                  prob.id === 1 ? "Without verifiable data, resumes become claims, not proof." :
                                                  "Real talent gets buried. Hiring becomes guesswork."}
@@ -1437,7 +1462,7 @@ export function LandingPageClient() {
                                     </h2>
                                     <div className="h-0.5 w-full bg-white/15" />
                                     
-                                    <p className="text-white/40 text-lg md:text-xl leading-relaxed max-w-xl font-normal">
+                                    <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
                                         Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
                                     </p>
                                 </div>
@@ -1468,7 +1493,7 @@ export function LandingPageClient() {
                                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
                                 </div>                                
                                 <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.6] sm:scale-[0.85]" />
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.8] sm:scale-[0.85]" />
                                 </div>
 
                                 {/* Top/Bottom Gradients to mask clipping */}
@@ -1476,15 +1501,15 @@ export function LandingPageClient() {
                                 <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
                                 {/* Floating Stats Overlay — Refined Metrics */}
-                                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8 px-8 py-4 rounded-xl border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-black/80 whitespace-nowrap">
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-black/80 whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[11px] font-bold text-emerald-400/80 tracking-tight">Low-cost attestations (~$0.001)</span>
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-emerald-400/80 tracking-tight">Low-cost attestations (~$0.001)</span>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
-                                        <span className="text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
                                     </div>
                                 </div>
                             </div>
@@ -1501,8 +1526,8 @@ export function LandingPageClient() {
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.7}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -50) handleWhyLoop(whyIdx + 1);
-                                    else if (info.offset.x > 50) handleWhyLoop(whyIdx - 1);
+                                    if (info.offset.x < -30) handleWhyLoop(whyIdx + 1);
+                                    else if (info.offset.x > 30) handleWhyLoop(whyIdx - 1);
                                 }}
                             >
                                 {[
@@ -1534,14 +1559,14 @@ export function LandingPageClient() {
                                 ].map((feature, i) => (
                                     <div 
                                         key={i} 
-                                        className={`p-10 bg-white/[0.03] border border-white/[0.08] rounded-2xl transition-colors group relative w-[85vw] md:w-auto flex-shrink-0 md:px-12 md:border-none md:rounded-none md:bg-black md:p-10 pb-12 px-6 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                        className={`p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:border-none md:rounded-none md:bg-black md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
                                     >
-                                        <div className="space-y-4 relative z-10">
+                                        <div className="space-y-3 relative z-10">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-1.5 h-1.5 rounded-full" style={{ background: feature.color }} />
-                                                <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
+                                                <h3 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
                                             </div>
-                                            <p className="text-white/40 text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
+                                            <p className="text-white/40 text-[12px] sm:text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
                                                 {feature.desc}
                                             </p>
                                         </div>
@@ -1569,10 +1594,10 @@ export function LandingPageClient() {
 
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section className="relative z-10 bg-black overflow-hidden">
+                <section id="problems" className="py-12 sm:py-32 relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-16 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
@@ -1587,7 +1612,7 @@ export function LandingPageClient() {
                             </h2>
                             <div className="h-0.5 w-full bg-white/15" />
                         </div>
-                        <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
                             Work history is fragmented and impossible to verify.<br />
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
@@ -1661,8 +1686,8 @@ export function LandingPageClient() {
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.7}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -50) handleSolutionLoop(solutionIdx + 1);
-                                    else if (info.offset.x > 50) handleSolutionLoop(solutionIdx - 1);
+                                    if (info.offset.x < -30) handleSolutionLoop(solutionIdx + 1);
+                                    else if (info.offset.x > 30) handleSolutionLoop(solutionIdx - 1);
                                 }}
                             >
                                 {[
@@ -1694,19 +1719,19 @@ export function LandingPageClient() {
                                 ].map((item, i) => (
                                     <div 
                                         key={i} 
-                                        className={`px-8 py-8 bg-white/[0.03] border border-white/[0.08] rounded-2xl group transition-all duration-300 w-[85vw] md:w-auto flex-shrink-0 md:border-none md:rounded-none md:bg-black md:px-8 md:py-7 pb-12 px-8 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                        className={`p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl group transition-all duration-300 w-[80vw] md:w-auto flex-shrink-0 md:border-none md:rounded-none md:bg-black md:px-8 md:py-7 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
                                     >
                                         <div className="flex items-center gap-2 mb-3">
                                             <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
                                                 style={{ background: item.accent + "60" }}
                                             />
-                                            <span className="text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
+                                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
                                                 style={{ color: item.accent + "99" }}
                                             >
                                                 {item.label}
                                             </span>
                                         </div>
-                                        <p className="text-white/30 text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
+                                        <p className="text-white/30 text-[12px] sm:text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
                                             {item.desc}
                                         </p>
                                     </div>
@@ -1732,7 +1757,7 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="py-16 sm:pt-16 md:pt-20 pb-8 sm:pb-10 md:pb-12 px-4 sm:px-6 relative z-10 bg-black">
+                <section id="solution" className="py-12 sm:pt-16 md:pt-20 pb-12 sm:pb-10 md:pb-12 px-4 sm:px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1812,7 +1837,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden">
+                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
@@ -1837,7 +1862,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="relative py-24 sm:py-48 px-6 overflow-hidden bg-black">
+                <section className="py-12 sm:py-48 relative z-10 overflow-hidden bg-black">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",

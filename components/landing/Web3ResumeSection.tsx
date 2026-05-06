@@ -413,7 +413,7 @@ function DashboardBg() {
 // ─── CV CARD MOCKUP (reference-matched) ─────────────────────────────────────
 function PublicCVCardMockup() {
     return (
-        <div className="relative w-[850px] mx-auto overflow-visible scale-[0.32] min-[380px]:scale-[0.36] min-[440px]:scale-[0.42] sm:scale-[0.6] md:scale-[0.75] lg:scale-100 origin-center">
+        <div className="relative w-[850px] mx-auto overflow-visible scale-[0.4] min-[380px]:scale-[0.46] min-[440px]:scale-[0.52] sm:scale-[0.6] md:scale-[0.75] lg:scale-100 origin-center">
             {/* Outer ambient glow */}
             <div className="absolute -inset-20 bg-white/[0.03] blur-[100px] rounded-full pointer-events-none -z-10" />
 
@@ -589,14 +589,14 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         </div>
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-sm md:text-lg font-normal max-w-2xl leading-relaxed">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed">
                             Turn your work into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                         </p>
                     </div>
                 </div>
 
                 {/* ── SHOWCASE: Seamless blended container ─── */}
-                <div className="relative w-full min-h-[350px] sm:min-h-[450px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
+                <div className="relative w-full min-h-[500px] sm:min-h-[450px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
 
                     {/* Background: blurred dashboard grid */}
                     <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
@@ -613,31 +613,27 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     <div className="absolute inset-x-0 top-0 h-16 sm:h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
                     {/* Foreground: CV Card floating on top */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-6">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-8 md:gap-6">
                         <motion.div
                             initial={{ opacity: 0, y: 32, scale: 0.97 }}
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.9, ease: "easeOut" }}
-                            className="w-full pointer-events-auto flex items-center justify-center overflow-visible"
+                            className="w-full h-[180px] sm:h-auto pointer-events-auto flex items-center justify-center overflow-visible"
                         >
                             <PublicCVCardMockup />
                         </motion.div>
 
                         {/* View Live CV button — floats directly below the card */}
-                        <motion.a
+                        <a
                             href="https://www.chainvolio.xyz/vivian-maier/27"
                             target="_blank"
                             rel="noopener noreferrer"
-                            initial={{ opacity: 0, y: 8 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                            className="pointer-events-auto group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-white/10 bg-black/40 backdrop-blur-sm hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200"
+                            className="pointer-events-auto group inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-white/20 bg-white/[0.08] backdrop-blur-md hover:bg-white/[0.12] hover:border-white/30 transition-all duration-200 shadow-2xl z-50 relative"
                         >
-                            <span className="text-xs font-bold text-white/50 group-hover:text-white/90 transition-colors uppercase tracking-[0.18em]">View Live CV</span>
-                            <ExternalLink className="w-3 h-3 text-white/30 group-hover:text-white/70 transition-colors" />
-                        </motion.a>
+                            <span className="text-xs font-bold text-white/70 group-hover:text-white transition-colors uppercase tracking-[0.18em]">View Live CV</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-white/40 group-hover:text-white/70 transition-colors" />
+                        </a>
                     </div>
                 </div>
 
@@ -666,13 +662,13 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         ].map((item, i) => (
                             <div 
                                 key={i} 
-                                className="flex-shrink-0 w-[280px] sm:w-[calc(33.333%-16px)] snap-center p-6 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
+                                className="flex-shrink-0 w-[260px] sm:w-[calc(33.333%-16px)] snap-center p-5 pb-6 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
                             >
-                                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-6 bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform">
-                                    <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4 bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform">
+                                    <item.icon className="w-4 h-4" style={{ color: item.color }} />
                                 </div>
-                                <h4 className="text-white/90 font-bold text-lg mb-3 tracking-tight">{item.title}</h4>
-                                <p className="text-white/30 text-sm leading-relaxed">{item.desc}</p>
+                                <h4 className="text-white/90 font-bold text-[15px] sm:text-lg mb-2 tracking-tight">{item.title}</h4>
+                                <p className="text-white/30 text-[12px] sm:text-sm leading-relaxed">{item.desc}</p>
                             </div>
                         ))}
                     </div>
