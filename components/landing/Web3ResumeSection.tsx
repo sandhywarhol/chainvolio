@@ -589,7 +589,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         </div>
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed text-right">
                             Turn your work into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                         </p>
                     </div>

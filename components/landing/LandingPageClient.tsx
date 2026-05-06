@@ -1350,11 +1350,11 @@ export function LandingPageClient() {
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-12 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
+                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="text-center mb-8 md:mb-24 space-y-4">
+                        <div className="text-center mb-8 md:mb-12 space-y-4">
                             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
                                 <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
                                     The problem
@@ -1441,17 +1441,17 @@ export function LandingPageClient() {
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="pt-8 pb-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+                <section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     </div>
 
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-24 items-center">
                             
                             {/* Left: Content Block */}
-                            <div className="space-y-12">
-                                <div className="space-y-6">
+                            <div className="space-y-6 md:space-y-12">
+                                <div className="space-y-3 md:space-y-6">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                         <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent uppercase">Why ChainVolio</span>
                                     </div>
@@ -1483,7 +1483,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[280px] sm:min-h-[360px] md:min-h-[450px]">
+                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[240px] sm:min-h-[360px] md:min-h-[450px]">
                                 {/* Subtle Glow behind globe */}
                                 <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-1000" />
                                 
@@ -1516,7 +1516,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-10 md:mt-24 overflow-hidden">
+                        <div className="relative mt-4 md:mt-24 overflow-hidden">
                             <motion.div 
                                 className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.03] md:border md:border-white/[0.03] md:rounded-3xl md:overflow-hidden md:gap-px"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
@@ -1575,7 +1575,7 @@ export function LandingPageClient() {
                             </motion.div>
 
                             {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50">
                                 {[0, 1, 2].map((i) => (
                                     <button
                                         key={i}
@@ -1594,11 +1594,11 @@ export function LandingPageClient() {
 
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section id="problems" className="py-12 sm:py-32 relative z-10 bg-black overflow-hidden">
+                <section id="problems" className="pt-8 pb-8 sm:py-12 md:py-16 relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
-                        <div className="space-y-4 max-w-xl">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
+                        <div className="space-y-2 md:space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                 <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">Signal vs noise</span>
@@ -1620,7 +1620,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
-                    <div className="relative w-full h-[220px] sm:h-[400px] md:h-[580px]">
+                    <div className="relative w-full h-[180px] sm:h-[400px] md:h-[580px]">
                         <SignalNoiseVisual />
 
                         {/* Radial vignette — lines fade at edges */}
@@ -1675,7 +1675,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-16 md:pb-32">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
                         <div className="relative overflow-hidden">
                             <motion.div 
                                 className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.05] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.05] md:gap-px"
@@ -1739,7 +1739,7 @@ export function LandingPageClient() {
                             </motion.div>
 
                             {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50">
                                 {[0, 1, 2].map((i) => (
                                     <button
                                         key={i}
@@ -1757,14 +1757,14 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="py-12 sm:pt-16 md:pt-20 pb-12 sm:pb-10 md:pb-12 px-4 sm:px-6 relative z-10 bg-black">
+                <section id="solution" className="pt-8 pb-8 sm:py-12 md:py-16 px-4 sm:px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
 
                         {/* ── Header: compact, left + right split ── */}
-                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
-                            <div className="space-y-4">
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-4">
+                            <div className="space-y-2 md:space-y-4">
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                     <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
                                         The Solution
@@ -1862,7 +1862,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-12 sm:py-48 relative z-10 overflow-hidden bg-black">
+                <section className="py-12 sm:py-16 md:py-20 relative z-10 overflow-hidden bg-black">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
