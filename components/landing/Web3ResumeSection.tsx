@@ -413,34 +413,63 @@ function DashboardBg() {
 // ─── CV CARD MOCKUP (reference-matched) ─────────────────────────────────────
 function PublicCVCardMockup() {
     return (
-        <div className="relative w-full max-w-[850px] mx-auto overflow-hidden scale-[0.58] min-[400px]:scale-[0.65] sm:scale-75 md:scale-100 origin-top">
+        <div className="relative w-[850px] mx-auto overflow-visible scale-[0.32] min-[380px]:scale-[0.36] min-[440px]:scale-[0.42] sm:scale-[0.6] md:scale-[0.75] lg:scale-100 origin-center">
             {/* Outer ambient glow */}
-            <div className="absolute -inset-8 bg-white/[0.02] blur-[80px] rounded-full pointer-events-none -z-10" />
+            <div className="absolute -inset-20 bg-white/[0.03] blur-[100px] rounded-full pointer-events-none -z-10" />
 
-            {/* Card */}
-            <div className="relative rounded-[24px] overflow-hidden border border-white/[0.08]"
-                style={{
-                    background: "linear-gradient(160deg, #0d0d0d 0%, #000000 100%)",
-                    boxShadow: "0 40px 80px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05)"
-                }}>
+            {/* MAIN CV CARD COMPONENT (Structure from official app/cv/[wallet]/page.tsx) */}
+            <div className="relative flex flex-col justify-between min-h-[440px] p-10 rounded-[32px] overflow-hidden group w-full text-left">
+                {/* Animated silver gradient border */}
+                <div className="absolute inset-0 rounded-[32px] bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
-                {/* Lightning shine */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 rounded-[24px]">
-                    <motion.div
-                        animate={{ x: ["-120%", "220%"] }}
-                        transition={{ duration: 2.8, repeat: Infinity, ease: "linear", repeatDelay: 6 }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent skew-x-12"
-                    />
+                {/* Main Card Background: Very Dark Grey */}
+                <div className="absolute inset-0 rounded-[32px] bg-[#0d0d0d] border border-white/10 pointer-events-none"></div>
+
+                {/* Top-Center Spotlight Effect */}
+                <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-[32px]">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[120%] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    {/* Diagonal lightning shine */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine opacity-50"></div>
                 </div>
 
+                {/* Bottom black gradient overlay */}
+                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
+                {/* 3D Rim Light */}
+                <div className="absolute inset-0 rounded-[32px] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),inset_1px_0_0_0_rgba(255,255,255,0.05)] pointer-events-none z-30" />
 
-                <div className="p-4 sm:p-8 flex flex-col md:flex-row gap-4 md:gap-8">
-                    
-                    {/* LEFT COLUMN */}
-                    <div className="w-[140px] flex-shrink-0 flex flex-col items-center md:items-start text-center md:text-left">
-                        {/* Avatar */}
-                        <div className="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-[#1c1c1c] shadow-2xl mb-6">
+                {/* Outer glow */}
+                <div className="absolute -inset-[2px] rounded-[32px] bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-80 transition-opacity duration-500 -z-10 blur-xl pointer-events-none"></div>
+
+                {/* Top-Right Badges/Score */}
+                <div className="absolute top-10 right-10 z-50 flex flex-col gap-8 items-center">
+                    {/* Verified Rosette Mock */}
+                    <div className="relative group/vcheck">
+                        <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-slate-900/90 backdrop-blur-xl border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                            <div className="relative w-8 h-8 flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" className="w-full h-full fill-none stroke-emerald-400 stroke-[1.5]">
+                                    <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z" />
+                                </svg>
+                                <Check className="absolute w-4 h-4 text-emerald-400" strokeWidth={4} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CV Score */}
+                    <div className="flex flex-col items-center justify-center group/score">
+                        <span className="text-[48px] font-black leading-none text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-blue-500 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                            98
+                        </span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#a855f7]/80 mt-2">CV Score</span>
+                    </div>
+                </div>
+
+                {/* Content wrapper - Forced flex-row for desktop fidelity on all screens */}
+                <div className="relative flex flex-row items-start gap-16 w-full z-40 flex-1">
+                    {/* Avatar Column */}
+                    <div className="flex-shrink-0 flex flex-col items-start">
+                        <div className="relative w-[150px] h-[150px] rounded-full overflow-hidden border-4 border-slate-800 shadow-2xl mb-6 bg-slate-800">
                             <img
                                 src="/homepage/cv%20example.png"
                                 alt="Alex Rivera"
@@ -448,61 +477,45 @@ function PublicCVCardMockup() {
                             />
                         </div>
                         
-                        {/* Location + Timezone */}
-                        <div className="space-y-2 mb-6">
-                            <div className="flex items-center justify-center md:justify-start gap-2 text-white/60 text-[13px] font-medium">
-                                <MapPin className="w-4 h-4" />
+                        <div className="space-y-3 text-slate-400">
+                            <div className="flex items-center gap-2 text-[14px] font-medium">
+                                <MapPin className="w-4 h-4 text-slate-500" />
                                 Canada
                             </div>
-                            <div className="flex items-center justify-center md:justify-start gap-2 text-white/30 text-[12px] font-mono">
+                            <div className="flex items-center gap-2 text-[12px] font-mono text-slate-500">
                                 <Clock className="w-4 h-4" />
                                 GMT-4
                             </div>
-                        </div>
-
-                        {/* Availability */}
-                        <div className="w-full">
-                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 mb-2 md:text-left text-center">Availability</p>
-                            <div className="flex md:justify-start justify-center">
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-bold text-emerald-400">
+                            <div className="pt-4">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Availability</p>
+                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-400">
                                     Full-time
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN */}
-                    <div className="flex-1 min-w-0 flex flex-col">
-                        
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-[12px] font-bold text-emerald-400 mb-4">
-                                    <Globe className="w-3.5 h-3.5" />
-                                    Open to remote as Protocol Engineer
-                                </div>
-                                <h3 className="text-[20px] sm:text-[24px] md:text-[32px] font-bold text-white tracking-tight leading-tight">Alex Rivera</h3>
-                                <p className="text-[14px] text-white/40 font-medium mt-1">Senior Engineer at Nexus Protocol</p>
-                            </div>
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="w-[42px] h-[42px] rounded-full border border-emerald-500/30 bg-[#0c0c0c] flex items-center justify-center shadow-lg">
-                                    <Check className="w-5 h-5 text-emerald-400" strokeWidth={2.5} />
-                                </div>
-                                <div className="text-center">
-                                    <span className="block text-[24px] sm:text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-[#a855f7] leading-none">98</span>
-                                    <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#a855f7] block mt-1">CV Score</span>
-                                </div>
-                            </div>
+                    {/* Info Column */}
+                    <div className="flex-1 flex flex-col space-y-5">
+                        {/* Looking For */}
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 w-max">
+                            <Globe className="w-4 h-4" />
+                            <span className="text-[13px] font-bold">Open to remote as Protocol Engineer</span>
                         </div>
 
-                        {/* Trust Badges row */}
-                        <div className="flex flex-wrap gap-2.5 mb-5">
+                        <div>
+                            <h3 className="text-[44px] font-bold text-white tracking-tight leading-none mb-2">Alex Rivera</h3>
+                            <p className="text-[18px] font-medium text-slate-400">Senior Engineer at Nexus Protocol</p>
+                        </div>
+
+                        {/* Trust Badges */}
+                        <div className="flex flex-wrap gap-3">
                             {[
-                                { label: "BUILDER", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/25", icon: <BadgeCheck className="w-3 h-3" /> },
-                                { label: "AUDITOR", color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", border: "border-fuchsia-500/25", icon: <ShieldCheck className="w-3 h-3" /> },
-                                { label: "GENESIS", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/25", icon: <Star className="w-3 h-3 fill-amber-400" /> },
-                                { label: "5Y EXP", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/25", icon: <Clock className="w-3 h-3" /> },
+                                { label: "BUILDER", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
+                                { label: "AUDITOR", color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", border: "border-fuchsia-500/20", icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+                                { label: "GENESIS", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", icon: <Star className="w-3.5 h-3.5 fill-amber-400" /> },
                             ].map(b => (
-                                <div key={b.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border ${b.bg} ${b.border} text-[10px] font-black uppercase tracking-[0.08em] ${b.color}`}>
+                                <div key={b.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${b.bg} ${b.border} text-[10px] font-black uppercase tracking-widest ${b.color}`}>
                                     {b.icon}
                                     {b.label}
                                 </div>
@@ -510,53 +523,37 @@ function PublicCVCardMockup() {
                         </div>
 
                         {/* Skills */}
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {["Rust", "Solidity", "Anchor Framework", "Distributed Systems", "Cryptography", "DeFi Security"].map(s => (
-                                <span key={s} className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-[12px] font-medium text-white/60">
+                        <div className="flex flex-wrap gap-2">
+                            {["Rust", "Solidity", "Anchor Framework", "Cryptography", "DeFi Security"].map(s => (
+                                <span key={s} className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-[13px] font-medium text-white/60">
                                     {s}
                                 </span>
                             ))}
                         </div>
 
-                        {/* Bio */}
-                        <p className="text-[14px] text-white/60 leading-relaxed font-medium max-w-lg mb-8">
-                            Core Protocol Engineer | Building high-performance blockchain infrastructure on Solana and EVM. Specialized in parallel execution engines and protocol security.
+                        <p className="text-[15px] text-slate-300 leading-relaxed font-medium max-w-[500px]">
+                            Core Protocol Engineer building high-performance blockchain infrastructure. Specialized in parallel execution engines and protocol security.
                         </p>
 
-                        {/* Divider & Bottom Row */}
-                        <div className="mt-auto">
-                            <div className="border-t border-white/[0.06] mb-5" />
-                            <div className="flex items-center justify-between">
-                                {/* Social icons */}
-                                <div className="flex items-center gap-2">
-                                    {[
-                                        { Icon: ({ className }: any) => <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg> },
-                                        { Icon: Github },
-                                        { Icon: Linkedin },
-                                        { Icon: Instagram },
-                                        { Icon: Globe },
-                                        { Icon: MessageSquare },
-                                        { Icon: Mail },
-                                    ].map(({ Icon }, i) => (
-                                        <div key={i} className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.1] transition-colors cursor-default">
-                                            <Icon className="w-3.5 h-3.5" />
-                                        </div>
-                                    ))}
+                        {/* Footer area inside card */}
+                        <div className="pt-6 mt-auto border-t border-white/[0.05] flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                {[Github, Linkedin, Mail, Globe].map((Icon, i) => (
+                                    <div key={i} className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-slate-500">
+                                        <Icon className="w-4 h-4" />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[11px] font-mono text-slate-500">
+                                    FwHt...GcMv
                                 </div>
-
-                                {/* Wallet + ID */}
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[10px] font-mono text-white/30">
-                                        FwHt...GcMv
-                                    </div>
-                                    <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[10px] font-mono">
-                                        <span className="text-white/20">ID</span>
-                                        <span className="text-white/40 font-black">#00001</span>
-                                    </div>
+                                <div className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[11px] font-mono">
+                                    <span className="text-slate-600">ID</span>
+                                    <span className="text-slate-400 font-black ml-1">#00001</span>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -567,7 +564,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="py-10 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+        <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
             {/* Elegant thin line separator constrained to content width */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -575,7 +572,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
             
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_65%)] pointer-events-none" />
 
-            <div className="max-w-[1240px] mx-auto space-y-12 relative">
+            <div className="max-w-[1240px] mx-auto space-y-4 sm:space-y-6 lg:space-y-12 relative">
 
                 {/* ── HEADER ──────────────────────────────────────────────── */}
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
@@ -588,17 +585,18 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                 A resume you don't<br /><span className="text-white/30">have to explain.</span>
                             </h2>
+                            <div className="h-0.5 w-full bg-white/15" />
                         </div>
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal lg:text-right">
-                            Turn your work experience into verifiable proof that recruiters can instantly trust. Transparent, portable, and impossible to fake.
+                        <p className="text-white/40 text-sm md:text-lg font-normal max-w-2xl leading-relaxed">
+                            Turn your work into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                         </p>
                     </div>
                 </div>
 
                 {/* ── SHOWCASE: Seamless blended container ─── */}
-                <div className="relative w-full min-h-[480px] sm:min-h-[580px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
+                <div className="relative w-full min-h-[350px] sm:min-h-[450px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
 
                     {/* Background: blurred dashboard grid */}
                     <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
@@ -621,7 +619,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.9, ease: "easeOut" }}
-                            className="w-full pointer-events-auto"
+                            className="w-full pointer-events-auto flex items-center justify-center overflow-visible"
                         >
                             <PublicCVCardMockup />
                         </motion.div>
@@ -643,22 +641,45 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     </div>
                 </div>
 
-                {/* ── DESCRIPTION GRID ─────────────────────────────────────── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 pt-10 border-t border-white/5">
-                    {[
-                        { title: "On-Chain History", desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record." },
-                        { title: "Cryptographic Proof", desc: "Contributions are proven through attestations cryptographically signed by real organizations and peers." },
-                        { title: "Instant Verification", desc: "Recruiters can instantly trust your experience without manual checks or reference calls." },
-                    ].map((item, i) => (
-                        <div key={i} className="space-y-4">
-                            <h4 className="text-white/80 font-bold text-lg">{item.title}</h4>
-                            <p className="text-white/30 text-sm leading-relaxed">{item.desc}</p>
-                        </div>
-                    ))}
+                {/* ── DESCRIPTION GRID (Now slideable boxes) ────────────────── */}
+                <div className="pt-10 border-t border-white/5">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-4 sm:gap-6 pb-4">
+                        {[
+                            { 
+                                title: "On-Chain History", 
+                                desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record.",
+                                icon: Clock,
+                                color: "#60a5fa"
+                            },
+                            { 
+                                title: "Cryptographic Proof", 
+                                desc: "Contributions are proven through attestations cryptographically signed by real organizations and peers.",
+                                icon: ShieldCheck,
+                                color: "#14F195"
+                            },
+                            { 
+                                title: "Instant Verification", 
+                                desc: "Recruiters can instantly trust your experience without manual checks or reference calls.",
+                                icon: BadgeCheck,
+                                color: "#a78bfa"
+                            },
+                        ].map((item, i) => (
+                            <div 
+                                key={i} 
+                                className="flex-shrink-0 w-[280px] sm:w-[calc(33.333%-16px)] snap-center p-6 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
+                            >
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-6 bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform">
+                                    <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                                </div>
+                                <h4 className="text-white/90 font-bold text-lg mb-3 tracking-tight">{item.title}</h4>
+                                <p className="text-white/30 text-sm leading-relaxed">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* ── MINI BENEFITS ────────────────────────────────────────── */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* ── MINI BENEFITS (2x2 on mobile) ────────────────────────── */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     {[
                         { title: "Verifiable", icon: ShieldCheck },
                         { title: "Portable", icon: ArrowRight },

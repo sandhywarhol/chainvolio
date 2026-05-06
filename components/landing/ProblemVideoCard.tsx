@@ -86,7 +86,7 @@ export default function ProblemVideoCard({ idleSrc, hoverSrc }: Props) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[150px] sm:h-[300px] flex items-center justify-center cursor-pointer"
+      className="relative w-full h-[200px] sm:h-[300px] flex items-center justify-center cursor-pointer"
       onMouseEnter={playForward}
       onMouseLeave={playBackward}
     >

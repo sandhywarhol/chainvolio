@@ -28,6 +28,8 @@ import {
     Globe,
     Terminal,
     ExternalLink,
+    ChevronLeft,
+    ChevronRight,
     User,
     FileCheck2,
     PenLine,
@@ -36,6 +38,13 @@ import {
     Hash,
     Linkedin,
     FileText,
+    MapPin,
+    Clock,
+    Github,
+    Mail,
+    BadgeCheck,
+    Star,
+    Check
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -67,199 +76,107 @@ function VerifiableWorkHistoryFlow() {
         hoveredIndex !== null && lineIndex < hoveredIndex;
 
     return (
-        <div className="relative w-full flex items-center justify-center py-12 pb-16 select-none scale-[0.38] min-[400px]:scale-[0.5] sm:scale-75 md:scale-100 origin-center">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(153,69,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+        <>
+            {/* ── DESKTOP VERSION (100% Original from GitHub) ── */}
+            <div className="hidden md:flex relative w-full items-center justify-center py-12 pb-16 select-none origin-center">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(153,69,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+                <div className="flex items-center w-full max-w-4xl mx-auto px-4">
+                    {nodes.map((node, i) => {
+                        const isHovered = hoveredIndex === i;
+                        const isActive  = hoveredIndex !== null && i <= hoveredIndex;
+                        const IconComp  = node.icon === "profile" ? null : node.icon;
+                        const isProfile = node.icon === "profile";
+                        const chipW     = "52px";
+                        const chipH     = "52px";
+                        const r         = "16px";
 
-            <div className="flex items-center w-full max-w-4xl mx-auto px-4">
-                {nodes.map((node, i) => {
-                    const isHovered = hoveredIndex === i;
-                    const isActive  = hoveredIndex !== null && i <= hoveredIndex;
-                    const IconComp  = node.icon === "profile" ? null : node.icon;
-                    const isProfile = node.icon === "profile";
-                    const chipW     = typeof window !== 'undefined' && window.innerWidth < 768 ? "36px" : "52px";
-                    const chipH     = typeof window !== 'undefined' && window.innerWidth < 768 ? "36px" : "52px";
-                    const r         = typeof window !== 'undefined' && window.innerWidth < 768 ? "12px" : "16px";
-
-                    return (
-                        <div key={i} className="contents">
-                            {/* ── NODE ── */}
-                            <div
-                                className="relative flex-shrink-0 flex flex-col items-center cursor-pointer z-10"
-                                onMouseEnter={() => setHoveredIndex(i)}
-                                onMouseLeave={() => setHoveredIndex(null)}
-                            >
-                                {/* 3D chip: tilt at rest, lifts on hover */}
-                                <motion.div
-                                    className="relative"
-                                    animate={{
-                                        y:       isHovered ? -10 : 0,
-                                        rotateX: isHovered ? 0 : 8,
-                                        rotateY: isHovered ? 0 : -10,
-                                        scale:   isHovered ? 1.1 : 1,
-                                    }}
-                                    transition={{ duration: 0.25, ease: "easeOut" }}
-                                    style={{ perspective: "600px", transformStyle: "preserve-3d" }}
-                                >
-                                    {/* Layer 3 — deepest shadow */}
-                                    <div style={{
-                                        position: "absolute", width: chipW, height: chipH,
-                                        top: "7px", left: "5px", borderRadius: r,
-                                        background: "#010101",
-                                        border: "1px solid rgba(255,255,255,0.02)",
-                                    }} />
-
-                                    {/* Layer 2 */}
-                                    <div style={{
-                                        position: "absolute", width: chipW, height: chipH,
-                                        top: "3px", left: "2px", borderRadius: r,
-                                        background: "#060606",
-                                        border: "1px solid rgba(255,255,255,0.04)",
-                                    }} />
-
-                                    {/* Main face */}
-                                    <motion.div
-                                        animate={{
-                                            borderColor: isActive ? node.color + "55" : "rgba(255,255,255,0.09)",
-                                            boxShadow: isHovered
-                                                ? `0 0 30px ${node.color}40, 0 14px 44px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)`
-                                                : "0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
-                                        }}
-                                        transition={{ duration: 0.2 }}
-                                        className="relative flex items-center justify-center overflow-hidden"
-                                        style={{
-                                            width: chipW, height: chipH, borderRadius: r,
-                                            background: "linear-gradient(145deg, #1e1e1e 0%, #0e0e0e 100%)",
-                                            border: "1px solid rgba(255,255,255,0.09)",
-                                        }}
-                                    >
-                                        {/* Lighting: top-edge highlight */}
-                                        <div className="absolute inset-x-2 top-0 h-[1px] pointer-events-none"
-                                            style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)" }} />
-                                        {/* Lighting: left-edge highlight */}
-                                        <div className="absolute inset-y-2 left-0 w-[1px] pointer-events-none"
-                                            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)" }} />
-
-                                        {/* Color inner glow (active) */}
-                                        <motion.div
-                                            animate={{ opacity: isActive ? 1 : 0 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute inset-0 pointer-events-none"
-                                            style={{
-                                                borderRadius: r,
-                                                background: `radial-gradient(circle at 40% 40%, ${node.color}22 0%, transparent 65%)`,
-                                            }}
-                                        />
-
-                                        {/* Content */}
-                                        {isProfile ? (
-                                            <User
-                                                className="relative z-10 w-4 h-4 md:w-6 md:h-6"
-                                                style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.4)" }}
-                                            />
-                                        ) : (
-                                            IconComp && (
-                                                <IconComp
-                                                    className="relative z-10 w-4 h-4 md:w-7 md:h-7"
-                                                    style={{ color: isActive ? node.color : "rgba(255,255,255,0.2)" }}
-                                                />
-                                            )
-                                        )}
-                                    </motion.div>
-                                </motion.div>
-
-                                {/* Ground glow puddle */}
-                                <motion.div
-                                    animate={{
-                                        opacity: isHovered ? 1 : 0.35,
-                                        scaleX: isHovered ? 1.4 : 0.85,
-                                    }}
-                                    transition={{ duration: 0.25 }}
-                                    className="pointer-events-none"
-                                    style={{
-                                        width: "100%", height: "10px", marginTop: "6px",
-                                        background: isActive
-                                            ? `radial-gradient(ellipse at center, ${node.color}45 0%, transparent 70%)`
-                                            : "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, transparent 70%)",
-                                        filter: "blur(4px)",
-                                    }}
-                                />
-
-                                {/* Hover label */}
-                                <motion.div
-                                    animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 5 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="absolute -bottom-10 flex flex-col items-center pointer-events-none whitespace-nowrap"
-                                >
-                                    <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: node.color }}>
-                                        {node.label}
-                                    </span>
-                                    <span className="text-[9px] text-white/30 tracking-wider mt-0.5">{node.sublabel}</span>
-                                </motion.div>
-                            </div>
-
-                            {/* ── CONNECTOR ── */}
-                            {i < nodes.length - 1 && (
-                                <div className="relative flex-1 h-6 flex items-center mx-1 overflow-visible">
-                                    {/* dashed base */}
-                                    <svg width="100%" height="2" className="absolute top-1/2 -translate-y-1/2 overflow-visible" preserveAspectRatio="none">
-                                        <line x1="0" y1="1" x2="100%" y2="1"
-                                            stroke="rgba(255,255,255,0.07)"
-                                            strokeWidth="1.5"
-                                            strokeDasharray="4 7"
-                                        />
-                                    </svg>
-
-                                    {/* active glow line */}
-                                    <motion.div
-                                        initial={{ opacity: 0, scaleX: 0 }}
-                                        animate={{
-                                            opacity: isLineActive(i) ? 1 : 0,
-                                            scaleX: isLineActive(i) ? 1 : 0,
-                                        }}
+                        return (
+                            <div key={i} className="contents">
+                                <div className="relative flex-shrink-0 flex flex-col items-center cursor-pointer z-10"
+                                    onMouseEnter={() => setHoveredIndex(i)}
+                                    onMouseLeave={() => setHoveredIndex(null)}>
+                                    <motion.div className="relative"
+                                        animate={{ y: isHovered ? -10 : 0, rotateX: isHovered ? 0 : 8, rotateY: isHovered ? 0 : -10, scale: isHovered ? 1.1 : 1 }}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
-                                        className="absolute h-[1.5px] w-full pointer-events-none"
-                                        style={{
-                                            top: "50%",
-                                            transform: "translateY(-50%)",
-                                            transformOrigin: "left center",
-                                            background: `linear-gradient(to right, ${nodes[i].color}90, ${nodes[i + 1].color}90)`,
-                                            boxShadow: `0 0 8px ${nodes[i + 1].color}60`,
-                                        }}
-                                    />
-
-                                    {/* traveling particle */}
-                                    {isLineActive(i) && (
+                                        style={{ perspective: "600px", transformStyle: "preserve-3d" }}>
+                                        <div style={{ position: "absolute", width: chipW, height: chipH, top: "7px", left: "5px", borderRadius: r, background: "#010101", border: "1px solid rgba(255,255,255,0.02)" }} />
+                                        <div style={{ position: "absolute", width: chipW, height: chipH, top: "3px", left: "2px", borderRadius: r, background: "#060606", border: "1px solid rgba(255,255,255,0.04)" }} />
                                         <motion.div
-                                            key={`dot-${i}-${hoveredIndex}`}
-                                            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none"
-                                            style={{
-                                                background: nodes[i + 1].color,
-                                                boxShadow: `0 0 8px ${nodes[i + 1].color}, 0 0 16px ${nodes[i + 1].color}60`,
-                                                left: 0,
-                                            }}
-                                            animate={{ left: "100%" }}
-                                            transition={{
-                                                duration: 1.0,
-                                                repeat: Infinity,
-                                                ease: "linear",
-                                                delay: i * 0.12,
-                                            }}
-                                        />
-                                    )}
+                                            animate={{ borderColor: isActive ? node.color + "55" : "rgba(255,255,255,0.09)", boxShadow: isHovered ? `0 0 30px ${node.color}40, 0 14px 44px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)` : "0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)" }}
+                                            transition={{ duration: 0.2 }}
+                                            className="relative flex items-center justify-center overflow-hidden"
+                                            style={{ width: chipW, height: chipH, borderRadius: r, background: "linear-gradient(145deg, #1e1e1e 0%, #0e0e0e 100%)", border: "1px solid rgba(255,255,255,0.09)" }}>
+                                            <div className="absolute inset-x-2 top-0 h-[1px] pointer-events-none" style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)" }} />
+                                            <div className="absolute inset-y-2 left-0 w-[1px] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)" }} />
+                                            <motion.div animate={{ opacity: isActive ? 1 : 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 pointer-events-none" style={{ borderRadius: r, background: `radial-gradient(circle at 40% 40%, ${node.color}22 0%, transparent 65%)` }} />
+                                            {isProfile ? <User className="relative z-10 w-6 h-6" style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.4)" }} /> : IconComp && <IconComp className="relative z-10 w-7 h-7" style={{ color: isActive ? node.color : "rgba(255,255,255,0.2)" }} />}
+                                        </motion.div>
+                                    </motion.div>
+                                    <motion.div animate={{ opacity: isHovered ? 1 : 0.35, scaleX: isHovered ? 1.4 : 0.85 }} transition={{ duration: 0.25 }} className="pointer-events-none" style={{ width: "100%", height: "10px", marginTop: "6px", background: isActive ? `radial-gradient(ellipse at center, ${node.color}45 0%, transparent 70%)` : "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, transparent 70%)", filter: "blur(4px)" }} />
+                                    <motion.div animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 5 }} transition={{ duration: 0.15 }} className="absolute -bottom-10 flex flex-col items-center pointer-events-none whitespace-nowrap">
+                                        <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: node.color }}>{node.label}</span>
+                                        <span className="text-[9px] text-white/30 tracking-wider mt-0.5">{node.sublabel}</span>
+                                    </motion.div>
                                 </div>
-                            )}
-                        </div>
-                    );
-                })}
+                                {i < nodes.length - 1 && (
+                                    <div className="relative flex-1 h-6 flex items-center mx-1 overflow-visible">
+                                        <svg width="100%" height="2" className="absolute top-1/2 -translate-y-1/2 overflow-visible" preserveAspectRatio="none">
+                                            <line x1="0" y1="1" x2="100%" y2="1" stroke="rgba(255,255,255,0.07)" strokeWidth="1.5" strokeDasharray="4 7" />
+                                        </svg>
+                                        <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: isLineActive(i) ? 1 : 0, scaleX: isLineActive(i) ? 1 : 0 }} transition={{ duration: 0.25, ease: "easeOut" }} className="absolute h-[1.5px] w-full pointer-events-none" style={{ top: "50%", transform: "translateY(-50%)", transformOrigin: "left center", background: `linear-gradient(to right, ${nodes[i].color}90, ${nodes[i + 1].color}90)`, boxShadow: `0 0 8px ${nodes[i + 1].color}60` }} />
+                                        {isLineActive(i) && (
+                                            <motion.div key={`dot-${i}-${hoveredIndex}`} className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none" style={{ background: nodes[i + 1].color, boxShadow: `0 0 8px ${nodes[i + 1].color}, 0 0 16px ${nodes[i + 1].color}60`, left: 0 }} animate={{ left: "100%" }} transition={{ duration: 1.0, repeat: Infinity, ease: "linear", delay: i * 0.12 }} />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+
+            {/* ── MOBILE VERSION (Optimized Swipeable) ── */}
+            <div className="md:hidden relative w-full pt-0 pb-24 select-none overflow-x-auto no-scrollbar">
+                <div className="flex items-center w-max px-12">
+                    {nodes.map((node, i) => {
+                        const IconComp  = node.icon === "profile" ? null : node.icon;
+                        const isProfile = node.icon === "profile";
+                        const chipW     = "58px";
+                        const chipH     = "58px";
+                        const r         = "16px";
+
+                        return (
+                            <div key={i} className="flex items-center">
+                                <div className="relative flex-shrink-0 flex flex-col items-center z-10">
+                                    <div className="relative" style={{ perspective: "600px", transformStyle: "preserve-3d" }}>
+                                        <div className="absolute top-[7px] left-[5px] w-[58px] h-[58px] rounded-[16px] bg-[#010101] border border-white/5 shadow-xl" />
+                                        <div className="relative flex items-center justify-center overflow-hidden w-[58px] h-[58px] rounded-[16px] bg-gradient-to-br from-[#1e1e1e] to-[#0e0e0e] border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]">
+                                            {isProfile ? <User className="relative z-10 w-5 h-5 text-white/40" /> : IconComp && <IconComp className="w-5 h-5" style={{ color: node.color }} />}
+                                        </div>
+                                    </div>
+                                    <div className="absolute -bottom-14 w-28 text-center pointer-events-none">
+                                        <p className="text-[10px] font-bold text-white uppercase tracking-wider">{node.label}</p>
+                                        <p className="text-[9px] text-white/40 uppercase tracking-tight">{node.sublabel}</p>
+                                    </div>
+                                </div>
+                                {i < nodes.length - 1 && (
+                                    <div className="relative w-12 h-[1.5px] bg-white/5 overflow-hidden mx-[-2px]">
+                                        <motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent" animate={{ x: ["-100%", "100%"] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} />
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </>
     );
 }
 
 // --- Static UI Mockup for Feature Card ---
 function MockProfileUI() {
     return (
-        <div className="w-[850px] md:w-full h-full flex font-sans text-sm scale-[0.32] min-[400px]:scale-[0.4] sm:scale-[0.7] md:scale-100 origin-top-left">
+        <div className="w-[1200px] h-[650px] flex font-sans text-sm">
             {/* 1. Sidebar (Linear Style) */}
             <div className="w-48 md:w-64 border-r border-white/5 bg-white/[0.01] p-4 md:p-6 flex flex-col gap-6 md:gap-8">
                 <div className="flex items-center gap-3">
@@ -615,7 +532,7 @@ function AttestationBlock() {
     // pos 0 = center (active), pos 1 = right peek, pos 2 = left peek
     const stackAnim = (pos: number) => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const xOffset = isMobile ? (window.innerWidth < 400 ? 30 : 50) : 160;
+        const xOffset = isMobile ? (window.innerWidth < 400 ? 35 : 55) : 160;
         
         if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"   };
         if (pos === 1) return { x: xOffset,  y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
@@ -643,7 +560,8 @@ function AttestationBlock() {
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Proof of work,<br /><span className="text-white/30">not claims.</span>
                     </h3>
-                    <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal max-w-md">
+                    <div className="h-0.5 w-full bg-white/15" />
+                    <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
                         Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
                     </p>
                 </div>
@@ -655,9 +573,10 @@ function AttestationBlock() {
                             key={i}
                             onHoverStart={() => { setPaused(true); setActive(i); }}
                             onHoverEnd={() => setPaused(false)}
+                            onClick={() => { setPaused(true); setActive(i); setTimeout(() => setPaused(false), 8000); }}
                             animate={{ opacity: active === i ? 1 : 0.45 }}
                             transition={{ duration: 0.2 }}
-                            className="flex items-start gap-4 py-4 cursor-default"
+                            className="flex items-start gap-4 py-4 cursor-pointer"
                         >
                             <motion.div
                                 animate={{
@@ -678,68 +597,72 @@ function AttestationBlock() {
                         </motion.div>
                     ))}
                 </div>
-
-                <Link href="/guides/attestation" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
-                    Explore attestations
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
             </div>
 
             {/* Right — Linear-style horizontal carousel */}
-            <div className="relative overflow-hidden" style={{ height: "560px" }}
-                onMouseEnter={() => setPaused(true)}
-                onMouseLeave={() => setPaused(false)}
-            >
-                {/* Ambient glow follows active card colour */}
-                <motion.div
-                    animate={{ background: `radial-gradient(ellipse 90% 55% at 50% 30%, ${features[active].color}12, transparent 68%)` }}
-                    transition={{ duration: 0.6 }}
-                    className="absolute inset-0 pointer-events-none"
-                />
+            <div className="flex flex-col gap-8">
+                <div className="relative overflow-hidden" style={{ height: "560px" }}
+                    onMouseEnter={() => setPaused(true)}
+                    onMouseLeave={() => setPaused(false)}
+                >
+                    {/* Ambient glow follows active card colour */}
+                    <motion.div
+                        animate={{ background: `radial-gradient(ellipse 90% 55% at 50% 30%, ${features[active].color}12, transparent 68%)` }}
+                        transition={{ duration: 0.6 }}
+                        className="absolute inset-0 pointer-events-none"
+                    />
 
-                {/* Cards — all anchored to horizontal centre */}
-                {cards.map((card, i) => {
-                    const pos = (i - active + 3) % 3;
-                    const anim = stackAnim(pos);
-                    return (
-                        <motion.div
-                            key={i}
-                            animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
-                            transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                            className="absolute top-7 left-1/2 -ml-[min(150px,calc(50vw-24px))]"
-                            style={{
-                                zIndex: anim.zIndex,
-                            }}
-                        >
-                            {card}
-                        </motion.div>
-                    );
-                })}
+                    {/* Cards — all anchored to horizontal centre */}
+                    {cards.map((card, i) => {
+                        const pos = (i - active + 3) % 3;
+                        const anim = stackAnim(pos);
+                        return (
+                            <motion.div
+                                key={i}
+                                animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
+                                transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                                className="absolute top-7 left-1/2 -ml-[min(150px,calc(50vw-24px))]"
+                                style={{
+                                    zIndex: anim.zIndex,
+                                }}
+                            >
+                                {card}
+                            </motion.div>
+                        );
+                    })}
 
-                {/* Left edge fade */}
-                <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
-                    style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
-                {/* Right edge fade */}
-                <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
-                    style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
-                {/* Bottom fade */}
-                <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
-                    style={{ background: "linear-gradient(to top, black 30%, transparent)" }} />
+                    {/* Left edge fade */}
+                    <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
+                        style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
+                    {/* Right edge fade */}
+                    <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
+                        style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
+                    {/* Bottom fade */}
+                    <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
+                        style={{ background: "linear-gradient(to top, black 30%, transparent)" }} />
 
-                {/* Dot indicators */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
-                    {features.map((f, i) => (
-                        <button
-                            key={i}
-                            onClick={() => { setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
-                            className="rounded-full transition-all duration-300"
-                            style={{
-                                width: active === i ? 20 : 6,
-                                height: 6,
-                                background: active === i ? features[active].color + "cc" : "rgba(255,255,255,0.18)",
-                            }}
-                        />
-                    ))}
+                    {/* Dot indicators */}
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
+                        {features.map((f, i) => (
+                            <button
+                                key={i}
+                                onClick={() => { setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
+                                className="rounded-full transition-all duration-300"
+                                style={{
+                                    width: active === i ? 20 : 6,
+                                    height: 6,
+                                    background: active === i ? features[active].color + "cc" : "rgba(255,255,255,0.18)",
+                                }}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex justify-center lg:justify-start">
+                    <Link href="/guides/attestation" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
+                        Explore attestations
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </Link>
                 </div>
             </div>
         </motion.div>
@@ -930,77 +853,79 @@ function RecruiterDashboardPreviewUI_V2({
 
     const cardAnim = (pos: number) => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const xOffset = isMobile ? (window.innerWidth < 400 ? 50 : 80) : 210;
+        const xOffset = isMobile ? (window.innerWidth < 400 ? 60 : 90) : 160;
 
         if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"  };
         if (pos === 1) return { x: xOffset,  y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
-        if (pos === 2) return { x: -210, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
+        if (pos === 2) return { x: -xOffset, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
         return              { x: 0,    y: 40, scale: 0.78, opacity: 0,    zIndex: 10, filter: "blur(4px)" };
     };
 
     return (
-        <div className="w-[1000px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.68] min-[400px]:scale-[0.75] sm:scale-90 md:scale-100 origin-top h-[520px] sm:h-auto"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-        >
-            {/* Header */}
-            <div className="flex items-center justify-between relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                        <Building2 className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Operations</p>
-                    </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Verified Org</span>
-                </div>
-            </div>
-
-            {/* Stat Pods */}
-            <div className="grid grid-cols-3 gap-3 relative z-10">
-                {[
-                    { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-emerald-400", bg: "bg-emerald-500/10" },
-                    { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
-                    { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
-                ].map((pod, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-1.5 shadow-xl">
-                        <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
-                            <pod.icon className={`w-3 h-3 ${pod.col}`} />
+        <>
+            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-[#080808]/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_32px_64px_rgba(0,0,0,0.6)]"
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <Building2 className="w-5 h-5 text-emerald-400" />
                         </div>
                         <div>
-                            <p className="text-lg font-black text-white leading-none">{pod.val}</p>
-                            <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">{pod.label}</p>
+                            <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Operations</p>
                         </div>
                     </div>
-                ))}
+                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Verified Org</span>
+                    </div>
+                </div>
+
+                {/* Stat Pods */}
+                <div className="grid grid-cols-3 gap-3 relative z-10">
+                    {[
+                        { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-emerald-400", bg: "bg-emerald-500/10" },
+                        { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
+                        { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
+                    ].map((pod, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-[#111111] bg-gradient-to-b from-transparent to-black/20 border border-white/5 space-y-1.5 shadow-xl">
+                            <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
+                                <pod.icon className={`w-3 h-3 ${pod.col}`} />
+                            </div>
+                            <div>
+                                <p className="text-lg font-black text-white leading-none">{pod.val}</p>
+                                <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">{pod.label}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Carousel */}
+                <div className="relative overflow-hidden" style={{ height: 170 }}>
+                    {panels.map((panel, i) => {
+                        const pos = (i - active + 4) % 4;
+                        const anim = cardAnim(pos);
+                        return (
+                            <motion.div
+                                key={i}
+                                animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
+                                transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                                className="absolute top-0 left-1/2 -ml-[min(150px,calc(50vw-24px))] w-[min(300px,calc(100vw-48px))]"
+                                style={{ zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
+                            >
+                                {panel}
+                            </motion.div>
+                        );
+                    })}
+                    <div className="absolute inset-y-0 left-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
+                    <div className="absolute inset-y-0 right-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
+                </div>
             </div>
 
-            {/* Carousel */}
-            <div className="relative overflow-hidden" style={{ height: 170 }}>
-                {panels.map((panel, i) => {
-                    const pos = (i - active + 4) % 4;
-                    const anim = cardAnim(pos);
-                    return (
-                        <motion.div
-                            key={i}
-                            animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
-                            transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                            className="absolute top-0 left-1/2 -ml-[min(150px,calc(50vw-24px))] w-[min(300px,calc(100vw-48px))]"
-                            style={{ zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
-                        >
-                            {panel}
-                        </motion.div>
-                    );
-                })}
-                <div className="absolute inset-y-0 left-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
-                <div className="absolute inset-y-0 right-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
-            </div>
-
-            {/* Dot indicators */}
-            <div className="flex items-center justify-center gap-2 relative z-10">
+            {/* Dot indicators — Moved outside the box */}
+            <div className="flex items-center justify-center gap-2 mt-6 relative z-10">
                 {slides.map((s, i) => (
                     <button
                         key={i}
@@ -1010,9 +935,7 @@ function RecruiterDashboardPreviewUI_V2({
                     />
                 ))}
             </div>
-
-            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
-        </div>
+        </>
     );
 }
 
@@ -1050,6 +973,13 @@ function HiringBlock() {
                     paused={paused}
                     setPaused={setPaused}
                 />
+                
+                <div className="mt-8 flex justify-center lg:justify-start">
+                    <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
+                        Start hiring
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </Link>
+                </div>
             </div>
 
             {/* Right — copy & hover-controlled feature rows */}
@@ -1062,6 +992,7 @@ function HiringBlock() {
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
+                    <div className="h-0.5 w-full bg-white/15" />
                     <p className="text-white/40 text-base md:text-lg leading-relaxed font-normal max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
                     </p>
@@ -1074,9 +1005,10 @@ function HiringBlock() {
                             key={i}
                             onHoverStart={() => { setPaused(true); setActive(f.slide); }}
                             onHoverEnd={() => setPaused(false)}
+                            onClick={() => { setPaused(true); setActive(f.slide); setTimeout(() => setPaused(false), 8000); }}
                             animate={{ opacity: active === f.slide ? 1 : 0.4 }}
                             transition={{ duration: 0.2 }}
-                            className="flex items-start gap-4 py-4 cursor-default"
+                            className="flex items-start gap-4 py-4 cursor-pointer"
                         >
                             <motion.div
                                 animate={{
@@ -1099,11 +1031,6 @@ function HiringBlock() {
                         </motion.div>
                     ))}
                 </div>
-
-                <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
-                    Start hiring
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
             </div>
         </motion.div>
     );
@@ -1151,6 +1078,50 @@ export function LandingPageClient() {
             setActiveModal(modal as any);
         }
     }, [searchParams, router]);
+    
+    // Mobile Carousel States
+    const [problemIdx, setProblemIdx] = useState(1);
+    const [whyIdx, setWhyIdx] = useState(1);
+    const [solutionIdx, setSolutionIdx] = useState(1);
+    const [isAnimating, setIsAnimating] = useState(false);
+    
+    const problems = [
+        { title: "Broken Work History", id: 0 },
+        { title: "Unverifiable Resumes", id: 1 },
+        { title: "Signal Lost in Noise", id: 2 }
+    ];
+    const clonedProblems = [problems[2], ...problems, problems[0]];
+
+    const handleProblemLoop = (newIdx: number) => {
+        if (isAnimating) return;
+        setIsAnimating(true);
+        setProblemIdx(newIdx);
+    };
+
+    const handleWhyLoop = (newIdx: number) => {
+        if (isAnimating) return;
+        setIsAnimating(true);
+        setWhyIdx(newIdx);
+    };
+
+    const handleSolutionLoop = (newIdx: number) => {
+        if (isAnimating) return;
+        setIsAnimating(true);
+        setSolutionIdx(newIdx);
+    };
+
+    const onAnimationComplete = () => {
+        setIsAnimating(false);
+        // Teleport for Problem
+        if (problemIdx === 0) setProblemIdx(3);
+        if (problemIdx === 4) setProblemIdx(1);
+        // Teleport for Why
+        if (whyIdx === 0) setWhyIdx(3);
+        if (whyIdx === 4) setWhyIdx(1);
+        // Teleport for Solution
+        if (solutionIdx === 0) setSolutionIdx(3);
+        if (solutionIdx === 4) setSolutionIdx(1);
+    };
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -1158,6 +1129,19 @@ export function LandingPageClient() {
         }, 5000);
         return () => clearInterval(timer);
     }, []);
+
+    // Auto-slide for Problem Carousel on Mobile
+    useEffect(() => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        if (!isMobile) return;
+
+        const timer = setInterval(() => {
+            if (!isAnimating) {
+                handleProblemLoop(problemIdx + 1);
+            }
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [problemIdx, isAnimating]);
 
     useEffect(() => {
         if (!connected || !publicKey) {
@@ -1216,14 +1200,14 @@ export function LandingPageClient() {
                 <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-glow-purple opacity-10 blur-[120px] pointer-events-none"></div>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-24 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
-                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-8 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
+                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust layer for Web3
                         </span>
                     </div>
 
-                    <h1 className="text-[36px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-[-0.04em] leading-[1.05] mb-6 sm:mb-8 text-white max-w-5xl px-2">
+                    <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
                             Resume <span className="text-white/30">That Recruiters Trust.</span>
@@ -1238,20 +1222,20 @@ export function LandingPageClient() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0">
                         <button
                             onClick={() => setIsWalletModalOpen(true)}
-                            className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                            className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                         >
                             Build Your Reputation
                         </button>
                         <button
                             onClick={() => router.push('/hiring/create')}
-                            className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
+                            className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-sm sm:text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
                         >
                             Discover Talent <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
 
                     {/* HERO VISUAL - Clean Slide Preview */}
-                    <div className="relative w-full max-w-4xl mx-auto group mt-4 sm:-mt-12 pt-4 pb-4">
+                    <div className="relative w-full max-w-4xl mx-auto group mt-0 sm:-mt-12 pt-4 pb-4">
                         <div className="relative overflow-hidden transition-all duration-1000">
                             <div className="aspect-[16/10] sm:aspect-[16/10] relative min-h-[220px]">
                                 {SLIDES.map((slide, index) => (
@@ -1277,7 +1261,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Slide Caption & Navigation */}
-                        <div className="mt-4 space-y-6 flex flex-col items-center">
+                        <div className="mt-2 sm:mt-4 space-y-4 sm:space-y-6 flex flex-col items-center">
                             <div className="h-10 relative w-full flex justify-center">
                                 {SLIDES.map((slide, index) => (
                                     <div 
@@ -1315,18 +1299,18 @@ export function LandingPageClient() {
                         <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
                     </div>
 
-                    <div className="mt-16 w-full max-w-[1400px] relative z-50">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-12">
+                    <div className="mt-8 sm:mt-16 w-full max-w-[1400px] relative z-50">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-6 sm:mb-12">
                             Powering the Web3 career stack
                         </p>
-                        <div className="w-full py-4 overflow-hidden relative mb-12" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                        <div className="w-full py-4 overflow-hidden relative mb-8 sm:mb-16" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                                 {[...partners, ...partners].map((partner, i) => (
                                     <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
                                         <img
                                             src={partner.src}
                                             alt={partner.name}
-                                            className="h-4 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
+                                            className="h-5 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
                                             style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
                                         />
                                     </div>
@@ -1334,14 +1318,14 @@ export function LandingPageClient() {
                             </div>
                         </div>
                         {/* Separator Line Below Logos */}
-                        <div className="w-full max-w-[1240px] mx-auto px-6">
+                        <div className="w-full max-w-[1240px] mx-auto px-6 pb-8 sm:pb-24">
                             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                         </div>
                     </div>
                 </section>
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-16 sm:py-24 md:py-32 pt-32 sm:pt-32 md:pt-48 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
+                <section className="pt-8 pb-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
@@ -1354,64 +1338,85 @@ export function LandingPageClient() {
                             <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
-                            <h2 className="text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.06] text-white">
+                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight leading-[1.06] text-white">
                                 Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
                             </h2>
-                            <p className="text-white/40 text-base md:text-lg font-normal max-w-4xl mx-auto">
+                            <div className="h-0.5 w-full bg-white/15" />
+                            <p className="text-white/40 text-sm md:text-lg font-normal max-w-4xl mx-auto">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
+                            
                         </div>
 
-                        <div className="max-w-5xl mx-auto">
-                            <div className="grid grid-cols-1 md:grid-cols-3">
-                                {/* Card 1 */}
-                                <div className="space-y-8 md:space-y-12 group md:pr-12 pb-12 md:pb-0">
-                                    <ProblemVideoCard
-                                        idleSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12"
-                                        hoverSrc="/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6"
-                                    />
-                                    <div className="space-y-4 text-center">
-                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Broken Work History</h3>
-                                        <p className="text-white/40 text-base leading-relaxed">
-                                            Your experience is scattered across PDFs, portfolios, and links. No single source of truth.
-                                        </p>
+                        <div className="relative max-w-5xl mx-auto group/carousel overflow-hidden px-4 sm:px-0">
+                            <motion.div 
+                                className="flex md:grid md:grid-cols-3 w-full"
+                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
+                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+                                onAnimationComplete={onAnimationComplete}
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.7}
+                                onDragEnd={(e: any, info: any) => {
+                                    if (info.offset.x < -50) handleProblemLoop(problemIdx + 1);
+                                    else if (info.offset.x > 50) handleProblemLoop(problemIdx - 1);
+                                }}
+                            >
+                                {clonedProblems.map((prob, i) => (
+                                    <div 
+                                        key={`${prob.id}-${i}`} 
+                                        className={`w-[85vw] md:w-auto flex-shrink-0 space-y-8 md:space-y-12 group transition-all duration-300 px-2 md:px-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''} ${
+                                            prob.id === 0 ? 'md:pr-12 md:pb-0' : 
+                                            prob.id === 1 ? 'md:px-12 md:border-l border-white/[0.05] md:pt-0 md:pb-0' : 
+                                            'md:pl-12 md:border-l border-white/[0.05] md:pt-0'
+                                        }`}
+                                    >
+                                        <ProblemVideoCard
+                                            idleSrc={
+                                                prob.id === 0 ? "/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12" :
+                                                prob.id === 1 ? "/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4" :
+                                                "/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
+                                            }
+                                            hoverSrc={
+                                                prob.id === 0 ? "/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6" :
+                                                prob.id === 1 ? "/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4" :
+                                                "/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
+                                            }
+                                        />
+                                        <div className="space-y-4 text-center">
+                                            <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">
+                                                {prob.id === 0 ? "Broken Work History" : prob.id === 1 ? "Unverifiable Resumes" : "Signal Lost in Noise"}
+                                            </h3>
+                                            <p className="text-white/40 text-base leading-relaxed">
+                                                {prob.id === 0 ? "Your experience is scattered across PDFs, portfolios, and links. No single source of truth." :
+                                                 prob.id === 1 ? "Without verifiable data, resumes become claims, not proof." :
+                                                 "Real talent gets buried. Hiring becomes guesswork."}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                ))}
+                            </motion.div>
 
-                                {/* Card 2 */}
-                                <div className="space-y-8 md:space-y-12 group md:px-12 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0 pb-12 md:pb-0">
-                                    <ProblemVideoCard
-                                        idleSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4"
-                                        hoverSrc="/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4"
+                            {/* Mobile Pagination Dots */}
+                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                                {[0, 1, 2].map((i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleProblemLoop(i + 1)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${
+                                            (problemIdx === i + 1 || (i === 2 && problemIdx === 0) || (i === 0 && problemIdx === 4)) 
+                                                ? "w-8 bg-white" 
+                                                : "w-1.5 bg-white/20"
+                                        }`}
                                     />
-                                    <div className="space-y-4 text-center pt-2">
-                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Unverifiable Resumes</h3>
-                                        <p className="text-white/40 text-base leading-relaxed">
-                                            Without verifiable data, resumes become claims, not proof.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Card 3 */}
-                                <div className="space-y-8 md:space-y-12 group md:pl-12 border-t md:border-t-0 md:border-l border-white/[0.05] pt-12 md:pt-0">
-                                    <ProblemVideoCard
-                                        idleSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
-                                        hoverSrc="/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
-                                    />
-                                    <div className="space-y-4 text-center">
-                                        <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-xl">Signal Lost in Noise</h3>
-                                        <p className="text-white/40 text-base leading-relaxed">
-                                            Real talent gets buried. Hiring becomes guesswork.
-                                        </p>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+                <section className="pt-8 pb-16 sm:py-24 md:py-32 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     </div>
@@ -1430,6 +1435,7 @@ export function LandingPageClient() {
                                         One trust layer.<br />
                                         <span className="text-white/30">Everything connects.</span>
                                     </h2>
+                                    <div className="h-0.5 w-full bg-white/15" />
                                     
                                     <p className="text-white/40 text-lg md:text-xl leading-relaxed max-w-xl font-normal">
                                         Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
@@ -1484,40 +1490,79 @@ export function LandingPageClient() {
                             </div>
                         </div>
 
-                        {/* Features Row — Minimal & Clean */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.03] border border-white/[0.03] rounded-3xl overflow-hidden mt-10 md:mt-24">
-                            {[
-                                {
-                                    title: "Beyond Profiles",
-                                    desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
-                                    color: "#60a5fa"
-                                },
-                                {
-                                    title: "Claims to Proof",
-                                    desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
-                                    color: "#14F195"
-                                },
-                                {
-                                    title: "Portable Trust",
-                                    desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                    color: "#a78bfa"
-                                }
-                            ].map((feature, i) => (
-                                <div key={i} className="p-10 bg-black hover:bg-white/[0.02] transition-colors group relative">
-                                    <div className="space-y-4 relative z-10">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: feature.color }} />
-                                            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
+                        {/* Features Row — Infinite Carousel on Mobile */}
+                        <div className="relative mt-10 md:mt-24 overflow-hidden">
+                            <motion.div 
+                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.03] md:border md:border-white/[0.03] md:rounded-3xl md:overflow-hidden md:gap-px"
+                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
+                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+                                onAnimationComplete={onAnimationComplete}
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.7}
+                                onDragEnd={(e: any, info: any) => {
+                                    if (info.offset.x < -50) handleWhyLoop(whyIdx + 1);
+                                    else if (info.offset.x > 50) handleWhyLoop(whyIdx - 1);
+                                }}
+                            >
+                                {[
+                                    {
+                                        title: "Portable Trust",
+                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                        color: "#a78bfa"
+                                    },
+                                    {
+                                        title: "Beyond Profiles",
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
+                                        color: "#60a5fa"
+                                    },
+                                    {
+                                        title: "Claims to Proof",
+                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
+                                        color: "#14F195"
+                                    },
+                                    {
+                                        title: "Portable Trust",
+                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                        color: "#a78bfa"
+                                    },
+                                    {
+                                        title: "Beyond Profiles",
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
+                                        color: "#60a5fa"
+                                    }
+                                ].map((feature, i) => (
+                                    <div 
+                                        key={i} 
+                                        className={`p-10 bg-white/[0.03] border border-white/[0.08] rounded-2xl transition-colors group relative w-[85vw] md:w-auto flex-shrink-0 md:px-12 md:border-none md:rounded-none md:bg-black md:p-10 pb-12 px-6 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                    >
+                                        <div className="space-y-4 relative z-10">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-1.5 h-1.5 rounded-full" style={{ background: feature.color }} />
+                                                <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
+                                            </div>
+                                            <p className="text-white/40 text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
+                                                {feature.desc}
+                                            </p>
                                         </div>
-                                        <p className="text-white/40 text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
-                                            {feature.desc}
-                                        </p>
                                     </div>
-                                    <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <ArrowRight className="w-4 h-4 text-white/20 -rotate-45" />
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </motion.div>
+
+                            {/* Mobile Pagination Dots */}
+                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                                {[0, 1, 2].map((i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleWhyLoop(i + 1)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${
+                                            (whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4)) 
+                                                ? "w-8 bg-white" 
+                                                : "w-1.5 bg-white/20"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1527,7 +1572,7 @@ export function LandingPageClient() {
                 <section className="relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-16 sm:pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8">
                         <div className="space-y-4 max-w-xl">
                             {/* badge */}
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
@@ -1540,8 +1585,9 @@ export function LandingPageClient() {
                                 From Noise to<br />
                                 <span className="text-white/30">Verifiable Signal</span>
                             </h2>
+                            <div className="h-0.5 w-full bg-white/15" />
                         </div>
-                        <p className="text-white/40 text-base md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
+                        <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xl md:text-right">
                             Work history is fragmented and impossible to verify.<br />
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
@@ -1605,52 +1651,94 @@ export function LandingPageClient() {
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-16 md:pb-32">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
-                            {[
-                                {
-                                    label: "One Unified Profile",
-                                    desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                    accent: "#14F195",
-                                },
-                                {
-                                    label: "On-Chain Attestation",
-                                    desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
-                                    accent: "#60a5fa",
-                                },
-                                {
-                                    label: "Verified Signal",
-                                    desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                    accent: "#a78bfa",
-                                },
-                            ].map((item, i) => (
-                                <div key={i} className="px-8 py-7 bg-black group hover:bg-white/[0.02] transition-colors duration-300">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                                            style={{ background: item.accent + "60" }}
-                                        />
-                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
-                                            style={{ color: item.accent + "99" }}
-                                        >
-                                            {item.label}
-                                        </span>
+                        <div className="relative overflow-hidden">
+                            <motion.div 
+                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.05] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.05] md:gap-px"
+                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}
+                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+                                onAnimationComplete={onAnimationComplete}
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.7}
+                                onDragEnd={(e: any, info: any) => {
+                                    if (info.offset.x < -50) handleSolutionLoop(solutionIdx + 1);
+                                    else if (info.offset.x > 50) handleSolutionLoop(solutionIdx - 1);
+                                }}
+                            >
+                                {[
+                                    {
+                                        label: "Verified Signal",
+                                        desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
+                                        accent: "#a78bfa",
+                                    },
+                                    {
+                                        label: "One Unified Profile",
+                                        desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
+                                        accent: "#14F195",
+                                    },
+                                    {
+                                        label: "On-Chain Attestation",
+                                        desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
+                                        accent: "#60a5fa",
+                                    },
+                                    {
+                                        label: "Verified Signal",
+                                        desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
+                                        accent: "#a78bfa",
+                                    },
+                                    {
+                                        label: "One Unified Profile",
+                                        desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
+                                        accent: "#14F195",
+                                    },
+                                ].map((item, i) => (
+                                    <div 
+                                        key={i} 
+                                        className={`px-8 py-8 bg-white/[0.03] border border-white/[0.08] rounded-2xl group transition-all duration-300 w-[85vw] md:w-auto flex-shrink-0 md:border-none md:rounded-none md:bg-black md:px-8 md:py-7 pb-12 px-8 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                    >
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
+                                                style={{ background: item.accent + "60" }}
+                                            />
+                                            <span className="text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
+                                                style={{ color: item.accent + "99" }}
+                                            >
+                                                {item.label}
+                                            </span>
+                                        </div>
+                                        <p className="text-white/30 text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
+                                            {item.desc}
+                                        </p>
                                     </div>
-                                    <p className="text-white/30 text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
-                                        {item.desc}
-                                    </p>
-                                </div>
-                            ))}
+                                ))}
+                            </motion.div>
+
+                            {/* Mobile Pagination Dots */}
+                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                                {[0, 1, 2].map((i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleSolutionLoop(i + 1)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${
+                                            (solutionIdx === i + 1 || (i === 2 && solutionIdx === 0) || (i === 0 && solutionIdx === 4)) 
+                                                ? "w-8 bg-white" 
+                                                : "w-1.5 bg-white/20"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                 </section>
 
-                <section id="solution" className="pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 relative z-10 bg-black">
+                <section id="solution" className="py-16 sm:pt-16 md:pt-20 pb-8 sm:pb-10 md:pb-12 px-4 sm:px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
 
                         {/* ── Header: compact, left + right split ── */}
-                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
                             <div className="space-y-4">
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                     <span className="text-[10px] font-black uppercase tracking-[0.22em] bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
@@ -1663,8 +1751,9 @@ export function LandingPageClient() {
                                 <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
                                     Build a reputation<br /><span className="text-white/30">that travels.</span>
                                 </h3>
+                                <div className="h-0.5 w-full bg-white/15" />
                             </div>
-                            <p className="text-white/40 text-base md:text-lg font-normal leading-relaxed max-w-xs md:text-right">
+                            <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xs md:text-right">
                                 Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
                             </p>
                         </div>
@@ -1672,22 +1761,22 @@ export function LandingPageClient() {
                         {/* ── Interactive Flow ── */}
                         <div className="relative w-full max-w-[860px] mx-auto mb-4">
                             <div className="absolute -inset-8 bg-gradient-to-r from-emerald-500/4 to-purple-500/4 blur-[80px] pointer-events-none" />
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/15 mb-4 text-center">
+                            <p className="hidden md:block text-[10px] font-bold uppercase tracking-[0.25em] text-white/15 mb-4 text-center">
                                 Hover each step to see the flow
                             </p>
                             <VerifiableWorkHistoryFlow />
                         </div>
 
                         {/* ── 3 compact attributes — replaces the old text card ── */}
-                        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-20 mt-6">
+                        <div className="flex flex-nowrap items-center justify-center gap-x-3 md:gap-x-8 gap-y-3 mb-0 mt-2 md:mt-4">
                             {[
                                 { icon: ShieldCheck, label: "On-Chain Proof",       color: "#14F195" },
                                 { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
                                 { icon: Lock,         label: "Impossible to Fake",  color: "#a78bfa" },
                             ].map(({ icon: Icon, label, color }, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                    <Icon className="w-3.5 h-3.5" style={{ color }} />
-                                    <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: color + "bb" }}>
+                                <div key={i} className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+                                    <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color }} />
+                                    <span className="text-[7.5px] md:text-[11px] font-bold uppercase tracking-[0.12em] md:tracking-[0.18em]" style={{ color: color + "bb" }}>
                                         {label}
                                     </span>
                                     {i < 2 && <span className="hidden md:block ml-8 w-px h-3 bg-white/10" />}
@@ -1696,18 +1785,23 @@ export function LandingPageClient() {
                         </div>
 
                         {/* ── UI Mockup ── */}
-                        <div className="relative h-[380px] sm:h-[500px] md:h-[650px] w-full max-w-[1100px] mx-auto flex items-center justify-center">
+                        <div className="relative h-[220px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
                             <div className="absolute inset-0 bg-emerald-500/4 blur-[120px] rounded-full opacity-40 pointer-events-none" />
-                            <div className="relative w-full h-full group">
-                                <div className="w-full h-full bg-[#0a0a0a] rounded-3xl border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-700 text-left relative">
-                                    <div className="absolute inset-0 w-full h-full">
+                            
+                            {/* Unified Scaling Container for the entire assembly */}
+                            <div className="relative scale-[0.31] min-[440px]:scale-[0.4] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[1200px] h-[650px]">
+                                <div className="relative w-full h-full group">
+                                    {/* Main Dashboard Mockup */}
+                                    <div className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden text-left relative">
                                         <MockProfileUI />
                                     </div>
-                                </div>
-                                <div className="hidden md:block absolute -right-8 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
-                                    <div className="[perspective:1500px]">
-                                        <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
-                                            <FloatingVerificationCard />
+
+                                    {/* Floating Proof Card - Now visible on all screens, part of the scaled assembly */}
+                                    <div className="absolute -right-16 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                        <div className="[perspective:1500px]">
+                                            <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
+                                                <FloatingVerificationCard />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1718,7 +1812,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* PRODUCT SECTION */}
-                <section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 overflow-hidden">
+                <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden">
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
                         <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     </div>
@@ -1743,7 +1837,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="relative py-48 px-6 overflow-hidden bg-black">
+                <section className="relative py-24 sm:py-48 px-6 overflow-hidden bg-black">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -1775,13 +1869,13 @@ export function LandingPageClient() {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
                                 <button
                                     onClick={() => setIsWalletModalOpen(true)}
-                                    className="premium-shimmer-button w-full sm:w-auto px-10 py-4 bg-white text-black font-bold text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                                    className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                                 >
                                     Create Your Profile
                                 </button>
                                 <Link
                                     href="/hiring/create"
-                                    className="w-full sm:w-auto px-10 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
+                                    className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-sm sm:text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
                                 >
                                     Create Hiring Link <ArrowRight className="w-4 h-4" />
                                 </Link>
@@ -2335,8 +2429,13 @@ function SignalNoiseVisual() {
 
         // Three layers of rays for depth — dense short inner, mid, long sparse outer
         const makeLayers = () => {
-            const layerA = Array.from({ length: 100 }, (_, i) => ({
-                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.12,
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+            const countA = isMobile ? 60 : 100;
+            const countB = isMobile ? 80 : 140;
+            const countC = isMobile ? 60 : 100;
+
+            const layerA = Array.from({ length: countA }, (_, i) => ({
+                baseAngle:   (i / countA) * Math.PI * 2 + Math.random() * 0.12,
                 length:      40 + Math.random() * 80,
                 wobbleAmp:   0.04 + Math.random() * 0.06,
                 wobbleSpeed: 0.6  + Math.random() * 1.2,
@@ -2347,8 +2446,8 @@ function SignalNoiseVisual() {
                 iconIdx:     -1
             }));
 
-            const layerB = Array.from({ length: 140 }, (_, i) => ({
-                baseAngle:   (i / 140) * Math.PI * 2 + Math.random() * 0.15,
+            const layerB = Array.from({ length: countB }, (_, i) => ({
+                baseAngle:   (i / countB) * Math.PI * 2 + Math.random() * 0.15,
                 length:      150 + Math.random() * 180,
                 wobbleAmp:   0.03 + Math.random() * 0.07,
                 wobbleSpeed: 0.3  + Math.random() * 0.8,
@@ -2359,8 +2458,8 @@ function SignalNoiseVisual() {
                 iconIdx:     -1
             }));
 
-            const layerC = Array.from({ length: 100 }, (_, i) => ({
-                baseAngle:   (i / 100) * Math.PI * 2 + Math.random() * 0.2,
+            const layerC = Array.from({ length: countC }, (_, i) => ({
+                baseAngle:   (i / countC) * Math.PI * 2 + Math.random() * 0.2,
                 length:      320 + Math.random() * 230,
                 wobbleAmp:   0.02 + Math.random() * 0.04,
                 wobbleSpeed: 0.2  + Math.random() * 0.5,
