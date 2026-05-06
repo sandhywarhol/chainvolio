@@ -928,7 +928,7 @@ function RecruiterDashboardPreviewUI_V2({
                         drag="x"
                         dragConstraints={{ left: 0, right: 0 }}
                         dragElastic={0.1}
-                        onDragEnd={(e, info) => {
+                        onDragEnd={(e: any, info: any) => {
                             if (info.offset.x < -30) setActive((prev) => (prev + 1) % 4);
                             if (info.offset.x > 30) setActive((prev) => (prev - 1 + 4) % 4);
                         }}
@@ -1273,7 +1273,7 @@ export function LandingPageClient() {
                                     drag="x"
                                     dragConstraints={{ left: 0, right: 0 }}
                                     dragElastic={0.2}
-                                    onDragEnd={(e, info) => {
+                                    onDragEnd={(e: any, info: any) => {
                                         if (info.offset.x < -40) setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
                                         if (info.offset.x > 40) setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
                                     }}
