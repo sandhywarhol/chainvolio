@@ -68,7 +68,7 @@ export default function BlogIndexPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {articles.map((article) => (
                             <Link key={article.slug} href={`/blog/${article.slug}`} className="group block">
-                                <article className="relative h-full flex flex-col p-8 rounded-[32px] bg-[#0d0d0d] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden">
+                                <article className="relative h-full flex flex-col p-8 rounded-[32px] bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden">
                                     {/* Hover Shine Effect */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                     

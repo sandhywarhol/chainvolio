@@ -282,7 +282,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                 </div>
               </div>
 
-              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl relative group">
+              <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl relative group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                   <div className="flex items-center gap-2">
@@ -475,7 +475,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Code Snippet */}
-              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+              <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
                 <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                   <span className="text-caption opacity-20">Fetch Signature</span>
                   <div className="flex items-center gap-6">
@@ -495,7 +495,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               </div>
 
               {/* JSON Response */}
-              <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
+              <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
                 <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center text-caption opacity-20">
                   <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
@@ -526,7 +526,7 @@ if (data.score > 75 && data.confidence > 0.8) {
               </div>
             </div>
 
-            <div className="bg-[#050505] rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl group">
+            <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl group">
               <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <Activity className="w-4 h-4 text-blue-400/60" />

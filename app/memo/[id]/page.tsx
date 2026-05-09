@@ -132,14 +132,14 @@ export default function MemoPage() {
     const avatarUrl = attester_profile?.avatar_url;
 
     const t = isDark ? {
-        body: "bg-[#0a0a0c] text-slate-300",
-        paper: "bg-[#111114] border-[#1e1e24]",
+        body: "bg-black text-slate-300",
+        paper: "bg-white/[0.02] border-[#1e1e24]",
         heading: "text-white",
         muted: "text-slate-500",
         accent: "text-emerald-400",
         badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
         divider: "border-[#1e1e24]",
-        btn: "bg-[#1a1a1e] hover:bg-[#25252b] border-[#2a2a32] text-slate-300",
+        btn: "bg-white/[0.02] hover:bg-white/[0.05] border-[#2a2a32] text-slate-300",
         btnPrimary: "bg-emerald-600 hover:bg-emerald-500 text-white",
     } : {
         body: "bg-gray-50 text-slate-700",
@@ -156,7 +156,7 @@ export default function MemoPage() {
     return (
         <div className={`min-h-screen font-sans ${t.body} antialiased`}>
             {/* Navigation */}
-            <nav className={`no-print sticky top-0 z-50 border-b backdrop-blur-md transition-all ${isDark ? "bg-[#0a0a0c]/80 border-[#1e1e24]" : "bg-white/80 border-gray-100"}`}>
+            <nav className={`no-print sticky top-0 z-50 border-b backdrop-blur-md transition-all ${isDark ? "bg-black/80 border-[#1e1e24]" : "bg-white/80 border-gray-100"}`}>
                 <div className="max-w-[1200px] mx-auto flex items-center justify-between px-8 py-4">
                     <Link href="/" className="flex items-center gap-2.5">
                         <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-7 h-7" />
@@ -305,7 +305,7 @@ export default function MemoPage() {
                     {/* Right Side: Verification Panel */}
                     <aside className="sticky top-28">
                         <div className={`p-8 md:p-10 rounded-[2.5rem] border shadow-2xl relative overflow-hidden transition-all group ${isDark
-                            ? "bg-[#141417]/80 border-white/10 backdrop-blur-2xl shadow-emerald-500/5"
+                            ? "bg-black/80 border-white/10 backdrop-blur-2xl shadow-emerald-500/5"
                             : "bg-white border-gray-200 shadow-xl"
                             }`}>
                             {/* Decorative Cryptographic Elements */}

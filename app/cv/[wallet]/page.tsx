@@ -291,7 +291,7 @@ function WorkRecordCard({
           {/* Primary: Role + Organization */}
           <div className="space-y-1 break-words whitespace-normal">
             {r.role && <h3 className="text-base font-semibold text-white break-words">{r.role}</h3>}
-            {r.org && <p className={`text-base text-emerald-400 font-bold break-words ${!r.role ? "text-white" : ""}`}>{r.org}</p>}
+            {r.org && <p className={`text-base text-emerald-300 font-bold break-words ${!r.role ? "text-white" : ""}`}>{r.org}</p>}
           </div>
 
           {/* Secondary: Date, Duration, Work Type */}
@@ -306,11 +306,11 @@ function WorkRecordCard({
             {r.status === "Attested" && r.attesterWallet && (
               <div className="mb-4 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">
+                  <p className="text-[10px] font-bold text-emerald-300/70 uppercase tracking-widest">
                     {r.attestationId ? "On-chain Recruiter Proof" : "Verification Signature"}
                   </p>
                   {r.attestationType === "Hiring Proof" ? (
-                    <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-tighter uppercase flex items-center gap-1">
+                    <span className="text-[8px] font-black bg-emerald-500/5 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-tighter uppercase flex items-center gap-1">
                       <ShieldCheck className="w-2.5 h-2.5" /> Institutional Verified
                     </span>
                   ) : r.isExternal && (
@@ -325,15 +325,15 @@ function WorkRecordCard({
                       <img
                         src={r.attesterAvatar}
                         alt={r.attesterName}
-                        className="w-12 h-12 rounded-full object-cover border border-emerald-500/20 shadow-lg"
+                        className="w-12 h-12 rounded-full object-cover border border-emerald-500/10 shadow-lg"
                       />
                     ) : (
                       <div className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 text-sm font-bold shadow-lg">
                         {r.attesterName?.[0] || '?'}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-0.5 border border-emerald-500/20 shadow-sm">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-0.5 border border-emerald-500/10 shadow-sm">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
                     </div>
                   </div>
 
@@ -379,7 +379,7 @@ function WorkRecordCard({
                  e.stopPropagation();
                  setIsExpanded(!isExpanded);
                }}
-               className="md:hidden mt-2 text-emerald-400 hover:text-emerald-300 text-xs font-bold flex items-center gap-1 group"
+               className="md:hidden mt-2 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 group"
              >
                {isExpanded ? "Show less" : "Read more"}
                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
@@ -391,7 +391,7 @@ function WorkRecordCard({
                  e.stopPropagation();
                  setIsDescExpanded(!isDescExpanded);
                }}
-               className="hidden md:flex mt-2 text-emerald-400/70 hover:text-emerald-400 text-[10px] font-bold items-center gap-1 group uppercase tracking-widest transition-colors"
+               className="hidden md:flex mt-2 text-emerald-300/70 hover:text-emerald-300 text-[10px] font-bold items-center gap-1 group uppercase tracking-widest transition-colors"
              >
                {isDescExpanded ? "Show less" : "Show more"}
                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isDescExpanded ? "rotate-180" : ""}`} />
@@ -412,7 +412,7 @@ function WorkRecordCard({
                 <ul className="space-y-1.5">
                   {r.impact.map((item, idx) => (
                     <li key={idx} className="text-sm text-slate-300 flex items-start gap-2 max-w-full">
-                      <span className="text-emerald-400 mt-0.5">•</span>
+                      <span className="text-emerald-300 mt-0.5">•</span>
                       <span className="break-words whitespace-normal">{item}</span>
                     </li>
                   ))}
@@ -433,7 +433,7 @@ function WorkRecordCard({
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       title={getEvidenceTooltip(link.label)}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-white/[0.08] shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-emerald-300 hover:text-emerald-200 transition-colors border border-white/[0.08] shadow-sm"
                     >
                       {getEvidenceIcon(link.label)} {link.label}
                     </a>
@@ -475,7 +475,7 @@ function WorkRecordCard({
                    target="_blank"
                    rel="noopener noreferrer"
                    onClick={(e) => e.stopPropagation()}
-                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 transition-all border border-emerald-500/20 text-[11px] font-black uppercase tracking-widest w-full sm:w-auto"
+                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 hover:text-emerald-200 transition-all border border-emerald-500/20 text-[11px] font-black uppercase tracking-widest w-full sm:w-auto"
                  >
                    <ExternalLink className="w-3.5 h-3.5" /> View Transaction
                  </a>
@@ -488,7 +488,7 @@ function WorkRecordCard({
         <div className="flex-shrink-0 flex items-start">
            <span
              className={`text-[9px] px-2 py-0.5 rounded border whitespace-nowrap font-black uppercase tracking-widest ${r.status === "Attested"
-               ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10"
+                ? "border-emerald-500/30 text-emerald-300 bg-emerald-500/5"
                : "border-slate-600 text-slate-400 bg-slate-800"
                }`}
              title={
@@ -769,7 +769,7 @@ export default function CVPage(props: any) {
 
     if (isCompany || isCommunity) {
       return (
-        <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+        <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black">
           <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
           <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
             <TrustIssuerCV
@@ -795,7 +795,7 @@ export default function CVPage(props: any) {
   // ── End role routing - IndividualCV renders below ──────────────────────────
 
   return (
-    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black">
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
       <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
         {(!profile && !loading) ? (
@@ -808,7 +808,7 @@ export default function CVPage(props: any) {
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
               {/* Main Card Background: Very Dark Grey */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[#0d0d0d] border border-white/10 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-black border border-white/10 pointer-events-none"></div>
 
               {/* Top-Center Spotlight Effect (Conical Spread) */}
               <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl md:rounded-3xl">

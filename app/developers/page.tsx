@@ -95,7 +95,7 @@ export default function DevelopersPage() {
                     </div>
                     <div className="relative group">
                         <div className="absolute -inset-10 bg-red-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative p-12 bg-[#050505] border border-white/[0.05] rounded-2xl space-y-6 shadow-2xl">
+                        <div className="relative p-12 bg-black border border-white/[0.05] rounded-2xl space-y-6 shadow-2xl">
                             <div className="flex gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500/20" />
                                 <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
@@ -247,7 +247,7 @@ export default function DevelopersPage() {
                             </div>
                             <h3 className="text-h1 !text-4xl md:!text-5xl">One Line of Logic.</h3>
                         </div>
-                        <div className="p-8 md:p-12 bg-[#050505] border border-white/[0.05] rounded-2xl font-mono text-xl md:text-3xl text-indigo-300 text-left relative group/code overflow-hidden shadow-2xl">
+                        <div className="p-8 md:p-12 bg-black border border-white/[0.05] rounded-2xl font-mono text-xl md:text-3xl text-indigo-300 text-left relative group/code overflow-hidden shadow-2xl">
                              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
                             <span className="text-white/20 italic">if (</span>
                             <span className="text-indigo-400 font-bold">trust_score</span>

@@ -117,10 +117,70 @@ export default function GlobeCanvas({ className }: { className?: string }) {
   const [dims, setDims] = useState({ w: 0, h: 0 });
   const [ready, setReady] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [network, setNetwork] = useState<{ hubs: { idx: number; targets: number[]; color: string }[] } | null>(null);
+  const networkRef = useRef<{ hubs: { idx: number; targets: number[]; color: string }[] } | null>(null);
 
   // Load land dots async (won't block render)
   useEffect(() => {
-    getLandDots().then((d) => { dotsRef.current = d; setReady(true); });
+    getLandDots().then((d) => { 
+      dotsRef.current = d; 
+      
+      const n = d.length / 4;
+      const hubs: { idx: number; targets: number[]; color: string }[] = [];
+      const colors = ["#ffffff", "#ffffff", "#ffffff"];
+      
+      // Create 3 hubs with distinct colors
+      // Create 3 hubs with distinct colors, ensuring they are spread out
+      for (let i = 0; i < 3; i++) {
+          let hubIdx = -1;
+          let bestHubIdx = -1;
+          let maxMinDist = -1;
+
+          // Try multiple candidates and pick the one farthest from existing hubs
+          for (let attempt = 0; attempt < 50; attempt++) {
+              const testIdx = Math.floor(Math.random() * n);
+              let minDist = 2.0; // Max possible distance on unit sphere is 2.0
+
+              for (const existing of hubs) {
+                  const d3d = Math.hypot(
+                      d[testIdx * 4] - d[existing.idx * 4],
+                      d[testIdx * 4 + 1] - d[existing.idx * 4 + 1],
+                      d[testIdx * 4 + 2] - d[existing.idx * 4 + 2]
+                  );
+                  if (d3d < minDist) minDist = d3d;
+              }
+
+              // Weight by distance AND brightness (rand)
+              const score = minDist * (0.5 + d[testIdx * 4 + 3] * 0.5);
+              if (score > maxMinDist) {
+                  maxMinDist = score;
+                  bestHubIdx = testIdx;
+              }
+          }
+          hubIdx = bestHubIdx;
+          
+          const targets: number[] = [];
+          const numTargets = 10 + Math.floor(Math.random() * 5); 
+          let attempts = 0;
+          while (targets.length < numTargets && attempts < 200) {
+              attempts++;
+              const targetIdx = Math.floor(Math.random() * n);
+              const d3d = Math.hypot(
+                  d[hubIdx * 4] - d[targetIdx * 4],
+                  d[hubIdx * 4 + 1] - d[targetIdx * 4 + 1],
+                  d[hubIdx * 4 + 2] - d[targetIdx * 4 + 2]
+              );
+              if (d3d > 0.8) { // Increased minimum distance to target for a "wider" network
+                  targets.push(targetIdx);
+              }
+          }
+          hubs.push({ idx: hubIdx, targets, color: colors[i] });
+      }
+      
+      networkRef.current = { hubs };
+      setNetwork({ hubs });
+      setReady(true); 
+    });
   }, []);
 
   // Intersection Observer to pause rendering when off-screen
@@ -165,6 +225,11 @@ export default function GlobeCanvas({ className }: { className?: string }) {
     const sinT = Math.sin(THETA);
 
     function frame() {
+      if (document.hidden) {
+        rafRef.current = requestAnimationFrame(frame);
+        return;
+      }
+
       if (!pauseRef.current) {
         phiRef.current += 0.0022;
         timeRef.current += 1;
@@ -192,8 +257,9 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         curCY = (cur.y * dims.h + offY) * dpr;
       }
 
-      const influR = R * 0.15; // increased slightly to ensure we find candidates
+      const influR = R * 0.15; 
       const influR2 = influR * influR;
+
 
       // ── Pass 1: Find closest dots ──────────────────────────────────────────
       const winners: { i: number; d2: number; rx: number; ry: number; rz: number }[] = [];
@@ -219,7 +285,7 @@ export default function GlobeCanvas({ className }: { className?: string }) {
       }
       const winnerIds = new Set(winners.map(w => w.i));
 
-      // ── Pass 2: Render ─────────────────────────────────────────────────────
+      // ── Pass 2: Render Dots and Network ────────────────────────────────────
       const time = timeRef.current;
 
       for (let i = 0; i < n; i++) {
@@ -248,67 +314,178 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         const erz = rz * pop;
         const depth = (erz + 1) * 0.5;
 
+
         // Stronger organic pulse
         const pulse = (
           Math.sin(time * (0.012 + rand * 0.008) + rand * 20) * 0.7 + 
           Math.sin(time * (0.03 + rand * 0.015) + rand * 10) * 0.3
         ) * 0.5 + 0.5;
         
-        // Twinkle (kelap-kelip) effect: faster brightness variance
+        // Twinkle (kelap-kelip) effect
         const twinkle = Math.sin(time * (0.06 + rand * 0.04) + rand * 100) * 0.5 + 0.5;
 
-        // Combine for a more energetic feel
         const alpha = Math.min(0.98, (0.15 + depth * 0.35 + elev * 0.45) * (0.6 + rand * 0.4) * (0.5 + pulse * 0.5) * (0.7 + twinkle * 0.3));
         const radius = (0.35 + depth * 0.5 + elev * 2.5 + rand * 0.8 + pulse * 0.4) * dpr;
 
-        // Random Color Logic (Monochrome)
-        let dotColor = "#ffffff"; 
-        if (rand > 0.90) dotColor = "#ffffff";      
-        else if (rand > 0.75) dotColor = "#cbd5e1"; 
-        else dotColor = "#ffffff";                  
-
-        ctx.fillStyle = dotColor;
+        ctx.fillStyle = "#ffffff";
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Subtler glow for fewer dots
-        if (rand > 0.96) {
-          ctx.globalAlpha = alpha * 0.3;
+        // Subtler glow for prominent dots
+        if (rand > 0.94) {
+          const isHub = networkRef.current?.hubs.some(h => h.idx === i);
+          ctx.globalAlpha = alpha * (isHub ? 0.6 : 0.25);
           ctx.beginPath();
-          ctx.arc(sx, sy, radius * 2.2, 0, Math.PI * 2);
+          ctx.arc(sx, sy, radius * (isHub ? 3.5 : 2.2), 0, Math.PI * 2);
+          const hubColor = networkRef.current?.hubs.find(h => h.idx === i)?.color;
+          ctx.fillStyle = hubColor || "#ffffff";
           ctx.fill();
         }
+      }
 
-        // Less frequent connection arcs
-        if (rand > 0.997 && !pauseRef.current) {
-          const nextIdx = (i + 13) % n; 
-          const nx = dots[nextIdx * 4];
-          const ny = dots[nextIdx * 4 + 1];
-          const nz = dots[nextIdx * 4 + 2];
+      // ── Pass 3: Draw Neural Network Connections ────────────────────────────
+      if (networkRef.current && networkRef.current.hubs.length > 0) {
+          const hubs = networkRef.current.hubs;
           
-          const nrx = nx * cosP - nz * sinP;
-          const nrz0 = nx * sinP + nz * cosP;
-          const nrz = ny * sinT + nrz0 * cosT;
-          const nry = ny * cosT - nrz0 * sinT;
+          hubs.forEach((hub, hubIdx) => {
+              const masterDot = {
+                  dx: dots[hub.idx * 4],
+                  dy: dots[hub.idx * 4 + 1],
+                  dz: dots[hub.idx * 4 + 2]
+              };
+              
+              const rx = masterDot.dx * cosP - masterDot.dz * sinP;
+              const rz0 = masterDot.dx * sinP + masterDot.dz * cosP;
+              const rz = masterDot.dy * sinT + rz0 * cosT;
+              const ry = masterDot.dy * cosT - rz0 * sinT;
+              
+              if (rz < -0.1) return;
+              
+              const mx = cx + rx * R;
+              const my = cy - ry * R;
 
-          if (nrz > 0) {
-            const nsx = cx + nrx * R;
-            const nsy = cy - nry * R;
-            
-            const arcPulse = Math.sin(time * 0.02 + rand * 100);
-            if (arcPulse > 0.6) {
-              const arcAlpha = (arcPulse - 0.6) * 0.1;
-              ctx.beginPath();
-              ctx.moveTo(sx, sy);
-              ctx.quadraticCurveTo(cx, cy, nsx, nsy);
-              ctx.strokeStyle = `rgba(255, 255, 255, ${arcAlpha})`; 
-              ctx.lineWidth = 0.4 * dpr;
-              ctx.stroke();
-            }
-          }
-        }
+              hub.targets.forEach((targetIdx, tIdx) => {
+                  const targetDot = {
+                      dx: dots[targetIdx * 4],
+                      dy: dots[targetIdx * 4 + 1],
+                      dz: dots[targetIdx * 4 + 2]
+                  };
+                  
+                  const isHovering = pauseRef.current;
+                  const trx = targetDot.dx * cosP - targetDot.dz * sinP;
+                  const trz0 = targetDot.dx * sinP + targetDot.dz * cosP;
+                  const trz = targetDot.dy * sinT + trz0 * cosT;
+                  const try_ = targetDot.dy * cosT - trz0 * sinT;
+                  
+                  if (trz < -0.1) return;
+                  
+                  const tx = cx + trx * R;
+                  const ty = cy - try_ * R;
+
+                  // Visibility based on average depth
+                  const visibility = Math.max(0, Math.min(1, (rz + trz) * 0.8));
+                  if (visibility <= 0) return;
+
+                  // Curve Calculation (Spherical Surface Approximation)
+                  const midX = (mx + tx) / 2;
+                  const midY = (my + ty) / 2;
+                  
+                  // Calculate control point that arcs follow the globe's radius
+                  const dToCenter = Math.hypot(midX - cx, midY - cy) || 1;
+                  const cpX = cx + (midX - cx) * (R / dToCenter) * 1.12; 
+                  const cpY = cy + (midY - cy) * (R / dToCenter) * 1.12;
+
+                  const linePulse = Math.sin(time * (isHovering ? 0.08 : 0.03) + hubIdx) * 0.5 + 0.5;
+                  const lineAlpha = (0.05 + linePulse * (isHovering ? 0.35 : 0.15)) * visibility;
+                  
+                  ctx.beginPath();
+                  ctx.moveTo(mx, my);
+                  ctx.quadraticCurveTo(cpX, cpY, tx, ty);
+                  
+                  ctx.strokeStyle = hub.color;
+                  ctx.globalAlpha = lineAlpha;
+                  ctx.lineWidth = (isHovering ? 1.0 : 0.5) * dpr;
+                  ctx.stroke();
+
+                  // ── Sequential Flow Logic ──
+                  const flowSpeed = isHovering ? 0.008 : 0.004;
+                  const hubCycleTime = time * flowSpeed;
+                  const activeTIdx = Math.floor(hubCycleTime % hub.targets.length);
+                  const flowProgress = hubCycleTime % 1;
+
+                  if (tIdx === activeTIdx) {
+                      const tailLength = 45; // Increased for a longer tail
+                      for (let j = 0; j < tailLength; j++) {
+                          // Reduced spacing (0.006) ensures segments overlap for a smooth, non-fragmented look
+                          const t = Math.max(0, flowProgress - j * 0.006);
+                          
+                          const px = (1 - t) * (1 - t) * mx + 2 * (1 - t) * t * cpX + t * t * tx;
+                          const py = (1 - t) * (1 - t) * my + 2 * (1 - t) * t * cpY + t * t * ty;
+                          
+                          // Non-linear fade for a more organic "comet" look
+                          const tailScale = Math.pow(1 - j / tailLength, 1.2);
+                          ctx.globalAlpha = lineAlpha * (isHovering ? 14 : 9) * visibility * tailScale;
+                          ctx.fillStyle = hub.color;
+                          
+                          if (j === 0) {
+                              // Lead particle bloom
+                              ctx.shadowBlur = 15 * dpr;
+                              ctx.shadowColor = hub.color;
+                              ctx.beginPath();
+                              ctx.arc(px, py, (isHovering ? 2.6 : 2.0) * dpr, 0, Math.PI * 2);
+                              ctx.fill();
+                              ctx.shadowBlur = 0; 
+                          } else {
+                              // Tail segments - slightly larger to ensure overlap
+                              ctx.beginPath();
+                              ctx.arc(px, py, (isHovering ? 2.2 : 1.6) * dpr * (0.5 + 0.5 * tailScale), 0, Math.PI * 2);
+                              ctx.fill();
+                          }
+                      }
+                  }
+              });
+
+              // Cross-hub connection (connect hub to next hub)
+              const nextHub = hubs[(hubIdx + 1) % hubs.length];
+              const nextDot = {
+                  dx: dots[nextHub.idx * 4],
+                  dy: dots[nextHub.idx * 4 + 1],
+                  dz: dots[nextHub.idx * 4 + 2]
+              };
+              
+              const nrx = nextDot.dx * cosP - nextDot.dz * sinP;
+              const nrz0 = nextDot.dx * sinP + nextDot.dz * cosP;
+              const nrz = nextDot.dy * sinT + nrz0 * cosT;
+              const nry = nextDot.dy * cosT - nrz0 * sinT;
+              
+              if (nrz > -0.1) {
+                  const nx = cx + nrx * R;
+                  const ny = cy - nry * R;
+                  
+                  const visibility = Math.max(0, Math.min(1, (rz + nrz) * 0.6));
+                  if (visibility > 0) {
+                      ctx.beginPath();
+                      ctx.moveTo(mx, my);
+                      const midX = (mx + nx) / 2;
+                      const midY = (my + ny) / 2;
+                      const offsetX = (midX - cx) * 0.25;
+                      const offsetY = (midY - cy) * 0.25;
+                      ctx.quadraticCurveTo(midX + offsetX, midY + offsetY, nx, ny);
+                      
+                      const grad = ctx.createLinearGradient(mx, my, nx, ny);
+                      grad.addColorStop(0, hub.color);
+                      grad.addColorStop(1, nextHub.color);
+                      
+                      ctx.strokeStyle = grad;
+                      ctx.globalAlpha = 0.1 * visibility;
+                      ctx.setLineDash([4, 4]);
+                      ctx.stroke();
+                      ctx.setLineDash([]);
+                  }
+              }
+          });
       }
 
       ctx.globalAlpha = 1;

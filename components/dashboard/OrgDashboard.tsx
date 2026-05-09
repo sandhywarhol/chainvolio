@@ -246,13 +246,13 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
 
   // ── Projects section ─────────────────────────────────────────────────────────
   const ProjectsSection = (
-    <div className="rounded-2xl bg-slate-800/30 border border-slate-700/50 overflow-hidden">
+    <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
       <div
         onClick={() => setProjectsExpanded(!projectsExpanded)}
         className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors group"
       >
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg transition-colors ${projectsExpanded ? "bg-emerald-500/10" : "bg-slate-700/50"}`}>
+          <div className={`p-2 rounded-lg transition-colors ${projectsExpanded ? "bg-emerald-500/5" : "bg-white/5"}`}>
             <FolderOpen className={`w-4 h-4 transition-colors ${projectsExpanded ? "text-emerald-400" : "text-slate-500"}`} />
           </div>
           <div>
@@ -493,7 +493,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
       )}
 
       {/* Hero card */}
-      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-[#0a0b0f]">
+      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-black">
         <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${accentHex}10 0%, transparent 60%)` }} />
 
         {/* Status badge top-right */}
@@ -612,7 +612,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           },
           { icon: FolderOpen, label: "Projects", val: projects.length, col: "text-purple-400", bg: "bg-purple-500/10", warn: false },
         ].map((pod, i) => (
-          <div key={i} className={`p-4 rounded-2xl bg-[#0a0b0f] border space-y-2 hover:border-white/10 transition-all ${pod.warn ? "border-rose-500/30" : "border-white/5"}`}>
+          <div key={i} className={`p-4 rounded-2xl bg-black border space-y-2 hover:border-white/10 transition-all ${pod.warn ? "border-rose-500/30" : "border-white/5"}`}>
             <div className={`w-8 h-8 flex items-center justify-center rounded-xl ${pod.bg}`}>
               <pod.icon className={`w-4 h-4 ${pod.warn ? "text-rose-400" : pod.col}`} />
             </div>
@@ -703,7 +703,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
 
       {/* Plan & Usage (active users) */}
       {isActive && (
-        <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50">
+        <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-slate-700/50">
@@ -800,7 +800,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
 
       {/* Attestation Signing — wallet linking for Google org users (paid plan only) */}
       {isGooglePath && isPaidPlan && (
-        <div className="rounded-2xl bg-slate-800/30 border border-slate-700/50 overflow-hidden">
+        <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
           <div className="flex items-center gap-3 p-4 border-b border-slate-700/50">
             <div className="p-2 rounded-lg bg-teal-500/10">
               <ShieldCheck className="w-4 h-4 text-teal-400" />
@@ -870,7 +870,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
       {ProjectsSection}
 
       {/* Hiring Center */}
-      <div className="rounded-2xl bg-slate-800/30 border border-slate-700/50 overflow-hidden">
+      <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
         <div
           onClick={() => setHiringExpanded(!hiringExpanded)}
           className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors group"

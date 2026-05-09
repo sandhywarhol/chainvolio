@@ -33,7 +33,7 @@ export default function RailwayDemoPage() {
     };
 
     return (
-        <div className="bg-[#0b0e14] min-h-screen text-white font-sans selection:bg-violet-500/30">
+        <div className="bg-black min-h-screen text-white font-sans selection:bg-violet-500/30">
             {/* Grid Background Effect */}
             <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03]" 
                  style={{ backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}>
@@ -41,7 +41,7 @@ export default function RailwayDemoPage() {
 
             {/* Navbar */}
             <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b ${
-                scrolled ? "bg-[#0b0e14]/80 backdrop-blur-xl border-white/10 py-3" : "bg-transparent border-transparent py-6"
+                scrolled ? "bg-black/80 backdrop-blur-xl border-white/10 py-3" : "bg-transparent border-transparent py-6"
             }`}>
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <div className="flex items-center gap-8">
@@ -96,13 +96,13 @@ export default function RailwayDemoPage() {
 
                 {/* Floating Glow Elements */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-600/20 blur-[150px] rounded-full z-0 opacity-50"></div>
-                <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[#0b0e14] z-10" style={{ clipPath: 'ellipse(100% 50% at 50% 100%)' }}></div>
+                <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-full h-[600px] bg-black z-10" style={{ clipPath: 'ellipse(100% 50% at 50% 100%)' }}></div>
             </section>
 
             {/* Dashboard Preview (The "Railway Look") */}
             <section className="px-6 -mt-20 mb-40 relative z-20">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-[#12161f] border border-white/10 rounded-[32px] p-2 shadow-2xl overflow-hidden group">
+                    <div className="bg-white/[0.02] border border-white/10 rounded-[32px] p-2 shadow-2xl overflow-hidden group">
                         <div className="bg-[#0b0e14] rounded-[24px] overflow-hidden border border-white/5">
                             {/* Window Header */}
                             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
@@ -152,7 +152,7 @@ export default function RailwayDemoPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-[#050505] rounded-xl p-4 border border-white/5 font-mono text-[10px] text-white/40 space-y-1">
+                                    <div className="bg-black rounded-xl p-4 border border-white/5 font-mono text-[10px] text-white/40 space-y-1">
                                         <p><span className="text-emerald-500">INFO</span> [2024-05-01 12:00:01] Server listening on port 3000</p>
                                         <p><span className="text-emerald-500">INFO</span> [2024-05-01 12:00:05] Database connected (PostgreSQL)</p>
                                         <p><span className="text-violet-500">LOG</span> [2024-05-01 12:05:22] GET /api/v1/health - 200 OK</p>

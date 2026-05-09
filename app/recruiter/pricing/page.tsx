@@ -140,7 +140,7 @@ function MaintenanceModal({ onClose }: { onClose: () => void }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onClose}>
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
             <div
-                className="relative w-full max-w-sm rounded-2xl bg-[#0d0d0d] border border-white/10 p-8 text-center shadow-2xl"
+                className="relative w-full max-w-sm rounded-2xl bg-black border border-white/10 p-8 text-center shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button

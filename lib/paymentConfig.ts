@@ -123,41 +123,41 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
     const type = normalizeTier(verificationType);
 
     if (type.includes("public") || type.includes("figure")) return {
-        color: "text-pink-400 bg-pink-500/10 border-pink-500/20",
-        iconText: "text-pink-400",
-        border: "border-pink-500/50",
-        bgBase: "bg-pink-500",
-        hex: "#ec4899",
+        color: "text-rose-200/80 bg-rose-500/5 border-rose-500/20",
+        iconText: "text-rose-300",
+        border: "border-rose-500/30",
+        bgBase: "bg-rose-400",
+        hex: "#fda4af", // rose-300
         bars: 3,
         icon: true,
         tierLabel: "Public",
     };
     if (type.includes("community") || type.includes("dao")) return {
-        color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-        iconText: "text-blue-400",
-        border: "border-blue-500/50",
-        bgBase: "bg-blue-500",
-        hex: "#3b82f6",
+        color: "text-blue-200/80 bg-blue-500/5 border-blue-500/20",
+        iconText: "text-blue-300",
+        border: "border-blue-500/30",
+        bgBase: "bg-blue-400",
+        hex: "#93c5fd", // blue-300
         bars: 4,
         icon: true,
         tierLabel: "Community / DAO",
     };
     if (type.includes("company") || type.includes("organization") || type.includes("org")) return {
-        color: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-        iconText: "text-amber-400",
-        border: "border-amber-500/50",
-        bgBase: "bg-amber-500",
-        hex: "#f59e0b",
+        color: "text-amber-200/80 bg-amber-500/5 border-amber-500/20",
+        iconText: "text-amber-300",
+        border: "border-amber-500/30",
+        bgBase: "bg-amber-400",
+        hex: "#fcd34d", // amber-300
         bars: 5,
         icon: true,
         tierLabel: "Company / Org",
     };
     if (type.includes("builder")) return {
-        color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-        iconText: "text-emerald-400",
-        border: "border-emerald-500/50",
-        bgBase: "bg-emerald-500",
-        hex: "#10b981",
+        color: "text-emerald-200/80 bg-emerald-500/5 border-emerald-500/20",
+        iconText: "text-emerald-300",
+        border: "border-emerald-500/30",
+        bgBase: "bg-emerald-400",
+        hex: "#6ee7b7", // emerald-300
         bars: 2,
         icon: true,
         tierLabel: "Builder",
@@ -165,9 +165,9 @@ export function getBadgeStyles(verificationType?: string): BadgeStyle {
 
     // Default / Unverified → Regular (1 strip, slate color)
     return {
-        color: "text-slate-400 bg-slate-500/10 border-slate-500/20",
+        color: "text-slate-400 bg-slate-500/5 border-slate-500/20",
         iconText: "text-slate-400",
-        border: "border-slate-500/50",
+        border: "border-slate-500/30",
         bgBase: "bg-slate-500",
         hex: "#94a3b8",
         bars: 1,

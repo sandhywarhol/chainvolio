@@ -9,10 +9,10 @@ import { Toast } from "@/components/ui/Toast";
 
 // ─── Color palette (matches modal) ─────────────────────────────────────────
 const C = {
-    emerald: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", bar: "bg-emerald-500", glow: "shadow-emerald-500/20", hex: "#10b981" },
-    pink:    { text: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/20",    bar: "bg-pink-500",    glow: "shadow-pink-500/20",    hex: "#ec4899" },
-    blue:    { text: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20",    bar: "bg-blue-500",    glow: "shadow-blue-500/20",    hex: "#3b82f6" },
-    amber:   { text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20",   bar: "bg-amber-500",   glow: "shadow-amber-500/20",   hex: "#f59e0b" },
+    emerald: { text: "text-emerald-300", bg: "bg-emerald-500/5", border: "border-emerald-500/20", bar: "bg-emerald-400", glow: "shadow-emerald-500/10", hex: "#6ee7b7" },
+    pink:    { text: "text-rose-300",    bg: "bg-rose-500/5",    border: "border-rose-500/20",    bar: "bg-rose-400",    glow: "shadow-rose-500/10",    hex: "#fda4af" },
+    blue:    { text: "text-blue-300",    bg: "bg-blue-500/5",    border: "border-blue-500/20",    bar: "bg-blue-400",    glow: "shadow-blue-500/10",    hex: "#93c5fd" },
+    amber:   { text: "text-amber-300",   bg: "bg-amber-500/5",   border: "border-amber-500/20",   bar: "bg-amber-400",   glow: "shadow-amber-500/10",   hex: "#fcd34d" },
 } as const;
 type CK = keyof typeof C;
 
@@ -203,7 +203,7 @@ export default function PricingPage() {
         <div className="min-h-screen bg-black text-white">
             {/* ── Background texture ── */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.05),transparent)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,255,255,0.03),transparent)]" />
                 <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
             </div>
 
@@ -217,14 +217,14 @@ export default function PricingPage() {
 
                 {/* ── Hero ── */}
                 <div className="text-center mb-16 md:mb-20">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-5">
                         <Shield className="w-3 h-3" />
                         Verified Identity
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-none">
                         Build trust that{" "}
-                        <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-                            can't be faked
+                        <span className="text-white/20">
+                            can&apos;t be faked
                         </span>
                     </h1>
                     <p className="text-white/40 text-[15px] md:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
@@ -435,16 +435,16 @@ export default function PricingPage() {
                 </div>
 
                 {/* ── Bottom CTA ── */}
-                <div className="text-center rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-10 md:p-14">
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-                        <Shield className="w-7 h-7 text-emerald-400" />
+                <div className="text-center rounded-2xl border border-white/10 bg-white/[0.02] p-10 md:p-14">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-5">
+                        <Shield className="w-7 h-7 text-white/40" />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-3">Start with Builder, for free</h2>
                     <p className="text-white/40 text-sm font-medium mb-7 max-w-md mx-auto leading-relaxed">
                         Complete your profile, add one proof of work, and get verified automatically. No payment, no waiting.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Link href="/dashboard" className="px-7 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-[13px] tracking-wide transition-all shadow-lg shadow-emerald-500/20">
+                        <Link href="/dashboard" className="px-7 py-3 rounded-xl bg-white text-black font-black text-[13px] tracking-wide transition-all shadow-lg shadow-white/10">
                             Go to Dashboard
                         </Link>
                         <Link href="/create-profile" className="px-7 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 font-bold text-[13px] tracking-wide transition-all">

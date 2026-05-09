@@ -162,7 +162,7 @@ export default function HowItWorksPage() {
                 onClick={() => setShowFullDiagram(false)}
               >
                 <div
-                  className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                  className="relative w-full max-w-6xl bg-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">

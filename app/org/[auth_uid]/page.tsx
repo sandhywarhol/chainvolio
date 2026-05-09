@@ -119,7 +119,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
       <main className="flex-1 w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12 space-y-6">
 
           {/* Hero card */}
-          <div className="relative p-6 md:p-8 rounded-2xl overflow-hidden border border-white/5 bg-[#0a0b0f]">
+          <div className="relative p-6 md:p-8 rounded-2xl overflow-hidden border border-white/5 bg-black">
             <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${accentHex}10 0%, transparent 60%)` }} />
 
             {/* Top-right: verified badge or org type badge */}
@@ -213,7 +213,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
 
           {/* Stats pods */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-[#0a0b0f] border border-white/5 space-y-2">
+            <div className="p-4 rounded-2xl bg-black border border-white/5 space-y-2">
               <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-emerald-500/10">
                 <LayoutDashboard className="w-4 h-4 text-emerald-400" />
               </div>
@@ -222,7 +222,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Hiring Collections</p>
               </div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0a0b0f] border border-white/5 space-y-2">
+            <div className="p-4 rounded-2xl bg-black border border-white/5 space-y-2">
               <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-purple-500/10">
                 <FolderOpen className="w-4 h-4 text-purple-400" />
               </div>

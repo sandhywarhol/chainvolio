@@ -227,7 +227,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
       
       {/* ── 1. Hero Module ────────────────────────────────────────────────────── */}
-      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-[#0a0b0f]">
+      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-black">
         <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${accentHex}10 0%, transparent 60%)` }} />
         
         {profile.isVerified && (
@@ -320,7 +320,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
           <div 
             key={i} 
             onClick={pod.onClick}
-            className={`p-4 rounded-2xl bg-[#0a0b0f] border border-white/5 space-y-2 cursor-pointer hover:border-white/10 hover:bg-white/[0.04] transition-all`}
+            className={`p-4 rounded-2xl bg-black border border-white/5 space-y-2 cursor-pointer hover:border-white/10 hover:bg-white/[0.04] transition-all`}
           >
             <div className={`w-8 h-8 flex items-center justify-center rounded-xl ${pod.bg}`}>
               <pod.icon className={`w-4 h-4 ${pod.col}`} />
@@ -337,7 +337,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 4. Talent Impact (Expertise) ───────────────────────────────────────── */}
       {sortedRoles.length > 0 && (
-        <div className="p-6 rounded-2xl bg-[#0a0b0f] border border-white/5">
+        <div className="p-6 rounded-2xl bg-black border border-white/5">
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-500" /> Talent Impact
           </h2>
@@ -354,7 +354,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 5. Recent Endorsements (List View) ────────────────────────────────── */}
       {sortedEndorsements.length > 0 && (
-        <div className="p-6 rounded-3xl bg-[#0a0b0f] border border-white/5">
+        <div className="p-6 rounded-3xl bg-black border border-white/5">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
                <UserCheck className="w-4 h-4 text-emerald-500" />
@@ -416,7 +416,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 6. Projects & Programs ────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div className="p-6 rounded-3xl bg-[#0a0b0f] border border-white/5">
+        <div className="p-6 rounded-3xl bg-black border border-white/5">
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
             <FolderOpen className="w-4 h-4 text-emerald-400" /> Projects &amp; Programs
           </h2>
@@ -485,7 +485,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
              {distinctRecipients.length > 0 && (
-               <div className="p-6 rounded-3xl bg-[#0a0b0f] border border-white/5 flex flex-col items-start">
+               <div className="p-6 rounded-3xl bg-black border border-white/5 flex flex-col items-start">
                  <div className="flex items-center justify-between mb-6 w-full">
                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Active Members</h2>
                    <Users className="w-4 h-4 text-blue-500" />
@@ -518,7 +518,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
              )}
              
              {sortedRoles.length > 0 && (
-               <div className="p-6 rounded-3xl bg-[#0a0b0f] border border-white/5">
+               <div className="p-6 rounded-3xl bg-black border border-white/5">
                  <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center justify-between">
                    Breakdown
                    <TrendingUp className="w-4 h-4 text-amber-500" />
@@ -549,7 +549,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200" onPointerDown={() => setActiveModal(null)}>
-          <div className="relative w-full max-w-md bg-[#0a0b0f] border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onPointerDown={e => e.stopPropagation()}>
+          <div className="relative w-full max-w-md bg-black border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onPointerDown={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-black text-white flex items-center gap-2">
                 {activeModal === "hiring" && <><Briefcase className="w-5 h-5 text-purple-400" /> Hiring Activity</>}

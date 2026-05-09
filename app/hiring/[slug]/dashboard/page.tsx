@@ -638,7 +638,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
+            <div className="min-h-screen bg-black flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
             </div>
         );
@@ -713,7 +713,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     return (
         <div className="min-h-screen text-slate-200 font-sans antialiased">
             {/* Top Header */}
-            <header className="border-b border-white/5 bg-[#0f0f11]/60 backdrop-blur-md sticky top-0 z-[100]">
+            <header className="border-b border-white/5 bg-black/60 backdrop-blur-md sticky top-0 z-[100]">
                 <div className="max-w-[1600px] mx-auto px-8 h-12 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/" className="flex items-center gap-3 group">
@@ -762,7 +762,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                         { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc, c) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", icon: Briefcase, color: "text-purple-400/80", desc: "Avg. proof volume" },
                         { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-orange-400/80", desc: "Verified partners" }
                     ].map((stat, i) => (
-                        <div key={i} className="bg-[#121215] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">
+                        <div key={i} className="bg-white/[0.02] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">
                             {/* Suble glow */}
                             <div className={`absolute -top-12 -right-12 w-24 h-24 blur-3xl opacity-5 transition-opacity group-hover:opacity-10 ${stat.color.split('-')[1] === 'blue' ? 'bg-blue-500' : stat.color.split('-')[1] === 'emerald' ? 'bg-emerald-500' : stat.color.split('-')[1] === 'purple' ? 'bg-purple-500' : 'bg-orange-500'}`}></div>
 
@@ -813,7 +813,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 )}
 
                 {/* Filters Bar */}
-                <div className="bg-[#121215]/80 backdrop-blur-sm border border-white/[0.04] rounded-2xl p-4 mb-10">
+                <div className="bg-black/80 backdrop-blur-sm border border-white/[0.04] rounded-2xl p-4 mb-10">
                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                         <div className="flex-1 relative group">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
@@ -902,7 +902,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 </div>
 
                 {/* Candidates Table */}
-                <div className="bg-[#121215] border border-white/[0.04] rounded-2xl overflow-hidden min-h-[400px] shadow-2xl relative">
+                <div className="bg-black border border-white/[0.04] rounded-2xl overflow-hidden min-h-[400px] shadow-2xl relative">
                     <table className="w-full text-left border-separate border-spacing-0">
                         <thead>
                             <tr className="bg-white/[0.01]">
@@ -1074,7 +1074,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                         </tr>
 
                                         {expandedId === candidate.id && (
-                                            <tr className="bg-[#0c0c0e]/50 backdrop-blur-sm">
+                                            <tr className="bg-black/50 backdrop-blur-sm">
                                                 <td colSpan={7} className="px-12 py-12 border-l-[3px] border-indigo-500/50 relative overflow-hidden">
                                                     {/* Background Pattern */}
                                                     <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>

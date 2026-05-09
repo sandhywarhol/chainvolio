@@ -343,7 +343,7 @@ export default function DashboardPage() {
                             setIsRenewal(false);
                             setShowVerificationModal(true);
                           }}
-                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-[10px] md:text-sm font-medium transition-colors border border-teal-500/20 flex items-center gap-1.5 md:gap-2"
+                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 text-[10px] md:text-sm font-medium transition-colors border border-emerald-500/20 flex items-center gap-1.5 md:gap-2"
                         >
                           <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Verify
                         </button>
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                             setIsRenewal(false);
                             setShowVerificationModal(true);
                           }}
-                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] md:text-sm font-medium transition-all border border-amber-500/20 flex items-center gap-1.5 md:gap-2 shadow-[0_0_15px_rgba(245,158,11,0.08)] active:scale-95"
+                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-500/5 hover:bg-amber-500/10 text-amber-300 text-[10px] md:text-sm font-medium transition-all border border-amber-500/20 flex items-center gap-1.5 md:gap-2 shadow-[0_0_15px_rgba(245,158,11,0.05)] active:scale-95"
                         >
                           <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Upgrade
                         </button>
@@ -371,14 +371,14 @@ export default function DashboardPage() {
                   {/* Profile Identity (Role/Organization) */}
                   {profile?.role ? (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="text-lg font-medium text-emerald-400">
+                      <span className="text-lg font-medium text-emerald-300">
                         {profile?.role}
                         {profile?.organization && <span className="text-slate-500 font-normal"> at {profile?.organization}</span>}
                       </span>
                     </div>
                   ) : profile?.organization ? (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="text-lg font-medium text-emerald-400">
+                      <span className="text-lg font-medium text-emerald-300">
                         {profile?.organization}
                       </span>
                     </div>
@@ -386,17 +386,17 @@ export default function DashboardPage() {
 
                   {/* Profile Completion Progress Indicator */}
                   {profile && profile.completionPercentage < 100 && (
-                    <div className="mt-2 mb-8 p-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl space-y-3 max-w-sm mx-auto md:mx-0">
+                    <div className="mt-2 mb-8 p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-3 max-w-sm mx-auto md:mx-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Profile Completion</span>
                         </div>
-                        <span className="text-[10px] font-black text-emerald-400">{profile.completionPercentage}%</span>
+                         <span className="text-[10px] font-black text-emerald-300">{profile.completionPercentage}%</span>
                       </div>
-                      <div className="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                      <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-gradient-to-r from-emerald-500/40 to-emerald-400 rounded-full transition-all duration-1000 ease-out" 
+                          className="h-full bg-emerald-400 rounded-full transition-all duration-1000 ease-out" 
                           style={{ width: `${profile.completionPercentage}%` }}
                         />
                       </div>
@@ -410,7 +410,7 @@ export default function DashboardPage() {
 
                   {profile.lookingFor && (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center gap-1.5">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 text-xs font-medium flex items-center gap-1.5">
                         <Briefcase className="w-3.5 h-3.5" />
                         {profile.lookingFor}
                       </span>
@@ -489,7 +489,7 @@ export default function DashboardPage() {
                         href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/20 transition-all"
+                        className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/5 hover:border-emerald-500/20 transition-all"
                         title="Website"
                       >
                         <Globe className="w-3.5 h-3.5" />

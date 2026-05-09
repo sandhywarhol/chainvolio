@@ -130,8 +130,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     if (error && !collection) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
-                <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6">
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
                     <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <AlertCircle className="w-8 h-8 text-red-500" />
                     </div>
@@ -147,7 +147,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30">
-            <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-[#0a0a0b]/40 backdrop-blur-md sticky top-0 z-50">
+            <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
                 <Link href="/" className="flex items-center gap-2 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
                     <span className="text-xl font-bold tracking-tight text-white">ChainVolio</span>
@@ -575,7 +575,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         {existingSubmission && (
                             <div 
                               id="application-status"
-                              className="bg-[#121214] border border-white/5 rounded-3xl p-8 text-left space-y-6 max-w-lg mx-auto scroll-mt-24 transition-all duration-1000"
+                              className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 text-left space-y-6 max-w-lg mx-auto scroll-mt-24 transition-all duration-1000"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">

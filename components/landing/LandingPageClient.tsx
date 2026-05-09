@@ -7,8 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import ProblemVideoCard from "./ProblemVideoCard";
-
 // Dynamic imports for heavy components to improve LCP and initial bundle size
 const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), { 
     ssr: false,
@@ -16,6 +14,8 @@ const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), {
 });
 const SimpleDiagram = dynamic(() => import("./SimpleDiagram"), { ssr: false });
 const CompetitiveNetworkDiagram = dynamic(() => import("./CompetitiveNetworkDiagram"), { ssr: false });
+const ProblemDiagram = dynamic(() => import("./ProblemDiagram"), { ssr: false });
+
 import {
     ArrowRight,
     CheckCircle2,
@@ -44,7 +44,11 @@ import {
     Mail,
     BadgeCheck,
     Star,
-    Check
+    Check,
+    HelpCircle,
+    LayoutGrid,
+    FileQuestion,
+    Activity
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -1163,10 +1167,17 @@ export function LandingPageClient() {
     }, [publicKey, connected]);
 
     useEffect(() => {
-        fetch('/api/logos')
-            .then(r => r.json())
-            .then(data => setPartners(data))
-            .catch(err => console.error('Error fetching logos:', err));
+        const fetchLogos = () => {
+            fetch('/api/logos')
+                .then(r => r.json())
+                .then(data => setPartners(data))
+                .catch(err => console.error('Error fetching logos:', err));
+        };
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            (window as any).requestIdleCallback(fetchLogos, { timeout: 2000 });
+        } else {
+            setTimeout(fetchLogos, 300);
+        }
     }, []);
 
     return (
@@ -1315,6 +1326,8 @@ export function LandingPageClient() {
                                         <img
                                             src={partner.src}
                                             alt={partner.name}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="h-5 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
                                             style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
                                         />
@@ -1334,89 +1347,85 @@ export function LandingPageClient() {
                     {/* Extended Smooth Transitions to reach the image slides */}
                     <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="text-center mb-8 md:mb-12 space-y-4">
-                            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-4 group transition-all hover:border-red-500/20 hover:bg-red-500/[0.02] mx-auto">
-                                <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent opacity-80">
-                                    The problem
-                                </span>
+                        <div className="text-center mb-10 md:mb-14 space-y-6">
+                            {/* Pill Badge - Simplified as per reference */}
+                            <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-amber-200/60 uppercase">The problem</span>
                             </div>
-                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+
+                            <p className="text-sm md:text-base font-medium text-white/40 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
-                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight leading-[1.06] text-white">
-                                Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
+                            
+                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-nowrap">
+                                Your work is real. <span className="text-white/[0.15]">Your proof isn&apos;t.</span>
                             </h2>
-                            <div className="h-0.5 w-full bg-white/15" />
-                            <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-4xl mx-auto">
+
+                            {/* Thin horizontal line - Full width as per reference */}
+                            <div className="h-px w-full bg-white/[0.08] mt-8" />
+
+                            <p className="text-white/40 text-[13px] md:text-base font-normal max-w-3xl mx-auto mt-6">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
-                            
                         </div>
 
-                        <div className="relative max-w-5xl mx-auto group/carousel overflow-hidden px-4 sm:px-0">
-                            <motion.div 
-                                className="flex md:grid md:grid-cols-3 w-full"
-                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
-                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
-                                onAnimationComplete={onAnimationComplete}
-                                drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.7}
-                                onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -30) handleProblemLoop(problemIdx + 1);
-                                    else if (info.offset.x > 30) handleProblemLoop(problemIdx - 1);
-                                }}
-                            >
-                                {clonedProblems.map((prob, i) => (
-                                    <div 
-                                        key={`${prob.id}-${i}`} 
-                                        className={`w-[85vw] md:w-auto flex-shrink-0 space-y-3 md:space-y-12 group transition-all duration-300 px-2 md:px-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''} ${
-                                            prob.id === 0 ? 'md:pr-12 md:pb-0' : 
-                                            prob.id === 1 ? 'md:px-12 md:border-l border-white/[0.05] md:pt-0 md:pb-0' : 
-                                            'md:pl-12 md:border-l border-white/[0.05] md:pt-0'
-                                        }`}
-                                    >
-                                        <ProblemVideoCard
-                                            idleSrc={
-                                                prob.id === 0 ? "/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Idle.mp4?v=12" :
-                                                prob.id === 1 ? "/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Idle.mp4?v=4" :
-                                                "/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Idle.mp4?v=4"
-                                            }
-                                            hoverSrc={
-                                                prob.id === 0 ? "/homepage/The%20Problem%20Asset/Broken%20Work%20History%20Mouse%20Click.mp4?v=6" :
-                                                prob.id === 1 ? "/homepage/The%20Problem%20Asset/Unverifiable%20Resumes%20Mouse%20Click.mp4?v=4" :
-                                                "/homepage/The%20Problem%20Asset/Signal%20Lost%20in%20Noise%20Mouse%20Click.mp4?v=4"
-                                            }
-                                        />
-                                        <div className="space-y-4 text-center">
-                                            <h3 className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent font-bold text-[15px] md:text-xl">
-                                                {prob.id === 0 ? "Broken Work History" : prob.id === 1 ? "Unverifiable Resumes" : "Signal Lost in Noise"}
-                                            </h3>
-                                            <p className="text-white/40 text-[12px] md:text-base leading-relaxed">
-                                                {prob.id === 0 ? "Your experience is scattered across PDFs, portfolios, and links. No single source of truth." :
-                                                 prob.id === 1 ? "Without verifiable data, resumes become claims, not proof." :
-                                                 "Real talent gets buried. Hiring becomes guesswork."}
-                                            </p>
+                        {/* NEW ANIMATED PROBLEM DIAGRAM */}
+                        <div className="relative w-full max-w-6xl mx-auto mb-10">
+                            <ProblemDiagram />
+                        </div>
+
+                        {/* BENTO CARDS SECTION - Minimal Editorial Style */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20 max-w-6xl mx-auto px-4 sm:px-0 mt-14 pb-12">
+                            {[
+                                {
+                                    id: "01",
+                                    title: "Scattered Identity",
+                                    desc: "Your work is spread across platforms, files, and chats. No single source of truth.",
+                                    icon: LayoutGrid
+                                },
+                                {
+                                    id: "02",
+                                    title: "Unverifiable Claims",
+                                    desc: "Without verifiable data, resumes become claims, not proof.",
+                                    icon: FileQuestion
+                                },
+                                {
+                                    id: "03",
+                                    title: "Lost in Noise",
+                                    desc: "Real talent gets buried. Hiring becomes slow, biased, and unreliable.",
+                                    icon: Activity
+                                }
+                            ].map((item, idx) => (
+                                <div key={item.id} className="relative group">
+                                    <div className="flex items-start gap-6">
+                                        {/* Icon Square */}
+                                        <div className="w-16 h-16 rounded-2xl bg-[#0c0c0c] border border-white/[0.08] flex items-center justify-center flex-shrink-0 group-hover:border-amber-200/30 group-hover:bg-amber-200/[0.02] transition-all duration-500">
+                                            <item.icon size={24} className="text-white/40 group-hover:text-amber-200/60 transition-colors duration-500" />
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-black text-amber-200/60 tracking-widest">{item.id}</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-xl font-bold text-white/90 group-hover:text-white transition-colors">{item.title}</h3>
+                                                <p className="text-[13px] text-white/30 leading-relaxed group-hover:text-white/50 transition-colors">
+                                                    {item.desc}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
-                            </motion.div>
+                                    
+                                    {/* Vertical Separator */}
+                                    {idx < 2 && (
+                                        <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/[0.05]" />
+                                    )}
+                                </div>
+                            ))}
 
-                            {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
-                                {[0, 1, 2].map((i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleProblemLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${
-                                            (problemIdx === i + 1 || (i === 2 && problemIdx === 0) || (i === 0 && problemIdx === 4)) 
-                                                ? "w-8 bg-white" 
-                                                : "w-1.5 bg-white/20"
-                                        }`}
-                                    />
-                                ))}
-                            </div>
                         </div>
+
+
                     </div>
                 </section>
 

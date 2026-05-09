@@ -40,7 +40,7 @@ export default function VerifiedOrganizationPage() {
 
             {/* HERO SECTION */}
             <section className="relative z-10 pt-32 pb-20 px-4 md:px-8 max-w-[1240px] mx-auto w-full">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-emerald-500/5 blur-[120px] pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-white/[0.01] blur-[120px] pointer-events-none" />
 
                 <div className="relative z-10 space-y-8 max-w-3xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest">
@@ -49,7 +49,7 @@ export default function VerifiedOrganizationPage() {
                     </div>
 
                     <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[0.95]">
-                        Verified <span className="text-emerald-400">Organization</span>
+                        Verified <span className="text-white/20">Organization</span>
                     </h1>
 
                     <p className="text-sm md:text-xl text-white/50 leading-relaxed font-normal tracking-tight">
@@ -128,7 +128,7 @@ export default function VerifiedOrganizationPage() {
                     ].map((benefit, i) => (
                         <div key={i} className="p-6 md:p-10 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-emerald-500/10 transition-all">
+                            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-white/10 transition-all">
                                 {benefit.icon}
                             </div>
                             <h3 className="text-xl font-bold mb-6 tracking-tight">{benefit.title}</h3>
@@ -144,10 +144,10 @@ export default function VerifiedOrganizationPage() {
                     ))}
                 </div>
 
-                <div className="mt-20 p-6 md:p-12 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10 text-center relative overflow-hidden group">
+                <div className="mt-20 p-6 md:p-12 rounded-2xl bg-white/[0.02] border border-white/10 text-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     <p className="text-2xl md:text-3xl font-normal text-white italic tracking-tight relative z-10">
-                        "Companies don't pay to give attestations - they pay to become <span className="text-emerald-400 font-bold not-italic">trusted issuers</span>."
+                        "Companies don't pay to give attestations - they pay to become <span className="text-white font-bold not-italic">trusted issuers</span>."
                     </p>
                 </div>
             </section>
@@ -172,7 +172,7 @@ export default function VerifiedOrganizationPage() {
                         </div>
                     </div>
 
-                    <div className="p-6 md:p-10 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 relative overflow-hidden group">
+                    <div className="p-6 md:p-10 rounded-2xl bg-white/[0.02] border border-white/5 relative overflow-hidden group">
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/20 blur-[100px] group-hover:bg-emerald-500/40 transition-all duration-700" />
                         <h3 className="text-2xl font-bold mb-6">How Verification Works</h3>
                         <div className="space-y-8 relative z-10">
@@ -207,7 +207,7 @@ export default function VerifiedOrganizationPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                         <Link 
                             href="/dashboard?tab=organization" 
-                            className="px-10 py-5 bg-white text-slate-950 font-black rounded-2xl hover:bg-emerald-50 transition-all shadow-2xl shadow-white/10 uppercase tracking-widest text-xs flex items-center gap-3"
+                            className="px-10 py-5 bg-white text-slate-950 font-black rounded-2xl hover:bg-white/90 transition-all shadow-2xl shadow-white/10 uppercase tracking-widest text-xs flex items-center gap-3"
                         >
                             Upgrade to Verified <ArrowRight className="w-4 h-4" />
                         </Link>

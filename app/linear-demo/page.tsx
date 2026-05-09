@@ -14,7 +14,7 @@ export default function LinearStyleHomepage() {
     }, []);
 
     return (
-        <div className="bg-[#000212] min-h-screen text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+        <div className="bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
             {/* Linear Style Background: Ambient Glows */}
             <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full"></div>
@@ -23,7 +23,7 @@ export default function LinearStyleHomepage() {
 
             {/* Navbar (Linear Style) */}
             <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-                scrolled ? "bg-[#000212]/80 backdrop-blur-md border-b border-white/[0.08] py-3" : "bg-transparent py-5"
+                scrolled ? "bg-black/80 backdrop-blur-md border-b border-white/[0.08] py-3" : "bg-transparent py-5"
             }`}>
                 <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
                     <div className="flex items-center gap-10">
@@ -79,7 +79,7 @@ export default function LinearStyleHomepage() {
                 {/* Hero Visual (Linear Style Dashboard Mockup) */}
                 <div className="max-w-[1200px] mx-auto mt-24 relative px-4 group">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#000212] via-transparent to-transparent z-10 h-full"></div>
-                    <div className="relative bg-[#050505] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl shadow-indigo-500/5 group-hover:border-white/20 transition-all duration-700">
+                    <div className="relative bg-black border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl shadow-indigo-500/5 group-hover:border-white/20 transition-all duration-700">
                         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.05] bg-white/[0.02]">
                             <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
                             <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>

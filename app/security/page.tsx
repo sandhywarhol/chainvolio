@@ -245,7 +245,7 @@ export default function SecurityPage() {
             {/* Modal for PDF Notice */}
             {showPdfNotice && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-8 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-[#0a0a0b] border border-white/10 p-10 rounded-[32px] max-w-md w-full relative">
+                    <div className="bg-black border border-white/10 p-10 rounded-[32px] max-w-md w-full relative">
                         <button
                             onClick={() => setShowPdfNotice(false)}
                             className="absolute top-6 right-6 p-2 rounded-xl hover:bg-white/5 transition-colors text-white/40 hover:text-white font-bold text-xl"

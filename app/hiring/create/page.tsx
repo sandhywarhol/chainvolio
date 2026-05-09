@@ -323,7 +323,7 @@ export default function CreateCollection() {
                         )}
 
                             {/* Main Info Card */}
-                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
+                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
                                 <div className="space-y-6">
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Job Position</label>
@@ -350,7 +350,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* Recruiter Identity Card */}
-                            <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl space-y-8">
+                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl space-y-8">
                                 <div className="flex items-center gap-3 pb-2 border-b border-white/5">
                                     <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                                         <Building2 className="w-5 h-5" />
@@ -519,7 +519,7 @@ export default function CreateCollection() {
                                     <Briefcase className="w-4 h-4 text-blue-500" /> Role Details
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Role Type</label>
                                         <div className="relative">
                                             <select
@@ -537,7 +537,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Work Mode</label>
                                         <div className="relative">
                                             <select
@@ -553,7 +553,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Timezone</label>
                                         <div className="relative">
                                             <select
@@ -570,7 +570,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Experience</label>
                                         <div className="relative">
                                             <select
@@ -587,7 +587,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs text-nowrap">Comp. Model</label>
                                         <div className="relative">
                                             <select
@@ -605,7 +605,7 @@ export default function CreateCollection() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#121214] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 group focus-within:border-blue-500/30 transition-colors">
                                         <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 group-focus-within:text-blue-400 text-xs">Salary</label>
                                         <div className="relative">
                                             <input
@@ -759,7 +759,7 @@ export default function CreateCollection() {
 
                             {/* Config Row: Deadline & Visibility */}
                             <div className="pt-8 border-t border-white/5 relative">
-                                <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0a0a0b] px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Final Configuration</span>
+                                <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Final Configuration</span>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Submission Deadline</label>
