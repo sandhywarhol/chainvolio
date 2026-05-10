@@ -22,9 +22,9 @@ export function AppBackground() {
                 </video>
                 
                 {/* Dark Overlays for depth and readability */}
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/60" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+                <div className="absolute inset-0 bg-black/70" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black/70" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
             </div>
 
             {/* Subtle Texture Overlay (Noise) */}
