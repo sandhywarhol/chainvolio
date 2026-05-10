@@ -10,7 +10,11 @@ export async function POST(request: Request) {
     const rawBody = await request.arrayBuffer();
     const body = Buffer.from(rawBody);
     const sig = request.headers.get("stripe-signature") ?? "";
-    const secret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+    const secret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!secret) {
+        console.error("STRIPE_WEBHOOK_SECRET is not configured");
+        return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+    }
 
     let event: Stripe.Event;
     try {
