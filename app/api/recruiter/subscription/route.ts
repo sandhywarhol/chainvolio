@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
-import { getEffectiveLimits } from "@/lib/stripePlans";
-import type { StripePlanName } from "@/lib/stripePlans";
+import { getEffectiveLimits } from "@/lib/plans";
+import type { PlanName } from "@/lib/plans";
 
 const err = (code: string, message: string, status = 400) =>
     NextResponse.json({ ok: false, error: { code, message } }, { status });
@@ -23,14 +23,14 @@ export async function GET(request: Request) {
 
     if (!orgAccount) return err("ERR_NOT_FOUND", "Org account not found", 404);
 
-    const plan = (orgAccount.plan_name ?? "free") as StripePlanName;
+    const plan = (orgAccount.plan_name ?? "free") as PlanName;
     const status = orgAccount.subscription_status ?? "free";
     const isExpired = orgAccount.current_period_end
         ? new Date(orgAccount.current_period_end) < new Date()
         : false;
 
     // If subscription is expired but status wasn't updated by webhook yet, treat as free
-    const effectivePlan: StripePlanName = (status === "canceled" || isExpired) ? "free" : plan;
+    const effectivePlan: PlanName = (status === "canceled" || isExpired) ? "free" : plan;
     const limits = getEffectiveLimits(effectivePlan, false); // isOrgVerified = false (Google-only path)
 
     // Count collections for this org account

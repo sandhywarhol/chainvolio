@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, Users, Building, Wrench, X, Building2, Briefcase,
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-import type { StripePlanName } from "@/lib/stripePlans";
+import type { PlanName } from "@/lib/plans";
 
 const C = {
     slate: { text: "text-slate-400", bg: "bg-slate-500/10", border: "border-slate-500/20", bar: "bg-slate-500", glow: "shadow-slate-500/20", hex: "#64748b" },
@@ -19,7 +19,7 @@ type CK = keyof typeof C;
 
 const TIERS = [
     {
-        id: "free" as StripePlanName,
+        id: "free" as PlanName,
         colorKey: "slate" as CK,
         Icon: Building2,
         label: "Free",
@@ -38,7 +38,7 @@ const TIERS = [
         ],
     },
     {
-        id: "community" as StripePlanName,
+        id: "community" as PlanName,
         colorKey: "blue" as CK,
         Icon: Users,
         label: "Community / DAO",
@@ -58,7 +58,7 @@ const TIERS = [
         ],
     },
     {
-        id: "company" as StripePlanName,
+        id: "company" as PlanName,
         colorKey: "amber" as CK,
         Icon: Building,
         label: "Company / Org",
@@ -174,7 +174,7 @@ export default function RecruiterPricingPage() {
     const { orgAccount } = useGoogleAuth();
     const [showMaintenance, setShowMaintenance] = useState(false);
 
-    const currentPlan = (orgAccount?.plan_name ?? "free") as StripePlanName;
+    const currentPlan = (orgAccount?.plan_name ?? "free") as PlanName;
     const colKeys: CK[] = ["slate", "blue", "amber"];
 
     return (

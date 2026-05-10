@@ -30,8 +30,8 @@ import { Toast } from "@/components/ui/Toast";
 import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { OrgProjectForm, type OrgProject } from "@/components/org/OrgProjectForm";
 import { getBadgeStyles, getAttestationQuota, getHiringLimit, normalizeTier } from "@/lib/paymentConfig";
-import { getEffectiveLimits, getPlanBadgeStyle } from "@/lib/stripePlans";
-import type { StripePlanName } from "@/lib/stripePlans";
+import { getEffectiveLimits, getPlanBadgeStyle } from "@/lib/plans";
+import type { PlanName } from "@/lib/plans";
 import { format } from "date-fns";
 import type { OrgAccount } from "@/hooks/useGoogleAuth";
 
@@ -96,7 +96,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const [projects, setProjects] = useState<OrgProject[]>([]);
   const [showProjectForm, setShowProjectForm] = useState(false);
 
-  const [managingSubscription, setManagingSubscription] = useState(false);
+  const [managingSubscription] = useState(false);
 
   // Wallet linking state (Google org users only)
   const { publicKey } = useWallet();
@@ -157,36 +157,19 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const orgLabel = isCommunity ? "Community" : "Organization";
 
   // Subscription helpers (Google-only path)
-  const planName = (googleOrgAccount?.plan_name ?? "free") as StripePlanName;
+  const planName = (googleOrgAccount?.plan_name ?? "free") as PlanName;
   const subStatus = googleOrgAccount?.subscription_status ?? "free";
   const isPastDue = subStatus === "past_due";
   const isExpired = googleOrgAccount?.current_period_end
     ? new Date(googleOrgAccount.current_period_end) < new Date()
     : false;
-  const effectivePlan: StripePlanName = (subStatus === "canceled" || isExpired) ? "free" : planName;
+  const effectivePlan: PlanName = (subStatus === "canceled" || isExpired) ? "free" : planName;
   const planLimits = getEffectiveLimits(effectivePlan, false);
   const planBadge = getPlanBadgeStyle(effectivePlan);
   const isPaidPlan = effectivePlan !== "free";
 
-  const handleManageSubscription = async () => {
-    if (!accessToken) return;
-    setManagingSubscription(true);
-    try {
-      const res = await fetch("/api/stripe/create-portal-session", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const data = await res.json();
-      if (data.ok && data.url) {
-        window.location.href = data.url;
-      } else {
-        setToastMessage(data.error?.message ?? "Billing management is currently under maintenance. Please try again later.");
-      }
-    } catch {
-      setToastMessage("Something went wrong. Please try again.");
-    } finally {
-      setManagingSubscription(false);
-    }
+  const handleManageSubscription = () => {
+    setToastMessage("Payment management is coming soon. Contact us to upgrade your plan.");
   };
 
   // Fetch projects
