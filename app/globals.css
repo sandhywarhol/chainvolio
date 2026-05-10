@@ -2,6 +2,177 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   THEME: CSS VARIABLES
+   html.dark  = dark mode (default)
+   html:not(.dark) = light mode
+   [data-preserve-dark] = subtree forced dark regardless of theme
+═══════════════════════════════════════════════════════════════ */
+
+:root {
+    --theme-bg: #ffffff;
+    --theme-bg-subtle: rgba(0,0,0,0.018);
+    --theme-text: #0a0a0a;
+    --theme-text-secondary: rgba(0,0,0,0.55);
+    --theme-text-muted: rgba(0,0,0,0.38);
+    --theme-text-faint: rgba(0,0,0,0.18);
+    --theme-border: rgba(0,0,0,0.07);
+    --theme-accent: #0d9488;       /* teal-600 */
+    --theme-accent-hover: #0f766e; /* teal-700 */
+}
+
+html.dark {
+    --theme-bg: #000000;
+    --theme-bg-subtle: rgba(255,255,255,0.02);
+    --theme-text: #ffffff;
+    --theme-text-secondary: rgba(255,255,255,0.6);
+    --theme-text-muted: rgba(255,255,255,0.4);
+    --theme-text-faint: rgba(255,255,255,0.15);
+    --theme-border: rgba(255,255,255,0.08);
+    --theme-accent: #f59e0b;       /* amber-500 */
+    --theme-accent-hover: #d97706; /* amber-600 */
+}
+
+/* ─── LIGHT MODE: BULK OVERRIDES ────────────────────────────────
+   :not([data-preserve-dark], [data-preserve-dark] *) excludes
+   UI card mockups that must stay dark in light mode.
+──────────────────────────────────────────────────────────────── */
+
+/* Base */
+html:not(.dark) body {
+    background-color: #ffffff;
+    color: #0a0a0a;
+}
+
+/* Page / section backgrounds */
+html:not(.dark) .bg-black:not([data-preserve-dark], [data-preserve-dark] *) {
+    background-color: #ffffff !important;
+}
+
+/* Near-black hex card backgrounds used in section wrappers */
+html:not(.dark) .bg-\[\#0c0c0c\]:not([data-preserve-dark], [data-preserve-dark] *),
+html:not(.dark) .bg-\[\#0a0a0b\]:not([data-preserve-dark], [data-preserve-dark] *),
+html:not(.dark) .bg-\[\#0a0a0f\]:not([data-preserve-dark], [data-preserve-dark] *),
+html:not(.dark) .bg-\[\#080808\]:not([data-preserve-dark], [data-preserve-dark] *) {
+    background-color: #f8f8f8 !important;
+}
+
+/* White text → dark */
+html:not(.dark) .text-white:not([data-preserve-dark], [data-preserve-dark] *) {
+    color: #0a0a0a !important;
+}
+html:not(.dark) .text-white\/90:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.9) !important; }
+html:not(.dark) .text-white\/80:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.8) !important; }
+html:not(.dark) .text-white\/70:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.7) !important; }
+html:not(.dark) .text-white\/60:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.55) !important; }
+html:not(.dark) .text-white\/50:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.45) !important; }
+html:not(.dark) .text-white\/40:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.38) !important; }
+html:not(.dark) .text-white\/30:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.28) !important; }
+html:not(.dark) .text-white\/20:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.18) !important; }
+html:not(.dark) .text-white\/\[0\.15\]:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.12) !important; }
+html:not(.dark) .text-white\/10:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.08) !important; }
+
+/* Borders: white opacity → black opacity */
+html:not(.dark) .border-white\/\[0\.08\]:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.07) !important; }
+html:not(.dark) .border-white\/\[0\.07\]:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.06) !important; }
+html:not(.dark) .border-white\/10:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.08) !important; }
+html:not(.dark) .border-white\/\[0\.05\]:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.05) !important; }
+html:not(.dark) .border-white\/5:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.05) !important; }
+html:not(.dark) .border-white\/20:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.12) !important; }
+html:not(.dark) .border-white\/15:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.09) !important; }
+html:not(.dark) .border-white\/\[0\.03\]:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.03) !important; }
+
+/* Card / overlay backgrounds: white-on-dark → black-on-white */
+html:not(.dark) .bg-white\/\[0\.02\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.018) !important; }
+html:not(.dark) .bg-white\/\[0\.03\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.025) !important; }
+html:not(.dark) .bg-white\/\[0\.04\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.03) !important; }
+html:not(.dark) .bg-white\/\[0\.05\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.035) !important; }
+html:not(.dark) .bg-white\/\[0\.06\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.04) !important; }
+html:not(.dark) .bg-white\/5:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.03) !important; }
+html:not(.dark) .bg-white\/10:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.06) !important; }
+html:not(.dark) .bg-white\/20:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.1) !important; }
+html:not(.dark) .bg-white\/\[0\.08\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.055) !important; }
+
+/* black-opacity modal overlays */
+html:not(.dark) .bg-black\/80:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(248,248,248,0.96) !important; }
+html:not(.dark) .bg-black\/60:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(248,248,248,0.7) !important; }
+html:not(.dark) .bg-black\/40:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(248,248,248,0.5) !important; }
+
+/* Amber accent → Teal in light mode */
+html:not(.dark) .text-amber-500:not([data-preserve-dark], [data-preserve-dark] *)  { color: #0d9488 !important; }
+html:not(.dark) .text-amber-400:not([data-preserve-dark], [data-preserve-dark] *)  { color: #0d9488 !important; }
+html:not(.dark) .text-amber-200\/60:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(13,148,136,0.7) !important; }
+html:not(.dark) .text-amber-400\/60:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(13,148,136,0.7) !important; }
+html:not(.dark) .text-amber-400\/40:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(13,148,136,0.5) !important; }
+html:not(.dark) .bg-amber-400\/60:not([data-preserve-dark], [data-preserve-dark] *)  { background-color: rgba(13,148,136,0.6) !important; }
+html:not(.dark) .bg-amber-500\/\[0\.04\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(13,148,136,0.04) !important; }
+html:not(.dark) .bg-amber-500\/\[0\.02\]:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(13,148,136,0.02) !important; }
+html:not(.dark) .border-amber-500\/20:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(13,148,136,0.2) !important; }
+html:not(.dark) .border-amber-500\/30:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(13,148,136,0.3) !important; }
+html:not(.dark) .hover\:text-amber-400:hover:not([data-preserve-dark], [data-preserve-dark] *) { color: #0d9488 !important; }
+html:not(.dark) .hover\:border-amber-500\/20:hover:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(13,148,136,0.2) !important; }
+html:not(.dark) .hover\:bg-amber-500\/\[0\.02\]:hover:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(13,148,136,0.02) !important; }
+html:not(.dark) .hover\:bg-amber-500\/\[0\.08\]:hover:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(13,148,136,0.08) !important; }
+
+/* Orange badge → teal in light */
+html:not(.dark) .text-orange-500\/80:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(13,148,136,0.8) !important; }
+
+/* Gradient separators (via-white/*) */
+html:not(.dark) .via-white\/20:not([data-preserve-dark], [data-preserve-dark] *) {
+    --tw-gradient-stops: var(--tw-gradient-from), rgba(0,0,0,0.12) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+html:not(.dark) .via-white\/10:not([data-preserve-dark], [data-preserve-dark] *) {
+    --tw-gradient-stops: var(--tw-gradient-from), rgba(0,0,0,0.07) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Gradient masking overlays — invert black→white for section fades */
+html:not(.dark) .from-black:not([data-preserve-dark], [data-preserve-dark] *) {
+    --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(255 255 255 / 0)) !important;
+}
+html:not(.dark) .via-black\/80:not([data-preserve-dark], [data-preserve-dark] *) {
+    --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,0.8) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+html:not(.dark) .via-black\/40:not([data-preserve-dark], [data-preserve-dark] *) {
+    --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,0.4) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Slate/gray overrides */
+html:not(.dark) .text-slate-500:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.38) !important; }
+html:not(.dark) .text-slate-400:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.45) !important; }
+
+/* hover state: bg-white → slightly dark tint in light */
+html:not(.dark) .hover\:bg-white\/\[0\.08\]:hover:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.05) !important; }
+html:not(.dark) .hover\:bg-white\/\[0\.04\]:hover:not([data-preserve-dark], [data-preserve-dark] *) { background-color: rgba(0,0,0,0.03) !important; }
+html:not(.dark) .hover\:border-white\/20:hover:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.12) !important; }
+html:not(.dark) .hover\:text-white:hover:not([data-preserve-dark], [data-preserve-dark] *) { color: #0a0a0a !important; }
+html:not(.dark) .hover\:text-white\/80:hover:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.8) !important; }
+html:not(.dark) .hover\:text-white\/60:hover:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.55) !important; }
+
+/* group-hover propagation */
+html:not(.dark) .group-hover\:text-white:not([data-preserve-dark], [data-preserve-dark] *) { color: #0a0a0a !important; }
+html:not(.dark) .group-hover\:text-white\/60:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.55) !important; }
+html:not(.dark) .group-hover\:text-white\/50:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(0,0,0,0.45) !important; }
+html:not(.dark) .group-hover\:border-white\/15:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(0,0,0,0.09) !important; }
+html:not(.dark) .group-hover\:border-amber-500\/30:not([data-preserve-dark], [data-preserve-dark] *) { border-color: rgba(13,148,136,0.3) !important; }
+html:not(.dark) .group-hover\:text-amber-500\/60:not([data-preserve-dark], [data-preserve-dark] *) { color: rgba(13,148,136,0.7) !important; }
+
+/* Typography classes in globals that hardcode color */
+html:not(.dark) .text-h1, html:not(.dark) .text-h2, html:not(.dark) .text-h3 {
+    color: #0a0a0a !important;
+}
+
+/* Selection color in light mode */
+html:not(.dark) .selection\:bg-amber-500\/20 ::selection { background-color: rgba(13,148,136,0.15); }
+
+/* Scrollbar */
+html:not(.dark) .custom-scrollbar::-webkit-scrollbar-track { background-color: rgba(0,0,0,0.04); }
+html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); }
+
+/* Wallet adapter overrides in light mode */
+html:not(.dark) .wallet-adapter-dropdown-list-item { color: rgba(0,0,0,0.5) !important; }
+html:not(.dark) .wallet-adapter-dropdown-list-item:hover { color: #0a0a0a !important; }
+
 @layer base {
   @media (max-width: 767px) {
     html, body {

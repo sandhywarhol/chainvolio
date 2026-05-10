@@ -56,6 +56,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { Web3ResumeSection } from "./Web3ResumeSection";
+import { useTheme } from "next-themes";
 
 // --- Interactive Verifiable Work History Flow (3D Chip Style) ---
 function VerifiableWorkHistoryFlow() {
@@ -515,6 +516,8 @@ function PublicVerifyCard() {
 
 // Block 1 — stateful wrapper so hover on left controls active card on right
 function AttestationBlock() {
+    const { resolvedTheme } = useTheme();
+    const isLight = resolvedTheme === "light";
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -562,7 +565,7 @@ function AttestationBlock() {
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Proof of work,<br /><span className="text-white/30">not claims.</span>
+                        Proof of work,<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>not claims.</span>
                     </h3>
                     <div className="h-0.5 w-full bg-white/15" />
                     <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
@@ -603,8 +606,8 @@ function AttestationBlock() {
                 </div>
             </div>
 
-            {/* Right — Linear-style horizontal carousel */}
-            <div className="flex flex-col gap-8">
+            {/* Right — Linear-style horizontal carousel (preserved dark in light mode) */}
+            <div data-preserve-dark className="flex flex-col gap-8">
                 <div className="relative overflow-hidden" style={{ height: "560px" }}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
@@ -630,15 +633,13 @@ function AttestationBlock() {
                         );
                     })}
 
-                    {/* Left edge fade */}
+                    {/* Edge fades — these are inside data-preserve-dark so always black */}
                     <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
-                    {/* Right edge fade */}
+                        style={{ background: "linear-gradient(to right, #0a0a0a 20%, transparent)" }} />
                     <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
-                    {/* Bottom fade */}
+                        style={{ background: "linear-gradient(to left, #0a0a0a 20%, transparent)" }} />
                     <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to top, black 30%, transparent)" }} />
+                        style={{ background: "linear-gradient(to top, #0a0a0a 30%, transparent)" }} />
 
                     {/* Dot indicators */}
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
@@ -952,6 +953,8 @@ function RecruiterDashboardPreviewUI_V2({
 
 // Block 2 — Hiring — state lifted here, controls both bullets and carousel
 function HiringBlock() {
+    const { resolvedTheme } = useTheme();
+    const isLight = resolvedTheme === "light";
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -975,8 +978,8 @@ function HiringBlock() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center"
         >
-            {/* Left — interactive dashboard */}
-            <div className="relative order-2 lg:order-1">
+            {/* Left — interactive dashboard (preserved dark in light mode) */}
+            <div data-preserve-dark className="relative order-2 lg:order-1">
 
                 <RecruiterDashboardPreviewUI_V2
                     active={active}
@@ -1001,7 +1004,7 @@ function HiringBlock() {
                         <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Use Case</span>
                     </div>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
+                        Hire based on real proof,<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>not profiles.</span>
                     </h3>
                     <div className="h-0.5 w-full bg-white/15" />
                     <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
@@ -1062,6 +1065,9 @@ const SLIDES = [
 // PARTNERS are now loaded dynamically from /api/logos
 
 export function LandingPageClient() {
+    const { resolvedTheme } = useTheme();
+    const isLight = resolvedTheme === "light";
+    const fadeColor = isLight ? "white" : "black";
     const { publicKey, connected } = useWallet();
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
@@ -1213,7 +1219,7 @@ export function LandingPageClient() {
                     <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className="text-white">That Recruiters Trust.</span>
+                            Resume <span className={isLight ? "text-teal-600" : "text-white"}>That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1225,7 +1231,11 @@ export function LandingPageClient() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
                         <button
                             onClick={() => setIsWalletModalOpen(true)}
-                            className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                            className={`premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 font-bold text-sm sm:text-base rounded-2xl transition-all flex items-center justify-center gap-2 ${
+                                isLight
+                                    ? "bg-gray-900 text-white hover:bg-gray-800"
+                                    : "bg-white text-black hover:bg-white/90"
+                            }`}
                         >
                             Build Your Reputation
                         </button>
@@ -1447,7 +1457,7 @@ export function LandingPageClient() {
                                     
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
-                                        <span className="text-white/30">Everything connects.</span>
+                                        <span className={isLight ? "text-teal-600" : "text-white/30"}>Everything connects.</span>
                                     </h2>
                                     <div className="h-0.5 w-full bg-white/15" />
                                     
@@ -1596,7 +1606,7 @@ export function LandingPageClient() {
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
-                                    <span className="text-white/30">Verifiable Signal</span>
+                                    <span className={isLight ? "text-teal-600" : "text-white/30"}>Verifiable Signal</span>
                                 </h2>
                             </div>
                         </div>
@@ -1766,7 +1776,7 @@ export function LandingPageClient() {
                                         Build a Verifiable Web3 Resume with On-Chain Proof
                                     </p>
                                     <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                        Build a reputation<br /><span className="text-white/30">that travels.</span>
+                                        Build a reputation<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>that travels.</span>
                                     </h3>
                                 </div>
                                 <div className="h-0.5 w-full md:w-[140%] bg-white/15 relative z-10" />
@@ -1807,15 +1817,15 @@ export function LandingPageClient() {
                             {/* Unified Scaling Container for the entire assembly */}
                             <div className="relative scale-[0.31] min-[440px]:scale-[0.4] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[1200px] h-[650px]">
                                 <div className="relative w-full h-full group">
-                                    {/* Main Dashboard Mockup */}
-                                    <div className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden text-left relative">
+                                    {/* Main Dashboard Mockup — preserved dark in light mode */}
+                                    <div data-preserve-dark className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden text-left relative">
                                         <MockProfileUI />
                                     </div>
 
-                                    {/* Floating Proof Card - Now visible on all screens, part of the scaled assembly */}
+                                    {/* Floating Proof Card — preserved dark in light mode */}
                                     <div className="absolute -right-16 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
                                         <div className="[perspective:1500px]">
-                                            <div className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
+                                            <div data-preserve-dark className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
                                                 <FloatingVerificationCard />
                                             </div>
                                         </div>
@@ -1923,10 +1933,16 @@ export function LandingPageClient() {
             )}
 
             {activeModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-8" onClick={() => setActiveModal(null)}>
-                    <div className="relative border border-white/20 rounded-sm max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden group" onClick={(e) => e.stopPropagation()}>
-                        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>
-                        <div className="relative z-10 p-5 sm:p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[90vh] sm:max-h-[80vh] overflow-y-auto custom-scrollbar">
+                <div
+                    className={`fixed inset-0 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-8 ${isLight ? "bg-black/30" : "bg-black/80"}`}
+                    onClick={() => setActiveModal(null)}
+                >
+                    <div
+                        className={`relative border rounded-sm max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden group ${isLight ? "border-black/10 bg-white shadow-2xl" : "border-white/20"}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {!isLight && <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>}
+                        <div className={`relative z-10 p-5 sm:p-8 md:p-12 max-h-[90vh] sm:max-h-[80vh] overflow-y-auto custom-scrollbar ${isLight ? "" : "bg-black/40 backdrop-blur-sm"}`}>
                             <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">&times;</button>
                             {activeModal === 'recruiters' && (
                                 <div className="space-y-16 py-4">
