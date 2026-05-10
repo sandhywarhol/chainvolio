@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clipboard, Lock } from "lucide-react";
+import { Clipboard, Lock, Send } from "lucide-react";
+import { motion } from "framer-motion";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
 import { ReceiptUpdates } from "@/components/receipt/ReceiptUpdates";
 import { WorkTimeline } from "@/components/profile/WorkTimeline";
 import { getBadgeStyles } from "@/lib/paymentConfig";
 import { RoleBadge } from "@/components/profile/RoleBadge";
+import { RequestVerificationModal } from "@/components/receipt/RequestVerificationModal";
 
 type Receipt = {
   id: string;
@@ -41,15 +43,22 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Request Verification modal state
+  const [verifyModal, setVerifyModal] = useState<{
+    open: boolean;
+    receiptId: string;
+    role: string;
+    org: string;
+  }>({ open: false, receiptId: "", role: "", org: "" });
 
   useEffect(() => {
     fetch(`/api/receipts?wallet=${walletAddress}`)
       .then((r) => r.json())
       .then((data) => {
-        // API returns { receipts: [...] }
         const list = Array.isArray(data) ? data : (data.receipts || []);
         setReceipts(list);
-        // Check for hash link and scroll
         setTimeout(() => {
           const hash = window.location.hash;
           if (hash && hash.startsWith('#receipt-')) {
@@ -64,6 +73,14 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
       })
       .finally(() => setLoading(false));
   }, [walletAddress]);
+
+  const handleCopyVerificationLink = (receiptId: string) => {
+    const url = `${window.location.origin}/attest/${receiptId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(receiptId);
+    setToastMessage("Verification link copied!");
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   if (loading) return <p className="text-slate-400">Loading receipts...</p>;
   if (receipts.length === 0) return <p className="text-slate-500">No receipts yet.</p>;
@@ -89,7 +106,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                   <h3 className="font-semibold">{r.role}</h3>
                 </div>
 
-                <p className="text-emerald-400 text-base font-bold">{r.org}</p>
+                <p className="text-white/80 text-base font-bold">{r.org}</p>
 
                 {r.status === "Attested" && r.attesterWallet && (() => {
                   const badge = getBadgeStyles(r.attesterVerificationType);
@@ -105,9 +122,9 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                           <span className="text-xs font-bold text-white truncate max-w-[120px]">
                             {r.attesterName || "Verified Attester"}
                           </span>
-                          <RoleBadge 
-                            isVerified={!!r.isOfficial} 
-                            type={r.verificationTier || r.attesterVerificationType} 
+                          <RoleBadge
+                            isVerified={!!r.isOfficial}
+                            type={r.verificationTier || r.attesterVerificationType}
                             showTooltip={true}
                             className="scale-75 origin-left -ml-1"
                           />
@@ -137,7 +154,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-white/[0.08]"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.08] text-xs text-white/60 hover:text-white transition-colors border border-white/[0.08]"
                       >
                         🔗 {link.label}
                       </a>
@@ -156,29 +173,53 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                 {r.status === "Attested" ? "✓ Attested" : "Self-Declared"}
               </span>
             </div>
+
+            {/* ── Action Row ────────────────────────────────────────── */}
             <div className="mt-4 pt-4 border-t border-white/[0.05] flex justify-between items-center">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                {/* Copy Verification Link */}
                 <button
-                  onClick={() => {
-                    const url = `${window.location.origin}/attest/${r.id}`;
-                    navigator.clipboard.writeText(url);
-                    setToastMessage("Verification link copied!");
-                  }}
-                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                  onClick={() => handleCopyVerificationLink(r.id)}
+                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
                 >
-                  <Clipboard className="w-3.5 h-3.5" aria-hidden="true" /> Copy Verification Link
+                  {copiedId === r.id ? (
+                    <svg className="w-3.5 h-3.5 text-[#14F195]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <Clipboard className="w-3.5 h-3.5" aria-hidden="true" />
+                  )}
+                  <span className={copiedId === r.id ? "text-[#14F195]" : ""}>
+                    {copiedId === r.id ? "Copied!" : "Copy Verification Link"}
+                  </span>
                 </button>
+
+                {/* Divider */}
+                <div className="w-px h-3.5 bg-white/[0.08]" />
+
+                {/* Request Verification — new premium button */}
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() =>
+                    setVerifyModal({ open: true, receiptId: r.id, role: r.role, org: r.org })
+                  }
+                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
+                >
+                  <Send className="w-3 h-3" />
+                  Request Verification
+                </motion.button>
               </div>
 
               <div className="flex items-center gap-3">
                 {r.status === "Attested" || r.status === "Locked" || r.status === "Submitted" ? (
                   <span className="text-[10px] text-slate-500 flex items-center gap-1 italic">
-                    <Lock className="w-3 h-3 text-emerald-500/50 flex-shrink-0" aria-hidden="true" /> This record is locked for editing after submission/attestation
+                    <Lock className="w-3 h-3 text-white/30 flex-shrink-0" aria-hidden="true" /> This record is locked for editing after submission/attestation
                   </span>
                 ) : (
                   <button
                     onClick={() => onEdit?.(r)}
-                    className="text-xs text-emerald-400 hover:text-emerald-300 font-medium px-2 py-1 rounded hover:bg-emerald-400/5 transition-colors"
+                    className="text-xs text-white/60 hover:text-white font-medium px-2 py-1 rounded hover:bg-white/5 transition-colors"
                   >
                     Edit Record
                   </button>
@@ -197,6 +238,15 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
           />
         )}
       </div>
+
+      {/* Request Verification Modal */}
+      <RequestVerificationModal
+        isOpen={verifyModal.open}
+        onClose={() => setVerifyModal((v) => ({ ...v, open: false }))}
+        receiptId={verifyModal.receiptId}
+        role={verifyModal.role}
+        org={verifyModal.org}
+      />
     </>
   );
 }

@@ -299,9 +299,9 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
               <div className="flex-1" />
               <button 
                 onClick={() => { navigator.clipboard.writeText(wallet); setToastMessage("Copied!"); }}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-[10px] text-slate-400 hover:border-emerald-500/40 transition-all font-mono"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-[10px] text-slate-400 hover:border-white/20 transition-all font-mono"
               >
-                <Wallet className="w-3 h-3 text-emerald-500" />
+                <Wallet className="w-3 h-3 text-white/40" />
                 {wallet.slice(0, 4)}...{wallet.slice(-4)}
               </button>
             </div>
@@ -312,10 +312,10 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
       {/* ── 2. Trust Impact Pods ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: UserCheck, label: "Talents Endorsed", val: uniqueTalents, col: "text-emerald-400", bg: "bg-emerald-500/10", onClick: () => setActiveModal("talents") },
+          { icon: UserCheck, label: "Talents Endorsed", val: uniqueTalents, col: "text-white/70", bg: "bg-white/5", onClick: () => setActiveModal("talents") },
           { icon: Briefcase, label: "Roles Verified", val: rolesCoveredLength, col: "text-blue-400", bg: "bg-blue-500/10", onClick: () => setActiveModal("roles") },
           { icon: Zap, label: "Trust Score", val: displayScore, col: "text-amber-400", bg: "bg-amber-500/10", onClick: () => setActiveModal("score") },
-          { icon: Briefcase, label: "Hiring Activity", val: collections.length, col: "text-purple-400", bg: "bg-purple-500/10", onClick: () => setActiveModal("hiring") },
+          { icon: Briefcase, label: "Hiring Activity", val: collections.length, col: "text-indigo-400", bg: "bg-indigo-500/10", onClick: () => setActiveModal("hiring") },
         ].map((pod, i) => (
           <div 
             key={i} 
@@ -384,7 +384,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-[13px] font-black text-white leading-none mb-1 group-hover:text-emerald-400 transition-colors">
+                    <h4 className="text-[13px] font-black text-white leading-none mb-1 group-hover:text-white/80 transition-colors">
                       {r.role}
                     </h4>
                     <div className="flex items-center gap-2">
@@ -418,7 +418,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
       {projects.length > 0 && (
         <div className="p-6 rounded-3xl bg-black border border-white/5">
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-            <FolderOpen className="w-4 h-4 text-emerald-400" /> Projects &amp; Programs
+            <FolderOpen className="w-4 h-4 text-white/50" /> Projects &amp; Programs
           </h2>
           <div className="grid gap-4">
             {projects.map(p => (
@@ -433,7 +433,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                         </span>
                       )}
                       {p.is_ongoing && (
-                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-white/5 text-white/50 border border-white/10">
                           Active
                         </span>
                       )}
@@ -552,7 +552,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
           <div className="relative w-full max-w-md bg-black border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onPointerDown={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-black text-white flex items-center gap-2">
-                {activeModal === "hiring" && <><Briefcase className="w-5 h-5 text-purple-400" /> Hiring Activity</>}
+                {activeModal === "hiring" && <><Briefcase className="w-5 h-5 text-indigo-400" /> Hiring Activity</>}
                 {activeModal === "talents" && <><UserCheck className="w-5 h-5 text-emerald-400" /> Talents Endorsed</>}
                 {activeModal === "roles" && <><Briefcase className="w-5 h-5 text-blue-400" /> Roles Verified</>}
                 {activeModal === "score" && <><Zap className="w-5 h-5 text-amber-400" /> Trust Score Breakdown</>}
@@ -583,14 +583,14 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                      const isClosed = status.toLowerCase() === "closed" || status.toLowerCase() === "removed";
                      
                      let statusColor = "text-slate-400 bg-slate-500/10 border-slate-500/20";
-                     if (isActive) statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-                     if (isHired) statusColor = "text-purple-400 bg-purple-500/10 border-purple-500/20";
+                     if (isActive) statusColor = "text-white/60 bg-white/5 border-white/10";
+                     if (isHired) statusColor = "text-indigo-400 bg-indigo-500/10 border-indigo-500/20";
                      
                      const cardContent = (
-                       <div className={`p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3 ${!isClosed ? 'hover:border-purple-500/30 hover:bg-white/[0.04] transition-all cursor-pointer group' : ''}`}>
+                       <div className={`p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3 ${!isClosed ? 'hover:border-indigo-500/30 hover:bg-white/[0.04] transition-all cursor-pointer group' : ''}`}>
                          <div className="flex items-start justify-between">
                            <div>
-                             <h4 className={`text-sm font-black ${!isClosed ? 'text-white group-hover:text-purple-400 transition-colors' : 'text-slate-300'}`}>{c.title}</h4>
+                             <h4 className={`text-sm font-black ${!isClosed ? 'text-white group-hover:text-indigo-400 transition-colors' : 'text-slate-300'}`}>{c.title}</h4>
                              <div className="flex items-center gap-2 mt-2">
                                <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-md border ${statusColor}`}>
                                  {status}
@@ -602,8 +602,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                              </div>
                            </div>
                            {!isClosed && (
-                             <div className="p-2 aspect-square rounded-xl bg-white/5 border border-white/10 group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all flex items-center justify-center">
-                               <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400 transition-colors" />
+                             <div className="p-2 aspect-square rounded-xl bg-white/5 border border-white/10 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all flex items-center justify-center">
+                               <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
                              </div>
                            )}
                          </div>
@@ -633,7 +633,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                     <button 
                       key={r.id}
                       onClick={() => { setActiveModal(null); setSelectedReceipt(r); }}
-                      className="w-full group flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 hover:bg-white/[0.04] transition-all text-left"
+                      className="w-full group flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/15 hover:bg-white/[0.04] transition-all text-left"
                     >
                       <div className="flex items-center gap-4">
                         {r.profile?.avatar_url ? (
@@ -644,7 +644,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
                           </div>
                         )}
                         <div>
-                          <h4 className="text-[13px] font-black text-white group-hover:text-emerald-400 transition-colors mb-0.5">
+                          <h4 className="text-[13px] font-black text-white group-hover:text-white/80 transition-colors mb-0.5">
                             {r.profile?.display_name || "Anonymous Builder"}
                           </h4>
                           <p className="text-[11px] font-bold text-slate-400">{r.role}</p>

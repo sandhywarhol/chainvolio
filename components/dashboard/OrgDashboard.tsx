@@ -252,14 +252,14 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors group"
       >
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg transition-colors ${projectsExpanded ? "bg-emerald-500/5" : "bg-white/5"}`}>
-            <FolderOpen className={`w-4 h-4 transition-colors ${projectsExpanded ? "text-emerald-400" : "text-slate-500"}`} />
+          <div className="p-2 rounded-lg transition-colors bg-white/5">
+            <FolderOpen className="w-4 h-4 transition-colors text-slate-500" />
           </div>
           <div>
             <h2 className="text-sm font-black text-white flex items-center gap-2">
               Projects &amp; Programs
               {projects.length > 0 && (
-                <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="text-[10px] font-bold bg-white/5 text-white/50 px-2 py-0.5 rounded-full border border-white/10">
                   {projects.length}
                 </span>
               )}
@@ -272,7 +272,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         <div className="flex items-center gap-3">
           <button
             onClick={e => { e.stopPropagation(); setShowProjectForm(true); }}
-            className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors text-emerald-400 hover:text-white bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/10"
+            className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"
           >
             <Plus className="w-3 h-3" /> Add Project
           </button>
@@ -293,7 +293,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               </p>
               <button
                 onClick={() => setShowProjectForm(true)}
-                className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg transition-all border border-emerald-500/20"
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold rounded-lg transition-all border border-white/10"
               >
                 Add First Project
               </button>
@@ -316,7 +316,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                         </span>
                       )}
                       {(p.is_ongoing || p.status === "active") && (
-                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="text-[9px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-white/5 text-white/50 border border-white/10">
                           Active
                         </span>
                       )}
@@ -338,7 +338,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                           href={p.project_url.startsWith("http") ? p.project_url : `https://${p.project_url}`}
                           target="_blank" rel="noopener noreferrer"
                           onClick={e => e.stopPropagation()}
-                          className="text-[10px] text-teal-400 hover:underline flex items-center gap-1 transition-colors"
+                          className="text-[10px] text-white/50 hover:text-white hover:underline flex items-center gap-1 transition-colors"
                         >
                           <ExternalLink className="w-2.5 h-2.5" /> View Project
                         </a>
@@ -431,7 +431,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-colors ${
                   profile.isExpired
                     ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20"
-                    : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
+                    : "bg-amber-400/10 border-amber-400/20 text-amber-400 hover:bg-amber-400/20"
                 }`}
               >
                 <RefreshCw className="w-3 h-3" />
@@ -450,7 +450,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             onClick={handleShare}
             className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 text-xs font-medium text-white transition-colors flex items-center gap-1.5"
           >
-            {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? "Copied!" : "Share"}
           </button>
           <Link
@@ -484,9 +484,9 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
 
       {/* Expiry warning (wallet only) */}
       {!isGooglePath && profile.isExpiringSoon && !profile.isExpired && (
-        <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-yellow-400/90">
+        <div className="p-4 rounded-xl border border-amber-400/20 bg-amber-400/5 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-amber-300 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-300/90">
             Your verification expires on <strong>{profile.expiresAt ? format(new Date(profile.expiresAt), "MMM d, yyyy") : "soon"}</strong>. Renew now to maintain your trust authority.
           </p>
         </div>
@@ -581,7 +581,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
 
             {!profile.bio && !profile.website && (
               <p className="text-xs text-slate-500 mt-5">
-                <Link href={editUrl} className="text-teal-400 hover:underline">Complete your profile</Link> to increase visibility.
+                <Link href={editUrl} className="text-white/50 hover:text-white hover:underline">Complete your profile</Link> to increase visibility.
               </p>
             )}
           </div>
@@ -595,8 +595,8 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             icon: LayoutDashboard,
             label: "Hiring Collections",
             val: collections.length,
-            col: "text-emerald-400",
-            bg: "bg-emerald-500/10",
+            col: "text-white/60",
+            bg: "bg-white/5",
             warn: isAtEffectiveLimit,
           },
           isGooglePath
@@ -610,7 +610,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             bg: isActive ? (isCommunity ? "bg-teal-500/10" : "bg-amber-500/10") : "bg-slate-700/50",
             warn: false,
           },
-          { icon: FolderOpen, label: "Projects", val: projects.length, col: "text-purple-400", bg: "bg-purple-500/10", warn: false },
+          { icon: FolderOpen, label: "Projects", val: projects.length, col: "text-indigo-400", bg: "bg-indigo-500/10", warn: false },
         ].map((pod, i) => (
           <div key={i} className={`p-4 rounded-2xl bg-black border space-y-2 hover:border-white/10 transition-all ${pod.warn ? "border-rose-500/30" : "border-white/5"}`}>
             <div className={`w-8 h-8 flex items-center justify-center rounded-xl ${pod.bg}`}>
@@ -642,7 +642,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 <p className="text-xs text-slate-400 mt-0.5">Subscribe to unlock unlimited collections, candidates, and your verified badge.</p>
               </div>
             </div>
-            <Link href="/recruiter/pricing" className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-black border border-emerald-500/20 transition-colors">
+            <Link href="/recruiter/pricing" className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-black border border-white/10 transition-colors">
               <Zap className="w-3.5 h-3.5" /> View Plans →
             </Link>
           </div>
@@ -690,11 +690,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         )
       ) : (
         isGooglePath && googleOrgAccount?.current_period_end ? (
-          <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between gap-4">
-            <p className="text-xs text-emerald-400/80">
+          <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-between gap-4">
+            <p className="text-xs text-white/60">
               {planBadge.text} plan active — renews <strong>{new Date(googleOrgAccount.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>
             </p>
-            <button onClick={handleManageSubscription} disabled={managingSubscription} className="flex-shrink-0 text-xs text-teal-400 hover:underline font-bold disabled:opacity-50">
+            <button onClick={handleManageSubscription} disabled={managingSubscription} className="flex-shrink-0 text-xs text-white/50 hover:text-white hover:underline font-bold disabled:opacity-50">
               {managingSubscription ? "Loading..." : "Manage"}
             </button>
           </div>
@@ -729,7 +729,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               </div>
             </div>
             {isGooglePath ? (
-              <button onClick={handleManageSubscription} disabled={managingSubscription} className="text-xs text-teal-400 hover:underline font-medium disabled:opacity-50">
+              <button onClick={handleManageSubscription} disabled={managingSubscription} className="text-xs text-white/50 hover:text-white hover:underline font-medium disabled:opacity-50">
                 {managingSubscription ? "Loading..." : "Manage Subscription"}
               </button>
             ) : (profile.verifierTier && profile.verifierTier < 4) ? (
@@ -749,7 +749,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                   </div>
                   <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${planLimits.collections !== null && collections.length >= planLimits.collections ? "bg-rose-500" : "bg-gradient-to-r from-emerald-500/60 to-emerald-400"}`}
+                      className={`h-full rounded-full transition-all ${planLimits.collections !== null && collections.length >= planLimits.collections ? "bg-rose-500" : "bg-gradient-to-r from-white/40 to-white/60"}`}
                       style={{ width: planLimits.collections !== null ? `${Math.min(100, (collections.length / planLimits.collections) * 100)}%` : "0%" }}
                     />
                   </div>
@@ -780,7 +780,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 </div>
                 <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${attestationNearLimit ? "bg-amber-500" : "bg-gradient-to-r from-emerald-500/60 to-emerald-400"}`}
+                    className={`h-full rounded-full transition-all duration-700 ${attestationNearLimit ? "bg-amber-500" : "bg-gradient-to-r from-white/40 to-white/60"}`}
                     style={{ width: `${attestationPct}%` }}
                   />
                 </div>
@@ -818,11 +818,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           <div className="p-4 space-y-4">
             {linkedWallet ? (
               <>
-                <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/10">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-white/50 flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-emerald-400">Wallet Linked</p>
+                      <p className="text-xs font-bold text-white/70">Wallet Linked</p>
                       <p className="text-[10px] font-mono text-slate-500 truncate">{linkedWallet}</p>
                     </div>
                   </div>
@@ -850,7 +850,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                     <button
                       onClick={handleLinkWallet}
                       disabled={linkingWallet}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 text-xs font-bold border border-teal-500/20 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold border border-white/10 transition-colors disabled:opacity-50"
                     >
                       <Link2 className="w-3.5 h-3.5" />
                       {linkingWallet ? "Linking..." : "Save as Signing Wallet"}
@@ -876,19 +876,19 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors group"
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg transition-colors ${hiringExpanded ? "bg-emerald-500/10" : "bg-slate-700/50"}`}>
-              <LayoutDashboard className={`w-4 h-4 transition-colors ${hiringExpanded ? "text-emerald-400" : "text-slate-500"}`} />
+            <div className="p-2 rounded-lg transition-colors bg-slate-700/50">
+              <LayoutDashboard className="w-4 h-4 transition-colors text-slate-500" />
             </div>
             <div>
               <h2 className="text-sm font-black text-white flex items-center gap-2">
                 Hiring Center
                 {collections.length > 0 && (
-                  <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">{collections.length}</span>
+                  <span className="text-[10px] font-bold bg-white/5 text-white/50 px-2 py-0.5 rounded-full border border-white/10">{collections.length}</span>
                 )}
               </h2>
               <p className="text-[10px] text-slate-500 mt-0.5">
                 {effectiveHiringLimit === null
-                  ? <span className="text-emerald-400 font-bold">Unlimited access</span>
+                  ? <span className="text-white/60 font-bold">Unlimited access</span>
                   : <span className={isAtEffectiveLimit ? "text-rose-400 font-bold" : ""}>{hiringUsed}/{effectiveHiringLimit} used{effectiveRemaining !== null && effectiveRemaining <= 1 ? " — last slot" : ""}</span>
                 }
               </p>
@@ -901,7 +901,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors ${
                 isAtEffectiveLimit
                   ? "text-slate-500 cursor-not-allowed pointer-events-none"
-                  : "text-emerald-400 hover:text-white bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/10"
+                  : "text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"
               }`}
             >
               <Plus className="w-3 h-3" /> New Collection
@@ -917,7 +917,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 {collections.map(col => (
                   <div key={col.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
                     <div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">{col.title}</h3>
+                      <h3 className="text-sm font-bold text-white group-hover:text-white/80 transition-colors">{col.title}</h3>
                       <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
                         <span>{new Date(col.created_at).toLocaleDateString()}</span>
                         <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={e => e.stopPropagation()}>
@@ -927,7 +927,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                     </div>
                     <Link
                       href={`/hiring/${col.slug}/dashboard`}
-                      className="px-3 py-1.5 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-lg transition-colors border border-emerald-500/10"
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10"
                       onClick={e => e.stopPropagation()}
                     >
                       Dashboard
@@ -939,7 +939,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               <div className="py-8 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
                 <h3 className="text-sm font-bold text-white mb-2">Source Talent for Your {orgLabel}</h3>
                 <p className="text-xs text-slate-500 mb-4 max-w-sm">Create a hiring collection to discover and track verified talent.</p>
-                <Link href="/hiring/create" className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg transition-all border border-emerald-500/20">
+                <Link href="/hiring/create" className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold rounded-lg transition-all border border-white/10">
                   Create First Collection
                 </Link>
               </div>

@@ -42,8 +42,8 @@ export function CommunityBadge({ cvId, className = "" }: CommunityBadgeProps) {
       label: "Founding User",
       tooltip: "Among the first 1000 professionals establishing on-chain professional identity.",
       icon: Circle,
-      containerClass: "bg-teal-500/10 border-teal-500/20 text-teal-400",
-      iconClass: "text-teal-400",
+      containerClass: "bg-white/5 border-white/10 text-white/60",
+      iconClass: "text-white/50",
       badgeLabel: "Founding User"
     };
   }

@@ -212,7 +212,7 @@ function TierCard({
             onMouseLeave={e => { if (!isUnavailable) e.currentTarget.style.boxShadow = `0 1px 32px ${hex}08`; }}
         >
             {isCurrent && (
-                <div className="absolute top-2 left-2 z-20 px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[8px] font-black uppercase tracking-widest">
+                <div className="absolute top-2 left-2 z-20 px-2 py-0.5 rounded-md bg-white/10 border border-white/20 text-white/60 text-[8px] font-black uppercase tracking-widest">
                     Current
                 </div>
             )}
@@ -458,8 +458,8 @@ export function VerificationRequestModal({
                         <button onClick={onClose} className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white/30 hover:text-white transition-all">
                             <X className="w-4 h-4" />
                         </button>
-                        <div className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mx-auto mb-5">
-                            <Clock className="w-8 h-8 text-yellow-400" />
+                        <div className="w-16 h-16 rounded-full bg-amber-400/10 border border-amber-400/20 flex items-center justify-center mx-auto mb-5">
+                            <Clock className="w-8 h-8 text-amber-300" />
                         </div>
                         <h2 className="text-lg font-bold mb-2">Review In Progress</h2>
                         <p className="text-white/35 mb-6 text-sm leading-relaxed">
