@@ -8,7 +8,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 // Dynamic imports for heavy components to improve LCP and initial bundle size
-const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), { 
+const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), {
     ssr: false,
     loading: () => <div className="w-full h-full bg-black/20 animate-pulse rounded-full" />
 });
@@ -56,7 +56,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { Web3ResumeSection } from "./Web3ResumeSection";
-import { useTheme } from "next-themes";
 
 // --- Interactive Verifiable Work History Flow (3D Chip Style) ---
 function VerifiableWorkHistoryFlow() {
@@ -68,14 +67,14 @@ function VerifiableWorkHistoryFlow() {
         sublabel: string;
         color: string;
     }[] = [
-        { icon: "profile",   label: "Your Profile",  sublabel: "Identity",    color: "#ffffff"  },
-        { icon: FileCheck2,  label: "Work Recorded", sublabel: "Contribution",color: "#94a3b8"  },
-        { icon: ShieldCheck, label: "Attested",       sublabel: "By Org",      color: "#94a3b8"  },
-        { icon: PenLine,     label: "Signed",         sublabel: "Crypto Sig",  color: "#94a3b8"  },
-        { icon: Boxes,       label: "On-Chain",       sublabel: "Solana",      color: "#94a3b8"  },
-        { icon: Hash,        label: "Hash Created",   sublabel: "Immutable",   color: "#94a3b8"  },
-        { icon: Share2,      label: "Shareable",      sublabel: "To Recruiters",color: "#94a3b8" },
-    ];
+            { icon: "profile", label: "Your Profile", sublabel: "Identity", color: "#ffffff" },
+            { icon: FileCheck2, label: "Work Recorded", sublabel: "Contribution", color: "#94a3b8" },
+            { icon: ShieldCheck, label: "Attested", sublabel: "By Org", color: "#94a3b8" },
+            { icon: PenLine, label: "Signed", sublabel: "Crypto Sig", color: "#94a3b8" },
+            { icon: Boxes, label: "On-Chain", sublabel: "Solana", color: "#94a3b8" },
+            { icon: Hash, label: "Hash Created", sublabel: "Immutable", color: "#94a3b8" },
+            { icon: Share2, label: "Shareable", sublabel: "To Recruiters", color: "#94a3b8" },
+        ];
 
     const isLineActive = (lineIndex: number) =>
         hoveredIndex !== null && lineIndex < hoveredIndex;
@@ -88,12 +87,12 @@ function VerifiableWorkHistoryFlow() {
                 <div className="flex items-center w-full max-w-4xl mx-auto px-4">
                     {nodes.map((node, i) => {
                         const isHovered = hoveredIndex === i;
-                        const isActive  = hoveredIndex !== null && i <= hoveredIndex;
-                        const IconComp  = node.icon === "profile" ? null : node.icon;
+                        const isActive = hoveredIndex !== null && i <= hoveredIndex;
+                        const IconComp = node.icon === "profile" ? null : node.icon;
                         const isProfile = node.icon === "profile";
-                        const chipW     = "52px";
-                        const chipH     = "52px";
-                        const r         = "16px";
+                        const chipW = "52px";
+                        const chipH = "52px";
+                        const r = "16px";
 
                         return (
                             <div key={i} className="contents">
@@ -144,11 +143,11 @@ function VerifiableWorkHistoryFlow() {
             <div className="md:hidden relative w-full pt-0 pb-24 overflow-x-auto no-scrollbar active:cursor-grabbing">
                 <div className="flex items-center w-max px-12">
                     {nodes.map((node, i) => {
-                        const IconComp  = node.icon === "profile" ? null : node.icon;
+                        const IconComp = node.icon === "profile" ? null : node.icon;
                         const isProfile = node.icon === "profile";
-                        const chipW     = "58px";
-                        const chipH     = "58px";
-                        const r         = "16px";
+                        const chipW = "58px";
+                        const chipH = "58px";
+                        const r = "16px";
 
                         return (
                             <div key={i} className="flex items-center">
@@ -265,7 +264,7 @@ function MockProfileUI() {
                         <div className="flex flex-wrap gap-4">
                             {[
                                 { name: "Lumina", color: "bg-blue-500" },
-                                { name: "Apex Guild", color: "bg-orange-500" }
+                                { name: "Apex Guild", color: "bg-amber-500" }
                             ].map((org, i) => (
                                 <div key={i} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5">
                                     <div className={`w-2 h-2 rounded-full ${org.color}`}></div>
@@ -302,14 +301,14 @@ const CARD_BASE: React.CSSProperties = {
     position: "relative",
     background: "#080808",
     border: "1px solid rgba(255,255,255,0.06)",
-    boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 24px 64px rgba(0,0,0,0.95), 0 4px 16px rgba(0,0,0,0.7)",
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)",
 };
 
 // Shared header dots (three-dot menu like Linear)
 function CardDots() {
     return (
         <div className="flex items-center gap-1">
-            {[0,1,2].map(i => (
+            {[0, 1, 2].map(i => (
                 <div key={i} className="w-[3px] h-[3px] rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
             ))}
         </div>
@@ -329,10 +328,10 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 // Card 1 — Activity Feed (emerald) — like Linear's left Activity panel
 function AttestationCard() {
     const items = [
-        { initials: "DC", color: "#34d399", name: "David Chen",           action: "attested your work on",         subject: "Brand Identity Design",        time: "2m ago" },
-        { initials: "GD", color: "#60a5fa", name: "Glassdoor",            action: "verified your employment at",   subject: "Stripe",                        time: "1h ago" },
-        { initials: "SA", color: "#a78bfa", name: "Smart Contract Auditor",action: "attested your audit on",        subject: "Payment Protocol v2",           time: "3h ago" },
-        { initials: "GH", color: "#f59e0b", name: "GitHub",               action: "verified your contribution in", subject: "chainvolio/identity-core",       time: "1d ago" },
+        { initials: "DC", color: "#34d399", name: "David Chen", action: "attested your work on", subject: "Brand Identity Design", time: "2m ago" },
+        { initials: "GD", color: "#60a5fa", name: "Glassdoor", action: "verified your employment at", subject: "Stripe", time: "1h ago" },
+        { initials: "SA", color: "#a78bfa", name: "Smart Contract Auditor", action: "attested your audit on", subject: "Payment Protocol v2", time: "3h ago" },
+        { initials: "GH", color: "#f59e0b", name: "GitHub", action: "verified your contribution in", subject: "chainvolio/identity-core", time: "1d ago" },
     ];
     return (
         <div style={CARD_BASE}>
@@ -351,7 +350,7 @@ function AttestationCard() {
             <div className="px-4 py-2.5 flex items-center gap-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <div className="flex items-center gap-1 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                     <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>All</span>
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round" /></svg>
                 </div>
             </div>
 
@@ -461,10 +460,10 @@ function OrgIssuerCard() {
 // Card 3 — Updates / Notifications (purple) — like Linear's right Updates panel
 function PublicVerifyCard() {
     const updates = [
-        { icon: CheckCircle2, color: "#34d399", dot: true,  title: "Attestation Received",   desc: "Superteam attested your grant",   time: "2h ago"  },
-        { icon: ShieldCheck,  color: "#60a5fa", dot: true,  title: "Audit Passed",            desc: "Smart contract audit passed",     time: "5h ago"  },
-        { icon: User,         color: "#a78bfa", dot: false, title: "New Attestation",         desc: "0xA34F...BCd2 attested your work", time: "1d ago" },
-        { icon: Globe,        color: "#f59e0b", dot: false, title: "Identity Verified",       desc: "Your wallet has been verified",   time: "2d ago"  },
+        { icon: CheckCircle2, color: "#34d399", dot: true, title: "Attestation Received", desc: "Superteam attested your grant", time: "2h ago" },
+        { icon: ShieldCheck, color: "#60a5fa", dot: true, title: "Audit Passed", desc: "Smart contract audit passed", time: "5h ago" },
+        { icon: User, color: "#a78bfa", dot: false, title: "New Attestation", desc: "0xA34F...BCd2 attested your work", time: "1d ago" },
+        { icon: Globe, color: "#f59e0b", dot: false, title: "Identity Verified", desc: "Your wallet has been verified", time: "2d ago" },
     ];
     return (
         <div style={CARD_BASE}>
@@ -483,7 +482,7 @@ function PublicVerifyCard() {
             <div className="px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                     <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>Unread</span>
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 3l2 2 2-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round" /></svg>
                 </div>
             </div>
 
@@ -516,8 +515,6 @@ function PublicVerifyCard() {
 
 // Block 1 — stateful wrapper so hover on left controls active card on right
 function AttestationBlock() {
-    const { resolvedTheme } = useTheme();
-    const isLight = resolvedTheme === "light";
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -529,9 +526,9 @@ function AttestationBlock() {
     }, [paused]);
 
     const features = [
-        { icon: ShieldCheck, label: "Verifiable on-chain proof",    desc: "Each attestation is stored permanently on Solana.", color: "#94a3b8" },
-        { icon: Building2,   label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.",    color: "#60a5fa" },
-        { icon: Lock,        label: "Public and tamper-resistant",  desc: "Anyone can verify, no one can alter or revoke.",      color: "#a78bfa" },
+        { icon: ShieldCheck, label: "Verifiable on-chain proof", desc: "Each attestation is stored permanently on Solana.", color: "#94a3b8" },
+        { icon: Building2, label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.", color: "#60a5fa" },
+        { icon: Lock, label: "Public and tamper-resistant", desc: "Anyone can verify, no one can alter or revoke.", color: "#a78bfa" },
     ];
 
     const cards = [<AttestationCard />, <OrgIssuerCard />, <PublicVerifyCard />];
@@ -540,10 +537,10 @@ function AttestationBlock() {
     const stackAnim = (pos: number) => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         const xOffset = isMobile ? (window.innerWidth < 400 ? 35 : 55) : 160;
-        
-        if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"   };
-        if (pos === 1) return { x: xOffset,  y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
-        return              { x: -xOffset, y: 40, scale: 0.9,  opacity: 0.5,  zIndex: 20, filter: "blur(1.5px)" };
+
+        if (pos === 0) return { x: 0, y: 0, scale: 1, opacity: 1, zIndex: 30, filter: "blur(0px)" };
+        if (pos === 1) return { x: xOffset, y: 40, scale: 0.9, opacity: 0.5, zIndex: 20, filter: "blur(1.5px)" };
+        return { x: -xOffset, y: 40, scale: 0.9, opacity: 0.5, zIndex: 20, filter: "blur(1.5px)" };
     };
 
     return (
@@ -565,9 +562,9 @@ function AttestationBlock() {
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Proof of work,<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>not claims.</span>
+                        Proof of work,<br /><span className="text-white/30">not claims.</span>
                     </h3>
-                    <div className="h-0.5 w-full bg-white/15" />
+                    <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
                         Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
                     </p>
@@ -606,8 +603,8 @@ function AttestationBlock() {
                 </div>
             </div>
 
-            {/* Right — Linear-style horizontal carousel (preserved dark in light mode) */}
-            <div data-preserve-dark className="flex flex-col gap-8">
+            {/* Right — Linear-style horizontal carousel */}
+            <div className="flex flex-col gap-8">
                 <div className="relative overflow-hidden" style={{ height: "560px" }}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
@@ -633,13 +630,15 @@ function AttestationBlock() {
                         );
                     })}
 
-                    {/* Edge fades — these are inside data-preserve-dark so always black */}
+                    {/* Left edge fade */}
                     <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to right, #0a0a0a 20%, transparent)" }} />
+                        style={{ background: "linear-gradient(to right, #0D0D0D, transparent)" }} />
+                    {/* Right edge fade */}
                     <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to left, #0a0a0a 20%, transparent)" }} />
+                        style={{ background: "linear-gradient(to left, #0D0D0D, transparent)" }} />
+                    {/* Bottom fade */}
                     <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to top, #0a0a0a 30%, transparent)" }} />
+                        style={{ background: "linear-gradient(to top, #0D0D0D, transparent)" }} />
 
                     {/* Dot indicators */}
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
@@ -673,7 +672,9 @@ function AttestationBlock() {
 // --- Floating Feature Card (Overlay) ---
 function FloatingVerificationCard() {
     return (
-        <div className="w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col font-sans">
+        <div className="w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
+            style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+        >
             {/* Card Header */}
             <div className="p-5 border-b border-white/5 flex items-center justify-between bg-emerald-500/5">
                 <div className="flex items-center gap-2">
@@ -682,7 +683,7 @@ function FloatingVerificationCard() {
                 </div>
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             </div>
-            
+
             {/* Card Body */}
             <div className="p-6 space-y-6">
                 <div className="flex items-center gap-4">
@@ -735,33 +736,33 @@ function RecruiterDashboardPreviewUI_V2({
     setPaused: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
     const slides = [
-        { label: "Verified signal candidates",  color: "#60a5fa" },
-        { label: "Org-backed endorsements",     color: "#94a3b8" },
+        { label: "Verified signal candidates", color: "#60a5fa" },
+        { label: "Org-backed endorsements", color: "#94a3b8" },
         { label: "Post your job link anywhere", color: "#f59e0b" },
-        { label: "Reduce hiring guesswork",     color: "#a78bfa" },
+        { label: "Reduce hiring guesswork", color: "#a78bfa" },
     ];
 
     const panels = [
         // Panel 0 — Verified Signal (bullet 0)
         <div key={0} className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Top Candidates with Proven Signals</p>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-white/20">Top Candidates with Proven Signals</p>
                 <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)" }}>
                     <span className="text-[8px] font-bold" style={{ color: "#60a5fa" }}>Verified</span>
                 </div>
             </div>
             {[
-                { name: "Alex Rivera", role: "Core Developer",     signals: 8 },
-                { name: "Sarah Chen",  role: "Smart Contract Dev", signals: 5 },
+                { name: "Alex Rivera", role: "Core Developer", signals: 8 },
+                { name: "Sarah Chen", role: "Smart Contract Dev", signals: 5 },
             ].map((c, i) => (
-                <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center justify-between shadow-xl">
+                <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white/40">
                             {c.name.split(" ").map((n: string) => n[0]).join("")}
                         </div>
                         <div>
                             <h5 className="text-[11px] font-bold text-white/80">{c.name}</h5>
-                            <p className="text-[9px] text-slate-500">{c.role}</p>
+                            <p className="text-[9px] text-white/30">{c.role}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.12)" }}>
@@ -774,12 +775,12 @@ function RecruiterDashboardPreviewUI_V2({
 
         // Panel 1 — Org-Backed Trust (bullet 1)
         <div key={1} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Endorsement Chain</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/20 mb-3">Alex Rivera, Endorsement Chain</p>
             {[
                 { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#94a3b8" },
-                { initials: "ST", name: "Superteam",      type: "Grant delivery, Q3 2024",  color: "#60a5fa" },
+                { initials: "ST", name: "Superteam", type: "Grant delivery, Q3 2024", color: "#60a5fa" },
             ].map((e, i) => (
-                <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center gap-3 shadow-xl">
+                <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center gap-3 shadow-xl">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                         style={{ background: e.color + "22", color: e.color, border: `1px solid ${e.color}33` }}>
                         {e.initials}
@@ -789,7 +790,7 @@ function RecruiterDashboardPreviewUI_V2({
                             <h5 className="text-[11px] font-bold text-white/80">{e.name}</h5>
                             <ShieldCheck className="w-2.5 h-2.5 flex-shrink-0" style={{ color: e.color }} />
                         </div>
-                        <p className="text-[9px] text-slate-500">{e.type}</p>
+                        <p className="text-[9px] text-white/30">{e.type}</p>
                     </div>
                 </div>
             ))}
@@ -798,12 +799,12 @@ function RecruiterDashboardPreviewUI_V2({
         // Panel 2 — Post Anywhere (bullet 2)
         <div key={2} className="space-y-2">
             <div className="flex items-center justify-between mb-3">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Share Job Post</p>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-white/20">Share Job Post</p>
                 <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
                     <span className="text-[8px] font-bold" style={{ color: "#f59e0b" }}>Portable Link</span>
                 </div>
             </div>
-            <div className="p-2.5 rounded-xl bg-black border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
+            <div className="p-2.5 rounded-xl bg-[#0D0D0D] border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
                 <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
                     <Share2 className="w-2.5 h-2.5 text-amber-400" />
                 </div>
@@ -811,11 +812,11 @@ function RecruiterDashboardPreviewUI_V2({
                 <span className="text-[8px] font-bold text-amber-400/70 flex-shrink-0">Copy</span>
             </div>
             {[
-                { platform: "LinkedIn",  icon: "in", color: "#60a5fa", status: "Posted",    statusColor: "#94a3b8" },
-                { platform: "Twitter/X", icon: "X",  color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
-                { platform: "Discord",   icon: "D",  color: "#a78bfa", status: "Posted",    statusColor: "#94a3b8" },
+                { platform: "LinkedIn", icon: "in", color: "#60a5fa", status: "Posted", statusColor: "#94a3b8" },
+                { platform: "Twitter/X", icon: "X", color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
+                { platform: "Discord", icon: "D", color: "#a78bfa", status: "Posted", statusColor: "#94a3b8" },
             ].map((p, i) => (
-                <div key={i} className="p-2.5 rounded-xl bg-black border border-white/5 flex items-center justify-between shadow-xl">
+                <div key={i} className="p-2.5 rounded-xl bg-[#0D0D0D] border border-white/5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0"
                             style={{ background: p.color + "18", color: p.color, border: `1px solid ${p.color}25` }}>
@@ -830,16 +831,16 @@ function RecruiterDashboardPreviewUI_V2({
 
         // Panel 3 — Confidence Score (auto-only, no bullet)
         <div key={3} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-3">Alex Rivera, Confidence Score</p>
-            <div className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-3 shadow-xl">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/20 mb-3">Alex Rivera, Confidence Score</p>
+            <div className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-3 shadow-xl">
                 {[
-                    { label: "Verified Work",    score: 92, color: "#94a3b8" },
+                    { label: "Verified Work", score: 92, color: "#94a3b8" },
                     { label: "Org Attestations", score: 87, color: "#60a5fa" },
-                    { label: "Chain Activity",   score: 74, color: "#a78bfa" },
+                    { label: "Chain Activity", score: 74, color: "#a78bfa" },
                 ].map((s, i) => (
                     <div key={i}>
                         <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] text-slate-400">{s.label}</span>
+                            <span className="text-[9px] text-white/30">{s.label}</span>
                             <span className="text-[9px] font-bold" style={{ color: s.color }}>{s.score}</span>
                         </div>
                         <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
@@ -855,15 +856,16 @@ function RecruiterDashboardPreviewUI_V2({
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         const xOffset = isMobile ? (window.innerWidth < 400 ? 60 : 90) : 160;
 
-        if (pos === 0) return { x: 0,    y: 0,  scale: 1,    opacity: 1,    zIndex: 30, filter: "blur(0px)"  };
-        if (pos === 1) return { x: xOffset,  y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
+        if (pos === 0) return { x: 0, y: 0, scale: 1, opacity: 1, zIndex: 30, filter: "blur(0px)" };
+        if (pos === 1) return { x: xOffset, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
         if (pos === 2) return { x: -xOffset, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
-        return              { x: 0,    y: 40, scale: 0.78, opacity: 0,    zIndex: 10, filter: "blur(4px)" };
+        return { x: 0, y: 40, scale: 0.78, opacity: 0, zIndex: 10, filter: "blur(4px)" };
     };
 
     return (
         <>
-            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-black border border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_32px_64px_rgba(0,0,0,0.6)]"
+            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8"
+                style={{ boxShadow: "0 6px 14px rgba(0,0,0,0.35)" }}
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
             >
@@ -875,7 +877,7 @@ function RecruiterDashboardPreviewUI_V2({
                         </div>
                         <div>
                             <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Operations</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Active Operations</p>
                         </div>
                     </div>
                     <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
@@ -886,17 +888,17 @@ function RecruiterDashboardPreviewUI_V2({
                 {/* Stat Pods */}
                 <div className="grid grid-cols-3 gap-3 relative z-10">
                     {[
-                        { icon: LayoutDashboard, label: "Hiring",  val: "12",  col: "text-white/60", bg: "bg-white/5" },
-                        { icon: ShieldCheck,     label: "Signals", val: "142", col: "text-blue-400",    bg: "bg-blue-500/10"    },
-                        { icon: FolderOpen,      label: "Active",  val: "4",   col: "text-purple-400",  bg: "bg-purple-500/10"  },
+                        { icon: LayoutDashboard, label: "Hiring", val: "12", col: "text-white/60", bg: "bg-white/5" },
+                        { icon: ShieldCheck, label: "Signals", val: "142", col: "text-blue-400", bg: "bg-blue-500/10" },
+                        { icon: FolderOpen, label: "Active", val: "4", col: "text-indigo-400", bg: "bg-indigo-500/10" },
                     ].map((pod, i) => (
-                        <div key={i} className="p-3 rounded-xl bg-black bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-1.5 shadow-xl">
+                        <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-1.5 shadow-xl">
                             <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
                                 <pod.icon className={`w-3 h-3 ${pod.col}`} />
                             </div>
                             <div>
                                 <p className="text-lg font-black text-white leading-none">{pod.val}</p>
-                                <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">{pod.label}</p>
+                                <p className="text-[8px] font-bold uppercase tracking-widest text-white/20">{pod.label}</p>
                             </div>
                         </div>
                     ))}
@@ -919,11 +921,10 @@ function RecruiterDashboardPreviewUI_V2({
                             </motion.div>
                         );
                     })}
-                    <div className="absolute inset-y-0 left-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to right, black 20%, transparent)" }} />
-                    <div className="absolute inset-y-0 right-0 w-10 pointer-events-none z-40" style={{ background: "linear-gradient(to left, black 20%, transparent)" }} />
-                    
+
+
                     {/* Swipe Overlay for Mobile */}
-                    <motion.div 
+                    <motion.div
                         className="absolute inset-0 z-50 md:hidden"
                         drag="x"
                         dragConstraints={{ left: 0, right: 0 }}
@@ -953,8 +954,6 @@ function RecruiterDashboardPreviewUI_V2({
 
 // Block 2 — Hiring — state lifted here, controls both bullets and carousel
 function HiringBlock() {
-    const { resolvedTheme } = useTheme();
-    const isLight = resolvedTheme === "light";
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
 
@@ -965,9 +964,9 @@ function HiringBlock() {
     }, [paused]);
 
     const features = [
-        { icon: ShieldCheck, label: "Verified Signal Only",     desc: "Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.",              color: "#60a5fa", slide: 0 },
-        { icon: Building2,   label: "Org-Backed Trust",         desc: "See exactly which protocols and organizations have attested to a candidate's specific work output.",              color: "#94a3b8", slide: 1 },
-        { icon: Share2,      label: "Post Anywhere, Instantly", desc: "Share a portable job link to LinkedIn, Twitter, Discord, or any platform. One link, verified by ChainVolio.", color: "#f59e0b", slide: 2 },
+        { icon: ShieldCheck, label: "Verified Signal Only", desc: "Surface candidates with proven on-chain records. No more guessing based on unverified PDF resumes.", color: "#60a5fa", slide: 0 },
+        { icon: Building2, label: "Org-Backed Trust", desc: "See exactly which protocols and organizations have attested to a candidate's specific work output.", color: "#94a3b8", slide: 1 },
+        { icon: Share2, label: "Post Anywhere, Instantly", desc: "Share a portable job link to LinkedIn, Twitter, Discord, or any platform. One link, verified by ChainVolio.", color: "#f59e0b", slide: 2 },
     ];
 
     return (
@@ -978,8 +977,8 @@ function HiringBlock() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center"
         >
-            {/* Left — interactive dashboard (preserved dark in light mode) */}
-            <div data-preserve-dark className="relative order-2 lg:order-1">
+            {/* Left — interactive dashboard */}
+            <div className="relative order-2 lg:order-1">
 
                 <RecruiterDashboardPreviewUI_V2
                     active={active}
@@ -987,7 +986,7 @@ function HiringBlock() {
                     paused={paused}
                     setPaused={setPaused}
                 />
-                
+
                 <div className="mt-8 flex justify-center lg:justify-start">
                     <Link href="/hiring/create" className="inline-flex items-center gap-2 text-sm font-bold text-white/30 hover:text-white/80 transition-colors duration-200 group">
                         Start hiring
@@ -1004,9 +1003,9 @@ function HiringBlock() {
                         <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Use Case</span>
                     </div>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Hire based on real proof,<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>not profiles.</span>
+                        Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
-                    <div className="h-0.5 w-full bg-white/15" />
+                    <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
                     </p>
@@ -1065,9 +1064,6 @@ const SLIDES = [
 // PARTNERS are now loaded dynamically from /api/logos
 
 export function LandingPageClient() {
-    const { resolvedTheme } = useTheme();
-    const isLight = resolvedTheme === "light";
-    const fadeColor = isLight ? "white" : "black";
     const { publicKey, connected } = useWallet();
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
@@ -1095,13 +1091,13 @@ export function LandingPageClient() {
             setActiveModal(modal as any);
         }
     }, [searchParams, router]);
-    
+
     // Mobile Carousel States
     const [problemIdx, setProblemIdx] = useState(1);
     const [whyIdx, setWhyIdx] = useState(1);
     const [solutionIdx, setSolutionIdx] = useState(1);
     const [isAnimating, setIsAnimating] = useState(false);
-    
+
     const problems = [
         { title: "Broken Work History", id: 0 },
         { title: "Unverifiable Resumes", id: 1 },
@@ -1219,7 +1215,7 @@ export function LandingPageClient() {
                     <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className={isLight ? "text-teal-600" : "text-white"}>That Recruiters Trust.</span>
+                            Resume <span className="text-white">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1231,11 +1227,7 @@ export function LandingPageClient() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
                         <button
                             onClick={() => setIsWalletModalOpen(true)}
-                            className={`premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 font-bold text-sm sm:text-base rounded-2xl transition-all flex items-center justify-center gap-2 ${
-                                isLight
-                                    ? "bg-gray-900 text-white hover:bg-gray-800"
-                                    : "bg-white text-black hover:bg-white/90"
-                            }`}
+                            className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                         >
                             Build Your Reputation
                         </button>
@@ -1252,11 +1244,10 @@ export function LandingPageClient() {
                         <div className="relative overflow-hidden transition-all duration-1000">
                             <div className="aspect-[14/10] sm:aspect-[16/10] relative min-h-[160px] sm:min-h-[220px] scale-[0.85] sm:scale-100">
                                 {SLIDES.map((slide, index) => (
-                                    <div 
+                                    <div
                                         key={index}
-                                        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                                            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                                        }`}
+                                        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                                            }`}
                                     >
                                         <Image
                                             src={slide.src}
@@ -1269,7 +1260,7 @@ export function LandingPageClient() {
                                 ))}
 
                                 {/* Swipe Detection for Mobile Hero */}
-                                <motion.div 
+                                <motion.div
                                     className="absolute inset-0 z-30 md:hidden cursor-grab active:cursor-grabbing"
                                     drag="x"
                                     dragConstraints={{ left: 0, right: 0 }}
@@ -1290,11 +1281,10 @@ export function LandingPageClient() {
                         <div className="mt-2 sm:mt-4 space-y-4 sm:space-y-6 flex flex-col items-center">
                             <div className="h-10 relative w-full flex justify-center">
                                 {SLIDES.map((slide, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`absolute transition-all duration-700 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${
-                                            index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
-                                        }`}
+                                    <div
+                                        key={index}
+                                        className={`absolute transition-all duration-700 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+                                            }`}
                                     >
                                         <div className="w-1 h-1 rounded-full bg-emerald-500/60" />
                                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
@@ -1303,18 +1293,17 @@ export function LandingPageClient() {
                                     </div>
                                 ))}
                             </div>
-                            
+
                             {/* Dot Indicators */}
                             <div className="flex items-center gap-3">
                                 {SLIDES.map((_, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setCurrentSlide(index)}
-                                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                                            index === currentSlide 
-                                                ? "w-8 bg-white" 
+                                        className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide
+                                                ? "w-8 bg-white"
                                                 : "w-1.5 bg-white/20 hover:bg-white/40"
-                                        }`}
+                                            }`}
                                         aria-label={`Go to slide ${index + 1}`}
                                     />
                                 ))}
@@ -1322,7 +1311,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Glow behind visual - reduced intensity */}
-                        <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
+                        <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
                     </div>
 
                     <div className="mt-8 sm:mt-16 w-full max-w-[1400px] relative z-50">
@@ -1345,34 +1334,32 @@ export function LandingPageClient() {
                                 ))}
                             </div>
                         </div>
-                        {/* Separator Line Below Logos */}
-                        <div className="w-full max-w-[1240px] mx-auto px-6 pb-8 sm:pb-24">
-                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                        </div>
+
                     </div>
                 </section>
 
+
+
                 {/* THE PROBLEM SECTION */}
-                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black mt-0 sm:-mt-24 md:-mt-32">
-                    {/* Extended Smooth Transitions to reach the image slides */}
-                    <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-transparent via-black/80 to-black -translate-y-full pointer-events-none"></div>
+                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-[#0D0D0D]">
+
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-10 md:mb-14 space-y-6">
-                            {/* Pill Badge - Simplified as per reference */}
+                            {/* Pill Badge - Editorial Light Style */}
                             <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-amber-200/60 uppercase">The problem</span>
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">The problem</span>
                             </div>
 
                             <p className="text-sm md:text-base font-medium text-white/40 tracking-tight">
                                 Why Traditional CVs Can&apos;t Be Trusted
                             </p>
-                            
-                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-nowrap">
-                                Your work is real. <span className="text-white/[0.15]">Your proof isn&apos;t.</span>
-                            </h2>
 
-                            {/* Thin horizontal line - Full width as per reference */}
-                            <div className="h-px w-full bg-white/[0.08] mt-8" />
+                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-nowrap">
+                                Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
+                            </h2>
+                            <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12" />
+
+
 
                             <p className="text-white/40 text-[13px] md:text-base font-normal max-w-3xl mx-auto mt-6">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
@@ -1380,11 +1367,11 @@ export function LandingPageClient() {
                         </div>
 
                         {/* NEW ANIMATED PROBLEM DIAGRAM */}
-                        <div className="relative w-full max-w-6xl mx-auto mb-10">
+                        <div className="relative w-full max-w-6xl mx-auto mt-16 mb-24">
                             <ProblemDiagram />
                         </div>
 
-                        {/* BENTO CARDS SECTION - Minimal Editorial Style */}
+                        {/* BENTO CARDS SECTION - Minimal Editorial Style (Light) */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20 max-w-6xl mx-auto px-4 sm:px-0 mt-14 pb-12">
                             {[
                                 {
@@ -1408,59 +1395,54 @@ export function LandingPageClient() {
                             ].map((item, idx) => (
                                 <div key={item.id} className="relative group">
                                     <div className="flex items-start gap-6">
-                                        {/* Icon Square */}
-                                        <div className="w-16 h-16 rounded-2xl bg-[#0c0c0c] border border-white/[0.08] flex items-center justify-center flex-shrink-0 group-hover:border-amber-200/30 group-hover:bg-amber-200/[0.02] transition-all duration-500">
-                                            <item.icon size={24} className="text-white/40 group-hover:text-amber-200/60 transition-colors duration-500" />
+                                        <div className="w-16 h-16 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
+                                            <item.icon size={24} className="text-white/60 group-hover:text-black transition-colors duration-500" />
                                         </div>
 
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-black text-amber-200/60 tracking-widest">{item.id}</span>
+                                                <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
                                             </div>
                                             <div className="space-y-2">
-                                                <h3 className="text-xl font-bold text-white/90 group-hover:text-white transition-colors">{item.title}</h3>
-                                                <p className="text-[13px] text-white/30 leading-relaxed group-hover:text-white/50 transition-colors">
+                                                <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
+                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
                                                     {item.desc}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Vertical Separator */}
                                     {idx < 2 && (
-                                        <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/[0.05]" />
+                                        <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/5" />
                                     )}
                                 </div>
                             ))}
 
                         </div>
 
-
                     </div>
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    </div>
+                <section className="relative pt-16 sm:pt-20 md:pt-24 lg:pt-32 z-10 bg-[#080808] overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-24 items-center">
-                            
+
                             {/* Left: Content Block */}
                             <div className="space-y-6 md:space-y-12">
                                 <div className="space-y-3 md:space-y-6">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-amber-200/60 uppercase">Why ChainVolio</span>
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99] uppercase">Why ChainVolio</span>
                                     </div>
-                                    
+
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
-                                        <span className={isLight ? "text-teal-600" : "text-white/30"}>Everything connects.</span>
+                                        <span className="text-white/30">Everything connects.</span>
                                     </h2>
-                                    <div className="h-0.5 w-full bg-white/15" />
-                                    
+                                    <div className="h-px w-full max-w-6xl bg-white/10" />
+
                                     <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
                                         Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
                                     </p>
@@ -1474,7 +1456,7 @@ export function LandingPageClient() {
                                     <div className="flex items-center gap-3">
                                         <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Built on</span>
                                         <div className="flex items-center gap-2 px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05]">
-                                            <div className="w-2 h-2 rounded-full bg-[#14F195]" />
+                                            <div className="w-2 h-2 rounded-full bg-[#0d9488]" />
                                             <span className="text-[9px] font-bold text-white/60">SOLANA</span>
                                         </div>
                                     </div>
@@ -1482,26 +1464,26 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[600px] mx-auto lg:ml-auto group rounded-2xl border border-white/[0.08] bg-black overflow-hidden flex flex-col h-full min-h-[240px] sm:min-h-[360px] md:min-h-[450px]">
-                                
+                            <div className="relative w-full max-w-[750px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[240px] sm:min-h-[360px] md:min-h-[550px] mb-8 bg-[#080808]">
+
                                 {/* Title Overlay */}
                                 <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
                                     <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
                                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
-                                </div>                                
+                                </div>
                                 <div className="flex-1 relative z-10 w-full">
                                     <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.8] sm:scale-[0.85]" />
                                 </div>
 
                                 {/* Top/Bottom Gradients to mask clipping */}
-                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black via-black/40 to-transparent z-10 pointer-events-none" />
-                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
+                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none" />
+                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none" />
 
                                 {/* Floating Stats Overlay — Refined Metrics */}
-                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-black/80 whitespace-nowrap">
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-[#080808]/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-[#080808]/80 whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-emerald-400/80 tracking-tight">Low-cost attestations (~$0.001)</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] tracking-tight">Low-cost attestations (~$0.001)</span>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <div className="flex flex-col gap-0.5">
@@ -1513,9 +1495,9 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-4 md:mt-24 overflow-hidden">
-                            <motion.div 
-                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.03] md:border md:border-white/[0.03] md:rounded-3xl md:overflow-hidden md:gap-px"
+                        <div className="relative mt-4 md:mt-8 mb-12 md:mb-24">
+                            <motion.div
+                                className="flex md:grid md:grid-cols-3 w-full"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
@@ -1529,59 +1511,66 @@ export function LandingPageClient() {
                             >
                                 {[
                                     {
-                                        title: "Portable Trust",
-                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        color: "#a78bfa"
-                                    },
-                                    {
+                                        id: "01",
                                         title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
-                                        color: "#60a5fa"
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
+                                        icon: Activity,
                                     },
                                     {
+                                        id: "02",
                                         title: "Claims to Proof",
                                         desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
-                                        color: "#14F195"
+                                        icon: ShieldCheck,
                                     },
                                     {
+                                        id: "03",
                                         title: "Portable Trust",
                                         desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        color: "#a78bfa"
+                                        icon: Globe,
                                     },
                                     {
+                                        id: "01",
                                         title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you&apos;ve done.",
-                                        color: "#60a5fa"
-                                    }
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
+                                        icon: Activity,
+                                    },
+                                    {
+                                        id: "02",
+                                        title: "Claims to Proof",
+                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
+                                        icon: ShieldCheck,
+                                    },
                                 ].map((feature, i) => (
-                                    <div 
-                                        key={i} 
-                                        className={`p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:border-none md:rounded-none md:bg-black md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                    <div
+                                        key={i}
+                                        className={`p-6 bg-transparent transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
                                     >
-                                        <div className="space-y-3 relative z-10">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-1.5 h-1.5 rounded-full" style={{ background: feature.color }} />
-                                                <h3 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: feature.color + "cc" }}>{feature.title}</h3>
+                                        <div className="space-y-4 relative z-10">
+                                            <span className="text-[10px] font-black text-white/25 tracking-widest">{feature.id}</span>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2.5">
+                                                    <feature.icon size={16} className="text-white/50 flex-shrink-0" />
+                                                    <h3 className="text-xl font-bold text-[#fde68a99]">{feature.title}</h3>
+                                                </div>
+                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+                                                    {feature.desc}
+                                                </p>
                                             </div>
-                                            <p className="text-white/40 text-[12px] sm:text-sm leading-relaxed font-normal group-hover:text-white/60 transition-colors">
-                                                {feature.desc}
-                                            </p>
                                         </div>
                                     </div>
                                 ))}
                             </motion.div>
 
                             {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50">
+                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50 mb-6">
                                 {[0, 1, 2].map((i) => (
                                     <button
                                         key={i}
                                         onClick={() => handleWhyLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${
-                                            (whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4)) 
-                                                ? "w-8 bg-white" 
+                                        className={`h-1 rounded-full transition-all duration-300 ${(whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4))
+                                                ? "w-8 bg-white"
                                                 : "w-1.5 bg-white/20"
-                                        }`}
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -1589,6 +1578,9 @@ export function LandingPageClient() {
                     </div>
                 </section>
 
+
+                {/* DIVIDER: why → black */}
+                <div className="h-px w-full bg-black/10" />
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section id="problems" className="pt-8 pb-8 sm:py-12 md:py-16 relative z-10 bg-black overflow-hidden">
@@ -1599,14 +1591,14 @@ export function LandingPageClient() {
                             <div className="max-w-xl space-y-2 md:space-y-4">
                                 {/* badge */}
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-amber-200/60">Signal vs noise</span>
+                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99]">Signal vs noise</span>
                                 </div>
                                 <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                     Why Web3 Needs Verifiable Work History
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
-                                    <span className={isLight ? "text-teal-600" : "text-white/30"}>Verifiable Signal</span>
+                                    <span className="text-white/30">Verifiable Signal</span>
                                 </h2>
                             </div>
                         </div>
@@ -1678,7 +1670,7 @@ export function LandingPageClient() {
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
                         <div className="relative overflow-hidden">
-                            <motion.div 
+                            <motion.div
                                 className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.05] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.05] md:gap-px"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
@@ -1695,39 +1687,39 @@ export function LandingPageClient() {
                                     {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "#a78bfa",
+                                        accent: "#fde68a99",
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "#14F195",
+                                        accent: "#fde68a99",
                                     },
                                     {
                                         label: "On-Chain Attestation",
                                         desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
-                                        accent: "#60a5fa",
+                                        accent: "#fde68a99",
                                     },
                                     {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "#a78bfa",
+                                        accent: "#fde68a99",
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "#14F195",
+                                        accent: "#fde68a99",
                                     },
                                 ].map((item, i) => (
-                                    <div 
-                                        key={i} 
+                                    <div
+                                        key={i}
                                         className={`p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl group transition-all duration-300 w-[80vw] md:w-auto flex-shrink-0 md:border-none md:rounded-none md:bg-black md:px-8 md:py-7 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
                                     >
                                         <div className="flex items-center gap-2 mb-3">
                                             <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                                                style={{ background: item.accent + "60" }}
+                                                style={{ background: "#fde68a99" }}
                                             />
                                             <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
-                                                style={{ color: item.accent + "99" }}
+                                                style={{ color: "#fde68a99" }}
                                             >
                                                 {item.label}
                                             </span>
@@ -1745,11 +1737,10 @@ export function LandingPageClient() {
                                     <button
                                         key={i}
                                         onClick={() => handleSolutionLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${
-                                            (solutionIdx === i + 1 || (i === 2 && solutionIdx === 0) || (i === 0 && solutionIdx === 4)) 
-                                                ? "w-8 bg-white" 
+                                        className={`h-1 rounded-full transition-all duration-300 ${(solutionIdx === i + 1 || (i === 2 && solutionIdx === 0) || (i === 0 && solutionIdx === 4))
+                                                ? "w-8 bg-white"
                                                 : "w-1.5 bg-white/20"
-                                        }`}
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -1769,22 +1760,23 @@ export function LandingPageClient() {
                                 <div className="max-w-xl space-y-2 md:space-y-4">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                         <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">
-                                             The Solution
+                                            The Solution
                                         </span>
                                     </div>
                                     <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
                                         Build a Verifiable Web3 Resume with On-Chain Proof
                                     </p>
                                     <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                        Build a reputation<br /><span className={isLight ? "text-teal-600" : "text-white/30"}>that travels.</span>
+                                        Build a reputation<br /><span className="text-white/30">that travels.</span>
                                     </h3>
                                 </div>
-                                <div className="h-0.5 w-full md:w-[140%] bg-white/15 relative z-10" />
+
                             </div>
                             <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xs md:text-right md:pt-20">
                                 Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
                             </p>
                         </div>
+                        <div className="w-full max-w-[1240px] mx-auto h-px bg-white/10 mt-12 mb-12" />
 
                         {/* ── Interactive Flow ── */}
                         <div className="relative w-full max-w-[860px] mx-auto mb-4">
@@ -1796,9 +1788,9 @@ export function LandingPageClient() {
                         {/* ── 3 compact attributes — replaces the old text card ── */}
                         <div className="flex flex-nowrap items-center justify-center gap-x-3 md:gap-x-8 gap-y-3 mb-0 mt-2 md:mt-4">
                             {[
-                                { icon: ShieldCheck, label: "On-Chain Proof",       color: "#14F195" },
+                                { icon: ShieldCheck, label: "On-Chain Proof", color: "#14F195" },
                                 { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
-                                { icon: Lock,         label: "Impossible to Fake",  color: "#a78bfa" },
+                                { icon: Lock, label: "Impossible to Fake", color: "#a78bfa" },
                             ].map(({ icon: Icon, label, color }, i) => (
                                 <div key={i} className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
                                     <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color }} />
@@ -1813,19 +1805,21 @@ export function LandingPageClient() {
                         {/* ── UI Mockup ── */}
                         <div className="relative h-[220px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
                             <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full opacity-40 pointer-events-none" />
-                            
+
                             {/* Unified Scaling Container for the entire assembly */}
                             <div className="relative scale-[0.31] min-[440px]:scale-[0.4] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[1200px] h-[650px]">
                                 <div className="relative w-full h-full group">
-                                    {/* Main Dashboard Mockup — preserved dark in light mode */}
-                                    <div data-preserve-dark className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden text-left relative">
+                                    {/* Main Dashboard Mockup */}
+                                    <div className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
+                                        style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
+                                    >
                                         <MockProfileUI />
                                     </div>
 
-                                    {/* Floating Proof Card — preserved dark in light mode */}
+                                    {/* Floating Proof Card - Now visible on all screens, part of the scaled assembly */}
                                     <div className="absolute -right-16 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
                                         <div className="[perspective:1500px]">
-                                            <div data-preserve-dark className="shadow-[0_40px_80px_rgba(0,0,0,0.7)] rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
+                                            <div className="rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
                                                 <FloatingVerificationCard />
                                             </div>
                                         </div>
@@ -1837,23 +1831,16 @@ export function LandingPageClient() {
                     </div>
                 </section>
 
-                {/* PRODUCT SECTION */}
-                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    </div>
-
-                    <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
-                        
-                        {/* BLOCK 1 — ATTESTATION */}
+                {/* CORE FEATURE SECTION */}
+                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D]">
+                    <div className="max-w-[1200px] mx-auto relative z-10">
                         <AttestationBlock />
+                    </div>
+                </section>
 
-                        {/* Refined Divider Text */}
-                        <div className="flex items-center justify-center gap-8 opacity-10">
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white" />
-                            <span className="text-[9px] font-bold uppercase tracking-[0.4em] whitespace-nowrap">From proof to hiring decisions</span>
-                            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white" />
-                        </div>
+                {/* USE CASE SECTION */}
+                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808]">
+                    <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
 
                         {/* BLOCK 2 — HIRING */}
                         <HiringBlock />
@@ -1863,19 +1850,21 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-12 sm:py-16 md:py-20 relative z-10 overflow-hidden bg-black">
+                <section className="py-24 sm:py-32 md:py-40 relative z-10 overflow-hidden bg-[#080808]">
                     {/* Subtle grid */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-                        backgroundSize: "88px 88px"
+                        backgroundSize: "88px 88px",
+                        maskImage: "radial-gradient(circle at center, white 0%, transparent 80%)",
+                        WebkitMaskImage: "radial-gradient(circle at center, white 0%, transparent 80%)"
                     }} />
                     {/* Radial glow center */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] rounded-full pointer-events-none"
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
                     />
                     {/* Top + bottom fade */}
-                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#080808] to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#080808] to-transparent pointer-events-none" />
 
                     <div className="relative max-w-[760px] mx-auto text-center z-10">
                         <motion.div
@@ -1885,8 +1874,8 @@ export function LandingPageClient() {
                             transition={{ duration: 0.9, ease: "easeOut" }}
                         >
                             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
-                                 Start Building Your<br />
-                                 <span className="text-white/30">Verifiable Web3 Resume.</span>
+                                Start Building Your<br />
+                                <span className="text-white/30">Verifiable Web3 Resume.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
@@ -1933,16 +1922,10 @@ export function LandingPageClient() {
             )}
 
             {activeModal && (
-                <div
-                    className={`fixed inset-0 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-8 ${isLight ? "bg-black/30" : "bg-black/80"}`}
-                    onClick={() => setActiveModal(null)}
-                >
-                    <div
-                        className={`relative border rounded-sm max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden group ${isLight ? "border-black/10 bg-white shadow-2xl" : "border-white/20"}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {!isLight && <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>}
-                        <div className={`relative z-10 p-5 sm:p-8 md:p-12 max-h-[90vh] sm:max-h-[80vh] overflow-y-auto custom-scrollbar ${isLight ? "" : "bg-black/40 backdrop-blur-sm"}`}>
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-3 sm:p-8" onClick={() => setActiveModal(null)}>
+                    <div className="relative border border-white/20 rounded-sm max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden group" onClick={(e) => e.stopPropagation()}>
+                        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-70"><source src="/box%20navigation.mp4" type="video/mp4" /></video>
+                        <div className="relative z-10 p-5 sm:p-8 md:p-12 bg-black/40 backdrop-blur-sm max-h-[90vh] sm:max-h-[80vh] overflow-y-auto custom-scrollbar">
                             <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-white/40 hover:text-white/90 transition-colors text-2xl z-20">&times;</button>
                             {activeModal === 'recruiters' && (
                                 <div className="space-y-16 py-4">
@@ -2432,9 +2415,9 @@ const NETWORK_ICONS = [
 ];
 
 function SignalNoiseVisual() {
-    const canvasRef  = useRef<HTMLCanvasElement>(null);
-    const mouseRef   = useRef({ x: -9999, y: -9999, active: false });
-    const rafRef     = useRef<number>(0);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const mouseRef = useRef({ x: -9999, y: -9999, active: false });
+    const rafRef = useRef<number>(0);
     const visibleRef = useRef(false);
 
     useEffect(() => {
@@ -2467,51 +2450,51 @@ function SignalNoiseVisual() {
             const countC = isMobile ? 60 : 100;
 
             const layerA = Array.from({ length: countA }, (_, i) => ({
-                baseAngle:   (i / countA) * Math.PI * 2 + Math.random() * 0.12,
-                length:      40 + Math.random() * 80,
-                wobbleAmp:   0.04 + Math.random() * 0.06,
-                wobbleSpeed: 0.6  + Math.random() * 1.2,
+                baseAngle: (i / countA) * Math.PI * 2 + Math.random() * 0.12,
+                length: 40 + Math.random() * 80,
+                wobbleAmp: 0.04 + Math.random() * 0.06,
+                wobbleSpeed: 0.6 + Math.random() * 1.2,
                 wobblePhase: Math.random() * Math.PI * 2,
-                opacity:     0.18 + Math.random() * 0.30,
-                thickness:   0.5  + Math.random() * 0.5,
-                dotR:        0.6  + Math.random() * 0.8,
-                iconIdx:     -1
+                opacity: 0.18 + Math.random() * 0.30,
+                thickness: 0.5 + Math.random() * 0.5,
+                dotR: 0.6 + Math.random() * 0.8,
+                iconIdx: -1
             }));
 
             const layerB = Array.from({ length: countB }, (_, i) => ({
-                baseAngle:   (i / countB) * Math.PI * 2 + Math.random() * 0.15,
-                length:      150 + Math.random() * 180,
-                wobbleAmp:   0.03 + Math.random() * 0.07,
-                wobbleSpeed: 0.3  + Math.random() * 0.8,
+                baseAngle: (i / countB) * Math.PI * 2 + Math.random() * 0.15,
+                length: 150 + Math.random() * 180,
+                wobbleAmp: 0.03 + Math.random() * 0.07,
+                wobbleSpeed: 0.3 + Math.random() * 0.8,
                 wobblePhase: Math.random() * Math.PI * 2,
-                opacity:     0.08 + Math.random() * 0.20,
-                thickness:   0.4  + Math.random() * 0.45,
-                dotR:        0.8  + Math.random() * 1.2,
-                iconIdx:     -1
+                opacity: 0.08 + Math.random() * 0.20,
+                thickness: 0.4 + Math.random() * 0.45,
+                dotR: 0.8 + Math.random() * 1.2,
+                iconIdx: -1
             }));
 
             const layerC = Array.from({ length: countC }, (_, i) => ({
-                baseAngle:   (i / countC) * Math.PI * 2 + Math.random() * 0.2,
-                length:      320 + Math.random() * 230,
-                wobbleAmp:   0.02 + Math.random() * 0.04,
-                wobbleSpeed: 0.2  + Math.random() * 0.5,
+                baseAngle: (i / countC) * Math.PI * 2 + Math.random() * 0.2,
+                length: 320 + Math.random() * 230,
+                wobbleAmp: 0.02 + Math.random() * 0.04,
+                wobbleSpeed: 0.2 + Math.random() * 0.5,
                 wobblePhase: Math.random() * Math.PI * 2,
-                opacity:     0.05 + Math.random() * 0.12,
-                thickness:   0.3  + Math.random() * 0.35,
-                dotR:        1.0  + Math.random() * 1.5,
-                iconIdx:     -1
+                opacity: 0.05 + Math.random() * 0.12,
+                thickness: 0.3 + Math.random() * 0.35,
+                dotR: 1.0 + Math.random() * 1.5,
+                iconIdx: -1
             }));
 
             // Helper to assign icons to a layer evenly across 360 degrees to prevent overlaps
             const assignIconsToLayer = (layer: any[], iconIndices: number[], angleOffset: number = 0) => {
                 const numIcons = iconIndices.length;
                 const sectorSize = (Math.PI * 2) / numIcons;
-                
+
                 iconIndices.forEach((iconIdx, i) => {
                     const targetAngle = (i * sectorSize + angleOffset) % (Math.PI * 2);
                     let bestRay: any = null;
                     let minDiff = Infinity;
-                    
+
                     layer.forEach(ray => {
                         if (ray.iconIdx === -1) {
                             let diff = Math.abs((ray.baseAngle % (Math.PI * 2)) - targetAngle);
@@ -2522,7 +2505,7 @@ function SignalNoiseVisual() {
                             }
                         }
                     });
-                    
+
                     if (bestRay) {
                         bestRay.iconIdx = iconIdx;
                     }
@@ -2543,11 +2526,11 @@ function SignalNoiseVisual() {
         let rays = makeLayers();
 
         const resize = () => {
-            const dpr  = window.devicePixelRatio || 1;
+            const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
             W = rect.width;
             H = rect.height;
-            canvas.width  = W * dpr;
+            canvas.width = W * dpr;
             canvas.height = H * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         };
@@ -2563,11 +2546,11 @@ function SignalNoiseVisual() {
             const ox = W / 2;
             const oy = H / 2;
 
-            const mx      = mouseRef.current.x;
-            const my      = mouseRef.current.y;
+            const mx = mouseRef.current.x;
+            const my = mouseRef.current.y;
             const mActive = mouseRef.current.active;
-            const mAngle  = Math.atan2(my - oy, mx - ox);
-            const mNorm   = mActive
+            const mAngle = Math.atan2(my - oy, mx - ox);
+            const mNorm = mActive
                 ? Math.min(Math.hypot(mx - ox, my - oy) / (Math.min(W, H) * 0.45), 1)
                 : 0;
 
@@ -2576,14 +2559,14 @@ function SignalNoiseVisual() {
 
                 let scatter = 0;
                 if (mActive && mNorm > 0.04) {
-                    const da  = ray.baseAngle - mAngle;
+                    const da = ray.baseAngle - mAngle;
                     const nda = Math.atan2(Math.sin(da), Math.cos(da));
-                    scatter   = Math.exp(-nda * nda * 5) * mNorm * 0.5;
+                    scatter = Math.exp(-nda * nda * 5) * mNorm * 0.5;
                 }
 
                 const angle = ray.baseAngle + wobble + scatter;
                 const lMult = 1 + (mNorm * Math.exp(-Math.abs(Math.atan2(Math.sin(ray.baseAngle - mAngle), Math.cos(ray.baseAngle - mAngle))) * 1.8) * 0.3);
-                const len   = ray.length * lMult;
+                const len = ray.length * lMult;
 
                 const ex = ox + Math.cos(angle) * len;
                 const ey = oy + Math.sin(angle) * len;
@@ -2593,7 +2576,7 @@ function SignalNoiseVisual() {
                 ctx.moveTo(ox, oy);
                 ctx.lineTo(ex, ey);
                 ctx.strokeStyle = `rgba(255,255,255,${ray.opacity})`;
-                ctx.lineWidth   = ray.thickness;
+                ctx.lineWidth = ray.thickness;
                 ctx.stroke();
 
                 // Draw Endpoint (Icon or Dot)

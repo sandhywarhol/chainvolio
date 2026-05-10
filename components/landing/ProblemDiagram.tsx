@@ -2,10 +2,10 @@
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { 
-    Github, 
-    Linkedin, 
-    Slack, 
+import {
+    Github,
+    Linkedin,
+    Slack,
     Trello,
     Figma,
     Triangle,
@@ -55,27 +55,32 @@ const QUESTIONS = [
 export default function ProblemDiagram() {
     const W = 1100;
     const H = 400; // Reduced height to crop empty space
-    const col1X = 170; 
-    const col2X = 550; 
-    const col3X = 930; 
+    const col1X = 170;
+    const col2X = 550;
+    const col3X = 930;
 
     const waveCount = 18;
     const chaosEndX = 820;
 
     const resultDots = useMemo(() => {
         const dots = [];
-        for (let i = 0; i < 1200; i++) { // Slightly more dots for core density
+        // Increase total dots for much higher density
+        for (let i = 0; i < 2200; i++) {
             const angle = Math.random() * Math.PI * 2;
-            // Higher power (2.0) concentrates more dots near the center
-            const rFactor = Math.pow(Math.random(), 2.0);
-            const rBase = 10 + rFactor * 65; 
-            
+
+            // Higher power (3.0) concentrates much more dots near the center for a "core" effect
+            const rFactor = Math.pow(Math.random(), 3.0);
+
+            // Core density adjustment: inner 20px are much more packed
+            const rBase = 5 + rFactor * 75;
+
             dots.push({
                 x: Math.cos(angle) * rBase,
                 y: Math.sin(angle) * rBase,
-                size: 0.1 + Math.random() * 0.7,
-                // Opacity fades out based on distance from center (rFactor)
-                opacity: (0.1 + Math.random() * 0.3) * (1 - rFactor * 0.9)
+                // Central dots are slightly more varied in size
+                size: (rFactor < 0.1 ? 0.3 : 0.1) + Math.random() * 0.8,
+                // Opacity also higher in center
+                opacity: (0.15 + Math.random() * 0.4) * (1 - rFactor * 0.8)
             });
         }
         return dots;
@@ -103,12 +108,12 @@ export default function ProblemDiagram() {
             const amplitudeBase = 70 + (i % 4) * 15 + Math.random() * 20;
             const frequency = 1.0 + (i % 3) * 0.4;
             const phase = i * (Math.PI / 4);
-            
+
             // 1. DYNAMIC CROSSING START (Tightened)
             // Each path enters at a staggered X to avoid the "gate" look
-            const chaosStartX = 290 + Math.random() * 60; 
+            const chaosStartX = 290 + Math.random() * 60;
             const chaosWidth = chaosEndX - chaosStartX;
-            
+
             // Tightened spread: cross closer to the center without merging
             let targetY;
             if (src.y < 250) {
@@ -118,7 +123,7 @@ export default function ProblemDiagram() {
             }
 
             let d = `M ${src.x + 10} ${src.y}`;
-            
+
             // Controlled organic curves for the crossing phase
             const cp1x = src.x + 60 + Math.random() * 30;
             const cp2x = chaosStartX - 60 - Math.random() * 30;
@@ -145,7 +150,7 @@ export default function ProblemDiagram() {
             const radius = 60 + Math.random() * 20; // Tightened radius to match new galaxy size
             const targetEndX = col3X + Math.cos(ringAngle) * radius;
             const targetEndY = 250 + Math.sin(ringAngle) * radius;
-            
+
             // Add a spiral segment that circles around the core
             const spiralRotation = Math.PI * (0.6 + Math.random() * 0.4); // 100-180 degree wrap
             const spiralEndX = col3X + Math.cos(ringAngle + spiralRotation) * (radius * 0.5);
@@ -153,7 +158,7 @@ export default function ProblemDiagram() {
 
             // Connect chaos wave to the spiral start
             d += ` C ${chaosEndX + 100} ${250}, ${col3X - 80} ${targetEndY}, ${targetEndX} ${targetEndY}`;
-            
+
             // Add the wrapping arc (using a quadratic curve as a simple spiral approximation)
             const midAngle = ringAngle + spiralRotation * 0.5;
             const cpX = col3X + Math.cos(midAngle) * radius * 1.3;
@@ -180,7 +185,7 @@ export default function ProblemDiagram() {
                 const currentAmp = amplitudeBase * envelope;
                 const angle = progress * Math.PI * 2 * frequency + phase;
                 const dotY = 250 + Math.sin(angle) * currentAmp;
-                
+
                 // Avoid collision with floating questions
                 const isTooClose = QUESTIONS.some(q => {
                     const dx = dotX - q.x;
@@ -206,32 +211,32 @@ export default function ProblemDiagram() {
     }, []);
 
     return (
-        <div className="w-full relative pt-0 pb-0 overflow-hidden bg-black select-none">
-            <svg 
-                viewBox="0 30 1100 370" 
+        <div className="w-full relative pt-0 pb-0 overflow-hidden bg-transparent select-none">
+            <svg
+                viewBox="0 30 1100 370"
                 className="w-full h-auto overflow-visible"
                 preserveAspectRatio="xMidYMid meet"
             >
                 <defs>
                     <filter id="cinematicGlow">
-                        <feGaussianBlur stdDeviation="1.2" result="blur"/>
+                        <feGaussianBlur stdDeviation="1.2" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
                     <filter id="bloomEffect">
-                        <feGaussianBlur stdDeviation="6" result="blur"/>
+                        <feGaussianBlur stdDeviation="6" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
-                    
+
                     <filter id="tracerGlow">
-                        <feGaussianBlur stdDeviation="0.8" result="blur"/>
+                        <feGaussianBlur stdDeviation="1.2" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
-                    
+
                     <linearGradient id="cloudAbsorption" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stopColor="white" />
                         <stop offset="60%" stopColor="white" />
-                        <stop offset="80%" stopColor="white" stopOpacity="0.4" />
-                        <stop offset="88%" stopColor="black" />
+                        <stop offset="85%" stopColor="white" stopOpacity="0.3" />
+                        <stop offset="95%" stopColor="black" />
                     </linearGradient>
                     <mask id="signalMask" maskUnits="userSpaceOnUse">
                         <rect x="0" y="0" width={W} height={H} fill="url(#cloudAbsorption)" />
@@ -239,7 +244,7 @@ export default function ProblemDiagram() {
                 </defs>
 
                 {/* --- Narrative Stage Labels --- */}
-                <g style={{ opacity: 0.3 }}>
+                <g style={{ opacity: 0.8 }}>
                     <g transform={`translate(${col1X}, 40)`} textAnchor="middle">
                         <text fill="white" fontSize="13" fontWeight="700">Your work</text>
                         <text y="18" fill="white" fontSize="10" opacity="0.4" fontWeight="400">Everywhere</text>
@@ -266,7 +271,7 @@ export default function ProblemDiagram() {
                 </g>
 
                 {/* --- Static Guide Lines --- */}
-                <g opacity="0.02">
+                <g opacity="0.08">
                     {paths.map((p) => (
                         <path key={`g-${p.id}`} d={p.d} fill="none" stroke="white" strokeWidth="0.5" />
                     ))}
@@ -282,20 +287,20 @@ export default function ProblemDiagram() {
                                     d={path.d}
                                     fill="none"
                                     stroke="white"
-                                    strokeWidth={tracer.strokeWidth * 0.8}
+                                    strokeWidth={tracer.strokeWidth * 1.5}
                                     strokeLinecap="round"
-                                    initial={{ 
+                                    initial={{
                                         strokeDasharray: `${tracer.length} 3500`,
                                         strokeDashoffset: tracer.length,
-                                        opacity: 0 
+                                        opacity: 0
                                     }}
-                                    animate={{ 
+                                    animate={{
                                         strokeDashoffset: -3500,
-                                        opacity: [0, tracer.opacity * 0.8, tracer.opacity * 0.8, 0]
+                                        opacity: [0, tracer.opacity * 1.2, tracer.opacity * 1.2, 0]
                                     }}
-                                    transition={{ 
-                                        duration: tracer.duration, 
-                                        repeat: Infinity, 
+                                    transition={{
+                                        duration: tracer.duration * 0.8,
+                                        repeat: Infinity,
                                         delay: tracer.delay,
                                         ease: "linear"
                                     }}
@@ -308,12 +313,12 @@ export default function ProblemDiagram() {
                                     key={`dot-${path.id}-${dot.id}`}
                                     cx={dot.x}
                                     cy={dot.y}
-                                    r={dot.size}
+                                    r={dot.size * 1.2}
                                     fill="white"
                                     initial={{ opacity: 0 }}
-                                    animate={{ 
-                                        opacity: [0, 0.5, 0],
-                                        scale: [0.7, 1.3, 0.7]
+                                    animate={{
+                                        opacity: [0, 0.6, 0],
+                                        scale: [0.7, 1.4, 0.7]
                                     }}
                                     transition={{
                                         duration: dot.duration,
@@ -330,23 +335,40 @@ export default function ProblemDiagram() {
                 {/* --- Result Target (Hollow Ring Zone) --- */}
                 <g transform={`translate(${col3X}, 250)`}>
                     {/* Atmospheric Glow in the empty center */}
-                    <motion.circle 
-                        r="25" 
-                        fill="rgba(255,255,255,0.02)" 
+                    <motion.circle
+                        r="25"
+                        fill="rgba(255,255,255,0.03)"
                         filter="url(#bloomEffect)"
-                        animate={{ 
-                            opacity: [0.1, 0.25, 0.1],
-                            scale: [0.9, 1.1, 0.9]
+                        animate={{
+                            opacity: [0.05, 0.2, 0.05],
+                            scale: [0.9, 1.2, 0.9]
                         }}
                         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                     />
-                    
+
                     <motion.g
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 200, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 160, repeat: Infinity, ease: "linear" }}
                     >
                         {resultDots.map((dot, i) => (
-                            <circle key={`d-${i}`} cx={dot.x} cy={dot.y} r={dot.size} fill="white" opacity={dot.opacity} />
+                            <motion.circle
+                                key={`d-${i}`}
+                                cx={dot.x}
+                                cy={dot.y}
+                                r={dot.size}
+                                fill="white"
+                                initial={{ opacity: dot.opacity * 1.5 }}
+                                animate={i % 5 === 0 ? {
+                                    opacity: [dot.opacity * 1.2, dot.opacity * 2.5, dot.opacity * 1.2],
+                                    scale: [1, 1.5, 1]
+                                } : {}}
+                                transition={{
+                                    duration: 3 + (i % 4),
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: (i % 10) * 0.2
+                                }}
+                            />
                         ))}
                     </motion.g>
                 </g>
@@ -358,7 +380,7 @@ export default function ProblemDiagram() {
                             key={`l-${i}`}
                             initial={{ opacity: 0, y: 0 }}
                             animate={{
-                                opacity: [0.2, 0.7, 0.2],
+                                opacity: [0.4, 0.9, 0.4],
                                 y: [0, -6, 0]
                             }}
                             transition={{
@@ -368,17 +390,18 @@ export default function ProblemDiagram() {
                                 ease: "easeInOut"
                             }}
                         >
-                            <line 
-                                x1={q.x} y1={q.y + 12} x2={q.x} y2={q.anchorY} 
-                                stroke="white" strokeWidth="0.5" strokeDasharray="1 3" opacity="0.08" 
+                            <line
+                                x1={q.x} y1={q.y + 12} x2={q.x} y2={q.anchorY}
+                                stroke="white" strokeWidth="0.5" strokeDasharray="1 3" opacity="0.1"
                             />
-                            <rect 
-                                x={q.x - 55} y={q.y - 11} width="110" height="22" rx="6" 
-                                fill="#050505" stroke="rgba(255,255,255,0.12)" strokeWidth="1" 
+                            <rect
+                                x={q.x - 55} y={q.y - 11} width="110" height="22" rx="6"
+                                fill="white" stroke="rgba(0,0,0,0.1)" strokeWidth="1"
+                                className="shadow-sm"
                             />
-                            <text 
-                                x={q.x} y={q.y + 4} textAnchor="middle" 
-                                fill="white" fontSize="8.5" fontWeight="500" opacity="0.75"
+                            <text
+                                x={q.x} y={q.y + 4} textAnchor="middle"
+                                fill="black" fontSize="8.5" fontWeight="500" opacity="1"
                                 letterSpacing="0.02em"
                             >
                                 {q.text}
@@ -389,41 +412,35 @@ export default function ProblemDiagram() {
 
                 {/* --- Source Icons with Pulse --- */}
                 {SOURCE_ICONS.map((src, i) => (
-                    <motion.g 
-                        key={`src-${i}`} 
-                        style={{ x: src.x - 20, y: src.y - 20 }}
-                    >
-                        <rect 
-                            width="40" height="40" rx="12" 
-                            fill="#050505" stroke="rgba(255,255,255,0.03)" strokeWidth="1" 
-                        />
-                        <motion.rect 
-                            width="40" height="40" rx="12" 
-                            fill="none" stroke="white" strokeWidth="1"
-                            initial={{ opacity: 0 }}
-                            animate={{ 
-                                opacity: [0, 0.15, 0],
-                                scale: [1, 1.05, 1]
+                    <g key={`src-wrapper-${i}`} transform={`translate(${src.x - 20}, ${src.y - 20})`}>
+                        <motion.g
+                            initial={{ opacity: 1, y: 0 }}
+                            animate={{
+                                scale: [1, 1.1, 1],
+                                opacity: [1, 0.85, 1]
                             }}
-                            transition={{ 
-                                repeat: Infinity, 
-                                duration: 4, 
-                                delay: i * 0.4, 
-                                ease: "easeInOut" 
+                            whileHover={{ scale: 1.15 }}
+                            transition={{
+                                repeat: Infinity,
+                                duration: 3,
+                                delay: i * 0.4,
+                                ease: "easeInOut"
                             }}
-                        />
-                        <foreignObject x="11" y="11" width={ICON_SIZE} height={ICON_SIZE}>
-                            <motion.div 
-                                className="flex items-center justify-center h-full"
-                                animate={{ 
-                                    color: ["rgba(255,255,255,0.15)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.15)"]
-                                }}
-                                transition={{ repeat: Infinity, duration: 4, delay: i * 0.4 }}
-                            >
-                                <src.icon size={ICON_SIZE} strokeWidth={1} />
-                            </motion.div>
-                        </foreignObject>
-                    </motion.g>
+                            className="cursor-pointer group/icon"
+                        >
+                            <rect
+                                width="40" height="40" rx="12"
+                                fill="white"
+                                stroke="rgba(0,0,0,0.1)"
+                                strokeWidth="1"
+                            />
+                            <foreignObject x="11" y="11" width={ICON_SIZE} height={ICON_SIZE}>
+                                <div className="flex items-center justify-center h-full text-black pointer-events-none">
+                                    <src.icon size={ICON_SIZE} strokeWidth={1.5} />
+                                </div>
+                            </foreignObject>
+                        </motion.g>
+                    </g>
                 ))}
             </svg>
         </div>

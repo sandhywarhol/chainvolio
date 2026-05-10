@@ -98,6 +98,22 @@ function getLandDots(): Promise<Float32Array> {
   return _promise;
 }
 
+// ─── spherical linear interpolation ──────────────────────────────────────────
+
+function slerp(
+  ax: number, ay: number, az: number,
+  bx: number, by: number, bz: number,
+  t: number
+): [number, number, number] {
+  const cosA = Math.max(-1, Math.min(1, ax * bx + ay * by + az * bz));
+  const omega = Math.acos(cosA);
+  if (omega < 0.0001) return [ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t];
+  const sinOmega = Math.sin(omega);
+  const s0 = Math.sin((1 - t) * omega) / sinOmega;
+  const s1 = Math.sin(t * omega) / sinOmega;
+  return [s0 * ax + s1 * bx, s0 * ay + s1 * by, s0 * az + s1 * bz];
+}
+
 // ─── projection constants ─────────────────────────────────────────────────────
 
 const THETA = 0.22; // fixed X-tilt (same as cobe default)
@@ -127,11 +143,10 @@ export default function GlobeCanvas({ className }: { className?: string }) {
       
       const n = d.length / 4;
       const hubs: { idx: number; targets: number[]; color: string }[] = [];
-      const colors = ["#ffffff", "#ffffff", "#ffffff"];
-      
-      // Create 3 hubs with distinct colors
-      // Create 3 hubs with distinct colors, ensuring they are spread out
-      for (let i = 0; i < 3; i++) {
+      const colors = ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
+
+      // Create 5 hubs spread across the globe — ensures front-face coverage during rotation
+      for (let i = 0; i < 5; i++) {
           let hubIdx = -1;
           let bestHubIdx = -1;
           let maxMinDist = -1;
@@ -159,20 +174,37 @@ export default function GlobeCanvas({ className }: { className?: string }) {
           }
           hubIdx = bestHubIdx;
           
+          // Build local tangent frame at hub for angular spread measurement
+          const hx = d[hubIdx * 4], hy = d[hubIdx * 4 + 1], hz = d[hubIdx * 4 + 2];
+          let nnx = hz, nny = 0, nnz = -hx;
+          if (Math.abs(hy) >= 0.9) { nnx = 0; nny = hz; nnz = -hy; }
+          const nnLen = Math.hypot(nnx, nny, nnz) || 1;
+          nnx /= nnLen; nny /= nnLen; nnz /= nnLen;
+          const nex = hy * nnz - hz * nny, ney = hz * nnx - hx * nnz, nez = hx * nny - hy * nnx;
+
+          // Pick exactly 5 targets, each in a distinct angular sector (~72° apart)
           const targets: number[] = [];
-          const numTargets = 10 + Math.floor(Math.random() * 5); 
+          const targetAngles: number[] = [];
+          const MIN_ANG_SEP = (Math.PI * 2) / 5 * 0.55; // ~40° min separation
           let attempts = 0;
-          while (targets.length < numTargets && attempts < 200) {
+          while (targets.length < 5 && attempts < 1000) {
               attempts++;
               const targetIdx = Math.floor(Math.random() * n);
-              const d3d = Math.hypot(
-                  d[hubIdx * 4] - d[targetIdx * 4],
-                  d[hubIdx * 4 + 1] - d[targetIdx * 4 + 1],
-                  d[hubIdx * 4 + 2] - d[targetIdx * 4 + 2]
-              );
-              if (d3d > 0.8) { // Increased minimum distance to target for a "wider" network
-                  targets.push(targetIdx);
+              const tx = d[targetIdx * 4], ty = d[targetIdx * 4 + 1], tz = d[targetIdx * 4 + 2];
+              if (Math.hypot(hx - tx, hy - ty, hz - tz) < 0.6) continue;
+              // Project onto hub tangent plane to measure angular direction
+              const dot = hx * tx + hy * ty + hz * tz;
+              const tanX = tx - dot * hx, tanY = ty - dot * hy, tanZ = tz - dot * hz;
+              const angle = Math.atan2(tanX * nex + tanY * ney + tanZ * nez,
+                                       tanX * nnx + tanY * nny + tanZ * nnz);
+              // Reject if angularly too close to any existing target
+              let tooClose = false;
+              for (const a of targetAngles) {
+                  let diff = Math.abs(angle - a);
+                  if (diff > Math.PI) diff = 2 * Math.PI - diff;
+                  if (diff < MIN_ANG_SEP) { tooClose = true; break; }
               }
+              if (!tooClose) { targets.push(targetIdx); targetAngles.push(angle); }
           }
           hubs.push({ idx: hubIdx, targets, color: colors[i] });
       }
@@ -232,8 +264,8 @@ export default function GlobeCanvas({ className }: { className?: string }) {
 
       if (!pauseRef.current) {
         phiRef.current += 0.0022;
-        timeRef.current += 1;
       }
+      timeRef.current += 1; // always advance — comets keep running even when globe is paused
 
       const dots = dotsRef.current;
       const n = dots.length / 4;
@@ -345,146 +377,205 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         }
       }
 
-      // ── Pass 3: Draw Neural Network Connections ────────────────────────────
+      // ── Pass 3: Elevated Geodesic Burst + Persistent Growing Trace ──────────
       if (networkRef.current && networkRef.current.hubs.length > 0) {
           const hubs = networkRef.current.hubs;
-          
+          const GEO_STEPS = 44;
+          const TRACE_STEPS = 32;
+          const isHovering = pauseRef.current;
+          // CYCLE: travel=1.0 + dissolve=0.2 + silent=0.08 = 1.28 total per hub
+          const CYCLE = 1.28;
+          const DISSOLVE_DURATION = 0.2; // trail fades quickly after comet arrives
+          const flowSpeed = isHovering ? 0.006 : 0.0028;
+
           hubs.forEach((hub, hubIdx) => {
-              const masterDot = {
-                  dx: dots[hub.idx * 4],
-                  dy: dots[hub.idx * 4 + 1],
-                  dz: dots[hub.idx * 4 + 2]
-              };
-              
-              const rx = masterDot.dx * cosP - masterDot.dz * sinP;
-              const rz0 = masterDot.dx * sinP + masterDot.dz * cosP;
-              const rz = masterDot.dy * sinT + rz0 * cosT;
-              const ry = masterDot.dy * cosT - rz0 * sinT;
-              
-              if (rz < -0.1) return;
-              
-              const mx = cx + rx * R;
-              const my = cy - ry * R;
+              const hax = dots[hub.idx * 4];
+              const hay = dots[hub.idx * 4 + 1];
+              const haz = dots[hub.idx * 4 + 2];
+
+              const hrx = hax * cosP - haz * sinP;
+              const hrz0h = hax * sinP + haz * cosP;
+              const hrza = hay * sinT + hrz0h * cosT;
+              const hrya = hay * cosT - hrz0h * sinT;
+
+              // Soft fade as hub approaches back of globe — no hard cutoff
+              const hubVis = Math.max(0, Math.min(1, (hrza + 0.25) / 0.35));
+              if (hubVis <= 0) return;
+
+              const hmx = cx + hrx * R;
+              const hmy = cy - hrya * R;
+
+              // Hubs fire in sequence — offset evenly across the cycle
+              const hubOffset = (hubIdx / hubs.length) * CYCLE;
+              const hubRaw = (time * flowSpeed + hubOffset) % CYCLE;
+              const isTraveling = hubRaw <= 1.0;
+              const isDissolving = !isTraveling && hubRaw <= 1.0 + DISSOLVE_DURATION;
+
+              const burstProg = isTraveling ? hubRaw : 1.0;
+              const fadeIn = Math.min(1, burstProg / 0.05);
+              // Trail: builds up during travel, dissolves smoothly right after arrival
+              const trailMult = isTraveling
+                  ? fadeIn
+                  : isDissolving
+                      ? 1 - (hubRaw - 1.0) / DISSOLVE_DURATION
+                      : 0;
 
               hub.targets.forEach((targetIdx, tIdx) => {
-                  const targetDot = {
-                      dx: dots[targetIdx * 4],
-                      dy: dots[targetIdx * 4 + 1],
-                      dz: dots[targetIdx * 4 + 2]
+                  const tax = dots[targetIdx * 4];
+                  const tay = dots[targetIdx * 4 + 1];
+                  const taz = dots[targetIdx * 4 + 2];
+
+                  const trz0t = tax * sinP + taz * cosP;
+                  const trza = tay * sinT + trz0t * cosT;
+
+                  // Soft fade for target edge — no hard cutoff
+                  const targetVis = Math.max(0, Math.min(1, (trza + 0.25) / 0.35));
+                  if (targetVis <= 0) return;
+
+                  const visibility = hubVis * targetVis * Math.max(0, Math.min(1, (hrza + trza + 0.5) * 0.6));
+                  if (visibility <= 0.01) return;
+
+                  // Per-arc orbital elevation: 0.08–0.40, stable (seeded by index)
+                  const elevFactor = 0.08 + ((hubIdx * 13 + tIdx * 7) % 9) / 9 * 0.32;
+
+                  // Project elevated arc point at param tp.
+                  // Rotation is linear so rotate(scale*p) = scale * rotate(p).
+                  const proj = (tp: number): [number, number] | null => {
+                      const [gx, gy, gz] = slerp(hax, hay, haz, tax, tay, taz, tp);
+                      const grx = gx * cosP - gz * sinP;
+                      const grz0 = gx * sinP + gz * cosP;
+                      const grz = gy * sinT + grz0 * cosT;
+                      const gry = gy * cosT - grz0 * sinT;
+                      const scale = 1 + elevFactor * Math.sin(Math.PI * tp);
+                      if (grz * scale < -0.04) return null;
+                      return [cx + grx * scale * R, cy - gry * scale * R];
                   };
-                  
-                  const isHovering = pauseRef.current;
-                  const trx = targetDot.dx * cosP - targetDot.dz * sinP;
-                  const trz0 = targetDot.dx * sinP + targetDot.dz * cosP;
-                  const trz = targetDot.dy * sinT + trz0 * cosT;
-                  const try_ = targetDot.dy * cosT - trz0 * sinT;
-                  
-                  if (trz < -0.1) return;
-                  
-                  const tx = cx + trx * R;
-                  const ty = cy - try_ * R;
 
-                  // Visibility based on average depth
-                  const visibility = Math.max(0, Math.min(1, (rz + trz) * 0.8));
-                  if (visibility <= 0) return;
-
-                  // Curve Calculation (Spherical Surface Approximation)
-                  const midX = (mx + tx) / 2;
-                  const midY = (my + ty) / 2;
-                  
-                  // Calculate control point that arcs follow the globe's radius
-                  const dToCenter = Math.hypot(midX - cx, midY - cy) || 1;
-                  const cpX = cx + (midX - cx) * (R / dToCenter) * 1.12; 
-                  const cpY = cy + (midY - cy) * (R / dToCenter) * 1.12;
-
-                  const linePulse = Math.sin(time * (isHovering ? 0.08 : 0.03) + hubIdx) * 0.5 + 0.5;
-                  const lineAlpha = (0.05 + linePulse * (isHovering ? 0.35 : 0.15)) * visibility;
-                  
-                  ctx.beginPath();
-                  ctx.moveTo(mx, my);
-                  ctx.quadraticCurveTo(cpX, cpY, tx, ty);
-                  
+                  // ── Base arc (ghost path, always visible, very dim) ──
                   ctx.strokeStyle = hub.color;
-                  ctx.globalAlpha = lineAlpha;
-                  ctx.lineWidth = (isHovering ? 1.0 : 0.5) * dpr;
-                  ctx.stroke();
-
-                  // ── Sequential Flow Logic ──
-                  const flowSpeed = isHovering ? 0.008 : 0.004;
-                  const hubCycleTime = time * flowSpeed;
-                  const activeTIdx = Math.floor(hubCycleTime % hub.targets.length);
-                  const flowProgress = hubCycleTime % 1;
-
-                  if (tIdx === activeTIdx) {
-                      const tailLength = 45; // Increased for a longer tail
-                      for (let j = 0; j < tailLength; j++) {
-                          // Reduced spacing (0.006) ensures segments overlap for a smooth, non-fragmented look
-                          const t = Math.max(0, flowProgress - j * 0.006);
-                          
-                          const px = (1 - t) * (1 - t) * mx + 2 * (1 - t) * t * cpX + t * t * tx;
-                          const py = (1 - t) * (1 - t) * my + 2 * (1 - t) * t * cpY + t * t * ty;
-                          
-                          // Non-linear fade for a more organic "comet" look
-                          const tailScale = Math.pow(1 - j / tailLength, 1.2);
-                          ctx.globalAlpha = lineAlpha * (isHovering ? 14 : 9) * visibility * tailScale;
-                          ctx.fillStyle = hub.color;
-                          
-                          if (j === 0) {
-                              // Lead particle bloom
-                              ctx.shadowBlur = 15 * dpr;
-                              ctx.shadowColor = hub.color;
-                              ctx.beginPath();
-                              ctx.arc(px, py, (isHovering ? 2.6 : 2.0) * dpr, 0, Math.PI * 2);
-                              ctx.fill();
-                              ctx.shadowBlur = 0; 
-                          } else {
-                              // Tail segments - slightly larger to ensure overlap
-                              ctx.beginPath();
-                              ctx.arc(px, py, (isHovering ? 2.2 : 1.6) * dpr * (0.5 + 0.5 * tailScale), 0, Math.PI * 2);
-                              ctx.fill();
-                          }
+                  ctx.globalAlpha = 0.03 * visibility;
+                  ctx.lineWidth = 0.25 * dpr;
+                  let inPath = false;
+                  ctx.beginPath();
+                  for (let s = 0; s <= GEO_STEPS; s++) {
+                      const pt = proj(s / GEO_STEPS);
+                      if (!pt) {
+                          if (inPath) { ctx.stroke(); ctx.beginPath(); inPath = false; }
+                          continue;
                       }
+                      if (!inPath) { ctx.moveTo(pt[0], pt[1]); inPath = true; }
+                      else ctx.lineTo(pt[0], pt[1]);
+                  }
+                  if (inPath) ctx.stroke();
+
+                  if (trailMult <= 0) return; // silent phase
+
+                  // ── Persistent trace: grows from hub → comet, stays through fade ──
+                  // Linear gradient: dim at hub (0.22) → bright near head (0.70)
+                  ctx.lineWidth = (isHovering ? 0.9 : 0.55) * dpr;
+                  ctx.strokeStyle = hub.color;
+                  for (let s = 0; s < TRACE_STEPS; s++) {
+                      const tp0 = (s / TRACE_STEPS) * burstProg;
+                      const tp1 = ((s + 1) / TRACE_STEPS) * burstProg;
+                      const pt0 = proj(tp0);
+                      const pt1 = proj(tp1);
+                      if (!pt0 || !pt1) continue;
+                      const segBright = 0.22 + 0.48 * (s / TRACE_STEPS);
+                      ctx.globalAlpha = segBright * trailMult * visibility;
+                      ctx.beginPath();
+                      ctx.moveTo(pt0[0], pt0[1]);
+                      ctx.lineTo(pt1[0], pt1[1]);
+                      ctx.stroke();
+                  }
+
+                  // ── Comet head + smooth tapered tail (travel phase only) ──
+                  if (!isTraveling) return;
+                  const fadeOut = Math.min(1, (1 - burstProg) / 0.06);
+                  const headMult = fadeIn * fadeOut;
+                  if (headMult < 0.01) return;
+
+                  const HEAD_N = 38;
+                  const HEAD_STEP = 0.007;
+                  const maxTailW = (isHovering ? 3.2 : 2.4) * dpr;
+
+                  // Draw tail segments back→front (dim/thin first, bright/thick last)
+                  // Round lineCap fills the gap between segments → no breaks
+                  ctx.lineCap = "round";
+                  ctx.strokeStyle = hub.color;
+                  for (let j = HEAD_N - 1; j >= 1; j--) {
+                      const tpA = Math.max(0, burstProg - (j - 1) * HEAD_STEP);
+                      const tpB = Math.max(0, burstProg - j * HEAD_STEP);
+                      const ptA = proj(tpA);
+                      const ptB = proj(tpB);
+                      if (!ptA || !ptB) continue;
+                      const fade = Math.pow(1 - j / HEAD_N, 1.8) * headMult;
+                      ctx.globalAlpha = 0.88 * visibility * fade;
+                      ctx.lineWidth = maxTailW * Math.pow(1 - j / HEAD_N, 0.5);
+                      ctx.beginPath();
+                      ctx.moveTo(ptB[0], ptB[1]);
+                      ctx.lineTo(ptA[0], ptA[1]);
+                      ctx.stroke();
+                  }
+                  ctx.lineCap = "butt";
+
+                  // Head bloom drawn on top of tail
+                  const ptHead = proj(burstProg);
+                  if (ptHead) {
+                      ctx.globalAlpha = 0.95 * visibility * headMult;
+                      ctx.shadowBlur = 14 * dpr;
+                      ctx.shadowColor = hub.color;
+                      ctx.fillStyle = hub.color;
+                      ctx.beginPath();
+                      ctx.arc(ptHead[0], ptHead[1], (isHovering ? 2.6 : 2.0) * dpr, 0, Math.PI * 2);
+                      ctx.fill();
+                      ctx.shadowBlur = 0;
                   }
               });
 
-              // Cross-hub connection (connect hub to next hub)
+              // ── Cross-hub geodesic connection ──
               const nextHub = hubs[(hubIdx + 1) % hubs.length];
-              const nextDot = {
-                  dx: dots[nextHub.idx * 4],
-                  dy: dots[nextHub.idx * 4 + 1],
-                  dz: dots[nextHub.idx * 4 + 2]
-              };
-              
-              const nrx = nextDot.dx * cosP - nextDot.dz * sinP;
-              const nrz0 = nextDot.dx * sinP + nextDot.dz * cosP;
-              const nrz = nextDot.dy * sinT + nrz0 * cosT;
-              const nry = nextDot.dy * cosT - nrz0 * sinT;
-              
-              if (nrz > -0.1) {
-                  const nx = cx + nrx * R;
-                  const ny = cy - nry * R;
-                  
-                  const visibility = Math.max(0, Math.min(1, (rz + nrz) * 0.6));
-                  if (visibility > 0) {
-                      ctx.beginPath();
-                      ctx.moveTo(mx, my);
-                      const midX = (mx + nx) / 2;
-                      const midY = (my + ny) / 2;
-                      const offsetX = (midX - cx) * 0.25;
-                      const offsetY = (midY - cy) * 0.25;
-                      ctx.quadraticCurveTo(midX + offsetX, midY + offsetY, nx, ny);
-                      
-                      const grad = ctx.createLinearGradient(mx, my, nx, ny);
-                      grad.addColorStop(0, hub.color);
-                      grad.addColorStop(1, nextHub.color);
-                      
-                      ctx.strokeStyle = grad;
-                      ctx.globalAlpha = 0.1 * visibility;
-                      ctx.setLineDash([4, 4]);
-                      ctx.stroke();
-                      ctx.setLineDash([]);
+              const nax = dots[nextHub.idx * 4];
+              const nay = dots[nextHub.idx * 4 + 1];
+              const naz = dots[nextHub.idx * 4 + 2];
+              const nrx = nax * cosP - naz * sinP;
+              const nrz0n = nax * sinP + naz * cosP;
+              const nrzan = nay * sinT + nrz0n * cosT;
+              const nryan = nay * cosT - nrz0n * sinT;
+              const nextHubVis = Math.max(0, Math.min(1, (nrzan + 0.25) / 0.35));
+              if (nextHubVis <= 0) return;
+              const vnx = cx + nrx * R;
+              const vny = cy - nryan * R;
+              const vis2 = hubVis * nextHubVis * Math.max(0, Math.min(1, (hrza + nrzan + 0.5) * 0.5));
+              if (vis2 <= 0.01) return;
+
+              const grad = ctx.createLinearGradient(hmx, hmy, vnx, vny);
+              grad.addColorStop(0, hub.color);
+              grad.addColorStop(1, nextHub.color);
+              ctx.strokeStyle = grad;
+              ctx.globalAlpha = 0.09 * vis2;
+              ctx.lineWidth = 0.4 * dpr;
+              ctx.setLineDash([4 * dpr, 5 * dpr]);
+
+              let inPath2 = false;
+              ctx.beginPath();
+              for (let s = 0; s <= GEO_STEPS; s++) {
+                  const tp = s / GEO_STEPS;
+                  const [gx, gy, gz] = slerp(hax, hay, haz, nax, nay, naz, tp);
+                  const grx = gx * cosP - gz * sinP;
+                  const grz0 = gx * sinP + gz * cosP;
+                  const grz = gy * sinT + grz0 * cosT;
+                  const gry = gy * cosT - grz0 * sinT;
+                  if (grz < -0.04) {
+                      if (inPath2) { ctx.stroke(); ctx.beginPath(); inPath2 = false; }
+                      continue;
                   }
+                  const gsx = cx + grx * R;
+                  const gsy = cy - gry * R;
+                  if (!inPath2) { ctx.moveTo(gsx, gsy); inPath2 = true; }
+                  else ctx.lineTo(gsx, gsy);
               }
+              if (inPath2) ctx.stroke();
+              ctx.setLineDash([]);
           });
       }
 

@@ -59,7 +59,9 @@ function DashboardPanels() {
     return (
         <div className="relative w-[1400px] h-full text-[9px] font-sans flex-shrink-0">
             {/* 1. Recent Attestations (Top Left) */}
-            <div className="absolute top-[5%] left-[2%] w-[280px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
+            <div className="absolute top-[5%] left-[2%] w-[280px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/5"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+            >
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Recent Attestations</span>
                     <span className="text-white/15 text-[10px]">•••</span>
@@ -87,7 +89,9 @@ function DashboardPanels() {
             </div>
 
             {/* 2. Verifiable Timeline (Top Center) */}
-            <div className="absolute top-[2%] left-[30%] w-[320px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
+            <div className="absolute top-[2%] left-[30%] w-[320px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/5"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+            >
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Verifiable Timeline</span>
                     <span className="text-white/15 text-[10px]">•••</span>
@@ -109,7 +113,9 @@ function DashboardPanels() {
             </div>
 
             {/* 3. Hiring Inbox (Top Right) */}
-            <div className="absolute top-[4%] right-[8%] w-[260px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
+            <div className="absolute top-[4%] right-[8%] w-[260px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/5"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+            >
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Hiring Inbox</span>
                     <span className="text-white/15 text-[10px]">•••</span>
@@ -135,7 +141,9 @@ function DashboardPanels() {
             </div>
 
             {/* 4. Proof of Work (Mid Left) */}
-            <div className="absolute top-[45%] left-[2%] w-[220px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
+            <div className="absolute top-[45%] left-[2%] w-[220px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/5"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+            >
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Proof of Work</span>
                     <span className="text-white/15 text-[10px]">•••</span>
@@ -159,7 +167,9 @@ function DashboardPanels() {
             </div>
 
             {/* 5. Credentials (Mid Right) */}
-            <div className="absolute top-[35%] right-[2%] w-[240px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
+            <div className="absolute top-[35%] right-[2%] w-[240px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/5"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+            >
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Identity & Credentials</span>
                     <span className="text-white/15 text-[10px]">•••</span>
@@ -371,7 +381,7 @@ function DashboardPanels() {
 
             {/* 15. Latest Badge (Center) */}
             <div className="absolute top-[52%] left-[40%] w-[180px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500/20 to-blue-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
                     <span className="text-[14px]">🏆</span>
                 </div>
                 <div>
@@ -432,11 +442,9 @@ function DashboardBg() {
 function PublicCVCardMockup() {
     return (
         <div className="relative w-[850px] mx-auto overflow-visible scale-[0.4] min-[380px]:scale-[0.46] min-[440px]:scale-[0.52] sm:scale-[0.6] md:scale-[0.75] lg:scale-100 origin-center">
-            {/* Outer ambient glow */}
             <div className="absolute -inset-20 bg-white/[0.03] blur-[100px] rounded-full pointer-events-none -z-10" />
-
-            {/* MAIN CV CARD COMPONENT (Structure from official app/cv/[wallet]/page.tsx) */}
             <div className="relative flex flex-col justify-between min-h-[440px] p-10 rounded-[32px] overflow-hidden group w-full text-left">
+
                 {/* Animated silver gradient border */}
                 <div className="absolute inset-0 rounded-[32px] bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
@@ -591,11 +599,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
-            {/* Elegant thin line separator constrained to content width */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1240px] px-6 z-20">
-                <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            </div>
+        <section className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
             
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_65%)] pointer-events-none" />
 
@@ -615,7 +619,6 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                                 </h2>
                             </div>
                         </div>
-                        <div className="h-0.5 w-full md:w-[140%] bg-white/15 relative z-10" />
                     </div>
                     <div className="lg:max-w-xs pb-2">
                         <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed text-right lg:pt-24">
@@ -623,9 +626,25 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         </p>
                     </div>
                 </div>
+                <div className="w-full max-w-[1240px] mx-auto h-px bg-white/10 mt-8 mb-8 relative z-10" />
+                
+                {/* ── MINI BENEFITS (2x2 on mobile) ────────────────────────── */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
+                    {[
+                        { title: "Verifiable", icon: ShieldCheck },
+                        { title: "Portable", icon: ArrowRight },
+                        { title: "Trustless", icon: Award },
+                        { title: "Tamper-proof", icon: ShieldCheck },
+                    ].map((bullet, i) => (
+                        <div key={i} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors group cursor-default">
+                            <bullet.icon className="w-3.5 h-3.5 text-emerald-500/40 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
+                            <span className="text-[9px] font-bold text-white/40 group-hover:text-white/80 transition-colors uppercase tracking-[0.2em]">{bullet.title}</span>
+                        </div>
+                    ))}
+                </div>
 
                 {/* ── SHOWCASE: Seamless blended container ─── */}
-                <div className="relative w-full min-h-[500px] sm:min-h-[450px] lg:min-h-[900px] bg-transparent overflow-hidden flex flex-col justify-center">
+                <div className="relative w-full min-h-[400px] sm:min-h-[350px] lg:min-h-[750px] bg-transparent overflow-hidden flex flex-col justify-center">
 
                     {/* Background: blurred dashboard grid */}
                     <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
@@ -634,7 +653,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
 
                     {/* Edge vignette — softer, only darkens outer edges */}
                     <div className="absolute inset-0 pointer-events-none"
-                        style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent 40%, black 95%)" }}
+                        style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent, black 95%)" }}
                     />
                     {/* Bottom fade — reduced on mobile to prevent covering the card */}
                     <div className="absolute inset-x-0 bottom-0 h-16 sm:h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
@@ -642,7 +661,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     <div className="absolute inset-x-0 top-0 h-16 sm:h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
                     {/* Foreground: CV Card floating on top */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-8 md:gap-6">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-4 md:gap-4">
                         <motion.div
                             initial={{ opacity: 0, y: 32, scale: 0.97 }}
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -667,56 +686,43 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                 </div>
 
                 {/* ── DESCRIPTION GRID (Now slideable boxes) ────────────────── */}
-                <div className="pt-10 border-t border-white/5">
+                <div className="pt-4 border-t border-white/5">
                     <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-4 sm:gap-6 pb-4">
                         {[
                             { 
                                 title: "On-Chain History", 
                                 desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record.",
                                 icon: Clock,
-                                color: "#60a5fa"
+                                color: "#fde68a99"
                             },
                             { 
                                 title: "Cryptographic Proof", 
                                 desc: "Contributions are proven through attestations cryptographically signed by real organizations and peers.",
                                 icon: ShieldCheck,
-                                color: "#14F195"
+                                color: "#fde68a99"
                             },
                             { 
                                 title: "Instant Verification", 
                                 desc: "Recruiters can instantly trust your experience without manual checks or reference calls.",
                                 icon: BadgeCheck,
-                                color: "#a78bfa"
+                                color: "#fde68a99"
                             },
                         ].map((item, i) => (
-                            <div 
-                                key={i} 
-                                className="flex-shrink-0 w-[260px] sm:w-[calc(33.333%-16px)] snap-center p-5 pb-6 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
-                            >
+                                <div 
+                                    key={i} 
+                                    className="flex-shrink-0 w-[260px] sm:w-[calc(33.333%-16px)] snap-center p-4 pb-5 rounded-[20px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
+                                >
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4 bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform">
-                                    <item.icon className="w-4 h-4" style={{ color: item.color }} />
+                                    <item.icon className="w-4 h-4 text-white/20" />
                                 </div>
-                                <h4 className="text-white/90 font-bold text-[15px] sm:text-lg mb-2 tracking-tight">{item.title}</h4>
-                                <p className="text-white/30 text-[12px] sm:text-sm leading-relaxed">{item.desc}</p>
+                                <h4 className="text-[#fde68a99] font-bold text-[14px] sm:text-[16px] mb-1.5 tracking-tight">{item.title}</h4>
+                                <p className="text-white/30 text-[11px] sm:text-[12px] leading-relaxed">{item.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* ── MINI BENEFITS (2x2 on mobile) ────────────────────────── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    {[
-                        { title: "Verifiable", icon: ShieldCheck },
-                        { title: "Portable", icon: ArrowRight },
-                        { title: "Trustless", icon: Award },
-                        { title: "Tamper-proof", icon: ShieldCheck },
-                    ].map((bullet, i) => (
-                        <div key={i} className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors group cursor-default">
-                            <bullet.icon className="w-4 h-4 text-emerald-500/40 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
-                            <span className="text-xs font-bold text-white/40 group-hover:text-white/80 transition-colors uppercase tracking-widest">{bullet.title}</span>
-                        </div>
-                    ))}
-                </div>
+
             </div>
         </section>
     );
