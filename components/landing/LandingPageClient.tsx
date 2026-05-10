@@ -1420,7 +1420,7 @@ export function LandingPageClient() {
                 <section className="relative pt-16 sm:pt-20 md:pt-24 lg:pt-32 z-10 bg-[#080808] overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-24 items-center">
+                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
 
                             {/* Left: Content Block */}
                             <div className="space-y-6 md:space-y-12">
@@ -1456,7 +1456,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[750px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[240px] sm:min-h-[360px] md:min-h-[550px] mb-8 bg-[#080808]">
+                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808]">
 
                                 {/* Title Overlay */}
                                 <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
@@ -1464,7 +1464,7 @@ export function LandingPageClient() {
                                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
                                 </div>
                                 <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.8] sm:scale-[0.85]" />
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70]" />
                                 </div>
 
                                 {/* Top/Bottom Gradients to mask clipping */}
@@ -1601,7 +1601,7 @@ export function LandingPageClient() {
                         </p>
                     </div>
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mb-4">
-                        <div className="h-0.5 w-full bg-white/15" />
+                        <div className="h-px w-full bg-white/10" />
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
@@ -1842,7 +1842,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-24 sm:py-32 md:py-40 relative z-10 overflow-hidden bg-[#080808]">
+                <section className="py-24 sm:py-32 md:py-40 relative z-10 overflow-hidden bg-black">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -1855,8 +1855,8 @@ export function LandingPageClient() {
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
                     />
                     {/* Top + bottom fade */}
-                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#080808] to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#080808] to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
 
                     <div className="relative max-w-[760px] mx-auto text-center z-10">
                         <motion.div

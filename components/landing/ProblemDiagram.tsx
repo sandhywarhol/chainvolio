@@ -414,16 +414,16 @@ export default function ProblemDiagram() {
                 {SOURCE_ICONS.map((src, i) => (
                     <g key={`src-wrapper-${i}`} transform={`translate(${src.x - 20}, ${src.y - 20})`}>
                         <motion.g
-                            initial={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0.9, scale: 1 }}
                             animate={{
-                                scale: [1, 1.1, 1],
-                                opacity: [1, 0.85, 1]
+                                scale: [1, 1.03, 1],
+                                opacity: [0.7, 1, 0.7]
                             }}
                             whileHover={{ scale: 1.15 }}
                             transition={{
                                 repeat: Infinity,
-                                duration: 3,
-                                delay: i * 0.4,
+                                duration: 4.5,
+                                delay: i * 0.5,
                                 ease: "easeInOut"
                             }}
                             className="cursor-pointer group/icon"
