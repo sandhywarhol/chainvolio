@@ -1198,12 +1198,6 @@ export function LandingPageClient() {
 
             <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
 
-
-                {/* Background Glows */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/[0.03] blur-[120px] pointer-events-none"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-white/[0.02] blur-[120px] pointer-events-none"></div>
-                <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-white/[0.02] blur-[120px] pointer-events-none"></div>
-
                 {/* HERO SECTION */}
                 <section className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
@@ -1310,8 +1304,6 @@ export function LandingPageClient() {
                             </div>
                         </div>
 
-                        {/* Glow behind visual - reduced intensity */}
-                        <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/5 to-emerald-500/5 blur-3xl -z-10 rounded-[40px] opacity-30"></div>
                     </div>
 
                     <div className="mt-8 sm:mt-16 w-full max-w-[1400px] relative z-50">
