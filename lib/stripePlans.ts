@@ -88,7 +88,7 @@ export function getPlanBadgeStyle(plan: StripePlanName): { text: string; classNa
     switch (plan) {
         case "community": return { text: "Community", className: "bg-teal-500/10 text-teal-400 border-teal-500/20" };
         case "company":   return { text: "Company", className: "bg-amber-500/10 text-amber-400 border-amber-500/20" };
-        case "enterprise": return { text: "Enterprise", className: "bg-purple-500/10 text-purple-400 border-purple-500/20" };
+        case "enterprise": return { text: "Enterprise", className: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" };
         default:          return { text: "Free", className: "bg-slate-700/50 text-slate-400 border-slate-600/50" };
     }
 }

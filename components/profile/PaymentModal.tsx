@@ -279,7 +279,7 @@ export function PaymentModal({
                 </div>
 
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-black uppercase tracking-widest ${col.bg} ${col.border} ${col.text}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
                     Status: Pending Admin Review
                 </div>
 

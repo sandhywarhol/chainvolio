@@ -25,7 +25,7 @@ export default function WhyPage() {
 
             {/* Ambient Background Glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-purple-500/[0.02] blur-[160px] rounded-full" />
+                <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/[0.02] blur-[160px] rounded-full" />
                 <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/[0.02] blur-[160px] rounded-full" />
                 <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/[0.02] blur-[160px] rounded-full" />
             </div>

@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[160px] rounded-full" />
+          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[160px] rounded-full" />
           <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[160px] rounded-full" />
           <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[160px] rounded-full" />
       </div>
@@ -125,7 +125,7 @@ export default function HowItWorksPage() {
             {/* ARCHITECTURE DIAGRAMS */}
             <section id="architecture" className="space-y-16 scroll-mt-[120px]">
               <div className="flex items-center gap-4">
-                <Cpu className="w-5 h-5 text-purple-400" />
+                <Cpu className="w-5 h-5 text-indigo-400" />
                 <h2 className="text-h2">System Architecture</h2>
               </div>
 
@@ -221,7 +221,7 @@ export default function HowItWorksPage() {
             {/* FEATURES */}
             <section id="features" className="space-y-12 scroll-mt-[120px]">
               <div className="flex items-center gap-4">
-                <Layers className="w-5 h-5 text-purple-400" />
+                <Layers className="w-5 h-5 text-indigo-400" />
                 <h2 className="text-h2">Technical Features</h2>
               </div>
               
@@ -313,7 +313,7 @@ export default function HowItWorksPage() {
                               items: ["Every attestation becomes a public signal", "Shows what kind of talent you value", "Builds your reputation as a serious builder", "Increases candidate trust in your brand"]
                           },
                           {
-                              icon: <Magnet className="w-5 h-5 text-purple-400" />,
+                              icon: <Magnet className="w-5 h-5 text-indigo-400" />,
                               title: "Attract Better Candidates",
                               items: ["Top talent prefers recognition from credible sources", "Candidates want to be endorsed by you", "Your organization becomes a talent magnet", "Reduces reliance on cold outreach"]
                           },
@@ -323,7 +323,7 @@ export default function HowItWorksPage() {
                               items: ["Each attestation: increases the candidate's trust", "Reinforces your credibility as an issuer", "Creates a network effect of trust"]
                           },
                           {
-                              icon: <Globe className="w-5 h-5 text-orange-400" />,
+                              icon: <Globe className="w-5 h-5 text-amber-400" />,
                               title: "Verifiable Network",
                               items: ["Attestations are transparent, traceable, and verifiable", "Contribute to a trust layer, not just a hiring pipeline"]
                           }

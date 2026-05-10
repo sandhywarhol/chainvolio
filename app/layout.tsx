@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
-import { ThemeProvider } from "@/components/ThemeProvider";
+
 import { AppBackground } from "@/components/layout/AppBackground";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -86,9 +86,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${inter.variable} font-sans min-h-screen text-white relative`}>
-        <ThemeProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -110,7 +109,6 @@ export default function RootLayout({
         <div className="relative z-[60]">
           <WalletProvider>{children}</WalletProvider>
         </div>
-        </ThemeProvider>
       </body>
     </html>
   );

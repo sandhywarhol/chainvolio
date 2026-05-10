@@ -106,7 +106,7 @@ export default function VerifiedOrganizationPage() {
                             items: ["Free users are limited, verified users scale", "Give more attestations per month", "Support more talent and expand your reach"]
                         },
                         {
-                            icon: <Magnet className="w-6 h-6 text-purple-400" />,
+                            icon: <Magnet className="w-6 h-6 text-indigo-400" />,
                             title: "Build a Stronger Talent Magnet",
                             items: ["More candidates seek your endorsement", "Your organization becomes a hub of trust", "Attract higher-quality talent"]
                         },
@@ -121,7 +121,7 @@ export default function VerifiedOrganizationPage() {
                             items: ["More attestations -> more visibility -> more trust", "Build a compounding reputation", "Establish long-term credibility"]
                         },
                         {
-                            icon: <Lock className="w-6 h-6 text-purple-400" />,
+                            icon: <Lock className="w-6 h-6 text-indigo-400" />,
                             title: "Ensure Network Quality",
                             items: ["Payment is not just a fee, but a commitment", "Ensures serious participation", "Reduces spam", "Maintains high-quality trust signals"]
                         }

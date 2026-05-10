@@ -399,15 +399,15 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+                                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                                                 <Filter className="w-5 h-5" />
                                             </div>
                                             <h2 className="text-xl font-bold">Eligibility Filters</h2>
                                         </div>
                                         <div className="space-y-3">
                                             {collection.eligibility_filters?.minReceiptsThreshold > 0 ? (
-                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
-                                                    <CheckCircle className="w-4 h-4 text-purple-400" />
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+                                                    <CheckCircle className="w-4 h-4 text-indigo-400" />
                                                     <span className="text-xs font-bold text-slate-300">Active Wallet Only</span>
                                                 </div>
                                             ) : (
@@ -432,7 +432,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400">
+                                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
                                                 <CalendarDays className="w-5 h-5" />
                                             </div>
                                             <h2 className="text-xl font-bold">Submission Deadline</h2>

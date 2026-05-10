@@ -37,13 +37,13 @@ export function CertificateCard({ cert, isOwner, onDelete, onPreview }: Certific
   return (
     <div 
         onClick={() => onPreview?.(cert)}
-        className="group relative flex items-start gap-4 p-4 rounded-xl border border-slate-800/60 bg-slate-900/40 hover:bg-slate-800/60 hover:border-violet-500/30 transition-all duration-300 cursor-pointer overflow-hidden"
+        className="group relative flex items-start gap-4 p-4 rounded-xl border border-slate-800/60 bg-slate-900/40 hover:bg-slate-800/60 hover:border-indigo-500/30 transition-all duration-300 cursor-pointer overflow-hidden"
     >
       {/* Background Glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-opacity" />
 
       {/* Preview/Icon */}
-      <div className="flex-shrink-0 w-11 h-11 rounded-lg border border-white/5 bg-slate-800/50 group-hover:border-violet-500/20 group-hover:bg-violet-500/10 flex items-center justify-center transition-all overflow-hidden relative shadow-inner">
+      <div className="flex-shrink-0 w-11 h-11 rounded-lg border border-white/5 bg-slate-800/50 group-hover:border-indigo-500/20 group-hover:bg-indigo-500/10 flex items-center justify-center transition-all overflow-hidden relative shadow-inner">
         {cert.file_type === "image" ? (
           <img 
             src={cert.file_url} 
@@ -65,7 +65,7 @@ export function CertificateCard({ cert, isOwner, onDelete, onPreview }: Certific
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-bold text-white group-hover:text-violet-300 transition-colors truncate">{cert.title}</h4>
+        <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors truncate">{cert.title}</h4>
         {cert.issuer_name && (
           <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{cert.issuer_name}</p>
         )}
@@ -134,14 +134,14 @@ export function CertificateSection({
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-violet-600/10 border border-violet-500/20 flex items-center justify-center">
-            <Award className="w-4 h-4 text-violet-400" />
+          <div className="w-7 h-7 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center">
+            <Award className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
               Verified Credentials
               {certs.length > 0 && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.1)] transition-all">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_10px_rgba(139,92,246,0.1)] transition-all">
                   {certs.length}
                 </span>
               )}
@@ -153,7 +153,7 @@ export function CertificateSection({
             {isOwner && onAdd && (
                 <button
                     onClick={onAdd}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/10 hover:bg-violet-600/20 text-violet-400 text-[11px] font-bold transition-all border border-violet-500/20"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 text-[11px] font-bold transition-all border border-indigo-500/20"
                 >
                     <Plus className="w-3 h-3" />
                     Add New
@@ -180,7 +180,7 @@ export function CertificateSection({
       }`}>
         {isLoading ? (
             <div className="flex items-center justify-center py-12 gap-3">
-                <Loader2 className="w-5 h-5 animate-spin text-violet-500" />
+                <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
                 <p className="text-xs text-slate-500 font-medium tracking-wide uppercase">Securing data...</p>
             </div>
         ) : certs.length > 0 ? (
@@ -206,7 +206,7 @@ export function CertificateSection({
                 {isOwner && onAdd && (
                     <button
                         onClick={onAdd}
-                        className="mt-6 px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-colors shadow-lg shadow-violet-900/20"
+                        className="mt-6 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-900/20"
                     >
                         Upload First Certificate
                     </button>

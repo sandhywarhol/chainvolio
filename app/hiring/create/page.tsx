@@ -702,7 +702,7 @@ export default function CreateCollection() {
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <Filter className="w-4 h-4 text-purple-500" /> Eligibility Filters
+                                        <Filter className="w-4 h-4 text-indigo-500" /> Eligibility Filters
                                     </h3>
                                     <span className="text-[10px] text-slate-500 uppercase tracking-wide font-medium">Reduce Spam (Optional)</span>
                                 </div>
@@ -715,20 +715,20 @@ export default function CreateCollection() {
                                         className={`
                                             cursor-pointer p-4 rounded-xl border transition-all duration-200 group relative
                                             ${formData.filters.minReceiptsThreshold === 5
-                                                ? 'bg-purple-500/10 border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
+                                                ? 'bg-indigo-500/10 border-indigo-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
                                                 : 'bg-[#121214] border-white/5 hover:border-white/10 hover:bg-white/[0.02]'}
                                         `}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${formData.filters.minReceiptsThreshold === 5 ? 'bg-purple-500/20 text-purple-400' : 'bg-white/5 text-slate-400'}`}>
+                                            <div className={`p-2 rounded-lg ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-slate-400'}`}>
                                                 <Clock className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-bold ${formData.filters.minReceiptsThreshold === 5 ? 'text-purple-100' : 'text-slate-300'}`}>Active Wallet Only</p>
+                                                <p className={`text-sm font-bold ${formData.filters.minReceiptsThreshold === 5 ? 'text-indigo-100' : 'text-slate-300'}`}>Active Wallet Only</p>
                                                 <p className="text-[10px] text-slate-500">Requires 5+ on-chain receipts/txs</p>
                                             </div>
                                         </div>
-                                        {formData.filters.minReceiptsThreshold === 5 && <div className="absolute top-2 right-2 text-purple-500"><Check className="w-4 h-4" /></div>}
+                                        {formData.filters.minReceiptsThreshold === 5 && <div className="absolute top-2 right-2 text-indigo-500"><Check className="w-4 h-4" /></div>}
                                     </div>
 
                                     <div

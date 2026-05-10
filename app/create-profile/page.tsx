@@ -402,7 +402,7 @@ export default function CreateProfilePage() {
             </div>
             <div>
               <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                <Mail size={14} className="text-orange-400" /> Email Address (optional)
+                <Mail size={14} className="text-amber-400" /> Email Address (optional)
               </label>
               <input
                 type="email"

@@ -7,11 +7,9 @@ import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-import { useTheme } from "next-themes";
 
 
 interface NavbarProps {
@@ -32,8 +30,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const { publicKey } = useWallet();
     const { isGoogleSignedIn } = useGoogleAuth();
     const pathname = usePathname();
-    const { resolvedTheme } = useTheme();
-    const isLight = resolvedTheme === "light";
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides' | 'developer'>('main');
     const [scrolled, setScrolled] = useState(false);
@@ -91,20 +87,18 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     return (
         <nav className={`fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
-                ? isLight
-                    ? "border-black/8 bg-white/90 backdrop-blur-2xl py-2 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
-                    : "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
-                : "border-transparent bg-transparent py-5"
+                ? "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+                : "border-white/0 bg-transparent py-5"
             }`}>
             <div className="flex items-center justify-between px-4 md:px-8 py-3 max-w-[1600px] w-full mx-auto">
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-1.5 group">
                         <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
-                        <span className={`text-sm font-bold ${isLight ? "text-gray-900" : "text-white/90"}`}>ChainVolio</span>
+                        <span className="text-sm font-bold text-white/90">ChainVolio</span>
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className={`hidden md:flex items-center gap-6 text-xs font-bold ${isLight ? "text-gray-600" : ""}`}>
+                    <div className="hidden md:flex items-center gap-6 text-xs font-bold">
                         <NavDropdown
                             label="Products"
                             href="/why"
@@ -143,7 +137,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         {publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" && (
                             <Link
                                 href="/admin/organization-verification"
-                                className={`transition-colors py-2 ${isActive('/admin/organization-verification') ? 'text-purple-400 font-extrabold' : 'text-purple-400/60 hover:text-purple-300'}`}
+                                className={`transition-colors py-2 ${isActive('/admin/organization-verification') ? 'text-indigo-400 font-extrabold' : 'text-indigo-400/60 hover:text-indigo-300'}`}
                             >
                                 Admin
                             </Link>
@@ -181,7 +175,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     </div>
                     
                     <NotificationBell />
-                    <ThemeToggle />
 
                     {/* Mobile Wallet & Menu Toggle */}
                     <div className="flex md:hidden items-center gap-3">
@@ -258,7 +251,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                     onClick={() => setActiveMobilePanel('products')} 
                                                 />
                                                 <MobileNavLink 
-                                                    icon={<BookOpen className="w-5 h-5 text-purple-400" />} 
+                                                    icon={<BookOpen className="w-5 h-5 text-indigo-400" />} 
                                                     label="Guides" 
                                                     hasSubmenu
                                                     onClick={() => setActiveMobilePanel('guides')} 

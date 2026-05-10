@@ -33,7 +33,7 @@ export default function RailwayDemoPage() {
     };
 
     return (
-        <div className="bg-black min-h-screen text-white font-sans selection:bg-violet-500/30">
+        <div className="bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30">
             {/* Grid Background Effect */}
             <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03]" 
                  style={{ backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}>
@@ -46,7 +46,7 @@ export default function RailwayDemoPage() {
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                                 <Zap className="w-5 h-5 fill-white" />
                             </div>
                             <span className="text-xl font-bold tracking-tight">Railway</span>
@@ -60,7 +60,7 @@ export default function RailwayDemoPage() {
                     </div>
                     <div className="flex items-center gap-4">
                         <button className="hidden sm:block text-sm font-medium text-white/70 hover:text-white px-4">Login</button>
-                        <button className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2 rounded-full text-sm font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all active:scale-95">
+                        <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-full text-sm font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all active:scale-95">
                             Start Building
                         </button>
                     </div>
@@ -70,10 +70,10 @@ export default function RailwayDemoPage() {
             {/* Hero Section */}
             <section className="relative pt-40 pb-20 px-6 overflow-hidden">
                 <div className="max-w-7xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-fade-in">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                         </span>
                         Next Gen Cloud Platform
                     </div>
@@ -85,7 +85,7 @@ export default function RailwayDemoPage() {
                         Deploy, manage, and scale your applications without the infrastructure headache. Built for developers who move fast.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="w-full sm:w-auto px-8 py-4 bg-violet-600 hover:bg-violet-500 rounded-2xl font-bold text-lg shadow-[0_20px_40px_rgba(124,58,237,0.2)] transition-all">
+                        <button className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg shadow-[0_20px_40px_rgba(124,58,237,0.2)] transition-all">
                             Deploy Now
                         </button>
                         <button className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2">
@@ -95,7 +95,7 @@ export default function RailwayDemoPage() {
                 </div>
 
                 {/* Floating Glow Elements */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-600/20 blur-[150px] rounded-full z-0 opacity-50"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-indigo-600/20 blur-[150px] rounded-full z-0 opacity-50"></div>
                 <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-full h-[600px] bg-black z-10" style={{ clipPath: 'ellipse(100% 50% at 50% 100%)' }}></div>
             </section>
 
@@ -115,11 +115,11 @@ export default function RailwayDemoPage() {
                                 <div className="w-12"></div>
                             </div>
                             {/* Window Content */}
-                            <div className="aspect-[16/9] bg-gradient-to-br from-violet-900/10 to-transparent flex items-center justify-center p-12">
+                            <div className="aspect-[16/9] bg-gradient-to-br from-indigo-900/10 to-transparent flex items-center justify-center p-12">
                                 <div className="w-full max-w-3xl space-y-8 animate-pulse-slow">
                                     <div className="flex items-center justify-between border-b border-white/10 pb-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-violet-400">
+                                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-indigo-400">
                                                 <Globe className="w-6 h-6" />
                                             </div>
                                             <div>
@@ -129,33 +129,33 @@ export default function RailwayDemoPage() {
                                         </div>
                                         <div className="flex gap-2">
                                             <div className="h-8 w-24 bg-white/5 rounded-lg border border-white/5"></div>
-                                            <div className="h-8 w-8 bg-violet-600/20 rounded-lg border border-violet-500/30"></div>
+                                            <div className="h-8 w-8 bg-indigo-600/20 rounded-lg border border-indigo-500/30"></div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 space-y-4">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">CPU Usage</span>
-                                                <span className="text-[9px] font-black text-violet-400">12.4%</span>
+                                                <span className="text-[9px] font-black text-indigo-400">12.4%</span>
                                             </div>
                                             <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                                <div className="h-full w-[12.4%] bg-violet-500 rounded-full"></div>
+                                                <div className="h-full w-[12.4%] bg-indigo-500 rounded-full"></div>
                                             </div>
                                         </div>
                                         <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 space-y-4">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Memory</span>
-                                                <span className="text-[9px] font-black text-violet-400">256MB</span>
+                                                <span className="text-[9px] font-black text-indigo-400">256MB</span>
                                             </div>
                                             <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                                <div className="h-full w-[45%] bg-violet-500 rounded-full"></div>
+                                                <div className="h-full w-[45%] bg-indigo-500 rounded-full"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="bg-black rounded-xl p-4 border border-white/5 font-mono text-[10px] text-white/40 space-y-1">
                                         <p><span className="text-emerald-500">INFO</span> [2024-05-01 12:00:01] Server listening on port 3000</p>
                                         <p><span className="text-emerald-500">INFO</span> [2024-05-01 12:00:05] Database connected (PostgreSQL)</p>
-                                        <p><span className="text-violet-500">LOG</span> [2024-05-01 12:05:22] GET /api/v1/health - 200 OK</p>
+                                        <p><span className="text-indigo-500">LOG</span> [2024-05-01 12:05:22] GET /api/v1/health - 200 OK</p>
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +169,7 @@ export default function RailwayDemoPage() {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
                         <div>
-                            <h2 className="text-[10px] font-black uppercase text-violet-500 tracking-[0.4em] mb-8">Infrastructure</h2>
+                            <h2 className="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-8">Infrastructure</h2>
                             <h3 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight leading-tight">
                                 Built for scale. <br />
                                 <span className="text-white/20">Designed for developers.</span>
@@ -182,13 +182,13 @@ export default function RailwayDemoPage() {
                                         onClick={() => setActiveTab(key)}
                                         className={`w-full text-left p-6 rounded-3xl transition-all border ${
                                             activeTab === key 
-                                            ? "bg-violet-600/10 border-violet-500/20 translate-x-2" 
+                                            ? "bg-indigo-600/10 border-indigo-500/20 translate-x-2" 
                                             : "hover:bg-white/[0.02] border-transparent text-white/40"
                                         }`}
                                     >
                                         <div className="flex items-center gap-4">
                                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${
-                                                activeTab === key ? "bg-violet-600 text-white border-violet-500" : "bg-white/5 border-white/10"
+                                                activeTab === key ? "bg-indigo-600 text-white border-indigo-500" : "bg-white/5 border-white/10"
                                             }`}>
                                                 {key === 'deploy' && <Zap className="w-5 h-5" />}
                                                 {key === 'network' && <Shield className="w-5 h-5" />}
@@ -198,7 +198,7 @@ export default function RailwayDemoPage() {
                                                 <h4 className={`font-bold transition-colors ${activeTab === key ? "text-white" : ""}`}>
                                                     {(features as any)[key].title}
                                                 </h4>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-violet-500/50 mt-0.5">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500/50 mt-0.5">
                                                     {(features as any)[key].label}
                                                 </p>
                                             </div>
@@ -210,10 +210,10 @@ export default function RailwayDemoPage() {
 
                         <div className="flex items-center justify-center">
                             <div className="relative w-full aspect-square max-w-md">
-                                <div className="absolute inset-0 bg-violet-600/10 blur-[80px] rounded-full"></div>
+                                <div className="absolute inset-0 bg-indigo-600/10 blur-[80px] rounded-full"></div>
                                 <div className="relative h-full w-full rounded-[48px] border-2 border-dashed border-white/10 bg-white/[0.01] flex items-center justify-center group overflow-hidden">
                                     <div className="text-center p-12 transition-all group-hover:scale-105 duration-700">
-                                        <div className="w-20 h-20 bg-violet-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(124,58,237,0.3)]">
+                                        <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(124,58,237,0.3)]">
                                             {activeTab === 'deploy' && <Terminal className="w-10 h-10" />}
                                             {activeTab === 'network' && <Shield className="w-10 h-10" />}
                                             {activeTab === 'scale' && <Globe className="w-10 h-10" />}
@@ -223,7 +223,7 @@ export default function RailwayDemoPage() {
                                     </div>
                                     {/* Decorative Code Fragments */}
                                     <div className="absolute top-8 left-8 text-[10px] font-mono text-emerald-500/20">deploy --prod</div>
-                                    <div className="absolute bottom-8 right-8 text-[10px] font-mono text-violet-500/20">railway.json</div>
+                                    <div className="absolute bottom-8 right-8 text-[10px] font-mono text-indigo-500/20">railway.json</div>
                                 </div>
                             </div>
                         </div>
@@ -236,7 +236,7 @@ export default function RailwayDemoPage() {
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-4xl md:text-6xl font-bold mb-12 tracking-tight">
                         Ready to ship? <br />
-                        <span className="text-violet-500">Build with Railway.</span>
+                        <span className="text-indigo-500">Build with Railway.</span>
                     </h2>
                     <button className="px-12 py-5 bg-white text-black hover:bg-white/90 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-xl">
                         Get Started for Free
@@ -249,7 +249,7 @@ export default function RailwayDemoPage() {
                 <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12">
                     <div className="col-span-2 lg:col-span-1">
                          <div className="flex items-center gap-2 mb-6">
-                            <Zap className="w-5 h-5 text-violet-500 fill-violet-500" />
+                            <Zap className="w-5 h-5 text-indigo-500 fill-indigo-500" />
                             <span className="text-lg font-bold">Railway</span>
                         </div>
                         <p className="text-white/30 text-xs leading-relaxed max-w-[200px]">

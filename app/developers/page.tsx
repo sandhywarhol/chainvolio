@@ -98,7 +98,7 @@ export default function DevelopersPage() {
                         <div className="relative p-12 bg-black border border-white/[0.05] rounded-2xl space-y-6 shadow-2xl">
                             <div className="flex gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500/20" />
-                                <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
+                                <div className="w-3 h-3 rounded-full bg-amber-400/20" />
                                 <div className="w-3 h-3 rounded-full bg-green-500/20" />
                             </div>
                             <div className="space-y-4">
@@ -189,7 +189,7 @@ export default function DevelopersPage() {
                     {[
                         { icon: <Target className="w-8 h-8 text-indigo-400" />, title: "Reputation Score", text: "Quantitative performance measurement based on verifiable on-chain output." },
                         { icon: <Gauge className="w-8 h-8 text-teal-400" />, title: "Confidence Level", text: "Measurement of data reliability and verification depth. Know when to trust." },
-                        { icon: <Zap className="w-8 h-8 text-purple-400" />, title: "Trust Score", text: "A decision-ready metric optimized for immediate application logic." }
+                        { icon: <Zap className="w-8 h-8 text-indigo-400" />, title: "Trust Score", text: "A decision-ready metric optimized for immediate application logic." }
                     ].map((item, i) => (
                         <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] group hover:border-indigo-500/20 transition-all duration-500">
                             <div className="p-4 rounded-2xl bg-white/[0.02] w-fit mb-8 group-hover:bg-indigo-500/10 transition-colors">

@@ -21,6 +21,7 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
+import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { format } from "date-fns";
 
@@ -88,24 +89,15 @@ export default function DashboardPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [showCertModal, setShowCertModal] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
 
-  const handleShare = async () => {
-    if (!profile || !publicKey) return;
-
-    let url = `${window.location.origin}/cv/${publicKey.toBase58()}`;
-
+  const getProfileUrl = () => {
+    if (!profile || !publicKey) return `${window.location.origin}/cv/${publicKey?.toBase58()}`;
     if (profile.displayName && profile.cardNumber) {
       const slug = profile.displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      url = `${window.location.origin}/${slug}/${profile.cardNumber}`;
+      return `${window.location.origin}/${slug}/${profile.cardNumber}`;
     }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      setToastMessage("CV link copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      setToastMessage("Failed to copy link.");
-    }
+    return `${window.location.origin}/cv/${publicKey.toBase58()}`;
   };
 
   useEffect(() => {
@@ -327,7 +319,7 @@ export default function DashboardPage() {
                           className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[9px] md:text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0 ${
                             profile?.isExpired 
                               ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20" 
-                              : "bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20"
+                              : "bg-amber-400/10 border-amber-400/20 text-amber-400 hover:bg-amber-400/20"
                           }`}
                         >
                            <RefreshCw className="w-2.5 h-2.5 md:w-3 md:h-3" />
@@ -371,14 +363,14 @@ export default function DashboardPage() {
                   {/* Profile Identity (Role/Organization) */}
                   {profile?.role ? (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="text-lg font-medium text-emerald-300">
+                      <span className="text-lg font-medium text-white/80">
                         {profile?.role}
                         {profile?.organization && <span className="text-slate-500 font-normal"> at {profile?.organization}</span>}
                       </span>
                     </div>
                   ) : profile?.organization ? (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="text-lg font-medium text-emerald-300">
+                      <span className="text-lg font-medium text-white/80">
                         {profile?.organization}
                       </span>
                     </div>
@@ -389,14 +381,14 @@ export default function DashboardPage() {
                     <div className="mt-2 mb-8 p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-3 max-w-sm mx-auto md:mx-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                           <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Profile Completion</span>
                         </div>
-                         <span className="text-[10px] font-black text-emerald-300">{profile.completionPercentage}%</span>
+                         <span className="text-[10px] font-black text-white/60">{profile.completionPercentage}%</span>
                       </div>
                       <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-emerald-400 rounded-full transition-all duration-1000 ease-out" 
+                        <div
+                          className="h-full bg-white/50 rounded-full transition-all duration-1000 ease-out" 
                           style={{ width: `${profile.completionPercentage}%` }}
                         />
                       </div>
@@ -410,7 +402,7 @@ export default function DashboardPage() {
 
                   {profile.lookingFor && (
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 text-xs font-medium flex items-center gap-1.5">
+                      <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-medium flex items-center gap-1.5">
                         <Briefcase className="w-3.5 h-3.5" />
                         {profile.lookingFor}
                       </span>
@@ -489,7 +481,7 @@ export default function DashboardPage() {
                         href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/5 hover:border-emerald-500/20 transition-all"
+                        className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all"
                         title="Website"
                       >
                         <Globe className="w-3.5 h-3.5" />
@@ -613,7 +605,7 @@ export default function DashboardPage() {
                   </div>
                   
                   {profile?.isExpiringSoon && (
-                    <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       <span>Subscription expires soon - renew now to maintain your verified identity</span>
                     </div>
@@ -700,7 +692,7 @@ export default function DashboardPage() {
                 <p className="text-[11px] text-slate-400 leading-relaxed">Upgrade for unlimited access and keep endorsing talent.</p>
                 <button
                   onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
-                  className="w-full py-2.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
                 </button>
@@ -735,7 +727,7 @@ export default function DashboardPage() {
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
                       isNearLimit ? "bg-amber-500" :
-                      profile?.isVerified ? "bg-gradient-to-r from-emerald-500/60 to-emerald-400" : "bg-slate-600"
+                      profile?.isVerified ? "bg-gradient-to-r from-white/50 to-white/70" : "bg-slate-600"
                     }`}
                     style={{ width: `${pct}%` }}
                   />
@@ -758,17 +750,17 @@ export default function DashboardPage() {
         <div className="mb-6 pb-6 border-b border-slate-800/60 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden">
           <div
             onClick={() => setIsHiringExpanded(!isHiringExpanded)}
-            className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-emerald-500/[0.03] hover:border-emerald-500/20 transition-all group"
+            className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.03] hover:border-white/10 transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${isHiringExpanded ? 'bg-emerald-500/10' : 'bg-slate-500/10'} transition-colors`}>
-                <LayoutDashboard className={`w-5 h-5 ${isHiringExpanded ? 'text-emerald-500' : 'text-slate-500'} transition-colors`} />
+              <div className={`p-2 rounded-lg ${isHiringExpanded ? 'bg-white/10' : 'bg-slate-500/10'} transition-colors`}>
+                <LayoutDashboard className={`w-5 h-5 ${isHiringExpanded ? 'text-white' : 'text-slate-500'} transition-colors`} />
               </div>
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="text-base font-bold text-white">Hiring Center</h2>
                   {collections.length > 0 && !isHiringExpanded && (
-                    <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="text-[10px] font-bold bg-white/10 text-white/60 px-2 py-0.5 rounded-full border border-white/10">
                       {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'}
                     </span>
                   )}
@@ -776,7 +768,7 @@ export default function DashboardPage() {
                 {!isHiringExpanded && (() => {
                   const hiringLimit = getHiringLimit(profile?.verificationTier);
                   if (hiringLimit === null) {
-                    return <p className="text-[10px] text-slate-500 mt-0.5"><span className="text-emerald-400 font-bold">Unlimited hiring access enabled</span></p>;
+                    return <p className="text-[10px] text-slate-500 mt-0.5"><span className="text-white/60 font-bold">Unlimited hiring access enabled</span></p>;
                   }
                   // Capped tier: show usage
                   const used = collections.length;
@@ -804,7 +796,7 @@ export default function DashboardPage() {
                   {isHiringExpanded ? 'Hide' : 'Quick Access'}
                 </div>
               )}
-              {isHiringExpanded ? <ChevronUp className="w-4 h-4 text-emerald-500/50 group-hover:text-emerald-500" /> : <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-400" />}
+              {isHiringExpanded ? <ChevronUp className="w-4 h-4 text-white/30 group-hover:text-white/60" /> : <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-400" />}
             </div>
           </div>
 
@@ -814,7 +806,7 @@ export default function DashboardPage() {
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Talent Collections</p>
                 <Link 
                   href="/hiring/create"
-                  className="text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors flex items-center gap-2"
+                  className="text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2"
                 >
                   <Plus className="w-3.5 h-3.5" /> New Collection
                 </Link>
@@ -825,7 +817,7 @@ export default function DashboardPage() {
                 {collections.map(col => (
                   <div key={col.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
                     <div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">{col.title}</h3>
+                      <h3 className="text-sm font-bold text-white group-hover:text-white transition-colors">{col.title}</h3>
                       <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
                         <span>{new Date(col.created_at).toLocaleDateString()}</span>
                         <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={(e) => e.stopPropagation()}>
@@ -835,7 +827,7 @@ export default function DashboardPage() {
                     </div>
                     <Link
                       href={`/hiring/${col.slug}/dashboard`}
-                      className="px-3 py-1.5 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-lg transition-colors border border-emerald-500/10"
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10"
                       onClick={(e) => e.stopPropagation()}
                     >
                       Dashboard
@@ -851,7 +843,7 @@ export default function DashboardPage() {
                 </p>
                 <Link
                   href="/hiring/create"
-                  className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg transition-all border border-emerald-500/20"
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold rounded-lg transition-all border border-white/10"
                 >
                   Create Hiring Collection
                 </Link>
@@ -881,14 +873,14 @@ export default function DashboardPage() {
               View CV
             </Link>
             <button
-              onClick={handleShare}
+              onClick={() => setShowShareModal(true)}
               className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-medium transition-colors"
             >
               Share
             </button>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs md:text-sm font-bold shadow-lg"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-white text-black hover:bg-white/90 text-xs md:text-sm font-bold shadow-lg"
             >
               {showForm ? "Close" : "+ Add Proof"}
             </button>
@@ -966,6 +958,17 @@ export default function DashboardPage() {
           onClose={() => setToastMessage(null)}
         />
       )}
+
+      <ShareProfileModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        profileUrl={typeof window !== "undefined" ? getProfileUrl() : ""}
+        displayName={profile?.displayName}
+        role={profile?.role || profile?.organization}
+        avatarUrl={profile?.avatarUrl}
+        isVerified={!!profile?.isVerified}
+        verificationTier={profile?.verificationTier}
+      />
       <Footer />
     </main>
   );

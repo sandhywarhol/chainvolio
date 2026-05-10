@@ -75,7 +75,7 @@ export function CertificatePreviewModal({ cert, onClose }: CertificatePreviewMod
         <div className={`flex-1 overflow-hidden bg-slate-950/50 relative ${cert.file_type === "image" ? "flex items-center justify-center p-2" : ""}`}>
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center z-0">
-              <Loader2 className="w-8 h-8 text-violet-500/50 animate-spin" />
+              <Loader2 className="w-8 h-8 text-indigo-500/50 animate-spin" />
             </div>
           )}
 

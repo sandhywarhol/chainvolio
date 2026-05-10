@@ -223,8 +223,8 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
               </div>
             </div>
             <div className="p-4 rounded-2xl bg-black border border-white/5 space-y-2">
-              <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-purple-500/10">
-                <FolderOpen className="w-4 h-4 text-purple-400" />
+              <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-indigo-500/10">
+                <FolderOpen className="w-4 h-4 text-indigo-400" />
               </div>
               <div>
                 <p className="text-[20px] font-black text-white">{projects.length}</p>

@@ -91,7 +91,7 @@ export default function TrustPage() {
                     <div className="space-y-10 group/section">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                                     <ShieldAlert className="w-5 h-5" />
                                 </div>
                                 <h2 className="text-h2 opacity-40">Platform Boundaries</h2>
@@ -106,7 +106,7 @@ export default function TrustPage() {
                             ].map((item, i) => (
                                 <article key={i} className="relative h-full flex flex-col p-8 rounded-[32px] bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden group/card">
                                     <div className="flex gap-4 items-start opacity-40 group-hover/card:opacity-90 transition-opacity">
-                                        <div className="p-2 rounded-lg bg-orange-500/5 text-orange-400/60 transition-colors">
+                                        <div className="p-2 rounded-lg bg-amber-500/5 text-amber-400/60 transition-colors">
                                             {item.icon}
                                         </div>
                                         <div>

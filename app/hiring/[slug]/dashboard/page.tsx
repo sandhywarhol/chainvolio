@@ -759,12 +759,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     {[
                         { label: "Pipeline Depth", value: data?.candidates?.length || 0, icon: Users, color: "text-blue-400/80", desc: "Total applications" },
                         { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter(c => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, icon: ShieldCheck, color: "text-emerald-400/80", desc: "Attested portfolios" },
-                        { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc, c) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", icon: Briefcase, color: "text-purple-400/80", desc: "Avg. proof volume" },
-                        { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-orange-400/80", desc: "Verified partners" }
+                        { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc, c) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", icon: Briefcase, color: "text-indigo-400/80", desc: "Avg. proof volume" },
+                        { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-amber-400/80", desc: "Verified partners" }
                     ].map((stat, i) => (
                         <div key={i} className="bg-white/[0.02] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">
                             {/* Suble glow */}
-                            <div className={`absolute -top-12 -right-12 w-24 h-24 blur-3xl opacity-5 transition-opacity group-hover:opacity-10 ${stat.color.split('-')[1] === 'blue' ? 'bg-blue-500' : stat.color.split('-')[1] === 'emerald' ? 'bg-emerald-500' : stat.color.split('-')[1] === 'purple' ? 'bg-purple-500' : 'bg-orange-500'}`}></div>
+                            <div className={`absolute -top-12 -right-12 w-24 h-24 blur-3xl opacity-5 transition-opacity group-hover:opacity-10 ${stat.color.split('-')[1] === 'blue' ? 'bg-blue-500' : stat.color.split('-')[1] === 'emerald' ? 'bg-emerald-500' : stat.color.split('-')[1] === 'purple' ? 'bg-indigo-500' : 'bg-amber-500'}`}></div>
 
                             <div className="flex items-center justify-between mb-4 relative z-10">
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em]">{stat.label}</span>
@@ -990,13 +990,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                             </td>
                                             <td className="px-8 py-6 text-center">
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20 shadow-sm shadow-yellow-500/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20 shadow-sm shadow-amber-400/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
                                                         {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
                                                         {candidate.signalStrength === 'Medium' && "CALIBRATED"}
                                                         {candidate.signalStrength === 'Low' && "LOW SIGNAL"}
                                                     </div>
                                                     <div className="w-16 h-1 bg-white/[0.02] rounded-full overflow-hidden">
-                                                        <div className={`h-full rounded-full transition-all duration-700 ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-yellow-500/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
+                                                        <div className={`h-full rounded-full transition-all duration-700 ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
                                                     </div>
                                                 </div>
                                             </td>

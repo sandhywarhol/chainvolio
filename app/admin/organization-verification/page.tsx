@@ -285,12 +285,12 @@ export default function AdminVerificationPage() {
 
     if (!connected) {
         return (
-            <main className="min-h-screen bg-black text-white selection:bg-purple-500/30">
+            <main className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
                 <Navbar />
                 <div className="flex flex-col items-center justify-center pt-48 pb-20 px-8 text-center">
                     <div className="w-20 h-20 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center mb-8 relative">
                         <LayoutDashboard className="w-8 h-8 text-slate-500" />
-                        <div className="absolute inset-0 bg-purple-500/10 blur-xl rounded-full" />
+                        <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full" />
                     </div>
                     <h1 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">Admin Dashboard</h1>
                     <p className="text-white/40 mb-8 max-w-sm">Please connect your authorized wallet to access the verification portal.</p>
@@ -405,7 +405,7 @@ export default function AdminVerificationPage() {
                 <div className="grid md:grid-cols-4 gap-4 mb-12">
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Pending</span>
-                        <span className="text-xl md:text-3xl font-bold text-yellow-400">{allPending.length}</span>
+                        <span className="text-xl md:text-3xl font-bold text-amber-300">{allPending.length}</span>
                     </div>
                     <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center text-center">
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Approved</span>
@@ -424,11 +424,11 @@ export default function AdminVerificationPage() {
                 {/* Search and Advanced Filters */}
                 <div className="flex flex-col lg:flex-row gap-4 mb-8 items-center justify-between">
                     <div className="relative w-full lg:w-[450px] group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                         <input 
                             type="text" 
                             placeholder="Search wallet, name, tx signature, tier..." 
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-12 py-3.5 text-sm focus:border-purple-500/50 outline-none transition-all placeholder:text-slate-600 focus:bg-white/[0.05]"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-12 py-3.5 text-sm focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 focus:bg-white/[0.05]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -511,7 +511,7 @@ export default function AdminVerificationPage() {
                         <button
                             onClick={() => setActiveTab("pending")}
                             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "pending" && statusFilter === "all"
-                                ? "bg-yellow-500/10 border border-yellow-500/30 text-yellow-400"
+                                ? "bg-amber-400/10 border border-amber-400/30 text-amber-300"
                                 : "bg-white/[0.02] border border-white/5 text-slate-500 hover:text-white"
                             }`}
                         >
@@ -529,7 +529,7 @@ export default function AdminVerificationPage() {
                         <button
                             onClick={() => setActiveTab("curated")}
                             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "curated"
-                                ? "bg-purple-500/10 border border-purple-500/30 text-purple-400"
+                                ? "bg-indigo-500/10 border border-indigo-500/30 text-indigo-400"
                                 : "bg-white/[0.02] border border-white/5 text-slate-500 hover:text-white"
                             }`}
                         >
@@ -553,7 +553,7 @@ export default function AdminVerificationPage() {
                             onClick={() => setShowAnalytics(!showAnalytics)}
                             className={`px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border ${
                                 showAnalytics 
-                                ? "bg-purple-500/10 border-purple-500/30 text-purple-400" 
+                                ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400" 
                                 : "bg-white/[0.02] border-white/5 text-slate-400 hover:text-white hover:bg-white/[0.04]"
                             }`}
                         >
@@ -678,7 +678,7 @@ export default function AdminVerificationPage() {
                             <input 
                                 type="text" 
                                 placeholder="Enter numeric CV ID (e.g. 7)" 
-                                className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm focus:border-purple-500/50 outline-none transition-all placeholder:text-slate-600 focus:bg-white/[0.05]"
+                                className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 focus:bg-white/[0.05]"
                                 value={curatedSearch}
                                 onChange={(e) => setCuratedSearch(e.target.value.replace(/[^0-9]/g, ''))}
                                 onKeyDown={(e) => e.key === 'Enter' && handleCuratedSearch()}
@@ -686,7 +686,7 @@ export default function AdminVerificationPage() {
                             <button 
                                 onClick={handleCuratedSearch}
                                 disabled={searchLoading || !curatedSearch}
-                                className="px-8 py-4 rounded-2xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-8 py-4 rounded-2xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {searchLoading ? "Searching..." : "Search"}
                             </button>
@@ -731,7 +731,7 @@ export default function AdminVerificationPage() {
                                 <div className="pt-6 border-t border-white/5">
                                     <label className="block text-sm font-bold text-slate-400 mb-2">Select Verification Tier to Grant</label>
                                     <select 
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-purple-500/50 outline-none transition-all cursor-pointer mb-6"
+                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-indigo-500/50 outline-none transition-all cursor-pointer mb-6"
                                         value={selectedTier}
                                         onChange={(e) => setSelectedTier(e.target.value)}
                                     >
@@ -826,7 +826,7 @@ export default function AdminVerificationPage() {
                                                     href={`/cv/${req.wallet_address}`} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-purple-500/10 border border-white/10 hover:border-purple-500/30 text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-purple-400 transition-all"
+                                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-indigo-400 transition-all"
                                                 >
                                                     <ExternalLink className="w-2.5 h-2.5" /> View CV
                                                 </a>
@@ -939,7 +939,7 @@ export default function AdminVerificationPage() {
                                                                 <XCircle className="w-2.5 h-2.5" /> Rejected
                                                             </span>
                                                         ) : req.status === "revoked" ? (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[9px] font-bold uppercase tracking-tight">
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-bold uppercase tracking-tight">
                                                                 <Ban className="w-2.5 h-2.5" /> Revoked
                                                             </span>
                                                         ) : (
@@ -961,7 +961,7 @@ export default function AdminVerificationPage() {
                                                         <>
                                                             <button
                                                                 onClick={() => setShowConfirm({ id: req.id, action: 'expire', name: req.name })}
-                                                                className="p-2 rounded-lg bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white transition-all border border-orange-500/20"
+                                                                className="p-2 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all border border-amber-500/20"
                                                                 title="Force Expire"
                                                             >
                                                                 <Clock8 className="w-4 h-4" />
@@ -1025,13 +1025,13 @@ export default function AdminVerificationPage() {
                         <div className={`p-4 rounded-3xl mb-6 text-center ${
                             showConfirm.action === 'approve' ? 'bg-emerald-500/10' : 
                             showConfirm.action === 'reject' || showConfirm.action === 'revoke' || showConfirm.action === 'delete' ? 'bg-red-500/10' :
-                            showConfirm.action === 'reset' ? 'bg-blue-500/10' : 'bg-orange-500/10'
+                            showConfirm.action === 'reset' ? 'bg-blue-500/10' : 'bg-amber-500/10'
                         }`}>
                             {showConfirm.action === 'approve' ? <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto" /> :
                              showConfirm.action === 'reject' ? <XCircle className="w-12 h-12 text-red-500 mx-auto" /> :
                              showConfirm.action === 'revoke' ? <Ban className="w-12 h-12 text-red-500 mx-auto" /> :
                              showConfirm.action === 'reset' ? <RotateCcw className="w-12 h-12 text-blue-500 mx-auto" /> :
-                             showConfirm.action === 'expire' ? <Clock8 className="w-12 h-12 text-orange-500 mx-auto" /> :
+                             showConfirm.action === 'expire' ? <Clock8 className="w-12 h-12 text-amber-500 mx-auto" /> :
                              <Trash2 className="w-12 h-12 text-red-700 mx-auto" />}
                         </div>
 
@@ -1063,7 +1063,7 @@ export default function AdminVerificationPage() {
                                     showConfirm.action === 'approve' ? 'bg-emerald-500 text-black hover:bg-emerald-400' :
                                     showConfirm.action === 'reject' || showConfirm.action === 'revoke' || showConfirm.action === 'delete' ? 'bg-red-500 text-white hover:bg-red-600' :
                                     showConfirm.action === 'reset' ? 'bg-blue-500 text-white hover:bg-blue-600' :
-                                    'bg-orange-500 text-white hover:bg-orange-600'
+                                    'bg-amber-500 text-white hover:bg-amber-600'
                                     } disabled:opacity-50`}
                             >
                                 {actionLoading ? 'Processing...' : `Confirm ${showConfirm.action}`}

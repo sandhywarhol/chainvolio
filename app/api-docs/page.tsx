@@ -172,7 +172,7 @@ if (data.score > 75 && data.confidence > 0.8) {
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[160px] rounded-full" />
+          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[160px] rounded-full" />
           <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[160px] rounded-full" />
           <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[160px] rounded-full" />
       </div>
@@ -191,7 +191,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { label: "Example Usage", href: "#example-usage" },
                   { label: "Authentication", href: "#authentication" }
               ].map((item, i) => (
-                  <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-purple-500 font-medium tracking-tight">
+                  <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-indigo-500 font-medium tracking-tight">
                       {item.label}
                   </a>
               ))}
@@ -218,14 +218,14 @@ if (data.score > 75 && data.confidence > 0.8) {
           <div className="flex-1 overflow-y-auto h-full px-8 lg:px-12 py-12 space-y-32 scrollbar-hide scroll-smooth">
           {/* Header */}
           <header id="introduction" className="space-y-8 scroll-mt-[120px]">
-            <div className="flex items-center gap-3 px-4 py-1.5 bg-purple-500/[0.03] border border-purple-500/10 rounded-full w-fit">
-              <Code2 className="w-4 h-4 text-purple-400" />
-              <span className="text-caption text-purple-400/80">Documentation V1</span>
+            <div className="flex items-center gap-3 px-4 py-1.5 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-full w-fit">
+              <Code2 className="w-4 h-4 text-indigo-400" />
+              <span className="text-caption text-indigo-400/80">Documentation V1</span>
             </div>
             <h1 className="text-3xl md:text-h1 break-words overflow-hidden max-w-full">
                 Reputation <span className="text-white/20">API.</span>
             </h1>
-            <p className="text-body text-lg md:text-xl italic border-l-2 border-purple-500/20 pl-6 md:pl-8 bg-purple-500/[0.01] py-6 rounded-r-3xl break-words">
+            <p className="text-body text-lg md:text-xl italic border-l-2 border-indigo-500/20 pl-6 md:pl-8 bg-indigo-500/[0.01] py-6 rounded-r-3xl break-words">
               "Integrate the ChainVolio reputation layer into your application. Authenticate professional identities and filter users by verified skill signals."
             </p>
           </header>
@@ -303,7 +303,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* GET API KEY */}
           <section id="get-key" className="space-y-10 scroll-mt-[120px]">
             <div className="flex items-center gap-4">
-              <Zap className="w-5 h-5 text-purple-400" />
+              <Zap className="w-5 h-5 text-indigo-400" />
               <h2 className="text-2xl md:text-h2 break-words">Identity Auth</h2>
             </div>
 
@@ -314,8 +314,8 @@ if (data.score > 75 && data.confidence > 0.8) {
                 { step: "02", title: "Sign Once", desc: "Sign a one-time message to prove ownership. No funds are moved, no transaction is sent." },
                 { step: "03", title: "Get Your Key", desc: "Your key is generated instantly. Use it in the x-api-key header on every request." },
               ].map((item) => (
-                <div key={item.step} className="p-6 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-3 hover:border-purple-500/20 transition-all">
-                  <span className="text-[10px] font-black text-purple-400/40 uppercase tracking-[0.25em]">Step {item.step}</span>
+                <div key={item.step} className="p-6 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-3 hover:border-indigo-500/20 transition-all">
+                  <span className="text-[10px] font-black text-indigo-400/40 uppercase tracking-[0.25em]">Step {item.step}</span>
                   <p className="text-caption text-white font-bold">{item.title}</p>
                   <p className="text-body text-xs">{item.desc}</p>
                 </div>
@@ -323,7 +323,7 @@ if (data.score > 75 && data.confidence > 0.8) {
             </div>
 
             <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-2xl relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row gap-16 items-center">
                     <div className="md:w-1/2 space-y-6">
                         <h3 className="text-2xl md:text-h2 md:!text-3xl break-words">Get Your API Key</h3>
@@ -345,7 +345,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                                 <button
                                     onClick={generateApiKey}
                                     disabled={generatingKey}
-                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-purple-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
+                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-indigo-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
                                 >
                                     {generatingKey ? "Signing…" : "Generate API Key"}
                                 </button>
@@ -460,7 +460,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           <section id="get-score" className="space-y-12 scroll-mt-[120px]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full max-w-full">
               <div className="flex items-center gap-4">
-                <Terminal className="w-5 h-5 text-purple-400" />
+                <Terminal className="w-5 h-5 text-indigo-400" />
                 <h2 className="text-2xl md:text-h2 break-words">Get Wallet Score</h2>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -480,11 +480,11 @@ if (data.score > 75 && data.confidence > 0.8) {
                   <span className="text-caption opacity-20">Fetch Signature</span>
                   <div className="flex items-center gap-6">
                     <button onClick={() => copyToClipboard(curlExample, 'curl-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
-                        <Terminal className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
+                        <Terminal className="w-3 h-3 group-hover:text-indigo-400 transition-colors" />
                         <span className="text-caption font-bold">cURL</span>
                     </button>
                     <button onClick={() => copyToClipboard(getExample, 'js-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
-                        <Copy className="w-3 h-3 group-hover:text-purple-400 transition-colors" />
+                        <Copy className="w-3 h-3 group-hover:text-indigo-400 transition-colors" />
                         <span className="text-caption font-bold">Fetch</span>
                     </button>
                   </div>
@@ -619,7 +619,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* Final Call to Action */}
           <section className="relative z-40 md:py-24 md:px-8 pt-16 pb-28 px-4 border-t border-white/[0.03] h-auto overflow-hidden max-w-full">
               <div className="p-8 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-center space-y-10 relative group flex flex-col items-center justify-start h-auto">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="relative z-10 flex flex-col items-center w-full space-y-8 md:space-y-10">
                       <div className="p-5 rounded-2xl bg-white/[0.03] w-fit mx-auto">
                         <Users className="w-10 h-10 text-white/40" />
