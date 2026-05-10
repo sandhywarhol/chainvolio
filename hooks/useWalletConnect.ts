@@ -46,13 +46,26 @@ export function useWalletConnect() {
             setIsConnecting(true);
             setConnectionError(null);
             try {
-                await connectRef.current();
+                // Race connect() against a 15s timeout so a hanging call never locks
+                // the state machine — the finally block always runs and resets the refs.
+                await Promise.race([
+                    connectRef.current(),
+                    new Promise<never>((_, reject) =>
+                        setTimeout(() => reject(new Error("WalletConnectTimeout")), 15000)
+                    ),
+                ]);
                 localStorage.removeItem("cv_connecting");
             } catch (err: any) {
                 const msg: string = err?.message ?? "";
                 // User closed/dismissed the popup — clear spinner but no error toast
                 if (err?.name === "WalletWindowClosedError") {
                     setConnectionError("cancelled");
+                    return;
+                }
+
+                // connect() hung for 15 s — treat as unresponsive extension
+                if (msg === "WalletConnectTimeout") {
+                    setConnectionError("extension_dead");
                     return;
                 }
 
@@ -105,7 +118,7 @@ export function useWalletConnect() {
                 const targetWallet = wallets.find(w => w.adapter.name === walletName);
                 const isInstalled =
                     targetWallet?.readyState === WalletReadyState.Installed ||
-                    (walletName === "Phantom" && !!(window as any).solana?.isPhantom) ||
+                    (walletName === "Phantom" && (!!(window as any).solana?.isPhantom || !!(window as any).phantom?.solana?.isPhantom)) ||
                     (walletName === "Solflare" && !!(window as any).solflare);
 
                 if (!isInstalled) {
@@ -126,8 +139,12 @@ export function useWalletConnect() {
             }
 
             // Step 1: tell the context which wallet we want.
-            // The context re-renders, sets up event listeners, then our useEffect
-            // calls connect() once `wallet` has updated to the target adapter.
+            // Reset to null first so the useEffect always fires on retry even if
+            // pendingWallet was already set to the same wallet name (React deduplicates
+            // identical state updates, which would silently skip the connection).
+            setPendingWallet(null);
+            // Use a microtask so React processes the null before setting the new value.
+            await Promise.resolve();
             setPendingWallet(walletName);
             select(walletName as WalletName);
         },

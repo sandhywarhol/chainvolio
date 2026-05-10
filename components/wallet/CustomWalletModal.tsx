@@ -56,7 +56,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         if (typeof window === "undefined") return;
         const phantom = wallets.find(w => w.adapter.name === "Phantom");
         const solflare = wallets.find(w => w.adapter.name === "Solflare");
-        setPhantomAvailable(phantom?.readyState === "Installed" || !!(window as any).solana?.isPhantom);
+        // Check both the legacy window.solana API and Phantom's newer window.phantom.solana API
+        const isPhantomWindow = !!(window as any).solana?.isPhantom || !!(window as any).phantom?.solana?.isPhantom;
+        setPhantomAvailable(phantom?.readyState === "Installed" || isPhantomWindow);
         setSolflareAvailable(solflare?.readyState === "Installed" || !!(window as any).solflare);
     }, [isOpen, wallets]);
 
@@ -407,7 +409,15 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             ))}
                         </div>
 
-                        <p className="text-[9px] text-slate-600 text-center font-medium">For freelancers, contributors &amp; professionals</p>
+                        {/* Show hint immediately when connecting so user knows to check toolbar */}
+                        {loadingKey?.startsWith("builder-") && (
+                            <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
+                                Check your browser toolbar — the wallet popup may be waiting for your approval.
+                            </p>
+                        )}
+                        {!loadingKey && (
+                            <p className="text-[9px] text-slate-600 text-center font-medium">For freelancers, contributors &amp; professionals</p>
+                        )}
                     </div>
 
                     {/* RIGHT — Recruiter */}
@@ -488,7 +498,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             </div>
                         </div>
 
-                        <p className="text-[9px] text-slate-600 text-center font-medium">For organizations, companies &amp; communities</p>
+                        {loadingKey?.startsWith("recruiter-") && (
+                            <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
+                                Check your browser toolbar — the wallet popup may be waiting for your approval.
+                            </p>
+                        )}
+                        {!loadingKey?.startsWith("recruiter-") && (
+                            <p className="text-[9px] text-slate-600 text-center font-medium">For organizations, companies &amp; communities</p>
+                        )}
                     </div>
                 </div>
 

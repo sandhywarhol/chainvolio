@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useEffect, useRef, useState } from "react";
+import { useMemo, useEffect } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { clusterApiUrl } from "@solana/web3.js";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -23,54 +25,50 @@ function MobileReturnHandler() {
 }
 
 /**
- * When Chrome suspends the Phantom MV3 service worker, autoConnect fails with
- * "Could not establish connection. Receiving end does not exist."
- * The failed attempt itself wakes the service worker up — so retrying after
- * a short delay almost always succeeds without any user interaction.
+ * Disconnects the wallet when the user leaves the page (refresh, tab close, navigation).
+ * This removes the active Phantom session so the approval popup is shown again on the next visit,
+ * giving users an explicit confirm step on every login.
  */
-function AutoConnectRetry({ error }: { error: Error | null }) {
-    const { connected, connecting, connect, wallet } = useWallet();
-    const retriedRef = useRef(false);
+function DisconnectOnUnload() {
+    const { connected, disconnect } = useWallet();
 
     useEffect(() => {
-        if (!error || retriedRef.current || connected || connecting || !wallet) return;
-        const msg = error.message ?? "";
-        if (!msg.includes("Receiving end does not exist") && !msg.includes("Could not establish connection")) return;
+        const handleUnload = () => {
+            // Try the direct wallet API first (most reliable in beforeunload context)
+            try {
+                const phantom = (window as any).phantom?.solana ?? (window as any).solana;
+                if (phantom?.isPhantom) phantom.disconnect();
+            } catch { /* ignore */ }
+            try {
+                const solflare = (window as any).solflare;
+                if (solflare) solflare.disconnect();
+            } catch { /* ignore */ }
+            // Also call the adapter disconnect so React state stays consistent
+            if (connected) disconnect().catch(() => {});
+        };
 
-        retriedRef.current = true;
-        const timer = setTimeout(async () => {
-            try { await connect(); } catch { /* silent — user can still connect manually */ }
-        }, 1500);
-
-        return () => clearTimeout(timer);
-    }, [error, connected, connecting, connect, wallet]);
+        window.addEventListener("beforeunload", handleUnload);
+        return () => window.removeEventListener("beforeunload", handleUnload);
+    }, [connected, disconnect]);
 
     return null;
 }
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
     const network = WalletAdapterNetwork.Mainnet;
-    const [lastError, setLastError] = useState<Error | null>(null);
-
-    // REQUIREMENT 8: Disable autoConnect on mobile to prevent automatic
-    // reconnect attempts that can cause redirect loops.
-    const [autoConnect, setAutoConnect] = useState(true);
-    useEffect(() => {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        if (isMobile) {
-            setAutoConnect(false);
-            console.log("[WalletProvider] Mobile detected — autoConnect disabled.");
-        }
-    }, []);
 
     const endpoint = useMemo(
         () => process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl(network),
         [network]
     );
 
-    // Phantom and Solflare auto-register via the Standard Wallet interface —
-    // listing them manually causes 40+ duplicate warnings per navigation.
-    const wallets = useMemo(() => [], []);
+    // Include adapters explicitly so select() + connect() always uses the
+    // battle-tested legacy flow — Standard Wallet auto-registration is unreliable
+    // with Phantom MV3 service workers in Chromium browsers.
+    const wallets = useMemo(() => [
+        new PhantomWalletAdapter(),
+        new SolflareWalletAdapter(),
+    ], []);
 
     const ConnProv = ConnectionProvider as any;
     const SolWallProv = SolanaWalletProvider as any;
@@ -78,10 +76,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <ConnProv endpoint={endpoint}>
-            <SolWallProv wallets={wallets} autoConnect={autoConnect} onError={(err: Error) => setLastError(err)}>
+            {/* autoConnect is disabled so the site never silently reconnects from a
+                cached session — users must go through the wallet approval flow every visit. */}
+            <SolWallProv wallets={wallets} autoConnect={false} onError={() => {}}>
                 <ModalProv>
                     <MobileReturnHandler />
-                    <AutoConnectRetry error={lastError} />
+                    <DisconnectOnUnload />
                     {children}
                 </ModalProv>
             </SolWallProv>
