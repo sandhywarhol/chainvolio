@@ -515,3 +515,27 @@ html[data-theme="light"] .theme-preserve .bg-white\/\[0\.03\] { background-color
 html[data-theme="light"] .theme-preserve .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,0.04) !important; }
 html[data-theme="light"] .theme-preserve .bg-white\/5       { background-color: rgba(255,255,255,0.05) !important; }
 html[data-theme="light"] .theme-preserve .text-\[#fde68a99\]  { color: #fde68a99 !important; }
+
+/* ── Navbar: always dark in light mode (bg-transparent when unscrolled → invisible) ── */
+html[data-theme="light"] nav.theme-preserve {
+  background: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* ── Section gradient overlays ──────────────────────────────────────────────
+   In light mode, black-to-transparent fades look wrong on white sections.
+   theme-fade-from-black / theme-fade-to-black → white equivalents.
+   theme-cta-fade → hidden (CTA section fades not needed on white bg).
+──────────────────────────────────────────────────────────────────────────── */
+html[data-theme="light"] .theme-aware .theme-fade-from-black {
+  background: linear-gradient(to top, #ffffff 0%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .theme-fade-to-black {
+  background: linear-gradient(to bottom, #ffffff 0%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .theme-solid-black {
+  background: #ffffff !important;
+}
+html[data-theme="light"] .theme-aware .theme-cta-fade {
+  display: none !important;
+}

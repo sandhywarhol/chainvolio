@@ -1257,8 +1257,8 @@ export function LandingPageClient() {
                                 />
 
                                 {/* Multi-layered Bottom Gradient for Smooth Blending */}
-                                <div className="absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
-                                <div className="absolute bottom-0 left-0 w-full h-12 bg-black z-20 pointer-events-none"></div>
+                                <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
+                                <div className="theme-solid-black absolute bottom-0 left-0 w-full h-12 bg-black z-20 pointer-events-none"></div>
                             </div>
                         </div>
 
@@ -1630,7 +1630,7 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section id="problems" className="py-16 sm:py-20 md:py-24 relative z-10 bg-black theme-bg-page overflow-hidden">
+                <section id="problems" className="theme-preserve py-16 sm:py-20 md:py-24 relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
@@ -1797,7 +1797,7 @@ export function LandingPageClient() {
                 </section>
 
                 <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black theme-bg-page">
-                    <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
+                    <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
 
@@ -1910,8 +1910,8 @@ export function LandingPageClient() {
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
                     />
                     {/* Top + bottom fade */}
-                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+                    <div className="theme-cta-fade absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+                    <div className="theme-cta-fade absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
 
                     <div className="relative max-w-[760px] mx-auto text-center z-10">
                         <motion.div
