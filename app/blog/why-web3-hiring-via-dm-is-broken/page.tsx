@@ -13,8 +13,8 @@ export default function BlogPostPage() {
 
     const handleShare = () => {
         const shareData = {
-            title: "What Recruiters Look for in Web3 Talent | ChainVolio",
-            text: "Discover what Web3 recruiters actually look for when hiring talent.",
+            title: "Why Web3 Hiring via DM Is Broken | ChainVolio",
+            text: "Informal hiring is slowing down Web3. Discover why verifiable signals are the solution.",
             url: typeof window !== 'undefined' ? window.location.href : '',
         };
 
@@ -34,8 +34,8 @@ export default function BlogPostPage() {
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
-            <title>What Recruiters Look for in Web3 Talent | ChainVolio</title>
-            <meta name="description" content="Discover what Web3 recruiters actually look for when hiring talent, from proof of work and on-chain reputation to public contributions." />
+            <title>Why Web3 Hiring via DM Is Broken | ChainVolio</title>
+            <meta name="description" content="Explore why informal hiring via DMs and emails is broken in Web3 and how to transition to verified hiring." />
             
             <Navbar />
             
@@ -64,12 +64,12 @@ export default function BlogPostPage() {
                                     </span>
                                     <div className="flex items-center gap-2 text-xs text-white/30 font-medium uppercase tracking-tight">
                                         <Clock className="w-3.5 h-3.5" />
-                                        6 min read
+                                        5 min read
                                     </div>
                                 </div>
 
                                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.15] text-white/90">
-                                    What Recruiters Look for in Web3 Talent
+                                    Why Web3 Hiring via DM Is Broken and What to Do Instead
                                 </h1>
 
                                 <div className="flex items-center justify-between py-8 border-y border-white/[0.05]">
@@ -79,7 +79,7 @@ export default function BlogPostPage() {
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-white/90">ChainVolio Team</span>
-                                            <span className="text-xs text-white/40">Published on May 15, 2026</span>
+                                            <span className="text-xs text-white/40">Published on May 10, 2026</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -102,102 +102,126 @@ export default function BlogPostPage() {
                             {/* Article Content */}
                             <div className="max-w-none relative z-10 pb-20">
                                 <div className="space-y-12 text-base md:text-lg text-white/60 leading-relaxed font-normal">
-                                    <p className="text-white/90 font-medium text-xl md:text-2xl leading-snug">
-                                        Hiring in Web3 is different from traditional recruiting.
-                                    </p>
-                                    
-                                    <p>
-                                        Most contributors work across multiple projects, identities are often pseudonymous, and resumes are difficult to verify. As a result, recruiters rely on a different set of signals to identify credible talent.
-                                    </p>
-
-                                    <div className="p-8 md:p-12 rounded-3xl bg-white/[0.02] border border-white/[0.05] relative overflow-hidden group/quote text-center">
-                                        <p className="text-white/30 text-xl md:text-2xl font-medium tracking-tight mb-4 uppercase text-xs font-black tracking-[0.2em]">The fundamental shift</p>
-                                        <p className="text-white/90 text-2xl md:text-4xl font-bold tracking-tighter">
-                                            The question is no longer “Where did you work?” <br /> It’s “What can you prove?”
+                                    <div className="space-y-6">
+                                        <p className="text-white/40 font-mono text-sm">
+                                            "Send me your portfolio on Twitter."<br />
+                                            "Just DM me your CV."<br />
+                                            "Shoot us an email and we'll review it."
+                                        </p>
+                                        <p>
+                                            Sound familiar? If you've been in Web3 for any amount of time, you've seen this. Hiring happens in Discord channels, Twitter threads, and email inboxes which are informal, unstructured, and almost impossible to verify.
+                                        </p>
+                                        <p className="text-white/90 font-bold text-xl">
+                                            It works. Until it doesn't.
                                         </p>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Proof of Work Matters More Than Titles</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">The Real Cost of DM Hiring</h2>
                                         <p>
-                                            Job titles carry less weight in Web3.
+                                            DM hiring feels fast. But what it actually does is push all the risk onto the recruiter.
                                         </p>
                                         <p>
-                                            Recruiters care more about shipped products, visible contributions, governance participation, and technical execution. A strong portfolio of real work often outperforms a polished resume with unverifiable claims.
-                                        </p>
-                                        <p className="text-emerald-400/80 font-bold tracking-tight text-xl md:text-2xl">
-                                            Proof creates trust.
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Public Contributions Build Credibility</h2>
-                                        <p>
-                                            Web3 is built in public. Recruiters actively look at these key signals:
+                                            When someone sends their portfolio via DM, the recruiter has no way to verify:
                                         </p>
                                         <ul className="space-y-4 list-none p-0">
                                             {[
-                                                "GitHub activity and code quality",
-                                                "DAO participation and governance votes",
-                                                "On-chain interactions and wallet activity",
-                                                "Community engagement on Discord/X",
-                                                "Content and thought leadership contributions"
+                                                "Whether the work was actually theirs",
+                                                "Whether the timeline they claim is accurate",
+                                                "Whether the organization they say they worked for can confirm it",
+                                                "Whether the skills they list were actually used"
                                             ].map((item, i) => (
                                                 <li key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.01] border border-white/[0.03]">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2" />
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-200 mt-2" />
                                                     <span className="text-white/70">{item}</span>
                                                 </li>
                                             ))}
                                         </ul>
                                         <p className="text-white/30 italic">
-                                            Your public footprint becomes part of your professional identity.
+                                            The recruiter is left making a judgment call based on vibes and reputation. That's not a hiring process. That's educated guessing.
                                         </p>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Verifiable Reputation is Becoming Essential</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">It's Not Just the Recruiter's Problem</h2>
                                         <p>
-                                            As more people enter Web3, distinguishing real contributors from noise becomes harder.
+                                            Talented contributors suffer too.
                                         </p>
                                         <p>
-                                            Recruiters increasingly need systems that allow them to verify work history quickly and reliably. Verifiable credentials and on-chain attestations reduce uncertainty and improve hiring confidence.
+                                            When hiring runs on informal signals, the people who win are often not the most skilled because they're the most visible. The best self-marketers. The ones with the most followers or the loudest presence in the right Discord servers.
                                         </p>
-                                        <p className="text-white/40 font-black uppercase tracking-[0.3em] text-xs">
-                                            Trust becomes scalable.
+                                        <p className="border-l-4 border-white/10 pl-8 py-2 text-white/30 text-xl font-medium tracking-tight">
+                                            Real contributors who do deep, valuable work in relative silence often get overlooked.
                                         </p>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">The Future of Hiring in Web3</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Why Email Isn't Much Better</h2>
                                         <p>
-                                            Traditional resumes were designed for centralized companies.
+                                            Email feels more formal. But the problems are the same.
                                         </p>
                                         <p>
-                                            Web3 requires a more transparent and portable identity system that reflects real contributions across ecosystems and communities.
+                                            A PDF attached to an email is a document anyone can edit. A portfolio link leads to a website anyone can build. Claims in a cover letter have no verification mechanism built in.
                                         </p>
-                                        <p className="border-l-4 border-white/10 pl-8 py-2 text-white/30 text-xl font-medium tracking-tight leading-relaxed">
-                                            The future of hiring will be based on verifiable work, not unverifiable claims.
+                                        <p>
+                                            Recruiters end up spending hours on reference calls, background checks, and trial periods, not because they want to, but because they have no other way to separate real contributors from self-promoters.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">What the Alternative Looks Like</h2>
+                                        <p>
+                                            Imagine a world where:
+                                        </p>
+                                        <ul className="space-y-4">
+                                            <li className="text-white/80">• Every role is confirmed by the organization</li>
+                                            <li className="text-white/80">• Every contribution is signed by someone who was actually there</li>
+                                            <li className="text-white/80">• That verification lives on a public blockchain</li>
+                                        </ul>
+                                        <p className="text-amber-200/60 font-black text-2xl tracking-tighter">
+                                            That's verifiable work history.
+                                        </p>
+                                        <p className="text-sm text-white/40">
+                                            Learn how to build your own in our <Link href="/blog/how-to-build-web3-portfolio" className="text-amber-200/60 hover:underline">Web3 portfolio guide</Link>.
                                         </p>
                                     </div>
 
                                     <div className="p-8 md:p-10 rounded-[32px] md:rounded-[40px] bg-white/[0.02] border border-white/10 space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight text-center">Build a Trusted Identity with ChainVolio</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">A Better Way to Share Your Work</h2>
                                         <p>
-                                            ChainVolio helps contributors create a verifiable Web3 resume backed by on-chain attestations.
+                                            Instead of DMing a portfolio that no one can verify, you share a single link. That link opens your on-chain professional profile. Every role is attested by the organization you worked for. Every contribution is backed by cryptographic proof.
                                         </p>
-                                        <p>
-                                            Instead of relying on static PDFs, your work history becomes transparent, portable, and instantly verifiable by recruiters.
-                                        </p>
-                                        <p className="text-white/80 font-medium text-center">
-                                            Your reputation becomes an asset you truly own.
+                                        <p className="text-white/80 font-medium">
+                                            Recruiters can verify everything instantly without needing DMs, calls, or back-and-forth.
                                         </p>
                                     </div>
 
+                                    <div className="space-y-6 pt-12">
+                                        <h2 className="text-3xl md:text-4xl font-bold text-white/90 tracking-tight">The Shift Is Already Happening</h2>
+                                        <p>
+                                            The best Web3 projects are already moving away from informal hiring. They want contributors who can prove their work instead of just describing it.
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
+                                            <Link 
+                                                href="/onboarding" 
+                                                className="px-8 py-4 rounded-full bg-white text-black font-black text-center hover:bg-amber-200 transition-all"
+                                            >
+                                                Build Your Verified Profile
+                                            </Link>
+                                            <Link 
+                                                href="/recruiter" 
+                                                className="px-8 py-4 rounded-full border border-white/10 bg-white/5 text-white font-black text-center hover:bg-white/10 transition-all"
+                                            >
+                                                Start Hiring with Verified Signals
+                                            </Link>
+                                        </div>
+                                    </div>
+
                                     {/* Back to Blog Navigation */}
-                                    <div className="pt-16 pb-12 relative z-20">
+                                    <div className="pt-16 pb-12 relative z-20 flex justify-center">
                                         <Link 
                                             href="/blog" 
-                                            className="inline-flex items-center gap-3 px-8 py-5 rounded-full bg-white/[0.05] border border-white/10 text-white font-bold text-lg md:text-xl hover:bg-white/[0.1] transition-all duration-300"
+                                            className="inline-flex items-center gap-3 px-8 py-5 rounded-full bg-white/[0.05] border border-white/10 text-white font-bold text-lg hover:bg-white/[0.1] transition-all duration-300"
                                         >
                                             <ArrowLeft className="w-6 h-6" />
                                             Back to Articles
@@ -209,12 +233,7 @@ export default function BlogPostPage() {
 
                         {/* Ultra-Smooth Easing Gradients */}
                         <div className="absolute inset-0 pointer-events-none z-10">
-                            {/* Bottom fade with easing stops */}
                             <div className="absolute bottom-0 left-0 right-0 h-[400px] bg-gradient-to-t from-black via-black/95 via-black/80 via-black/40 via-black/10 to-transparent" />
-                            {/* Left fade with easing stops */}
-                            <div className="absolute left-0 top-0 bottom-0 w-48 bg-gradient-to-r from-black/40 via-black/20 via-black/5 to-transparent hidden lg:block" />
-                            {/* Right fade with easing stops */}
-                            <div className="absolute right-0 top-0 bottom-0 w-48 bg-gradient-to-l from-black/40 via-black/20 via-black/5 to-transparent hidden lg:block" />
                         </div>
                     </div>
                 </div>

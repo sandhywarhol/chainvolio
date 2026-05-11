@@ -13,8 +13,8 @@ export default function BlogPostPage() {
 
     const handleShare = () => {
         const shareData = {
-            title: "What Recruiters Look for in Web3 Talent | ChainVolio",
-            text: "Discover what Web3 recruiters actually look for when hiring talent.",
+            title: "The Web3 Job Market in 2026 | ChainVolio",
+            text: "Discover how the Web3 job market has evolved and why verifiable proof is now the gold standard.",
             url: typeof window !== 'undefined' ? window.location.href : '',
         };
 
@@ -34,8 +34,8 @@ export default function BlogPostPage() {
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
-            <title>What Recruiters Look for in Web3 Talent | ChainVolio</title>
-            <meta name="description" content="Discover what Web3 recruiters actually look for when hiring talent, from proof of work and on-chain reputation to public contributions." />
+            <title>The Web3 Job Market in 2026 | ChainVolio</title>
+            <meta name="description" content="The Web3 job market in 2026 rewards real contributors over self-promoters. Learn how it has changed and how to navigate it." />
             
             <Navbar />
             
@@ -60,7 +60,7 @@ export default function BlogPostPage() {
                             <header className="space-y-8 mb-16 relative z-10">
                                 <div className="flex items-center gap-4">
                                     <span className="px-3 py-1 rounded-full bg-amber-200/10 border border-amber-200/20 text-[10px] font-black uppercase tracking-widest text-amber-200/80">
-                                        Recruitment
+                                        Career
                                     </span>
                                     <div className="flex items-center gap-2 text-xs text-white/30 font-medium uppercase tracking-tight">
                                         <Clock className="w-3.5 h-3.5" />
@@ -69,7 +69,7 @@ export default function BlogPostPage() {
                                 </div>
 
                                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.15] text-white/90">
-                                    What Recruiters Look for in Web3 Talent
+                                    The Web3 Job Market in 2026: What's Changed and How to Navigate It
                                 </h1>
 
                                 <div className="flex items-center justify-between py-8 border-y border-white/[0.05]">
@@ -79,7 +79,7 @@ export default function BlogPostPage() {
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-white/90">ChainVolio Team</span>
-                                            <span className="text-xs text-white/40">Published on May 15, 2026</span>
+                                            <span className="text-xs text-white/40">Published on May 7, 2026</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -102,102 +102,104 @@ export default function BlogPostPage() {
                             {/* Article Content */}
                             <div className="max-w-none relative z-10 pb-20">
                                 <div className="space-y-12 text-base md:text-lg text-white/60 leading-relaxed font-normal">
-                                    <p className="text-white/90 font-medium text-xl md:text-2xl leading-snug">
-                                        Hiring in Web3 is different from traditional recruiting.
-                                    </p>
-                                    
-                                    <p>
-                                        Most contributors work across multiple projects, identities are often pseudonymous, and resumes are difficult to verify. As a result, recruiters rely on a different set of signals to identify credible talent.
-                                    </p>
-
-                                    <div className="p-8 md:p-12 rounded-3xl bg-white/[0.02] border border-white/[0.05] relative overflow-hidden group/quote text-center">
-                                        <p className="text-white/30 text-xl md:text-2xl font-medium tracking-tight mb-4 uppercase text-xs font-black tracking-[0.2em]">The fundamental shift</p>
-                                        <p className="text-white/90 text-2xl md:text-4xl font-bold tracking-tighter">
-                                            The question is no longer “Where did you work?” <br /> It’s “What can you prove?”
+                                    <div className="space-y-6">
+                                        <p className="text-white/90 font-medium text-xl md:text-2xl leading-snug">
+                                            The Web3 job market in 2026 looks nothing like it did two years ago.
+                                        </p>
+                                        <p>
+                                            The hype cycles have settled. The speculative noise has faded. What's left is a more mature, more demanding, and ultimately more interesting ecosystem, one that rewards real contributors over self-promoters.
+                                        </p>
+                                        <p>
+                                            If you're looking to enter or advance in Web3 this year, here's what has changed and what it means for you.
                                         </p>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Proof of Work Matters More Than Titles</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">What's Different in 2026</h2>
                                         <p>
-                                            Job titles carry less weight in Web3.
+                                            A few years ago, getting a Web3 role was often about timing and connections. Being early to the right Discord server, knowing the right people, or being willing to work for equity in projects that might never ship.
                                         </p>
                                         <p>
-                                            Recruiters care more about shipped products, visible contributions, governance participation, and technical execution. A strong portfolio of real work often outperforms a polished resume with unverifiable claims.
+                                            That era is largely over. Web3 organizations in 2026 are more selective, more structured, and more focused on verifiable output.
                                         </p>
-                                        <p className="text-emerald-400/80 font-bold tracking-tight text-xl md:text-2xl">
-                                            Proof creates trust.
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Public Contributions Build Credibility</h2>
-                                        <p>
-                                            Web3 is built in public. Recruiters actively look at these key signals:
-                                        </p>
-                                        <ul className="space-y-4 list-none p-0">
-                                            {[
-                                                "GitHub activity and code quality",
-                                                "DAO participation and governance votes",
-                                                "On-chain interactions and wallet activity",
-                                                "Community engagement on Discord/X",
-                                                "Content and thought leadership contributions"
-                                            ].map((item, i) => (
-                                                <li key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.01] border border-white/[0.03]">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2" />
-                                                    <span className="text-white/70">{item}</span>
-                                                </li>
-                                            ))}
+                                        <p className="text-white/30 italic">Three shifts define the current market:</p>
+                                        <ul className="space-y-4">
+                                            <li className="text-white/80">• Verification is becoming a baseline expectation, where recruiters want proof, not just claims.</li>
+                                            <li className="text-white/80">• Remote-first is now truly global, meaning competing for roles means competing with talent worldwide.</li>
+                                            <li className="text-white/80">• Specialization matters more, as generalist "crypto enthusiast" profiles are losing ground to contributors with documented, specific expertise.</li>
                                         </ul>
-                                        <p className="text-white/30 italic">
-                                            Your public footprint becomes part of your professional identity.
-                                        </p>
                                     </div>
 
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">Verifiable Reputation is Becoming Essential</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">The Roles That Are Actually Hiring</h2>
                                         <p>
-                                            As more people enter Web3, distinguishing real contributors from noise becomes harder.
+                                            Technical roles remain the most in-demand, but the definition of "technical" has expanded. Solana developers, smart contract auditors, and protocol engineers are still sought after, but so are:
                                         </p>
-                                        <p>
-                                            Recruiters increasingly need systems that allow them to verify work history quickly and reliably. Verifiable credentials and on-chain attestations reduce uncertainty and improve hiring confidence.
-                                        </p>
-                                        <p className="text-white/40 font-black uppercase tracking-[0.3em] text-xs">
-                                            Trust becomes scalable.
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">The Future of Hiring in Web3</h2>
-                                        <p>
-                                            Traditional resumes were designed for centralized companies.
-                                        </p>
-                                        <p>
-                                            Web3 requires a more transparent and portable identity system that reflects real contributions across ecosystems and communities.
-                                        </p>
-                                        <p className="border-l-4 border-white/10 pl-8 py-2 text-white/30 text-xl font-medium tracking-tight leading-relaxed">
-                                            The future of hiring will be based on verifiable work, not unverifiable claims.
-                                        </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {[
+                                                "Growth and marketing with Web3-native experience",
+                                                "Community builders with governance participation",
+                                                "Product designers who understand on-chain UX",
+                                                "Technical writers and educators",
+                                                "Operations contributors in distributed teams"
+                                            ].map((item, i) => (
+                                                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.01] border border-white/[0.03]">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-200" />
+                                                    <span className="text-white/70 text-sm">{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div className="p-8 md:p-10 rounded-[32px] md:rounded-[40px] bg-white/[0.02] border border-white/10 space-y-6">
-                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight text-center">Build a Trusted Identity with ChainVolio</h2>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">What Recruiters Are Screening For</h2>
                                         <p>
-                                            ChainVolio helps contributors create a verifiable Web3 resume backed by on-chain attestations.
+                                            The hiring process in Web3 has professionalized. Serious organizations are no longer hiring from DMs alone. They want to see:
+                                        </p>
+                                        <ul className="space-y-2">
+                                            <li>• A track record of shipped work, not just ideas.</li>
+                                            <li>• On-chain activity that confirms claims.</li>
+                                            <li>• Attestations from recognized organizations.</li>
+                                            <li>• A consistent professional identity.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">How to Position Yourself for 2026</h2>
+                                        <p>
+                                            Given where the market is, here is what actually moves the needle:
                                         </p>
                                         <p>
-                                            Instead of relying on static PDFs, your work history becomes transparent, portable, and instantly verifiable by recruiters.
+                                            Build in public. Every shipped contribution, no matter how small, is a data point. Learn how to package these effectively in our <Link href="/blog/how-to-build-web3-portfolio" className="text-amber-200/60 hover:underline">portfolio guide</Link>.
                                         </p>
-                                        <p className="text-white/80 font-medium text-center">
-                                            Your reputation becomes an asset you truly own.
+                                        <p>
+                                            Get your work attested. When a recognized organization confirms your contribution in writing, especially on-chain, your credibility increases significantly.
+                                        </p>
+                                        <p>
+                                            Make your proof portable. A verified profile you can share in one link is increasingly the standard that serious candidates are expected to meet. Explore <Link href="/guides/how-it-works" className="text-amber-200/60 hover:underline">how it works</Link> to get started.
                                         </p>
                                     </div>
 
+                                    <div className="space-y-6 pt-12">
+                                        <h2 className="text-3xl md:text-4xl font-bold text-white/90 tracking-tight text-center">The Opportunity</h2>
+                                        <p className="text-center text-white/40 max-w-xl mx-auto">
+                                            Because verification is becoming the standard, there's a real advantage for the people who start building a verifiable track record now.
+                                        </p>
+                                        <div className="flex justify-center pt-8">
+                                            <Link 
+                                                href="/onboarding" 
+                                                className="px-10 py-5 rounded-full bg-white text-black font-black text-lg hover:bg-amber-200 transition-all duration-500 shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+                                            >
+                                                Build Your 2026-Ready Profile
+                                            </Link>
+                                        </div>
+                                    </div>
+
                                     {/* Back to Blog Navigation */}
-                                    <div className="pt-16 pb-12 relative z-20">
+                                    <div className="pt-16 pb-12 relative z-20 flex justify-center">
                                         <Link 
                                             href="/blog" 
-                                            className="inline-flex items-center gap-3 px-8 py-5 rounded-full bg-white/[0.05] border border-white/10 text-white font-bold text-lg md:text-xl hover:bg-white/[0.1] transition-all duration-300"
+                                            className="inline-flex items-center gap-3 px-8 py-5 rounded-full bg-white/[0.05] border border-white/10 text-white font-bold text-lg hover:bg-white/[0.1] transition-all duration-300"
                                         >
                                             <ArrowLeft className="w-6 h-6" />
                                             Back to Articles
@@ -209,12 +211,7 @@ export default function BlogPostPage() {
 
                         {/* Ultra-Smooth Easing Gradients */}
                         <div className="absolute inset-0 pointer-events-none z-10">
-                            {/* Bottom fade with easing stops */}
                             <div className="absolute bottom-0 left-0 right-0 h-[400px] bg-gradient-to-t from-black via-black/95 via-black/80 via-black/40 via-black/10 to-transparent" />
-                            {/* Left fade with easing stops */}
-                            <div className="absolute left-0 top-0 bottom-0 w-48 bg-gradient-to-r from-black/40 via-black/20 via-black/5 to-transparent hidden lg:block" />
-                            {/* Right fade with easing stops */}
-                            <div className="absolute right-0 top-0 bottom-0 w-48 bg-gradient-to-l from-black/40 via-black/20 via-black/5 to-transparent hidden lg:block" />
                         </div>
                     </div>
                 </div>

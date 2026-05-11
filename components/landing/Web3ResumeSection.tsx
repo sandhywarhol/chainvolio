@@ -685,38 +685,64 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                     </div>
                 </div>
 
-                {/* ── DESCRIPTION GRID (Now slideable boxes) ────────────────── */}
-                <div className="pt-4 border-t border-white/5">
-                    <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-4 sm:gap-6 pb-4">
+                {/* ── DESCRIPTION GRID (Now matches The Problem section) ────────────────── */}
+                <div className="relative mt-14 pb-12 -mx-4 sm:mx-0 overflow-hidden border-t border-white/5 pt-12">
+                    <div className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y relative z-30">
                         {[
                             { 
-                                title: "On-Chain History", 
-                                desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record.",
-                                icon: Clock,
-                                color: "#fde68a99"
-                            },
-                            { 
-                                title: "Cryptographic Proof", 
-                                desc: "Contributions are proven through attestations cryptographically signed by real organizations and peers.",
-                                icon: ShieldCheck,
-                                color: "#fde68a99"
-                            },
-                            { 
+                                id: "03",
                                 title: "Instant Verification", 
                                 desc: "Recruiters can instantly trust your experience without manual checks or reference calls.",
                                 icon: BadgeCheck,
-                                color: "#fde68a99"
                             },
-                        ].map((item, i) => (
-                                <div 
-                                    key={i} 
-                                    className="flex-shrink-0 w-[260px] sm:w-[calc(33.333%-16px)] snap-center p-4 pb-5 rounded-[20px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
-                                >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4 bg-white/[0.03] border border-white/5 group-hover:scale-110 transition-transform">
-                                    <item.icon className="w-4 h-4 text-white/20" />
+                            { 
+                                id: "01",
+                                title: "On-Chain History", 
+                                desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record.",
+                                icon: Clock,
+                            },
+                            { 
+                                id: "02",
+                                title: "Cryptographic Proof", 
+                                desc: "Contributions are proven through attestations cryptographically signed by real organizations and peers.",
+                                icon: ShieldCheck,
+                            },
+                            { 
+                                id: "03",
+                                title: "Instant Verification", 
+                                desc: "Recruiters can instantly trust your experience without manual checks or reference calls.",
+                                icon: BadgeCheck,
+                            },
+                            { 
+                                id: "01",
+                                title: "On-Chain History", 
+                                desc: "Every project and achievement is permanently anchored to your wallet as a tamper-proof record.",
+                                icon: Clock,
+                            }
+                        ].map((item, idx) => (
+                            <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
+                                <div className="flex items-start gap-6">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
+                                        <item.icon size={20} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
+                                            <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+                                                {item.desc}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h4 className="text-[#fde68a99] font-bold text-[14px] sm:text-[16px] mb-1.5 tracking-tight">{item.title}</h4>
-                                <p className="text-white/30 text-[11px] sm:text-[12px] leading-relaxed">{item.desc}</p>
+
+                                {/* Vertical Separator */}
+                                {idx > 0 && idx < 3 && (
+                                    <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                )}
                             </div>
                         ))}
                     </div>

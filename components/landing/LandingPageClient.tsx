@@ -1402,8 +1402,8 @@ export function LandingPageClient() {
                                 ].map((item, idx) => (
                                     <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
                                         <div className="flex items-start gap-6">
-                                            <div className="w-16 h-16 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
-                                                <item.icon size={24} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                                            <div className="w-14 h-14 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
+                                                <item.icon size={20} className="text-white/60 group-hover:text-black transition-colors duration-500" />
                                             </div>
 
                                             <div className="space-y-4">
@@ -1421,7 +1421,7 @@ export function LandingPageClient() {
 
                                         {/* Vertical Separator */}
                                         {idx > 0 && idx < 3 && (
-                                            <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/5" />
+                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                                         )}
                                     </div>
                                 ))}
@@ -1581,6 +1581,11 @@ export function LandingPageClient() {
                                                 </p>
                                             </div>
                                         </div>
+
+                                        {/* Vertical Separator */}
+                                        {i > 0 && i < 3 && (
+                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                        )}
                                     </div>
                                 ))}
                             </motion.div>
