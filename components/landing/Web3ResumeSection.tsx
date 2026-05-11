@@ -599,7 +599,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+        <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
             
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_65%)] pointer-events-none" />
 
@@ -628,8 +628,8 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                 </div>
                 <div className="w-full max-w-[1240px] mx-auto h-px bg-white/10 mt-8 mb-8 relative z-10" />
                 
-                {/* ── MINI BENEFITS (2x2 on mobile) ────────────────────────── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
+                {/* ── MINI BENEFITS ────────────────────────── */}
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-10">
                     {[
                         { title: "Verifiable", icon: ShieldCheck },
                         { title: "Portable", icon: ArrowRight },

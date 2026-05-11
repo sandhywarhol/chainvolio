@@ -742,147 +742,160 @@ function RecruiterDashboardPreviewUI_V2({
     ];
 
     const panels = [
-        // Panel 0 — Verified Signal (bullet 0)
-        <div key={0} className="space-y-2">
-            <div className="flex items-center gap-2 mb-3">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-white/20">Top Candidates with Proven Signals</p>
-                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)" }}>
-                    <span className="text-[8px] font-bold" style={{ color: "#60a5fa" }}>Verified</span>
+        // Box 0: Talent Pool (Verified Signal)
+        <div key={0} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <ShieldCheck className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-white tracking-tight">Talent Pool</h4>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Verified Signal</p>
+                    </div>
+                </div>
+                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 hidden sm:block">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Top Match</span>
                 </div>
             </div>
-            {[
-                { name: "Alex Rivera", role: "Core Developer", signals: 8 },
-                { name: "Sarah Chen", role: "Smart Contract Dev", signals: 5 },
-            ].map((c, i) => (
-                <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center justify-between shadow-xl">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white/40">
-                            {c.name.split(" ").map((n: string) => n[0]).join("")}
+
+            {/* Profile Card */}
+            <div className="flex-1 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/5 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-center shadow-inner">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+                <div className="flex items-center justify-between mb-5 relative z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-lg font-black text-white/80 shadow-lg">
+                            AR
                         </div>
                         <div>
-                            <h5 className="text-[11px] font-bold text-white/80">{c.name}</h5>
-                            <p className="text-[9px] text-white/30">{c.role}</p>
+                            <h5 className="text-base font-bold text-white mb-0.5">Alex Rivera</h5>
+                            <p className="text-xs text-white/40">Sr. Rust Developer</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "rgba(96,165,250,0.05)", border: "1px solid rgba(96,165,250,0.12)" }}>
-                        <ShieldCheck className="w-2.5 h-2.5" style={{ color: "#60a5fa" }} />
-                        <span className="text-[9px] font-bold" style={{ color: "#60a5fa" }}>{c.signals}</span>
+                    
+                    {/* Trust Score Badge */}
+                    <div className="flex flex-col items-center justify-center relative">
+                        <span className="text-[8px] font-bold text-[#14F195]/60 uppercase tracking-widest mb-1">Score</span>
+                        <div className="w-12 h-12 rounded-full bg-[#14F195]/10 border border-[#14F195]/30 shadow-[0_0_15px_rgba(20,241,149,0.15)] flex items-center justify-center">
+                            <span className="text-lg font-black text-[#14F195]">98</span>
+                        </div>
                     </div>
                 </div>
-            ))}
+                <div className="grid grid-cols-2 gap-3 relative z-10">
+                    <div className="p-3 rounded-xl bg-[#0D0D0D] border border-white/5 shadow-md">
+                        <p className="text-[9px] text-white/30 uppercase tracking-wider mb-1.5 font-bold">On-Chain Signals</p>
+                        <p className="text-lg font-black text-blue-400 leading-none">142</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#0D0D0D] border border-white/5 shadow-md">
+                        <p className="text-[9px] text-white/30 uppercase tracking-wider mb-1.5 font-bold">Org Attestations</p>
+                        <p className="text-lg font-black text-indigo-400 leading-none">12</p>
+                    </div>
+                </div>
+            </div>
         </div>,
 
-        // Panel 1 — Org-Backed Trust (bullet 1)
-        <div key={1} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/20 mb-3">Alex Rivera, Endorsement Chain</p>
-            {[
-                { initials: "NP", name: "Nexus Protocol", type: "Core infrastructure audit", color: "#94a3b8" },
-                { initials: "ST", name: "Superteam", type: "Grant delivery, Q3 2024", color: "#60a5fa" },
-            ].map((e, i) => (
-                <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 flex items-center gap-3 shadow-xl">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                        style={{ background: e.color + "22", color: e.color, border: `1px solid ${e.color}33` }}>
-                        {e.initials}
+        // Box 1: Org-Backed Trust (Endorsement Chain)
+        <div key={1} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-500/10 border border-slate-500/20 flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-slate-400" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                            <h5 className="text-[11px] font-bold text-white/80">{e.name}</h5>
-                            <ShieldCheck className="w-2.5 h-2.5 flex-shrink-0" style={{ color: e.color }} />
-                        </div>
-                        <p className="text-[9px] text-white/30">{e.type}</p>
+                    <div>
+                        <h4 className="text-sm font-black text-white tracking-tight">Trust Network</h4>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Endorsement Chain</p>
                     </div>
                 </div>
-            ))}
+            </div>
+
+            {/* Timeline */}
+            <div className="flex-1 relative pl-5 space-y-5 border-l-2 border-white/[0.08] ml-3 flex flex-col justify-center">
+                {[
+                    { org: "Nexus Protocol", role: "Core Contributor", date: "Q3 2024", color: "#94a3b8" },
+                    { org: "Superteam", role: "Grant Winner", date: "Q1 2024", color: "#60a5fa" },
+                    { org: "Solana Foundation", role: "Hackathon 1st", date: "2023", color: "#14F195" },
+                ].map((e, i) => (
+                    <div key={i} className="relative group">
+                        <div className="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full border-[3px] border-[#0D0D0D] transition-transform duration-300 group-hover:scale-125" style={{ background: e.color }} />
+                        <div className="p-3 sm:p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors flex items-center justify-between shadow-md">
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <ShieldCheck className="w-4 h-4" style={{ color: e.color }} />
+                                    <h5 className="text-sm font-bold text-white/90">{e.org}</h5>
+                                </div>
+                                <p className="text-[10px] text-white/40">{e.role}</p>
+                            </div>
+                            <span className="text-[10px] font-medium text-white/30 bg-white/5 px-2 py-1 rounded-md">{e.date}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>,
  
-        // Panel 2 — Post Anywhere (bullet 2)
-        <div key={2} className="space-y-2">
-            <div className="flex items-center justify-between mb-3">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-white/20">Share Job Post</p>
-                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
-                    <span className="text-[8px] font-bold" style={{ color: "#f59e0b" }}>Portable Link</span>
-                </div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-[#0D0D0D] border border-white/5 flex items-center gap-2 mb-2 shadow-xl">
-                <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-                    <Share2 className="w-2.5 h-2.5 text-amber-400" />
-                </div>
-                <span className="text-[9px] text-white/30 font-mono truncate flex-1">chainvolio.xyz/hire/nexus-rust-dev</span>
-                <span className="text-[8px] font-bold text-amber-400/70 flex-shrink-0">Copy</span>
-            </div>
-            {[
-                { platform: "LinkedIn", icon: "in", color: "#60a5fa", status: "Posted", statusColor: "#94a3b8" },
-                { platform: "Twitter/X", icon: "X", color: "#ffffff", status: "Scheduled", statusColor: "#f59e0b" },
-                { platform: "Discord", icon: "D", color: "#a78bfa", status: "Posted", statusColor: "#94a3b8" },
-            ].map((p, i) => (
-                <div key={i} className="p-2.5 rounded-xl bg-[#0D0D0D] border border-white/5 flex items-center justify-between shadow-xl">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0"
-                            style={{ background: p.color + "18", color: p.color, border: `1px solid ${p.color}25` }}>
-                            {p.icon}
-                        </div>
-                        <span className="text-[9px] text-white/50 font-medium">{p.platform}</span>
+        // Box 2: Post Anywhere (Share Link)
+        <div key={2} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                        <Share2 className="w-5 h-5 text-amber-400" />
                     </div>
-                    <span className="text-[8px] font-bold" style={{ color: p.statusColor }}>{p.status}</span>
+                    <div>
+                        <h4 className="text-sm font-black text-white tracking-tight">Distribution</h4>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Portable Job Link</p>
+                    </div>
                 </div>
-            ))}
+            </div>
+            
+            {/* Share Widget */}
+            <div className="flex-1 rounded-2xl bg-[#0D0D0D] border border-white/10 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-inner">
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent pointer-events-none" />
+                <div className="w-16 h-16 mb-4 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 relative z-10 shadow-lg">
+                     <Share2 className="w-7 h-7 text-amber-400" />
+                     <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#14F195] rounded-full border-2 border-[#0D0D0D] shadow-[0_0_10px_rgba(20,241,149,0.5)]" />
+                </div>
+                <h5 className="text-base sm:text-lg font-bold text-white mb-2 z-10">chainvolio.xyz/hire/rust-dev</h5>
+                <p className="text-xs text-white/40 mb-6 max-w-[200px] mx-auto z-10 leading-relaxed">Generate a verifiable hiring link and blast it across platforms.</p>
+                
+                <div className="flex items-center justify-center gap-4 w-full z-10 px-4">
+                    {/* LinkedIn Button */}
+                    <div className="flex-1 max-w-[140px] py-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex flex-col items-center justify-center gap-1.5 hover:bg-blue-500/20 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-blue-500/10">
+                        <span className="text-xl font-black text-blue-400">
+                            in
+                        </span>
+                    </div>
+                    {/* X (Twitter) Button */}
+                    <div className="flex-1 max-w-[140px] py-3.5 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1.5 hover:bg-white/10 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-white/5">
+                        <span className="text-xl font-black text-white/80 hover:text-white">
+                            X
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>,
     ];
 
     const cardAnim = (pos: number) => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const xOffset = isMobile ? (window.innerWidth < 400 ? 60 : 90) : 160;
+        const xOffset = isMobile ? (window.innerWidth < 400 ? 60 : 90) : 90;
 
         if (pos === 0) return { x: 0, y: 0, scale: 1, opacity: 1, zIndex: 30, filter: "blur(0px)" };
-        if (pos === 1) return { x: xOffset, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
-        if (pos === 2) return { x: -xOffset, y: 20, scale: 0.88, opacity: 0.45, zIndex: 20, filter: "blur(2px)" };
-        return { x: 0, y: 40, scale: 0.78, opacity: 0, zIndex: 10, filter: "blur(4px)" };
+        if (pos === 1) return { x: xOffset, y: 15, scale: 0.85, opacity: 0.35, zIndex: 20, filter: "blur(2px)" };
+        if (pos === 2) return { x: -xOffset, y: 15, scale: 0.85, opacity: 0.35, zIndex: 20, filter: "blur(2px)" };
+        return { x: 0, y: 30, scale: 0.75, opacity: 0, zIndex: 10, filter: "blur(4px)" };
     };
 
     return (
         <>
-            <div className="w-full max-w-[640px] relative left-1/2 -translate-x-1/2 flex flex-col gap-6 group scale-[0.72] min-[400px]:scale-[0.82] sm:scale-90 md:scale-95 lg:scale-100 origin-top h-auto bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8"
-                style={{ boxShadow: "0 6px 14px rgba(0,0,0,0.35)" }}
+            <div className="w-full max-w-[460px] relative left-1/2 -translate-x-1/2 scale-[0.82] min-[400px]:scale-[0.92] sm:scale-95 md:scale-100 lg:scale-100 origin-top"
+                style={{ height: 380 }}
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
             >
-                {/* Header */}
-                <div className="flex items-center justify-between relative z-10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-white/60" />
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-black text-white tracking-tight">Recruiter Dashboard</h4>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Active Operations</p>
-                        </div>
-                    </div>
-                    <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Verified Org</span>
-                    </div>
-                </div>
-
-                {/* Stat Pods */}
-                <div className="grid grid-cols-3 gap-3 relative z-10">
-                    {[
-                        { icon: LayoutDashboard, label: "Hiring", val: "12", col: "text-white/60", bg: "bg-white/5" },
-                        { icon: ShieldCheck, label: "Signals", val: "142", col: "text-blue-400", bg: "bg-blue-500/10" },
-                        { icon: FolderOpen, label: "Active", val: "4", col: "text-indigo-400", bg: "bg-indigo-500/10" },
-                    ].map((pod, i) => (
-                        <div key={i} className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-1.5 shadow-xl">
-                            <div className={`w-6 h-6 flex items-center justify-center rounded-lg ${pod.bg}`}>
-                                <pod.icon className={`w-3 h-3 ${pod.col}`} />
-                            </div>
-                            <div>
-                                <p className="text-lg font-black text-white leading-none">{pod.val}</p>
-                                <p className="text-[8px] font-bold uppercase tracking-widest text-white/20">{pod.label}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
                 {/* Carousel */}
-                <div className="relative overflow-hidden" style={{ height: 170 }}>
+                <div className="absolute inset-0">
                     {panels.map((panel, i) => {
                         const pos = (i - active + 3) % 3;
                         const anim = cardAnim(pos);
@@ -891,14 +904,13 @@ function RecruiterDashboardPreviewUI_V2({
                                 key={i}
                                 animate={{ x: anim.x, y: anim.y, scale: anim.scale, opacity: anim.opacity, filter: anim.filter }}
                                 transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                                className="absolute top-0 left-1/2 -ml-[min(150px,calc(50vw-24px))] w-[min(300px,calc(100vw-48px))]"
+                                className="absolute top-0 left-0 w-full"
                                 style={{ zIndex: anim.zIndex, pointerEvents: pos === 0 ? "auto" : "none" }}
                             >
                                 {panel}
                             </motion.div>
                         );
                     })}
-
 
                     {/* Swipe Overlay for Mobile */}
                     <motion.div
@@ -1178,7 +1190,7 @@ export function LandingPageClient() {
             <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
 
                 {/* HERO SECTION */}
-                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
+                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
                         <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
                             Trust layer for Web3
@@ -1289,7 +1301,7 @@ export function LandingPageClient() {
                         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-6 sm:mb-12">
                             Powering the Web3 career stack
                         </p>
-                        <div className="w-full py-4 overflow-hidden relative mb-8 sm:mb-16" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                        <div className="w-full py-4 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                                 {[...PARTNERS, ...PARTNERS].map((partner, i) => (
                                     <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
@@ -1311,7 +1323,7 @@ export function LandingPageClient() {
 
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative z-10 bg-[#0D0D0D]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#0D0D0D]">
 
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-10 md:mb-14 space-y-6">
@@ -1395,7 +1407,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="relative pt-16 sm:pt-20 md:pt-24 lg:pt-32 z-10 bg-[#080808] overflow-hidden">
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
@@ -1469,7 +1481,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-4 md:mt-8 mb-12 md:mb-24">
+                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8">
                             <motion.div
                                 className="flex md:grid md:grid-cols-3 w-full"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
@@ -1549,6 +1561,24 @@ export function LandingPageClient() {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Founder Quote */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="max-w-2xl mx-auto mt-8 md:mt-12 text-center px-6"
+                        >
+                            <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
+                            <p className="text-sm md:text-base text-white/50 italic leading-relaxed mb-6 font-normal">
+                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
+                            </p>
+                            <div className="flex flex-col items-center gap-1">
+                                <span className="text-[10px] md:text-[11px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Founder Chainvolio</span>
+                            </div>
+                        </motion.div>
                     </div>
                 </section>
 
@@ -1557,7 +1587,7 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section id="problems" className="pt-8 pb-8 sm:py-12 md:py-16 relative z-10 bg-black overflow-hidden">
+                <section id="problems" className="py-16 sm:py-20 md:py-24 relative z-10 bg-black overflow-hidden">
 
                     {/* ── Top text block ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
@@ -1723,7 +1753,7 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="pt-8 pb-8 sm:py-12 md:py-16 px-4 sm:px-6 relative z-10 bg-black">
+                <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1806,14 +1836,14 @@ export function LandingPageClient() {
                 </section>
 
                 {/* CORE FEATURE SECTION */}
-                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D]">
                     <div className="max-w-[1200px] mx-auto relative z-10">
                         <AttestationBlock />
                     </div>
                 </section>
 
                 {/* USE CASE SECTION */}
-                <section className="py-12 sm:py-10 md:py-12 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808]">
                     <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
 
                         {/* BLOCK 2 — HIRING */}
@@ -1824,7 +1854,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-24 sm:py-32 md:py-40 relative z-10 overflow-hidden bg-black">
+                <section className="py-20 sm:py-24 md:py-32 relative z-10 overflow-hidden bg-black">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
