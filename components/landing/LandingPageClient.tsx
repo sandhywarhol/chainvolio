@@ -180,9 +180,9 @@ function VerifiableWorkHistoryFlow() {
 // --- Static UI Mockup for Feature Card ---
 function MockProfileUI() {
     return (
-        <div className="w-[1200px] h-[650px] flex font-sans text-sm">
+        <div className="w-full h-full flex flex-col md:flex-row font-sans text-sm overflow-hidden">
             {/* 1. Sidebar (Linear Style) */}
-            <div className="w-48 md:w-64 border-r border-white/5 bg-white/[0.01] p-4 md:p-6 flex flex-col gap-6 md:gap-8">
+            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.01] p-6 md:p-6 flex flex-col gap-4 md:gap-8">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
                         <span className="text-xs font-bold text-white/50">AR</span>
@@ -219,7 +219,7 @@ function MockProfileUI() {
             </div>
 
             {/* 2. Main Content Area */}
-            <div className="flex-1 flex flex-col bg-[#0a0a0a] overflow-hidden">
+            <div className="flex-1 flex flex-col bg-[#0a0a0a] overflow-y-auto md:overflow-hidden">
                 {/* Content Header */}
                 <div className="h-14 border-b border-white/5 px-8 flex items-center justify-between bg-white/[0.01]">
                     <div className="flex items-center gap-4">
@@ -1336,7 +1336,7 @@ export function LandingPageClient() {
                                 Why Web3 Hiring Is Broken
                             </p>
 
-                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-nowrap">
+                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
                                 Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
                             </h2>
                             <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12" />
@@ -1354,62 +1354,100 @@ export function LandingPageClient() {
                         </div>
 
                         {/* BENTO CARDS SECTION - Minimal Editorial Style (Light) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20 max-w-6xl mx-auto px-4 sm:px-0 mt-14 pb-12">
-                            {[
-                                {
-                                    id: "01",
-                                    title: "Scattered Identity",
-                                    desc: "Your work is spread across platforms, files, and chats. No single source of truth.",
-                                    icon: LayoutGrid
-                                },
-                                {
-                                    id: "02",
-                                    title: "Unverifiable Claims",
-                                    desc: "Without verifiable data, resumes become claims, not proof.",
-                                    icon: FileQuestion
-                                },
-                                {
-                                    id: "03",
-                                    title: "Lost in Noise",
-                                    desc: "Real talent gets buried. Hiring becomes slow, biased, and unreliable.",
-                                    icon: Activity
-                                }
-                            ].map((item, idx) => (
-                                <div key={item.id} className="relative group">
-                                    <div className="flex items-start gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
-                                            <item.icon size={24} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                        <div className="relative mt-14 pb-12 -mx-4 sm:mx-0 overflow-hidden">
+                            <motion.div
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing relative z-30"
+                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
+                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+                                onAnimationComplete={onAnimationComplete}
+                                drag="x"
+                                dragConstraints={{ left: -1000, right: 1000 }}
+                                dragElastic={0.2}
+                                onDragEnd={(e: any, info: any) => {
+                                    if (info.offset.x < -40) handleProblemLoop(problemIdx + 1);
+                                    else if (info.offset.x > 40) handleProblemLoop(problemIdx - 1);
+                                }}
+                            >
+                                {[
+                                    {
+                                        id: "03",
+                                        title: "Lost in Noise",
+                                        desc: "Real talent gets buried. Hiring becomes slow, biased, and unreliable.",
+                                        icon: Activity
+                                    },
+                                    {
+                                        id: "01",
+                                        title: "Scattered Identity",
+                                        desc: "Your work is spread across platforms, files, and chats. No single source of truth.",
+                                        icon: LayoutGrid
+                                    },
+                                    {
+                                        id: "02",
+                                        title: "Unverifiable Claims",
+                                        desc: "Without verifiable data, resumes become claims, not proof.",
+                                        icon: FileQuestion
+                                    },
+                                    {
+                                        id: "03",
+                                        title: "Lost in Noise",
+                                        desc: "Real talent gets buried. Hiring becomes slow, biased, and unreliable.",
+                                        icon: Activity
+                                    },
+                                    {
+                                        id: "01",
+                                        title: "Scattered Identity",
+                                        desc: "Your work is spread across platforms, files, and chats. No single source of truth.",
+                                        icon: LayoutGrid
+                                    }
+                                ].map((item, idx) => (
+                                    <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
+                                        <div className="flex items-start gap-6">
+                                            <div className="w-16 h-16 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
+                                                <item.icon size={24} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
+                                                    <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+                                                        {item.desc}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
-                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
-                                                    {item.desc}
-                                                </p>
-                                            </div>
-                                        </div>
+                                        {/* Vertical Separator */}
+                                        {idx > 0 && idx < 3 && (
+                                            <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/5" />
+                                        )}
                                     </div>
+                                ))}
+                            </motion.div>
 
-                                    {/* Vertical Separator */}
-                                    {idx < 2 && (
-                                        <div className="hidden md:block absolute -right-12 top-1/2 -translate-y-1/2 h-24 w-px bg-white/5" />
-                                    )}
-                                </div>
-                            ))}
-
+                            {/* Mobile Pagination Dots */}
+                            <div className="flex justify-center gap-1.5 mt-8 md:hidden relative z-50">
+                                {[0, 1, 2].map((i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleProblemLoop(i + 1)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${(problemIdx === i + 1 || (i === 2 && problemIdx === 0) || (i === 0 && problemIdx === 4))
+                                                ? "w-8 bg-white"
+                                                : "w-1.5 bg-white/20"
+                                            }`}
+                                    />
+                                ))}
+                            </div>
                         </div>
-
                     </div>
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
                 <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] overflow-hidden">
 
-                    <div className="max-w-[1240px] mx-auto">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
 
                             {/* Left: Content Block */}
@@ -1481,18 +1519,18 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8">
+                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-full"
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
                                 drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.7}
+                                dragConstraints={{ left: -1000, right: 1000 }}
+                                dragElastic={0.2}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -30) handleWhyLoop(whyIdx + 1);
-                                    else if (info.offset.x > 30) handleWhyLoop(whyIdx - 1);
+                                    if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
+                                    else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
                                 }}
                             >
                                 {[
@@ -1790,28 +1828,28 @@ export function LandingPageClient() {
                         </div>
 
                         {/* ── 3 compact attributes — replaces the old text card ── */}
-                        <div className="flex flex-nowrap items-center justify-center gap-x-3 md:gap-x-8 gap-y-3 mb-0 mt-2 md:mt-4">
+                        <div className="flex flex-wrap items-center justify-center gap-x-6 md:gap-x-10 gap-y-4 mb-6 mt-4 md:mt-6 px-6">
                             {[
                                 { icon: ShieldCheck, label: "On-Chain Proof", color: "#14F195" },
                                 { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
                                 { icon: Lock, label: "Impossible to Fake", color: "#a78bfa" },
                             ].map(({ icon: Icon, label, color }, i) => (
-                                <div key={i} className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
-                                    <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color }} />
-                                    <span className="text-[7.5px] md:text-[11px] font-bold uppercase tracking-[0.12em] md:tracking-[0.18em]" style={{ color: color + "bb" }}>
+                                <div key={i} className="flex items-center gap-2 md:gap-2.5 flex-shrink-0">
+                                    <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color }} />
+                                    <span className="text-[9px] md:text-[11px] font-bold uppercase tracking-[0.08em] md:tracking-[0.18em] max-w-[65px] md:max-w-none whitespace-normal md:whitespace-nowrap leading-tight text-left" style={{ color: color + "cc" }}>
                                         {label}
                                     </span>
-                                    {i < 2 && <span className="hidden md:block ml-8 w-px h-3 bg-white/10" />}
+                                    {i < 2 && <span className="hidden md:block ml-10 w-px h-4 bg-white/10" />}
                                 </div>
                             ))}
                         </div>
 
                         {/* ── UI Mockup ── */}
-                        <div className="relative h-[220px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
+                        <div className="relative h-[480px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
                             <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full opacity-40 pointer-events-none" />
 
                             {/* Unified Scaling Container for the entire assembly */}
-                            <div className="relative scale-[0.31] min-[440px]:scale-[0.4] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[1200px] h-[650px]">
+                            <div className="relative scale-[0.65] min-[440px]:scale-[0.75] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[350px] h-[650px] md:w-[1200px] md:h-[650px]">
                                 <div className="relative w-full h-full group">
                                     {/* Main Dashboard Mockup */}
                                     <div className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
@@ -1886,16 +1924,16 @@ export function LandingPageClient() {
                                 Cryptographically verified.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 px-4">
                                 <button
                                     onClick={() => setIsWalletModalOpen(true)}
-                                    className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                                    className="premium-shimmer-button w-fit min-w-[240px] sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2 mx-auto sm:mx-0"
                                 >
                                     Create Your Profile
                                 </button>
                                 <Link
                                     href="/hiring/create"
-                                    className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-sm sm:text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
+                                    className="w-fit min-w-[240px] sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-sm sm:text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm mx-auto sm:mx-0"
                                 >
                                     Create Hiring Link <ArrowRight className="w-4 h-4" />
                                 </Link>
