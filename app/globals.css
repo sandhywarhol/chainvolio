@@ -443,9 +443,9 @@ html[data-theme="light"] .theme-aware .text-indigo-300  { color: #4338ca !import
 html[data-theme="light"] .theme-aware .text-indigo-400  { color: #4338ca !important; }
 html[data-theme="light"] .theme-aware .text-blue-300    { color: #1d4ed8 !important; }
 html[data-theme="light"] .theme-aware .text-blue-400    { color: #1d4ed8 !important; }
-html[data-theme="light"] .theme-aware .text-amber-200   { color: #b45309 !important; }
-html[data-theme="light"] .theme-aware .text-amber-300   { color: #b45309 !important; }
-html[data-theme="light"] .theme-aware .text-amber-400   { color: #b45309 !important; }
+html[data-theme="light"] .theme-aware .text-amber-200   { color: #374151 !important; }
+html[data-theme="light"] .theme-aware .text-amber-300   { color: #374151 !important; }
+html[data-theme="light"] .theme-aware .text-amber-400   { color: #374151 !important; }
 html[data-theme="light"] .theme-aware .text-rose-300    { color: #be123c !important; }
 html[data-theme="light"] .theme-aware .text-rose-400    { color: #be123c !important; }
 html[data-theme="light"] .theme-aware .text-red-400     { color: #dc2626 !important; }
@@ -501,8 +501,8 @@ html[data-theme="light"] .theme-aware .bg-white\/\[0\.04\]  { background-color: 
 html[data-theme="light"] .theme-aware .bg-white\/5        { background-color: rgb(0 0 0 / 0.06) !important; }
 
 /* Amber hex with alpha — used in section badge labels */
-html[data-theme="light"] .theme-aware .text-\[#fde68a99\] { color: #92400e !important; }
-html[data-theme="light"] .theme-aware .text-amber-200\/60  { color: #92400e !important; }
+html[data-theme="light"] .theme-aware .text-\[#fde68a99\] { color: #374151 !important; }
+html[data-theme="light"] .theme-aware .text-amber-200\/60  { color: #374151 !important; }
 
 /* Restore inside theme-preserve (cards have their own dark bg — keep original values) */
 html[data-theme="light"] .theme-preserve .border-white\/\[0\.07\] { border-color: rgba(255,255,255,0.07) !important; }
@@ -539,3 +539,18 @@ html[data-theme="light"] .theme-aware .theme-solid-black {
 html[data-theme="light"] .theme-aware .theme-cta-fade {
   display: none !important;
 }
+
+/* ── ProblemDiagram: invert white SVG elements to black on light bg ── */
+html[data-theme="light"] .theme-aware .theme-invert-diagram {
+  filter: invert(1);
+}
+
+/* ── White lines and dividers → dark on light bg ────────────────────── */
+html[data-theme="light"] .theme-aware .bg-white\/10   { background-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.1\] { background-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .divide-white\/\[0\.04\] > * + * { border-color: rgb(0 0 0 / 0.06) !important; }
+html[data-theme="light"] .theme-aware .divide-white\/\[0\.08\] > * + * { border-color: rgb(0 0 0 / 0.10) !important; }
+
+/* Restore inside theme-preserve */
+html[data-theme="light"] .theme-preserve .bg-white\/10   { background-color: rgba(255,255,255,0.10) !important; }
+html[data-theme="light"] .theme-preserve .divide-white\/\[0\.04\] > * + * { border-color: rgba(255,255,255,0.04) !important; }

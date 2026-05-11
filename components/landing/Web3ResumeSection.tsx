@@ -599,7 +599,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+        <section className="theme-preserve py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
             
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_65%)] pointer-events-none" />
 

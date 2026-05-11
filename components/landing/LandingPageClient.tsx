@@ -1349,7 +1349,7 @@ export function LandingPageClient() {
                         </div>
 
                         {/* NEW ANIMATED PROBLEM DIAGRAM */}
-                        <div className="relative w-full max-w-6xl mx-auto mt-16 mb-24">
+                        <div className="theme-invert-diagram relative w-full max-w-6xl mx-auto mt-16 mb-24">
                             <ProblemDiagram />
                         </div>
 
