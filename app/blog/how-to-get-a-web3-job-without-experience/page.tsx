@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>How to Get a Web3 Job Without Experience | ChainVolio</title>
             <meta name="description" content="Learn how to get a Web3 job without traditional experience by building proof of work, contributing publicly, and creating a verifiable reputation." />
             

@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function AboutPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
 
             <Navbar />
 

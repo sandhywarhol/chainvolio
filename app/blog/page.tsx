@@ -93,7 +93,7 @@ const articles = [
 
 export default function BlogIndexPage() {
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>Insights & Guides | ChainVolio Blog</title>
             <meta name="description" content="Learn about Web3 resumes, proof of work, hiring, and verifiable professional identity." />
             

@@ -1187,7 +1187,7 @@ export function LandingPageClient() {
                 onAttestationClick={() => router.push('/guides/attestation')}
             />
 
-            <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
+            <main className="flex-1 flex flex-col relative overflow-hidden bg-black theme-bg-page theme-aware">
 
                 {/* HERO SECTION */}
                 <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
@@ -1323,7 +1323,7 @@ export function LandingPageClient() {
 
 
                 {/* THE PROBLEM SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#0D0D0D]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#0D0D0D] theme-bg-section">
 
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-10 md:mb-14 space-y-6">
@@ -1445,7 +1445,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] overflow-hidden">
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
@@ -1630,7 +1630,7 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section id="problems" className="py-16 sm:py-20 md:py-24 relative z-10 bg-black overflow-hidden">
+                <section id="problems" className="py-16 sm:py-20 md:py-24 relative z-10 bg-black theme-bg-page overflow-hidden">
 
                     {/* ── Top text block ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
@@ -1796,7 +1796,7 @@ export function LandingPageClient() {
 
                 </section>
 
-                <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black">
+                <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black theme-bg-page">
                     <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
@@ -1879,14 +1879,14 @@ export function LandingPageClient() {
                 </section>
 
                 {/* CORE FEATURE SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D] theme-bg-section">
                     <div className="max-w-[1200px] mx-auto relative z-10">
                         <AttestationBlock />
                     </div>
                 </section>
 
                 {/* USE CASE SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808]">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808] theme-bg-section2">
                     <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
 
                         {/* BLOCK 2 — HIRING */}
@@ -1897,7 +1897,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-20 sm:py-24 md:py-32 relative z-10 overflow-hidden bg-black">
+                <section className="py-20 sm:py-24 md:py-32 relative z-10 overflow-hidden bg-black theme-bg-page">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",

@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>The Web3 Job Market in 2026 | ChainVolio</title>
             <meta name="description" content="The Web3 job market in 2026 rewards real contributors over self-promoters. Learn how it has changed and how to navigate it." />
             

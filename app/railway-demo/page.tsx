@@ -33,7 +33,7 @@ export default function RailwayDemoPage() {
     };
 
     return (
-        <div className="bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30">
+        <div className="bg-black theme-bg-page theme-aware min-h-screen text-white font-sans selection:bg-indigo-500/30">
             {/* Grid Background Effect */}
             <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03]" 
                  style={{ backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}>

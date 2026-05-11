@@ -313,14 +313,14 @@ export default function AttestPage() {
     // ─── Loading ──────────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
             </div>
         );
     }
 
     if (error && !receipt) return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black">
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black theme-bg-page theme-aware">
             <p className="text-red-400">{error}</p>
             <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
         </main>
@@ -328,7 +328,7 @@ export default function AttestPage() {
 
     // ─── Success ──────────────────────────────────────────────────────────────
     if (success) return (
-        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black">
+        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black theme-bg-page theme-aware">
             <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-4xl">✓</div>
             <div className="text-center space-y-2">
                 <h1 className="text-2xl font-bold">Attestation Recorded On-Chain</h1>
@@ -364,7 +364,7 @@ export default function AttestPage() {
     const showForm = (googleSession || publicKey) && !isOwnWork;
 
     return (
-        <main className="min-h-screen text-white bg-black">
+        <main className="min-h-screen text-white bg-black theme-bg-page theme-aware">
             <nav className="flex items-center justify-between px-6 py-4 max-w-2xl mx-auto relative z-[100]">
                 <Link href="/" className="flex items-center gap-1.5 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />

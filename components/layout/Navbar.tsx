@@ -10,6 +10,7 @@ import { NotificationBell } from "./NotificationBell";
 import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 
 interface NavbarProps {
@@ -170,7 +171,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     {/* Removed redundant verified badge for CV view consistency */}
 
                     {/* Desktop Wallet & Global Notification Bell */}
-                    <div className="hidden md:block">
+                    <div className="hidden md:flex items-center gap-2">
+                        <ThemeToggle />
                         <WalletMultiButton />
                     </div>
                     

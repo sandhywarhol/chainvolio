@@ -178,7 +178,7 @@ export default function RecruiterPricingPage() {
     const colKeys: CK[] = ["slate", "blue", "amber"];
 
     return (
-        <main className="min-h-screen bg-black text-white flex flex-col">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white flex flex-col">
             <Navbar />
 
             {showMaintenance && <MaintenanceModal onClose={() => setShowMaintenance(false)} />}

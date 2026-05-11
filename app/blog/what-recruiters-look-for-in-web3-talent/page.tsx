@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>What Recruiters Look for in Web3 Talent | ChainVolio</title>
             <meta name="description" content="Discover what Web3 recruiters actually look for when hiring talent, from proof of work and on-chain reputation to public contributions." />
             

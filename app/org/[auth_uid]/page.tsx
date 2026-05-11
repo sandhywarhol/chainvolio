@@ -94,7 +94,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
     return (
       <>
         <Navbar />
-        <main className="min-h-screen bg-black flex items-center justify-center">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-black text-white mb-2">Organization Not Found</h1>
             <p className="text-slate-400 text-sm mb-6">This org page doesn't exist or has been removed.</p>
@@ -114,7 +114,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
   const accentHex = isCommunity ? "#14b8a6" : "#f59e0b";
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-black theme-bg-page theme-aware text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
       <Navbar />
       <main className="flex-1 w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12 space-y-6">
 

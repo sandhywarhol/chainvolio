@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>LinkedIn vs ChainVolio: Why You Need Both | ChainVolio</title>
             <meta name="description" content="LinkedIn is built for visibility, but it lacks verification. ChainVolio is a trust layer that works alongside it to provide proof of work." />
             

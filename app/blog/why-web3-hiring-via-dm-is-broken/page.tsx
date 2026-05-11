@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>Why Web3 Hiring via DM Is Broken | ChainVolio</title>
             <meta name="description" content="Explore why informal hiring via DMs and emails is broken in Web3 and how to transition to verified hiring." />
             

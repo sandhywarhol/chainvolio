@@ -122,7 +122,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-white/20" />
             </div>
         );
@@ -130,7 +130,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     if (error && !collection) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-black theme-bg-page theme-aware text-white p-6">
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
                     <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <AlertCircle className="w-8 h-8 text-red-500" />

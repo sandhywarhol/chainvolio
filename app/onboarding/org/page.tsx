@@ -64,14 +64,14 @@ function OrgOnboardingContent() {
 
     if (loading) {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-black">
+            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-black">
+        <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-black theme-bg-page theme-aware">
             <div className="w-full max-w-lg">
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold text-white mb-2">
@@ -138,7 +138,7 @@ function OrgOnboardingContent() {
 export default function OrgOnboardingPage() {
     return (
         <Suspense fallback={
-            <main className="min-h-screen flex items-center justify-center bg-black">
+            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </main>
         }>

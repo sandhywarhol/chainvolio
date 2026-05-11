@@ -177,7 +177,7 @@ export default function CreateProfilePage() {
 
   if (loading && !form.displayName) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white/20" />
       </div>
     );
@@ -185,7 +185,7 @@ export default function CreateProfilePage() {
 
   if (!connected || !publicKey) {
     return (
-      <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black">
+      <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black theme-bg-page theme-aware">
         <h1 className="text-2xl font-bold">Connect your wallet</h1>
         <p className="text-slate-400 text-center max-w-sm">
           You need to connect your Solana wallet (e.g. Phantom) to create or edit your profile.
@@ -199,7 +199,7 @@ export default function CreateProfilePage() {
   }
 
   return (
-    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black">
+    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar />

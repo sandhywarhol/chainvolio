@@ -14,7 +14,7 @@ export default function LinearStyleHomepage() {
     }, []);
 
     return (
-        <div className="bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+        <div className="bg-black theme-bg-page theme-aware min-h-screen text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
             {/* Linear Style Background: Ambient Glows */}
             <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full"></div>

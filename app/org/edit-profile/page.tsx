@@ -149,14 +149,14 @@ export default function OrgEditProfilePage() {
 
     if (loading) {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-black">
+            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen bg-black text-white">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white">
             {/* Sticky header */}
             <div className="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-4 py-4">
                 <div className="max-w-2xl mx-auto flex items-center justify-between">

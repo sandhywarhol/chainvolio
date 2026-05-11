@@ -5,7 +5,7 @@ import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFound() {
     return (
-        <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 relative overflow-hidden selection:bg-indigo-500/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white flex flex-col items-center justify-center px-6 relative overflow-hidden selection:bg-indigo-500/30">
             {/* Ambient glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[20%] left-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[160px] rounded-full" />

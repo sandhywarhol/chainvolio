@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export default function DevelopersPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white font-sans bg-black">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white font-sans bg-black theme-bg-page theme-aware">
             <Navbar />
 
             {/* Ambient Background Glows */}

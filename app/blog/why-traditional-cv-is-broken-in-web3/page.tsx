@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>Why Traditional CVs Are Broken in Web3 | ChainVolio</title>
             <meta name="description" content="Explore why static PDFs and unverifiable claims are failing the decentralized workforce and how attestations provide a solution." />
             

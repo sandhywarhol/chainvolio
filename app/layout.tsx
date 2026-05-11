@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 import { AppBackground } from "@/components/layout/AppBackground";
 
@@ -86,7 +87,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Restore saved theme before React hydrates — prevents flash of wrong theme */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('cv-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();` }} />
+      </head>
       <body className={`${inter.variable} font-sans min-h-screen text-white relative`}>
         <script
           type="application/ld+json"
@@ -107,7 +112,9 @@ export default function RootLayout({
         />
         <AppBackground />
         <div className="relative z-[60]">
-          <WalletProvider>{children}</WalletProvider>
+          <ThemeProvider>
+            <WalletProvider>{children}</WalletProvider>
+          </ThemeProvider>
         </div>
       </body>
     </html>

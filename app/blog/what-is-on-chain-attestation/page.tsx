@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>What Is On-Chain Attestation? A Simple Guide | ChainVolio</title>
             <meta name="description" content="A simple guide to understanding on-chain attestations and why they matter for Web3 professionals." />
             

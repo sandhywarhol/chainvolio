@@ -285,7 +285,7 @@ export default function AdminVerificationPage() {
 
     if (!connected) {
         return (
-            <main className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
+            <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-indigo-500/30">
                 <Navbar />
                 <div className="flex flex-col items-center justify-center pt-48 pb-20 px-8 text-center">
                     <div className="w-20 h-20 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center mb-8 relative">
@@ -303,7 +303,7 @@ export default function AdminVerificationPage() {
 
     if (isAuthorized === false) {
         return (
-            <main className="min-h-screen bg-black text-white selection:bg-red-500/30">
+            <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-red-500/30">
                 <Navbar />
                 <div className="flex flex-col items-center justify-center pt-48 pb-20 px-8 text-center">
                     <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8">
@@ -376,7 +376,7 @@ export default function AdminVerificationPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-slate-500/30 font-sans">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-slate-500/30 font-sans">
             <Navbar />
 
             <div className="pt-24 pb-20 px-8 max-w-[1400px] mx-auto w-full">

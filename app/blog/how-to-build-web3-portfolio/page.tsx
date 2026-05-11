@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>How to Build a Web3 Portfolio That Gets You Hired | ChainVolio</title>
             <meta name="description" content="A practical guide on how to build a verifiable Web3 portfolio using proof of work and on-chain attestations." />
             

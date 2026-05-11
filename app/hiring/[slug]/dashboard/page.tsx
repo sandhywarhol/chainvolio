@@ -638,7 +638,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
             </div>
         );

@@ -33,7 +33,7 @@ export default function BlogPostPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
+        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-amber-200/30">
             <title>How to Ask for a Work Attestation | ChainVolio</title>
             <meta name="description" content="Learn how to ask for a work attestation on ChainVolio with practical tips and example messages." />
             

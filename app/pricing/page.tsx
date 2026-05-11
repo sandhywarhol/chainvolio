@@ -200,7 +200,7 @@ export default function PricingPage() {
     const colKeys: CK[] = ["emerald", "pink", "blue", "amber"];
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-black theme-bg-page theme-aware text-white">
             {/* ── Background texture ── */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,255,255,0.03),transparent)]" />

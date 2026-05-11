@@ -34,9 +34,9 @@ export default function VerifiedOrganizationPage() {
     const showVerifyCTA = !isVerified;
 
     return (
-        <div className="min-h-screen relative bg-black">
+        <div className="min-h-screen relative bg-black theme-bg-page theme-aware">
             <Navbar />
-            <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative">
+            <main className="min-h-screen bg-black theme-bg-page theme-aware text-white selection:bg-emerald-500/30 relative">
 
             {/* HERO SECTION */}
             <section className="relative z-10 pt-32 pb-20 px-4 md:px-8 max-w-[1240px] mx-auto w-full">
