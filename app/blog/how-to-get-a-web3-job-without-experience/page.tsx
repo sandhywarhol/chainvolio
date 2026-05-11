@@ -1,13 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { Toast } from "@/components/ui/Toast";
 import { ArrowLeft, ArrowRight, Clock, Calendar, User, Share2, Bookmark } from "lucide-react";
 
 export default function BlogPostPage() {
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const handleShare = () => {
+        const shareData = {
+            title: "How to Get a Web3 Job Without Experience | ChainVolio",
+            text: "Learn how to get a Web3 job without traditional experience by building proof of work.",
+            url: typeof window !== 'undefined' ? window.location.href : '',
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData).catch((err) => {
+                if (err.name !== 'AbortError') console.error("Error sharing:", err);
+            });
+        } else {
+            navigator.clipboard.writeText(shareData.url);
+            setToast({ message: "Link copied to clipboard!", type: 'success' });
+        }
+    };
+
+    const handleBookmark = () => {
+        setToast({ message: "Bookmark feature coming soon!", type: 'success' });
+    };
+
     return (
         <main className="min-h-screen bg-black text-white selection:bg-amber-200/30">
             <title>How to Get a Web3 Job Without Experience | ChainVolio</title>
@@ -59,10 +83,16 @@ export default function BlogPostPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <button className="w-10 h-10 rounded-full border border-white/5 bg-white/[0.02] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 transition-all">
+                                        <button 
+                                            onClick={handleShare}
+                                            className="w-10 h-10 rounded-full border border-white/5 bg-white/[0.02] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 transition-all"
+                                        >
                                             <Share2 className="w-4 h-4" />
                                         </button>
-                                        <button className="w-10 h-10 rounded-full border border-white/5 bg-white/[0.02] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 transition-all">
+                                        <button 
+                                            onClick={handleBookmark}
+                                            className="w-10 h-10 rounded-full border border-white/5 bg-white/[0.02] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 transition-all"
+                                        >
                                             <Bookmark className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -194,6 +224,14 @@ export default function BlogPostPage() {
             </div>
 
             <Footer />
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </main>
     );
 }
