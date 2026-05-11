@@ -334,7 +334,7 @@ function AttestationCard() {
         { initials: "GH", color: "#f59e0b", name: "GitHub", action: "verified your contribution in", subject: "chainvolio/identity-core", time: "1d ago" },
     ];
     return (
-        <div style={CARD_BASE}>
+        <div style={CARD_BASE} className="theme-preserve">
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -382,7 +382,7 @@ function AttestationCard() {
 // Card 2 — Attestation Issuance (blue) — like Linear's center Thread panel
 function OrgIssuerCard() {
     return (
-        <div style={CARD_BASE}>
+        <div style={CARD_BASE} className="theme-preserve">
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -466,7 +466,7 @@ function PublicVerifyCard() {
         { icon: Globe, color: "#f59e0b", dot: false, title: "Identity Verified", desc: "Your wallet has been verified", time: "2d ago" },
     ];
     return (
-        <div style={CARD_BASE}>
+        <div style={CARD_BASE} className="theme-preserve">
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -672,7 +672,7 @@ function AttestationBlock() {
 // --- Floating Feature Card (Overlay) ---
 function FloatingVerificationCard() {
     return (
-        <div className="w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
+        <div className="theme-preserve w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
             style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
         >
             {/* Card Header */}
@@ -743,7 +743,7 @@ function RecruiterDashboardPreviewUI_V2({
 
     const panels = [
         // Box 0: Talent Pool (Verified Signal)
-        <div key={0} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+        <div key={0} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6 relative z-10">
                 <div className="flex items-center gap-3">
@@ -796,7 +796,7 @@ function RecruiterDashboardPreviewUI_V2({
         </div>,
 
         // Box 1: Org-Backed Trust (Endorsement Chain)
-        <div key={1} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+        <div key={1} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6 relative z-10">
                 <div className="flex items-center gap-3">
@@ -835,7 +835,7 @@ function RecruiterDashboardPreviewUI_V2({
         </div>,
  
         // Box 2: Post Anywhere (Share Link)
-        <div key={2} className="w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+        <div key={2} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6 relative z-10">
                 <div className="flex items-center gap-3">
@@ -1857,7 +1857,7 @@ export function LandingPageClient() {
                             <div className="relative scale-[0.65] min-[440px]:scale-[0.75] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[350px] h-[650px] md:w-[1200px] md:h-[650px]">
                                 <div className="relative w-full h-full group">
                                     {/* Main Dashboard Mockup */}
-                                    <div className="w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
+                                    <div className="theme-preserve w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
                                         style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
                                     >
                                         <MockProfileUI />

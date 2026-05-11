@@ -450,3 +450,41 @@ html[data-theme="light"] .theme-aware .text-rose-300    { color: #be123c !import
 html[data-theme="light"] .theme-aware .text-rose-400    { color: #be123c !important; }
 html[data-theme="light"] .theme-aware .text-red-400     { color: #dc2626 !important; }
 html[data-theme="light"] .theme-aware .text-pink-400    { color: #be185d !important; }
+
+/* ── theme-preserve: dark UI card islands inside light pages ─────────────────
+   Elements with this class keep their original white-on-dark appearance.
+   Rules here must come AFTER the .theme-aware rules to win on equal specificity.
+──────────────────────────────────────────────────────────────────────────── */
+html[data-theme="light"] .theme-preserve { color: white; }
+html[data-theme="light"] .theme-preserve .text-white,
+html[data-theme="light"] .theme-preserve.text-white       { color: white !important; }
+html[data-theme="light"] .theme-preserve .text-white\/10  { color: rgb(255 255 255 / 0.10) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/15  { color: rgb(255 255 255 / 0.15) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/20  { color: rgb(255 255 255 / 0.20) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/25  { color: rgb(255 255 255 / 0.25) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/30  { color: rgb(255 255 255 / 0.30) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/35  { color: rgb(255 255 255 / 0.35) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/40  { color: rgb(255 255 255 / 0.40) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/45  { color: rgb(255 255 255 / 0.45) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/50  { color: rgb(255 255 255 / 0.50) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/55  { color: rgb(255 255 255 / 0.55) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/60  { color: rgb(255 255 255 / 0.60) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/65  { color: rgb(255 255 255 / 0.65) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/70  { color: rgb(255 255 255 / 0.70) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/75  { color: rgb(255 255 255 / 0.75) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/80  { color: rgb(255 255 255 / 0.80) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/85  { color: rgb(255 255 255 / 0.85) !important; }
+html[data-theme="light"] .theme-preserve .text-white\/90  { color: rgb(255 255 255 / 0.90) !important; }
+html[data-theme="light"] .theme-preserve .text-slate-200  { color: #e2e8f0 !important; }
+html[data-theme="light"] .theme-preserve .text-slate-300  { color: #cbd5e1 !important; }
+html[data-theme="light"] .theme-preserve .text-slate-400  { color: #94a3b8 !important; }
+html[data-theme="light"] .theme-preserve .text-slate-500  { color: #64748b !important; }
+html[data-theme="light"] .theme-preserve .text-emerald-400 { color: #34d399 !important; }
+html[data-theme="light"] .theme-preserve .text-emerald-500 { color: #10b981 !important; }
+html[data-theme="light"] .theme-preserve .text-teal-400   { color: #2dd4bf !important; }
+html[data-theme="light"] .theme-preserve .text-indigo-400 { color: #818cf8 !important; }
+html[data-theme="light"] .theme-preserve .text-blue-400   { color: #60a5fa !important; }
+html[data-theme="light"] .theme-preserve .text-amber-400  { color: #fbbf24 !important; }
+html[data-theme="light"] .theme-preserve .text-amber-500  { color: #f59e0b !important; }
+html[data-theme="light"] .theme-preserve .text-rose-400   { color: #fb7185 !important; }
+html[data-theme="light"] .theme-preserve .text-red-400    { color: #f87171 !important; }
