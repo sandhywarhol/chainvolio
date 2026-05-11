@@ -739,7 +739,6 @@ function RecruiterDashboardPreviewUI_V2({
         { label: "Verified signal candidates", color: "#60a5fa" },
         { label: "Org-backed endorsements", color: "#94a3b8" },
         { label: "Post your job link anywhere", color: "#f59e0b" },
-        { label: "Reduce hiring guesswork", color: "#a78bfa" },
     ];
 
     const panels = [
@@ -795,7 +794,7 @@ function RecruiterDashboardPreviewUI_V2({
                 </div>
             ))}
         </div>,
-
+ 
         // Panel 2 — Post Anywhere (bullet 2)
         <div key={2} className="space-y-2">
             <div className="flex items-center justify-between mb-3">
@@ -827,28 +826,6 @@ function RecruiterDashboardPreviewUI_V2({
                     <span className="text-[8px] font-bold" style={{ color: p.statusColor }}>{p.status}</span>
                 </div>
             ))}
-        </div>,
-
-        // Panel 3 — Confidence Score (auto-only, no bullet)
-        <div key={3} className="space-y-2">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/20 mb-3">Alex Rivera, Confidence Score</p>
-            <div className="p-3 rounded-xl bg-[#0D0D0D] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 space-y-3 shadow-xl">
-                {[
-                    { label: "Verified Work", score: 92, color: "#94a3b8" },
-                    { label: "Org Attestations", score: 87, color: "#60a5fa" },
-                    { label: "Chain Activity", score: 74, color: "#a78bfa" },
-                ].map((s, i) => (
-                    <div key={i}>
-                        <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] text-white/30">{s.label}</span>
-                            <span className="text-[9px] font-bold" style={{ color: s.color }}>{s.score}</span>
-                        </div>
-                        <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                            <div className="h-full rounded-full" style={{ width: `${s.score}%`, background: s.color + "99" }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
         </div>,
     ];
 
@@ -907,7 +884,7 @@ function RecruiterDashboardPreviewUI_V2({
                 {/* Carousel */}
                 <div className="relative overflow-hidden" style={{ height: 170 }}>
                     {panels.map((panel, i) => {
-                        const pos = (i - active + 4) % 4;
+                        const pos = (i - active + 3) % 3;
                         const anim = cardAnim(pos);
                         return (
                             <motion.div
@@ -930,8 +907,8 @@ function RecruiterDashboardPreviewUI_V2({
                         dragConstraints={{ left: 0, right: 0 }}
                         dragElastic={0.1}
                         onDragEnd={(e: any, info: any) => {
-                            if (info.offset.x < -30) setActive((prev) => (prev + 1) % 4);
-                            if (info.offset.x > 30) setActive((prev) => (prev - 1 + 4) % 4);
+                            if (info.offset.x < -30) setActive((prev) => (prev + 1) % 3);
+                            if (info.offset.x > 30) setActive((prev) => (prev - 1 + 3) % 3);
                         }}
                     />
                 </div>
@@ -959,7 +936,7 @@ function HiringBlock() {
 
     useEffect(() => {
         if (paused) return;
-        const t = setInterval(() => setActive(p => (p + 1) % 4), 3500);
+        const t = setInterval(() => setActive(p => (p + 1) % 3), 3500);
         return () => clearInterval(t);
     }, [paused]);
 
@@ -1000,8 +977,12 @@ function HiringBlock() {
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
                         <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Use Case</span>
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[#fde68a99]">Use Case</span>
                     </div>
+
+                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                        How to Hire Verified Web3 Talent
+                    </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
                     </h3>
@@ -1061,14 +1042,25 @@ const SLIDES = [
 ];
 
 
-// PARTNERS are now loaded dynamically from /api/logos
+const PARTNERS = [
+    { src: "/logos/solana.png", name: "Solana" },
+    { src: "/logos/github.png", name: "GitHub" },
+    { src: "/logos/linkedin.png", name: "LinkedIn" },
+    { src: "/logos/phantom.png", name: "Phantom" },
+    { src: "/logos/discord.png", name: "Discord" },
+    { src: "/logos/superteam.png", name: "Superteam" },
+    { src: "/logos/notion.png", name: "Notion" },
+    { src: "/logos/alchemy.png", name: "Alchemy" },
+    { src: "/logos/telegram.png", name: "Telegram" },
+    { src: "/logos/solflare.png", name: "Solflare" },
+    { src: "/logos/X.png", name: "X" },
+];
 
 export function LandingPageClient() {
     const { publicKey, connected } = useWallet();
     const [profile, setProfile] = useState<any>(null);
     const [activeModal, setActiveModal] = useState<'how' | 'recruiters' | 'talent' | 'ask' | 'screening' | 'attestation' | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [partners, setPartners] = useState<{ src: string; name: string; scale?: number }[]>([]);
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -1168,19 +1160,6 @@ export function LandingPageClient() {
             .catch(() => setProfile(null));
     }, [publicKey, connected]);
 
-    useEffect(() => {
-        const fetchLogos = () => {
-            fetch('/api/logos')
-                .then(r => r.json())
-                .then(data => setPartners(data))
-                .catch(err => console.error('Error fetching logos:', err));
-        };
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-            (window as any).requestIdleCallback(fetchLogos, { timeout: 2000 });
-        } else {
-            setTimeout(fetchLogos, 300);
-        }
-    }, []);
 
     return (
         <div className="min-h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white">
@@ -1214,8 +1193,8 @@ export function LandingPageClient() {
                     </h1>
 
                     <p className="text-white/40 text-[13px] md:text-xl font-normal max-w-[310px] sm:max-w-2xl mb-10 sm:mb-12 leading-relaxed mx-auto">
-                        Turn your work experience into verifiable on-chain proof.<br />
-                        No fake CVs. No manual checks. Just trust.
+                        Signed by real people. Anchored on Solana.<br />
+                        Cryptographically verified.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
@@ -1312,7 +1291,7 @@ export function LandingPageClient() {
                         </p>
                         <div className="w-full py-4 overflow-hidden relative mb-8 sm:mb-16" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
-                                {[...partners, ...partners].map((partner, i) => (
+                                {[...PARTNERS, ...PARTNERS].map((partner, i) => (
                                     <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
                                         <img
                                             src={partner.src}
@@ -1320,7 +1299,6 @@ export function LandingPageClient() {
                                             loading="lazy"
                                             decoding="async"
                                             className="h-5 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
-                                            style={{ transform: partner.scale ? `scale(${partner.scale})` : 'none' }}
                                         />
                                     </div>
                                 ))}
@@ -1342,8 +1320,8 @@ export function LandingPageClient() {
                                 <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">The problem</span>
                             </div>
 
-                            <p className="text-sm md:text-base font-medium text-white/40 tracking-tight">
-                                Why Traditional CVs Can&apos;t Be Trusted
+                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                Why Web3 Hiring Is Broken
                             </p>
 
                             <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-nowrap">
@@ -1426,8 +1404,12 @@ export function LandingPageClient() {
                             <div className="space-y-6 md:space-y-12">
                                 <div className="space-y-3 md:space-y-6">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99] uppercase">Why ChainVolio</span>
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">Why ChainVolio</span>
                                     </div>
+
+                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                        How On-Chain Attestations Work
+                                    </p>
 
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
@@ -1503,6 +1485,12 @@ export function LandingPageClient() {
                             >
                                 {[
                                     {
+                                        id: "03",
+                                        title: "Portable Trust",
+                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                        icon: Globe,
+                                    },
+                                    {
                                         id: "01",
                                         title: "Beyond Profiles",
                                         desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
@@ -1525,12 +1513,6 @@ export function LandingPageClient() {
                                         title: "Beyond Profiles",
                                         desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
                                         icon: Activity,
-                                    },
-                                    {
-                                        id: "02",
-                                        title: "Claims to Proof",
-                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
-                                        icon: ShieldCheck,
                                     },
                                 ].map((feature, i) => (
                                     <div
@@ -1586,7 +1568,7 @@ export function LandingPageClient() {
                                     <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99]">Signal vs noise</span>
                                 </div>
                                 <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                    Why Web3 Needs Verifiable Work History
+                                    Why Web3 Work History Can&apos;t Be Verified
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
@@ -1870,7 +1852,8 @@ export function LandingPageClient() {
                                 <span className="text-white/30">Verifiable Web3 Resume.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
-                                Turn your work experience into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
+                                Signed by real people. Anchored on Solana.<br />
+                                Cryptographically verified.
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">

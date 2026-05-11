@@ -45,11 +45,13 @@ const SOURCE_ICONS = [
 ];
 
 const QUESTIONS = [
-    { text: "Who shipped this?", x: 450, y: 160, anchorY: 220, duration: 5, delay: 0 },
-    { text: "Can this be verified?", x: 650, y: 150, anchorY: 220, duration: 7, delay: 2 },
-    { text: "Real contributor?", x: 420, y: 340, anchorY: 280, duration: 6, delay: 1 },
-    { text: "Self claimed", x: 550, y: 380, anchorY: 280, duration: 8, delay: 3 },
-    { text: "Where is the proof?", x: 680, y: 330, anchorY: 280, duration: 5.5, delay: 0.5 },
+    { text: "Who shipped this?", x: 430, y: 160, anchorY: 220, duration: 5, delay: 0 },
+    { text: "Who can verify this?", x: 550, y: 110, anchorY: 220, duration: 6.5, delay: 1.5 },
+    { text: "Is this authentic?", x: 670, y: 160, anchorY: 220, duration: 7, delay: 2 },
+    { text: "Real contributor?", x: 400, y: 340, anchorY: 280, duration: 6, delay: 1 },
+    { text: "Trusted by who?", x: 550, y: 390, anchorY: 280, duration: 7.5, delay: 2.5 },
+    { text: "Where is the proof?", x: 700, y: 330, anchorY: 280, duration: 5.5, delay: 0.5 },
+    { text: "Trust disappears", x: 930, y: 330, anchorY: 250, duration: 8, delay: 0 },
 ];
 
 export default function ProblemDiagram() {
@@ -254,8 +256,8 @@ export default function ProblemDiagram() {
                     </g>
 
                     <g transform={`translate(${col2X}, 40)`} textAnchor="middle">
-                        <text fill="white" fontSize="13" fontWeight="700">Proof gets lost</text>
-                        <text y="18" fill="white" fontSize="10" opacity="0.4" fontWeight="400">In the noise</text>
+                        <text fill="white" fontSize="13" fontWeight="700">Self Claimed</text>
+                        <text y="18" fill="white" fontSize="10" opacity="0.4" fontWeight="400">No verifiable proof</text>
                         <foreignObject x="-6" y="24" width="12" height="12">
                             <ArrowDown size={12} className="text-white/20" />
                         </foreignObject>
