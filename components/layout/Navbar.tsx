@@ -87,7 +87,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
+        <nav className={`theme-preserve fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
                 ? "border-white/10 bg-black/80 backdrop-blur-2xl py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
                 : "border-white/0 bg-transparent py-5"
             }`}>

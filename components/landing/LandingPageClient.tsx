@@ -593,7 +593,7 @@ function AttestationBlock() {
                                 <f.icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: active === i ? f.color : f.color + "55" }} />
                             </motion.div>
                             <div>
-                                <p className="text-sm font-bold mb-0.5" style={{ color: active === i ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
+                                <p className={`text-sm font-bold mb-0.5 ${active === i ? "text-white/90" : "text-white/50"}`}>
                                     {f.label}
                                 </p>
                                 <p className="text-xs text-white/25 leading-relaxed">{f.desc}</p>
@@ -604,7 +604,7 @@ function AttestationBlock() {
             </div>
 
             {/* Right — Linear-style horizontal carousel */}
-            <div className="flex flex-col gap-8">
+            <div className="theme-preserve flex flex-col gap-8">
                 <div className="relative overflow-hidden" style={{ height: "560px" }}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
@@ -1027,10 +1027,10 @@ function HiringBlock() {
                                 <f.icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: active === f.slide ? f.color : f.color + "55" }} />
                             </motion.div>
                             <div>
-                                <p className="text-sm font-bold mb-1" style={{ color: active === f.slide ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
+                                <p className={`text-sm font-bold mb-1 ${active === f.slide ? "text-white/90" : "text-white/50"}`}>
                                     {f.label}
                                 </p>
-                                <p className="text-xs leading-relaxed" style={{ color: active === f.slide ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)" }}>
+                                <p className={`text-xs leading-relaxed ${active === f.slide ? "text-white/40" : "text-white/20"}`}>
                                     {f.desc}
                                 </p>
                             </div>
@@ -1716,7 +1716,7 @@ export function LandingPageClient() {
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
-                        <div className="relative overflow-hidden">
+                        <div className="theme-preserve relative overflow-hidden">
                             <motion.div
                                 className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.05] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.05] md:gap-px"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}

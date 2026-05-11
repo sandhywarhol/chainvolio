@@ -488,3 +488,30 @@ html[data-theme="light"] .theme-preserve .text-amber-400  { color: #fbbf24 !impo
 html[data-theme="light"] .theme-preserve .text-amber-500  { color: #f59e0b !important; }
 html[data-theme="light"] .theme-preserve .text-rose-400   { color: #fb7185 !important; }
 html[data-theme="light"] .theme-preserve .text-red-400    { color: #f87171 !important; }
+
+/* ── Section badge pills: nearly-invisible white borders/bg → visible on light bg ── */
+html[data-theme="light"] .theme-aware .border-white\/\[0\.07\]  { border-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .border-white\/\[0\.08\]  { border-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .border-white\/\[0\.05\]  { border-color: rgb(0 0 0 / 0.07) !important; }
+html[data-theme="light"] .theme-aware .border-white\/10  { border-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .border-white\/5   { border-color: rgb(0 0 0 / 0.06) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.02\]  { background-color: rgb(0 0 0 / 0.04) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.03\]  { background-color: rgb(0 0 0 / 0.05) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.04\]  { background-color: rgb(0 0 0 / 0.06) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/5        { background-color: rgb(0 0 0 / 0.06) !important; }
+
+/* Amber hex with alpha — used in section badge labels */
+html[data-theme="light"] .theme-aware .text-\[#fde68a99\] { color: #92400e !important; }
+html[data-theme="light"] .theme-aware .text-amber-200\/60  { color: #92400e !important; }
+
+/* Restore inside theme-preserve (cards have their own dark bg — keep original values) */
+html[data-theme="light"] .theme-preserve .border-white\/\[0\.07\] { border-color: rgba(255,255,255,0.07) !important; }
+html[data-theme="light"] .theme-preserve .border-white\/\[0\.08\] { border-color: rgba(255,255,255,0.08) !important; }
+html[data-theme="light"] .theme-preserve .border-white\/\[0\.05\] { border-color: rgba(255,255,255,0.05) !important; }
+html[data-theme="light"] .theme-preserve .border-white\/10  { border-color: rgba(255,255,255,0.10) !important; }
+html[data-theme="light"] .theme-preserve .border-white\/5   { border-color: rgba(255,255,255,0.05) !important; }
+html[data-theme="light"] .theme-preserve .bg-white\/\[0\.02\] { background-color: rgba(255,255,255,0.02) !important; }
+html[data-theme="light"] .theme-preserve .bg-white\/\[0\.03\] { background-color: rgba(255,255,255,0.03) !important; }
+html[data-theme="light"] .theme-preserve .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,0.04) !important; }
+html[data-theme="light"] .theme-preserve .bg-white\/5       { background-color: rgba(255,255,255,0.05) !important; }
+html[data-theme="light"] .theme-preserve .text-\[#fde68a99\]  { color: #fde68a99 !important; }
