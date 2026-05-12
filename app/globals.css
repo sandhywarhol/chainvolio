@@ -42,6 +42,38 @@
   .text-caption {
     @apply text-xs font-medium uppercase tracking-[0.3em] text-white/40;
   }
+
+  :root {
+    --cyan-brand: #22d3ee;
+    --cyan-brand-muted: rgba(34, 211, 238, 0.4);
+    --cyan-brand-border: rgba(34, 211, 238, 0.2);
+  }
+
+  html[data-theme="light"] {
+    --cyan-brand: #0e7490;
+    --cyan-brand-muted: rgba(14, 116, 144, 0.4);
+    --cyan-brand-border: rgba(14, 116, 144, 0.2);
+  }
+
+  .theme-cyan-accent {
+    color: var(--cyan-brand) !important;
+  }
+
+  .theme-cyan-badge-text {
+    color: var(--cyan-brand) !important;
+  }
+
+  .bg-brand-cyan {
+    background-color: var(--cyan-brand) !important;
+  }
+
+  .border-brand-cyan {
+    border-color: var(--cyan-brand-border) !important;
+  }
+
+  .text-brand-cyan {
+    color: var(--cyan-brand) !important;
+  }
 }
 
 @layer utilities {
@@ -290,6 +322,9 @@
   justify-content: flex-end !important;
 }
 
+.theme-cyan-accent { color: var(--cyan-brand); }
+.theme-cyan-badge-text { color: var(--cyan-brand); background: var(--cyan-brand-muted); }
+
 .wallet-adapter-dropdown-list-item:hover {
   color: #ffffff !important;
   background: transparent !important;
@@ -386,10 +421,10 @@
    Scoped entirely to html[data-theme="light"] — dark theme is never touched.
 ──────────────────────────────────────────────────────────────────────────── */
 
-/* Backgrounds */
-html[data-theme="light"] .theme-bg-page     { background-color: #ffffff !important; }
-html[data-theme="light"] .theme-bg-section  { background-color: #f5f5f5 !important; }
-html[data-theme="light"] .theme-bg-section2 { background-color: #eeeeee !important; }
+/* Backgrounds - Refined Bone White and sophisticated light grey/slate */
+html[data-theme="light"] .theme-bg-page     { background-color: #fdfbf7 !important; }
+html[data-theme="light"] .theme-bg-section  { background-color: #f8f7f2 !important; }
+html[data-theme="light"] .theme-bg-section2 { background-color: #f1f0ea !important; }
 
 /* Base: inherit dark text for elements with no explicit color class.
    Same-element fix: pages use <main class="theme-aware text-white"> on a single element,
@@ -443,13 +478,14 @@ html[data-theme="light"] .theme-aware .text-indigo-300  { color: #4338ca !import
 html[data-theme="light"] .theme-aware .text-indigo-400  { color: #4338ca !important; }
 html[data-theme="light"] .theme-aware .text-blue-300    { color: #1d4ed8 !important; }
 html[data-theme="light"] .theme-aware .text-blue-400    { color: #1d4ed8 !important; }
-html[data-theme="light"] .theme-aware .text-amber-200   { color: #374151 !important; }
-html[data-theme="light"] .theme-aware .text-amber-300   { color: #374151 !important; }
-html[data-theme="light"] .theme-aware .text-amber-400   { color: #374151 !important; }
+html[data-theme="light"] .theme-aware .text-amber-200   { color: #0e7490 !important; }
+html[data-theme="light"] .theme-aware .text-amber-300   { color: #0e7490 !important; }
+html[data-theme="light"] .theme-aware .text-amber-400   { color: #0e7490 !important; }
 html[data-theme="light"] .theme-aware .text-rose-300    { color: #be123c !important; }
 html[data-theme="light"] .theme-aware .text-rose-400    { color: #be123c !important; }
 html[data-theme="light"] .theme-aware .text-red-400     { color: #dc2626 !important; }
 html[data-theme="light"] .theme-aware .text-pink-400    { color: #be185d !important; }
+/* Cyan accent is already handled by variables above */
 
 /* ── theme-preserve: dark UI card islands inside light pages ─────────────────
    Elements with this class keep their original white-on-dark appearance.
@@ -500,9 +536,21 @@ html[data-theme="light"] .theme-aware .bg-white\/\[0\.03\]  { background-color: 
 html[data-theme="light"] .theme-aware .bg-white\/\[0\.04\]  { background-color: rgb(0 0 0 / 0.06) !important; }
 html[data-theme="light"] .theme-aware .bg-white\/5        { background-color: rgb(0 0 0 / 0.06) !important; }
 
-/* Amber hex with alpha — used in section badge labels */
-html[data-theme="light"] .theme-aware .text-\[#fde68a99\] { color: #374151 !important; }
-html[data-theme="light"] .theme-aware .text-amber-200\/60  { color: #374151 !important; }
+/* Amber/Cyan transition — improved contrast for badges and accent labels
+   Catching all variations used across landing page and components. */
+html[data-theme="light"] .text-\[\#fde68a99\] { color: #0e7490 !important; }
+html[data-theme="light"] .text-amber-200\/60  { color: #0e7490 !important; }
+html[data-theme="light"] .text-amber-200\/80  { color: #0e7490 !important; }
+html[data-theme="light"] .text-amber-300      { color: #0e7490 !important; }
+html[data-theme="light"] .text-amber-400      { color: #0e7490 !important; }
+html[data-theme="light"] .text-amber-500      { color: #0e7490 !important; }
+html[data-theme="light"] .bg-amber-400\/10    { background-color: #0e749022 !important; }
+html[data-theme="light"] .bg-amber-400\/40    { background-color: #0e749066 !important; }
+html[data-theme="light"] .bg-amber-500\/5     { background-color: #0e749011 !important; }
+html[data-theme="light"] .bg-amber-500\/10    { background-color: #0e749022 !important; }
+html[data-theme="light"] .border-amber-400\/20 { border-color: #0e749044 !important; }
+html[data-theme="light"] .border-amber-500\/20 { border-color: #0e749044 !important; }
+html[data-theme="light"] .border-amber-500\/30 { border-color: #0e749055 !important; }
 
 /* Restore inside theme-preserve (cards have their own dark bg — keep original values) */
 html[data-theme="light"] .theme-preserve .border-white\/\[0\.07\] { border-color: rgba(255,255,255,0.07) !important; }
@@ -514,7 +562,9 @@ html[data-theme="light"] .theme-preserve .bg-white\/\[0\.02\] { background-color
 html[data-theme="light"] .theme-preserve .bg-white\/\[0\.03\] { background-color: rgba(255,255,255,0.03) !important; }
 html[data-theme="light"] .theme-preserve .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,0.04) !important; }
 html[data-theme="light"] .theme-preserve .bg-white\/5       { background-color: rgba(255,255,255,0.05) !important; }
-html[data-theme="light"] .theme-preserve .text-\[#fde68a99\]  { color: #fde68a99 !important; }
+html[data-theme="light"] .theme-preserve .text-\[\#fde68a99\]  { color: #fde68a99 !important; }
+html[data-theme="light"] .theme-preserve .text-amber-200\/60  { color: #fde68a99 !important; }
+html[data-theme="light"] .theme-preserve .text-amber-400     { color: #fbbf24 !important; }
 
 /* ── Navbar: always dark in light mode (bg-transparent when unscrolled → invisible) ── */
 html[data-theme="light"] nav.theme-preserve {
@@ -528,13 +578,28 @@ html[data-theme="light"] nav.theme-preserve {
    theme-cta-fade → hidden (CTA section fades not needed on white bg).
 ──────────────────────────────────────────────────────────────────────────── */
 html[data-theme="light"] .theme-aware .theme-fade-from-black {
-  background: linear-gradient(to top, #ffffff 0%, transparent 100%) !important;
+  background: linear-gradient(to top, #fdfbf7 0%, #fdfbf7 45%, transparent 100%) !important;
 }
 html[data-theme="light"] .theme-aware .theme-fade-to-black {
-  background: linear-gradient(to bottom, #ffffff 0%, transparent 100%) !important;
+  background: linear-gradient(to bottom, #fdfbf7 0%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .theme-fade-to-black-left {
+  background: linear-gradient(to right, #fdfbf7 0%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .theme-fade-to-black-right {
+  background: linear-gradient(to left, #fdfbf7 0%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .from-black {
+  --tw-gradient-from: #fdfbf7 !important;
+  --tw-gradient-to: rgb(253 251 247 / 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 html[data-theme="light"] .theme-aware .theme-solid-black {
-  background: #ffffff !important;
+  background: #fdfbf7 !important;
+}
+html[data-theme="light"] .theme-aware .bg-\[\#0c0c0c\] {
+  background-color: #f5f5f5 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
 }
 html[data-theme="light"] .theme-aware .theme-cta-fade {
   display: none !important;
@@ -545,12 +610,97 @@ html[data-theme="light"] .theme-aware .theme-invert-diagram {
   filter: invert(1);
 }
 
-/* ── White lines and dividers → dark on light bg ────────────────────── */
+/* ── White backgrounds and dividers → dark on light bg ────────────────────── */
+html[data-theme="light"] .theme-aware .bg-white\/5    { background-color: rgb(0 0 0 / 0.05) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/8    { background-color: rgb(0 0 0 / 0.08) !important; }
 html[data-theme="light"] .theme-aware .bg-white\/10   { background-color: rgb(0 0 0 / 0.10) !important; }
-html[data-theme="light"] .theme-aware .bg-white\/\[0\.1\] { background-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/20   { background-color: rgb(0 0 0 / 0.20) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.03\] { background-color: rgb(0 0 0 / 0.03) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.05\] { background-color: rgb(0 0 0 / 0.05) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.06\] { background-color: rgb(0 0 0 / 0.06) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.08\] { background-color: rgb(0 0 0 / 0.08) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.1\]   { background-color: rgb(0 0 0 / 0.10) !important; }
+html[data-theme="light"] .theme-aware .bg-white\/\[0\.15\]  { background-color: rgb(0 0 0 / 0.15) !important; }
 html[data-theme="light"] .theme-aware .divide-white\/\[0\.04\] > * + * { border-color: rgb(0 0 0 / 0.06) !important; }
-html[data-theme="light"] .theme-aware .divide-white\/\[0\.08\] > * + * { border-color: rgb(0 0 0 / 0.10) !important; }
 
 /* Restore inside theme-preserve */
 html[data-theme="light"] .theme-preserve .bg-white\/10   { background-color: rgba(255,255,255,0.10) !important; }
 html[data-theme="light"] .theme-preserve .divide-white\/\[0\.04\] > * + * { border-color: rgba(255,255,255,0.04) !important; }
+/* ── Logo Marquee: Dark Grey logos in light mode ── */
+html[data-theme="light"] .theme-aware .animate-marquee .grayscale {
+  filter: grayscale(1) brightness(0.2) contrast(1.2) !important;
+  opacity: 0.6 !important;
+}
+
+/* ── Hero Main Button: Dark Grey in light mode ── */
+html[data-theme="light"] .theme-aware .premium-shimmer-button {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+html[data-theme="light"] .theme-aware .premium-shimmer-button:hover {
+  background-color: #333333 !important;
+}
+
+/* ── Hero Dot Indicators: Dark in light mode ── */
+html[data-theme="light"] .theme-aware .theme-dot-indicator {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+html[data-theme="light"] .theme-aware .theme-dot-indicator.active {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* ── Problem Section Dividers: Dark in light mode ── */
+html[data-theme="light"] .theme-aware .theme-border-base {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .theme-aware .theme-fade-border {
+  background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.08), transparent) !important;
+}
+
+/* ── Globe Visual: Invert and blend in light mode ── */
+html[data-theme="light"] .theme-aware .theme-globe-canvas {
+  filter: invert(1) brightness(0.9) contrast(1.1) !important;
+  mix-blend-mode: multiply !important;
+  background-color: transparent !important;
+}
+
+/* ── Globe Visual Gradients: Match section2 background (#f1f0ea) ── */
+html[data-theme="light"] .theme-aware .theme-fade-to-black {
+  background: linear-gradient(to bottom, #f1f0ea 0%, rgba(241, 240, 234, 0.4) 50%, transparent 100%) !important;
+}
+html[data-theme="light"] .theme-aware .theme-fade-from-black {
+  background: linear-gradient(to top, #f1f0ea 0%, rgba(241, 240, 234, 0.8) 50%, transparent 100%) !important;
+}
+
+/* ── Signal vs Noise Vignette & Background ── */
+.theme-signal-bg {
+  background-color: #000000 !important;
+}
+
+html[data-theme="light"] .theme-aware .theme-signal-bg {
+  background-color: #fdfbf7 !important;
+}
+
+.theme-signal-vignette {
+  background: radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #000 92%);
+}
+
+html[data-theme="light"] .theme-aware .theme-signal-vignette {
+  background: radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #fdfbf7 92%) !important;
+}
+
+.theme-signal-fade-to {
+  background: linear-gradient(to bottom, #000, transparent);
+}
+
+.theme-signal-fade-from {
+  background: linear-gradient(to top, #000, transparent);
+}
+
+html[data-theme="light"] .theme-aware .theme-signal-fade-to {
+  background: linear-gradient(to bottom, #fdfbf7, transparent) !important;
+}
+
+html[data-theme="light"] .theme-aware .theme-signal-fade-from {
+  background: linear-gradient(to top, #fdfbf7, transparent) !important;
+}
