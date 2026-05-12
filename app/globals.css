@@ -55,11 +55,11 @@
     --cyan-brand-border: rgba(14, 116, 144, 0.2);
   }
 
-  .theme-cyan-accent {
+  html[data-theme="light"] .theme-cyan-accent {
     color: var(--cyan-brand) !important;
   }
 
-  .theme-cyan-badge-text {
+  html[data-theme="light"] .theme-cyan-badge-text {
     color: var(--cyan-brand) !important;
   }
 
@@ -322,8 +322,8 @@
   justify-content: flex-end !important;
 }
 
-.theme-cyan-accent { color: var(--cyan-brand); }
-.theme-cyan-badge-text { color: var(--cyan-brand); background: var(--cyan-brand-muted); }
+html[data-theme="light"] .theme-cyan-accent { color: var(--cyan-brand); }
+html[data-theme="light"] .theme-cyan-badge-text { color: var(--cyan-brand); background: var(--cyan-brand-muted); }
 
 .wallet-adapter-dropdown-list-item:hover {
   color: #ffffff !important;

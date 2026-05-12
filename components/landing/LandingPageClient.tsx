@@ -1197,7 +1197,11 @@ export function LandingPageClient() {
                 {/* HERO SECTION */}
                 <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                        <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap theme-cyan-badge-text">
+                        <span className={`text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap ${
+                            theme === 'light'
+                                ? 'theme-cyan-badge-text'
+                                : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80'
+                        }`}>
                             Trust layer for Web3
                         </span>
                     </div>
@@ -1518,7 +1522,7 @@ export function LandingPageClient() {
                                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05] whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <div className="flex flex-col gap-0.5">
@@ -1656,7 +1660,7 @@ export function LandingPageClient() {
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
-                                    <span className="theme-cyan-accent">Verifiable Signal</span>
+                                    <span className="text-white/30 theme-cyan-accent">Verifiable Signal</span>
                                 </h2>
                             </div>
                         </div>
