@@ -566,7 +566,7 @@ function AttestationBlock() {
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Proof of work,<br /><span className="text-white/30 theme-cyan-accent">not claims.</span>
+                        Proof of work,<br /><span className="text-amber-200/60">not claims.</span>
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
@@ -829,42 +829,76 @@ function RecruiterDashboardPreviewUI_V2({
         </div>,
  
         // Box 2: Post Anywhere (Share Link)
-        <div key={2} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+        <div key={2} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-5 shadow-2xl flex flex-col relative overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6 relative z-10">
+            <div className="flex items-center justify-between mb-4 relative z-10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                        <Share2 className="w-5 h-5 text-amber-400" />
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                        <Share2 className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
                         <h4 className="text-sm font-black text-white tracking-tight">Distribution</h4>
-                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Portable Job Link</p>
+                        <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">Portable Job Link</p>
                     </div>
                 </div>
             </div>
             
-            {/* Share Widget */}
-            <div className="flex-1 rounded-2xl bg-[#0D0D0D] border border-white/10 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-inner">
-                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent pointer-events-none" />
-                <div className="w-16 h-16 mb-4 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 relative z-10 shadow-lg">
-                     <Share2 className="w-7 h-7 text-amber-400" />
-                     <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#14F195] rounded-full border-2 border-[#0D0D0D] shadow-[0_0_10px_rgba(20,241,149,0.5)]" />
-                </div>
-                <h5 className="text-base sm:text-lg font-bold text-white mb-2 z-10">chainvolio.xyz/hire/rust-dev</h5>
-                <p className="text-xs text-white/40 mb-6 max-w-[200px] mx-auto z-10 leading-relaxed">Generate a verifiable hiring link and blast it across platforms.</p>
-                
-                <div className="flex items-center justify-center gap-4 w-full z-10 px-4">
-                    {/* LinkedIn Button */}
-                    <div className="flex-1 max-w-[140px] py-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex flex-col items-center justify-center gap-1.5 hover:bg-blue-500/20 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-blue-500/10">
-                        <span className="text-xl font-black text-blue-400">
-                            in
-                        </span>
+            {/* Share Widget - Launchpad Style */}
+            <div className="flex-1 flex flex-col gap-3 relative z-10">
+                {/* Primary Link Card */}
+                <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col gap-2 relative group/link hover:bg-white/[0.05] transition-all duration-500">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
+                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Live Link</span>
+                        </div>
+                        <div className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                            <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Encrypted</span>
+                        </div>
                     </div>
-                    {/* X (Twitter) Button */}
-                    <div className="flex-1 max-w-[140px] py-3.5 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1.5 hover:bg-white/10 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-white/5">
-                        <span className="text-xl font-black text-white/80 hover:text-white">
-                            X
-                        </span>
+                    
+                    <div className="flex items-center justify-between gap-3">
+                        <span className="text-base font-bold text-white tracking-tight truncate">chainvolio.xyz/hire/rust-dev</span>
+                        <button className="flex-shrink-0 w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center hover:bg-white/90 transition-all shadow-lg active:scale-95">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Social Channels */}
+                <div className="grid grid-cols-2 gap-3 flex-1">
+                    {/* LinkedIn Channel */}
+                    <div className="rounded-xl border border-white/5 bg-gradient-to-br from-[#0077b5]/10 to-transparent p-3 flex flex-col justify-between group/social hover:border-[#0077b5]/30 transition-all duration-500 cursor-pointer">
+                        <div className="flex items-center justify-between">
+                            <div className="w-7 h-7 rounded-lg bg-[#0077b5]/20 flex items-center justify-center">
+                                <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
+                        </div>
+                        <div>
+                            <h5 className="text-[11px] font-bold text-white mb-0.5">LinkedIn</h5>
+                            <p className="text-[8px] text-white/30 leading-tight">Professional network</p>
+                        </div>
+                        <div className="mt-2 py-1.5 w-full rounded-lg bg-[#0077b5] text-white text-[9px] font-black uppercase tracking-widest text-center shadow-lg shadow-[#0077b5]/20 opacity-80 group-hover/social:opacity-100 transition-opacity">
+                            Share Post
+                        </div>
+                    </div>
+
+                    {/* X Channel */}
+                    <div className="rounded-xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent p-3 flex flex-col justify-between group/social hover:border-white/20 transition-all duration-500 cursor-pointer">
+                        <div className="flex items-center justify-between">
+                            <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
+                                <span className="text-xs font-black text-white">X</span>
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
+                        </div>
+                        <div>
+                            <h5 className="text-[11px] font-bold text-white mb-0.5">X / Twitter</h5>
+                            <p className="text-[8px] text-white/30 leading-tight">Instant broadcast</p>
+                        </div>
+                        <div className="mt-2 py-1.5 w-full rounded-lg bg-white text-black text-[9px] font-black uppercase tracking-widest text-center shadow-lg shadow-white/10 opacity-90 group-hover/social:opacity-100 transition-opacity">
+                            Blast Link
+                        </div>
                     </div>
                 </div>
             </div>
@@ -990,7 +1024,7 @@ function HiringBlock() {
                         How to Hire Verified Web3 Talent
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Hire based on real proof,<br /><span className="text-white/30 theme-cyan-accent">not profiles.</span>
+                        Hire based on real proof,<br /><span className="text-amber-200/60">not profiles.</span>
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
@@ -1042,7 +1076,6 @@ const SLIDES = [
     { src: "/homepage/image%20slide%202/dashboard%202.svg", label: "Recruiter dashboard" },
     { src: "/homepage/image%20slide%202/edit%20profile%202.svg", label: "Profile customization" },
     { src: "/homepage/image%20slide%202/proof%20of%20work%202.svg", label: "Verifiable work" },
-    { src: "/homepage/image%20slide%202/apply%20(2).png", label: "Talent application" },
     { src: "/homepage/image%20slide%202/attestation.svg", label: "On-chain attestations" },
     { src: "/homepage/image%20slide%202/status.svg", label: "Verification status" },
 ];
@@ -1200,7 +1233,7 @@ export function LandingPageClient() {
                         <span className={`text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap ${
                             theme === 'light'
                                 ? 'theme-cyan-badge-text'
-                                : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80'
+                                : 'text-amber-200/60'
                         }`}>
                             Trust layer for Web3
                         </span>
@@ -1209,7 +1242,7 @@ export function LandingPageClient() {
                     <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className="text-white theme-cyan-accent">That Recruiters Trust.</span>
+                            Resume <span className="text-amber-200/60">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1346,7 +1379,7 @@ export function LandingPageClient() {
                             </p>
 
                             <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
-                                Your work is real. <span className="text-white/30 theme-cyan-accent">Your proof isn&apos;t.</span>
+                                Your work is real. <span className="text-amber-200/60">Your proof isn&apos;t.</span>
                             </h2>
                             <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12 theme-border-base" />
 
@@ -1480,7 +1513,7 @@ export function LandingPageClient() {
 
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
-                                        <span className="text-white/30 theme-cyan-accent">Everything connects.</span>
+                                        <span className="text-amber-200/60">Everything connects.</span>
                                     </h2>
                                     <div className="h-px w-full max-w-6xl bg-white/10 theme-border-base" />
 
@@ -1664,7 +1697,7 @@ export function LandingPageClient() {
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
-                                    <span className="text-white/30 theme-cyan-accent">Verifiable Signal</span>
+                                    <span className="text-amber-200/60">Verifiable Signal</span>
                                 </h2>
                             </div>
                         </div>
@@ -1731,7 +1764,7 @@ export function LandingPageClient() {
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
                         <div className="relative overflow-hidden">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.08] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.08] md:gap-px"
+                                className="flex md:grid md:grid-cols-3 w-full md:gap-8"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
@@ -1750,45 +1783,65 @@ export function LandingPageClient() {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
                                         accent: "#fde68a99",
+                                        icon: Activity,
+                                        id: "03"
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
                                         accent: "#fde68a99",
+                                        icon: User,
+                                        id: "01"
                                     },
                                     {
                                         label: "On-Chain Attestation",
                                         desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
                                         accent: "#fde68a99",
+                                        icon: ShieldCheck,
+                                        id: "02"
                                     },
                                     {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
                                         accent: "#fde68a99",
+                                        icon: Activity,
+                                        id: "03"
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
                                         accent: "#fde68a99",
+                                        icon: User,
+                                        id: "01"
                                     },
                                 ].map((item, i) => (
                                     <div
                                         key={i}
-                                        className={`p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl group transition-all duration-300 w-[80vw] md:w-auto flex-shrink-0 md:border-none md:rounded-none md:bg-black md:px-8 md:py-7 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                        className={`p-6 bg-transparent transition-all duration-300 w-[80vw] md:w-auto flex-shrink-0 md:px-10 md:py-8 pb-8 px-5 mx-2 md:mx-0 group ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
                                     >
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                                                style={{ background: "#fde68a99" }}
-                                            />
-                                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-300"
-                                                style={{ color: "#fde68a99" }}
-                                            >
-                                                {item.label}
-                                            </span>
+                                        <div className="flex items-start gap-8">
+                                            {/* Big Number */}
+                                            <div className="flex-shrink-0 pt-2">
+                                                <span className="text-4xl font-black text-white/10 group-hover:text-[#fde68a99] transition-colors duration-500 tracking-tighter leading-none">
+                                                    {item.id}
+                                                </span>
+                                            </div>
+
+                                            {/* Vertical Divider */}
+                                            <div className="w-px h-20 bg-gradient-to-b from-transparent via-white/10 to-transparent flex-shrink-0 mt-1" />
+
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-2.5">
+                                                    <item.icon size={16} className="text-white/40" />
+                                                    <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">
+                                                        {item.label}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-[13px] text-white/30 leading-relaxed group-hover:text-white/50 transition-colors duration-300 max-w-sm">
+                                                    {item.desc}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <p className="text-white/30 text-[12px] sm:text-sm leading-relaxed group-hover:text-white/45 transition-colors duration-300">
-                                            {item.desc}
-                                        </p>
                                     </div>
                                 ))}
                             </motion.div>
@@ -1829,7 +1882,7 @@ export function LandingPageClient() {
                                         Build a Verifiable Web3 Resume with On-Chain Proof
                                     </p>
                                     <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                        Build a reputation<br /><span className="text-white/30">that travels.</span>
+                                        Build a reputation<br /><span className="text-amber-200/60">that travels.</span>
                                     </h3>
                                 </div>
 
@@ -1937,7 +1990,7 @@ export function LandingPageClient() {
                         >
                             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
                                 Start Building Your<br />
-                                <span className="text-white/30">Verifiable Web3 Resume.</span>
+                                <span className="text-amber-200/60">Verifiable Web3 Resume.</span>
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Signed by real people. Anchored on Solana.<br />
