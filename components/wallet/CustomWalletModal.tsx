@@ -80,30 +80,30 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             // User dismissed the wallet popup — just clear the spinner, no toast
         } else if (connectionError === "extension_dead") {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
-            setToast({
-                message: `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser untuk membangunkannya, lalu coba lagi.`,
-                type: "error",
-            });
+            const msg = isMobile
+                ? `${walletName} tidak merespons. Coba tutup dan buka kembali aplikasi ${walletName}, lalu coba lagi.`
+                : `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser untuk membangunkannya, lalu coba lagi.`;
+            setToast({ message: msg, type: "error" });
         } else {
             setToast({ message: "Koneksi gagal. Silakan coba lagi.", type: "error" });
         }
         setLoadingKey(null);
-    }, [connectionError, loadingKey]);
+    }, [connectionError, isMobile, loadingKey]);
 
     // Safety-net timeout: if anything goes wrong and the spinner is still showing
-    // after 12 s (extension dead, event swallowed, etc.) — clear it automatically.
+    // after 20 s (extension dead, event swallowed, etc.) — clear it automatically.
     useEffect(() => {
         if (!loadingKey) return;
         const timer = setTimeout(() => {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
-            setToast({
-                message: `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser, lalu coba lagi.`,
-                type: "error",
-            });
+            const msg = isMobile
+                ? `${walletName} tidak merespons. Coba tutup dan buka kembali aplikasi ${walletName}, lalu coba lagi.`
+                : `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser, lalu coba lagi.`;
+            setToast({ message: msg, type: "error" });
             setLoadingKey(null);
         }, 20000);
         return () => clearTimeout(timer);
-    }, [loadingKey]);
+    }, [isMobile, loadingKey]);
 
     // Fires when a new wallet connection completes.
     // loadingKey guard prevents this from firing when a returning user opens the modal while already connected.
@@ -165,22 +165,17 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleBuilderConnect = async (walletName: string) => {
         const key = `builder-${walletName}`;
-        setLoadingKey(key);
         recruiterModeRef.current = false;
         try {
-            const targetWallet = wallets.find(w => w.adapter.name === walletName);
-            const address = targetWallet?.adapter.publicKey?.toBase58();
-
-            if (address) {
-                // Wallet already connected — verify then close directly
-                const allowed = await checkRoleAllowed(address, 'builder');
-                if (!allowed) return;
-                setLoadingKey(null);
-                onClose();
-                router.refresh();
-                return;
+            // Disconnect first (before setting loadingKey) if the adapter still holds a
+            // session from this page visit. This guarantees two things:
+            // 1. connect() is always called → Phantom shows its unlock popup if locked.
+            // 2. connected goes false→true, so the modal-close useEffect fires at the
+            //    right moment instead of immediately when loadingKey is set.
+            if (connected) {
+                await disconnect();
             }
-
+            setLoadingKey(key);
             await connectWallet(walletName, isMobile);
             // The useEffect above takes over once `connected` becomes true
         } catch (error) {
@@ -191,21 +186,12 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const handleRecruiterConnect = async (walletName: string) => {
         const key = `recruiter-${walletName}`;
-        setLoadingKey(key);
         recruiterModeRef.current = true;
         try {
-            const targetWallet = wallets.find(w => w.adapter.name === walletName);
-            const address = targetWallet?.adapter.publicKey?.toBase58();
-
-            if (address) {
-                // Wallet already connected — verify then proceed to org-type step directly
-                const allowed = await checkRoleAllowed(address, 'recruiter');
-                if (!allowed) return;
-                setLoadingKey(null);
-                setStep("org-type");
-                return;
+            if (connected) {
+                await disconnect();
             }
-
+            setLoadingKey(key);
             await connectWallet(walletName, isMobile);
             // The useEffect above takes over once `connected` becomes true
         } catch (error) {
@@ -409,10 +395,11 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                             ))}
                         </div>
 
-                        {/* Show hint immediately when connecting so user knows to check toolbar */}
                         {loadingKey?.startsWith("builder-") && (
                             <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
-                                Check your browser toolbar — the wallet popup may be waiting for your approval.
+                                {isMobile
+                                    ? "Menunggu konfirmasi dari wallet — pastikan aplikasi wallet kamu terbuka."
+                                    : "Check your browser toolbar — the wallet popup may be waiting for your approval."}
                             </p>
                         )}
                         {!loadingKey && (
@@ -500,7 +487,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
                         {loadingKey?.startsWith("recruiter-") && (
                             <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
-                                Check your browser toolbar — the wallet popup may be waiting for your approval.
+                                {isMobile
+                                    ? "Menunggu konfirmasi dari wallet — pastikan aplikasi wallet kamu terbuka."
+                                    : "Check your browser toolbar — the wallet popup may be waiting for your approval."}
                             </p>
                         )}
                         {!loadingKey?.startsWith("recruiter-") && (

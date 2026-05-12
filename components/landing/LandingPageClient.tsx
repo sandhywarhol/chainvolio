@@ -1248,7 +1248,7 @@ export function LandingPageClient() {
 
                     <p className="text-white/40 text-[13px] md:text-xl font-normal max-w-[310px] sm:max-w-2xl mb-10 sm:mb-12 leading-relaxed mx-auto">
                         Signed by real people. Anchored on Solana.<br />
-                        Cryptographically verified.
+                        Cryptographically verified. Share anywhere with one link.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
@@ -1994,7 +1994,7 @@ export function LandingPageClient() {
                             </h2>
                             <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Signed by real people. Anchored on Solana.<br />
-                                Cryptographically verified.
+                                Cryptographically verified. Share anywhere with one link.
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 px-4">
