@@ -56,6 +56,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { Web3ResumeSection } from "./Web3ResumeSection";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 // --- Interactive Verifiable Work History Flow (3D Chip Style) ---
 function VerifiableWorkHistoryFlow() {
@@ -103,10 +104,13 @@ function VerifiableWorkHistoryFlow() {
                                         animate={{ y: isHovered ? -10 : 0, rotateX: isHovered ? 0 : 8, rotateY: isHovered ? 0 : -10, scale: isHovered ? 1.1 : 1 }}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         style={{ perspective: "600px", transformStyle: "preserve-3d" }}>
-                                        <div style={{ position: "absolute", width: chipW, height: chipH, top: "7px", left: "5px", borderRadius: r, background: "#010101", border: "1px solid rgba(255,255,255,0.02)" }} />
-                                        <div style={{ position: "absolute", width: chipW, height: chipH, top: "3px", left: "2px", borderRadius: r, background: "#060606", border: "1px solid rgba(255,255,255,0.04)" }} />
                                         <motion.div
-                                            animate={{ borderColor: isActive ? node.color + "55" : "rgba(255,255,255,0.09)", boxShadow: isHovered ? `0 0 30px ${node.color}40, 0 14px 44px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)` : "0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)" }}
+                                            animate={{
+                                                borderColor: isActive ? node.color + "55" : "rgba(255,255,255,0.09)",
+                                                boxShadow: isHovered
+                                                    ? `0 0 40px ${node.color}30, 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)`
+                                                    : "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
+                                            }}
                                             transition={{ duration: 0.2 }}
                                             className="relative flex items-center justify-center overflow-hidden"
                                             style={{ width: chipW, height: chipH, borderRadius: r, background: "linear-gradient(145deg, #1e1e1e 0%, #0e0e0e 100%)", border: "1px solid rgba(255,255,255,0.09)" }}>
@@ -117,10 +121,10 @@ function VerifiableWorkHistoryFlow() {
                                         </motion.div>
                                     </motion.div>
                                     <motion.div animate={{ opacity: isHovered ? 1 : 0.35, scaleX: isHovered ? 1.4 : 0.85 }} transition={{ duration: 0.25 }} className="pointer-events-none" style={{ width: "100%", height: "10px", marginTop: "6px", background: isActive ? `radial-gradient(ellipse at center, ${node.color}45 0%, transparent 70%)` : "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, transparent 70%)", filter: "blur(4px)" }} />
-                                    <motion.div animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 5 }} transition={{ duration: 0.15 }} className="absolute -bottom-10 flex flex-col items-center pointer-events-none whitespace-nowrap">
-                                        <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: node.color }}>{node.label}</span>
+                                    <div className="absolute -bottom-10 flex flex-col items-center pointer-events-none whitespace-nowrap">
+                                        <span className="text-[10px] font-bold tracking-widest uppercase text-white/60">{node.label}</span>
                                         <span className="text-[9px] text-white/30 tracking-wider mt-0.5">{node.sublabel}</span>
-                                    </motion.div>
+                                    </div>
                                 </div>
                                 {i < nodes.length - 1 && (
                                     <div className="relative flex-1 h-6 flex items-center mx-1 overflow-visible">
@@ -159,8 +163,8 @@ function VerifiableWorkHistoryFlow() {
                                         </div>
                                     </div>
                                     <div className="absolute -bottom-14 w-28 text-center pointer-events-none">
-                                        <p className="text-[10px] font-bold text-white uppercase tracking-wider">{node.label}</p>
-                                        <p className="text-[9px] text-white/40 uppercase tracking-tight">{node.sublabel}</p>
+                                        <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider">{node.label}</p>
+                                        <p className="text-[9px] text-white/30 uppercase tracking-tight">{node.sublabel}</p>
                                     </div>
                                 </div>
                                 {i < nodes.length - 1 && (
@@ -562,7 +566,7 @@ function AttestationBlock() {
                         Verifiable Work History with On-Chain Attestations
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Proof of work,<br /><span className="text-white/30">not claims.</span>
+                        Proof of work,<br /><span className="text-white/30 theme-cyan-accent">not claims.</span>
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
@@ -605,7 +609,7 @@ function AttestationBlock() {
 
             {/* Right — Linear-style horizontal carousel */}
             <div className="theme-preserve flex flex-col gap-8">
-                <div className="relative overflow-hidden" style={{ height: "560px" }}
+                <div className="relative" style={{ height: "560px" }}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
                 >
@@ -629,16 +633,6 @@ function AttestationBlock() {
                             </motion.div>
                         );
                     })}
-
-                    {/* Left edge fade */}
-                    <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to right, #0D0D0D, transparent)" }} />
-                    {/* Right edge fade */}
-                    <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to left, #0D0D0D, transparent)" }} />
-                    {/* Bottom fade */}
-                    <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-40"
-                        style={{ background: "linear-gradient(to top, #0D0D0D, transparent)" }} />
 
                     {/* Dot indicators */}
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50">
@@ -996,7 +990,7 @@ function HiringBlock() {
                         How to Hire Verified Web3 Talent
                     </p>
                     <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
-                        Hire based on real proof,<br /><span className="text-white/30">not profiles.</span>
+                        Hire based on real proof,<br /><span className="text-white/30 theme-cyan-accent">not profiles.</span>
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10" />
                     <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
@@ -1048,7 +1042,7 @@ const SLIDES = [
     { src: "/homepage/image%20slide%202/dashboard%202.svg", label: "Recruiter dashboard" },
     { src: "/homepage/image%20slide%202/edit%20profile%202.svg", label: "Profile customization" },
     { src: "/homepage/image%20slide%202/proof%20of%20work%202.svg", label: "Verifiable work" },
-    { src: "/homepage/image%20slide%202/apply.svg", label: "Talent application" },
+    { src: "/homepage/image%20slide%202/apply%20(2).png", label: "Talent application" },
     { src: "/homepage/image%20slide%202/attestation.svg", label: "On-chain attestations" },
     { src: "/homepage/image%20slide%202/status.svg", label: "Verification status" },
 ];
@@ -1077,7 +1071,18 @@ export function LandingPageClient() {
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const heroVideoRef = useRef<HTMLVideoElement>(null);
     const searchParams = useSearchParams();
+    const { theme } = useTheme();
     const router = useRouter();
+
+    const filteredSlides = theme === 'light'
+        ? SLIDES.filter(s => !s.src.includes('apply'))
+        : SLIDES;
+
+    useEffect(() => {
+        if (currentSlide >= filteredSlides.length) {
+            setCurrentSlide(0);
+        }
+    }, [theme, filteredSlides.length, currentSlide]);
 
     useEffect(() => {
         if (heroVideoRef.current) {
@@ -1142,10 +1147,10 @@ export function LandingPageClient() {
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+            setCurrentSlide((prev) => (prev + 1) % filteredSlides.length);
         }, 5000);
         return () => clearInterval(timer);
-    }, []);
+    }, [filteredSlides.length]);
 
     // Auto-slide for Problem Carousel on Mobile
     useEffect(() => {
@@ -1192,7 +1197,7 @@ export function LandingPageClient() {
                 {/* HERO SECTION */}
                 <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                        <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent opacity-80">
+                        <span className="text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap theme-cyan-badge-text">
                             Trust layer for Web3
                         </span>
                     </div>
@@ -1200,7 +1205,7 @@ export function LandingPageClient() {
                     <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
                         <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
                         <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className="text-white">That Recruiters Trust.</span>
+                            Resume <span className="text-white theme-cyan-accent">That Recruiters Trust.</span>
                         </span>
                     </h1>
 
@@ -1226,9 +1231,9 @@ export function LandingPageClient() {
 
                     {/* HERO VISUAL - Clean Slide Preview */}
                     <div className="relative w-full max-w-4xl mx-auto group mt-0 sm:-mt-12 pt-4 pb-4 px-4 sm:px-0">
-                        <div className="relative overflow-hidden transition-all duration-1000">
+                        <div className="relative overflow-hidden transition-all duration-1000" style={{ clipPath: "inset(0 0 5% 0)" }}>
                             <div className="aspect-[14/10] sm:aspect-[16/10] relative min-h-[160px] sm:min-h-[220px] scale-[0.85] sm:scale-100">
-                                {SLIDES.map((slide, index) => (
+                                {filteredSlides.map((slide, index) => (
                                     <div
                                         key={index}
                                         className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
@@ -1238,7 +1243,7 @@ export function LandingPageClient() {
                                             src={slide.src}
                                             alt={slide.label}
                                             fill
-                                            className="object-contain"
+                                            className="object-contain drop-shadow-lg"
                                             priority={index === 0}
                                         />
                                     </div>
@@ -1251,8 +1256,8 @@ export function LandingPageClient() {
                                     dragConstraints={{ left: 0, right: 0 }}
                                     dragElastic={0.2}
                                     onDragEnd={(e: any, info: any) => {
-                                        if (info.offset.x < -40) setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
-                                        if (info.offset.x > 40) setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+                                        if (info.offset.x < -40) setCurrentSlide((prev) => (prev + 1) % filteredSlides.length);
+                                        if (info.offset.x > 40) setCurrentSlide((prev) => (prev - 1 + filteredSlides.length) % filteredSlides.length);
                                     }}
                                 />
 
@@ -1265,7 +1270,7 @@ export function LandingPageClient() {
                         {/* Slide Caption & Navigation */}
                         <div className="mt-2 sm:mt-4 space-y-4 sm:space-y-6 flex flex-col items-center">
                             <div className="h-10 relative w-full flex justify-center">
-                                {SLIDES.map((slide, index) => (
+                                {filteredSlides.map((slide, index) => (
                                     <div
                                         key={index}
                                         className={`absolute transition-all duration-700 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
@@ -1281,12 +1286,12 @@ export function LandingPageClient() {
 
                             {/* Dot Indicators */}
                             <div className="flex items-center gap-3">
-                                {SLIDES.map((_, index) => (
+                                {filteredSlides.map((_, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setCurrentSlide(index)}
-                                        className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide
-                                                ? "w-8 bg-white"
+                                        className={`h-1.5 rounded-full transition-all duration-300 theme-dot-indicator ${index === currentSlide
+                                                ? "w-8 bg-white active"
                                                 : "w-1.5 bg-white/20 hover:bg-white/40"
                                             }`}
                                         aria-label={`Go to slide ${index + 1}`}
@@ -1337,9 +1342,9 @@ export function LandingPageClient() {
                             </p>
 
                             <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
-                                Your work is real. <span className="text-white/30">Your proof isn&apos;t.</span>
+                                Your work is real. <span className="text-white/30 theme-cyan-accent">Your proof isn&apos;t.</span>
                             </h2>
-                            <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12" />
+                            <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12 theme-border-base" />
 
 
 
@@ -1356,11 +1361,11 @@ export function LandingPageClient() {
                         {/* BENTO CARDS SECTION - Minimal Editorial Style (Light) */}
                         <div className="relative mt-14 pb-12 -mx-4 sm:mx-0 overflow-hidden">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing relative z-30"
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y md:cursor-default cursor-grab active:cursor-grabbing relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
-                                drag="x"
+                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
                                 dragConstraints={{ left: -1000, right: 1000 }}
                                 dragElastic={0.2}
                                 onDragEnd={(e: any, info: any) => {
@@ -1402,8 +1407,14 @@ export function LandingPageClient() {
                                 ].map((item, idx) => (
                                     <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
                                         <div className="flex items-start gap-6">
-                                            <div className="w-14 h-14 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
-                                                <item.icon size={20} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl ${
+                                                theme === 'light'
+                                                ? 'bg-brand-cyan border border-brand-cyan shadow-cyan-900/10 theme-preserve'
+                                                : 'bg-white/10 group-hover:bg-white border border-white/10 shadow-black/5'
+                                            }`}>
+                                                <item.icon size={20} className={`transition-colors duration-500 ${
+                                                    theme === 'light' ? 'text-white' : 'text-white/60 group-hover:text-black'
+                                                }`} />
                                             </div>
 
                                             <div className="space-y-4">
@@ -1421,7 +1432,7 @@ export function LandingPageClient() {
 
                                         {/* Vertical Separator */}
                                         {idx > 0 && idx < 3 && (
-                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
                                         )}
                                     </div>
                                 ))}
@@ -1463,9 +1474,9 @@ export function LandingPageClient() {
 
                                     <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                         One trust layer.<br />
-                                        <span className="text-white/30">Everything connects.</span>
+                                        <span className="text-white/30 theme-cyan-accent">Everything connects.</span>
                                     </h2>
-                                    <div className="h-px w-full max-w-6xl bg-white/10" />
+                                    <div className="h-px w-full max-w-6xl bg-white/10 theme-border-base" />
 
                                     <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
                                         Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
@@ -1488,7 +1499,7 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808]">
+                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808] theme-bg-section2">
 
                                 {/* Title Overlay */}
                                 <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
@@ -1496,18 +1507,18 @@ export function LandingPageClient() {
                                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
                                 </div>
                                 <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70]" />
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
                                 </div>
 
                                 {/* Top/Bottom Gradients to mask clipping */}
-                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none" />
-                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none" />
+                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
+                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
 
                                 {/* Floating Stats Overlay — Refined Metrics */}
-                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-[#080808]/60 backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-[#080808]/80 whitespace-nowrap">
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05] whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] tracking-tight">Low-cost attestations (~$0.001)</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <div className="flex flex-col gap-0.5">
@@ -1521,11 +1532,11 @@ export function LandingPageClient() {
                         {/* Features Row — Infinite Carousel on Mobile */}
                         <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing relative z-30"
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y md:cursor-default cursor-grab active:cursor-grabbing relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
-                                drag="x"
+                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
                                 dragConstraints={{ left: -1000, right: 1000 }}
                                 dragElastic={0.2}
                                 onDragEnd={(e: any, info: any) => {
@@ -1584,7 +1595,7 @@ export function LandingPageClient() {
 
                                         {/* Vertical Separator */}
                                         {i > 0 && i < 3 && (
-                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
                                         )}
                                     </div>
                                 ))}
@@ -1630,7 +1641,7 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
-                <section id="problems" className="theme-preserve py-16 sm:py-20 md:py-24 relative z-10 bg-black overflow-hidden">
+                <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
                     {/* ── Top text block ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
@@ -1645,7 +1656,7 @@ export function LandingPageClient() {
                                 </p>
                                 <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
                                     From Noise to<br />
-                                    <span className="text-white/30">Verifiable Signal</span>
+                                    <span className="theme-cyan-accent">Verifiable Signal</span>
                                 </h2>
                             </div>
                         </div>
@@ -1664,17 +1675,11 @@ export function LandingPageClient() {
                         <SignalNoiseVisual />
 
                         {/* Radial vignette — lines fade at edges */}
-                        <div className="absolute inset-0 pointer-events-none z-10"
-                            style={{ background: "radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #000 92%)" }}
-                        />
+                        <div className="absolute inset-0 pointer-events-none z-10 theme-signal-vignette" />
 
-                        {/* Top + bottom black bleed so canvas merges with section bg */}
-                        <div className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10"
-                            style={{ background: "linear-gradient(to bottom, black, transparent)" }}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
-                            style={{ background: "linear-gradient(to top, black, transparent)" }}
-                        />
+                        {/* Top + bottom bleed so canvas merges with section bg */}
+                        <div className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10 theme-signal-fade-to" />
+                        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10 theme-signal-fade-from" />
 
                         {/* ── Central Logo Node ── */}
                         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
@@ -1716,18 +1721,20 @@ export function LandingPageClient() {
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
-                        <div className="theme-preserve relative overflow-hidden">
+                        <div className="relative overflow-hidden">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.05] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.05] md:gap-px"
+                                className="flex md:grid md:grid-cols-3 w-full md:bg-white/[0.08] md:rounded-2xl md:overflow-hidden md:border md:border-white/[0.08] md:gap-px"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
-                                drag="x"
+                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.7}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -30) handleSolutionLoop(solutionIdx + 1);
-                                    else if (info.offset.x > 30) handleSolutionLoop(solutionIdx - 1);
+                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                                        if (info.offset.x < -30) handleSolutionLoop(solutionIdx + 1);
+                                        else if (info.offset.x > 30) handleSolutionLoop(solutionIdx - 1);
+                                    }
                                 }}
                             >
                                 {[
