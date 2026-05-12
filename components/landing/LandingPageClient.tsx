@@ -1365,7 +1365,7 @@ export function LandingPageClient() {
                         {/* BENTO CARDS SECTION - Minimal Editorial Style (Light) */}
                         <div className="relative mt-14 pb-12 -mx-4 sm:mx-0 overflow-hidden">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y md:cursor-default cursor-grab active:cursor-grabbing relative z-30"
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
@@ -1373,8 +1373,10 @@ export function LandingPageClient() {
                                 dragConstraints={{ left: -1000, right: 1000 }}
                                 dragElastic={0.2}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -40) handleProblemLoop(problemIdx + 1);
-                                    else if (info.offset.x > 40) handleProblemLoop(problemIdx - 1);
+                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                                        if (info.offset.x < -40) handleProblemLoop(problemIdx + 1);
+                                        else if (info.offset.x > 40) handleProblemLoop(problemIdx - 1);
+                                    }
                                 }}
                             >
                                 {[
@@ -1536,7 +1538,7 @@ export function LandingPageClient() {
                         {/* Features Row — Infinite Carousel on Mobile */}
                         <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
                             <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y md:cursor-default cursor-grab active:cursor-grabbing relative z-30"
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
                                 transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
                                 onAnimationComplete={onAnimationComplete}
@@ -1544,8 +1546,10 @@ export function LandingPageClient() {
                                 dragConstraints={{ left: -1000, right: 1000 }}
                                 dragElastic={0.2}
                                 onDragEnd={(e: any, info: any) => {
-                                    if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
-                                    else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
+                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                                        if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
+                                        else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
+                                    }
                                 }}
                             >
                                 {[
