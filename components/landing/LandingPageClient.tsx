@@ -1494,193 +1494,6 @@ export function LandingPageClient() {
                     </div>
                 </section>
 
-                {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
-
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
-
-                            {/* Left: Content Block */}
-                            <div className="space-y-6 md:space-y-12">
-                                <div className="space-y-3 md:space-y-6">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">Why ChainVolio</span>
-                                    </div>
-
-                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                        How On-Chain Attestations Work
-                                    </p>
-
-                                    <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-                                        One trust layer.<br />
-                                        <span className="text-amber-200/60">Everything connects.</span>
-                                    </h2>
-                                    <div className="h-px w-full max-w-6xl bg-white/10 theme-border-base" />
-
-                                    <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
-                                        Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-wrap gap-8 items-center">
-                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white transition-colors group">
-                                        Explore the architecture
-                                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Built on</span>
-                                        <div className="flex items-center gap-2 px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05]">
-                                            <div className="w-2 h-2 rounded-full bg-[#0d9488]" />
-                                            <span className="text-[9px] font-bold text-white/60">SOLANA</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808] theme-bg-section2">
-
-                                {/* Title Overlay */}
-                                <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
-                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
-                                </div>
-                                <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
-                                </div>
-
-                                {/* Top/Bottom Gradients to mask clipping */}
-                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
-                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
-
-                                {/* Floating Stats Overlay — Refined Metrics */}
-                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05] whitespace-nowrap">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
-                                    </div>
-                                    <div className="w-px h-6 bg-white/10" />
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
-                            <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
-                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
-                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
-                                onAnimationComplete={onAnimationComplete}
-                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
-                                dragConstraints={{ left: -1000, right: 1000 }}
-                                dragElastic={0.2}
-                                onDragEnd={(e: any, info: any) => {
-                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                                        if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
-                                        else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
-                                    }
-                                }}
-                            >
-                                {[
-                                    {
-                                        id: "03",
-                                        title: "Portable Trust",
-                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        icon: Globe,
-                                    },
-                                    {
-                                        id: "01",
-                                        title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
-                                        icon: Activity,
-                                    },
-                                    {
-                                        id: "02",
-                                        title: "Claims to Proof",
-                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
-                                        icon: ShieldCheck,
-                                    },
-                                    {
-                                        id: "03",
-                                        title: "Portable Trust",
-                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        icon: Globe,
-                                    },
-                                    {
-                                        id: "01",
-                                        title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
-                                        icon: Activity,
-                                    },
-                                ].map((feature, i) => (
-                                    <div
-                                        key={i}
-                                        className={`p-6 bg-transparent transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
-                                    >
-                                        <div className="space-y-4 relative z-10">
-                                            <span className="text-[10px] font-black text-white/25 tracking-widest">{feature.id}</span>
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2.5">
-                                                    <feature.icon size={16} className="text-white/50 flex-shrink-0" />
-                                                    <h3 className="text-xl font-bold text-[#fde68a99]">{feature.title}</h3>
-                                                </div>
-                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
-                                                    {feature.desc}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Vertical Separator */}
-                                        {i > 0 && i < 3 && (
-                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
-                                        )}
-                                    </div>
-                                ))}
-                            </motion.div>
-
-                            {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50 mb-6">
-                                {[0, 1, 2].map((i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleWhyLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${(whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4))
-                                                ? "w-8 bg-white"
-                                                : "w-1.5 bg-white/20"
-                                            }`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Founder Quote */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="max-w-2xl mx-auto mt-8 md:mt-12 text-center px-6"
-                        >
-                            <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
-                            <p className="text-sm md:text-base text-white/50 italic leading-relaxed mb-6 font-normal">
-                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
-                            </p>
-                            <div className="flex flex-col items-center gap-1">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
-                                <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Founder Chainvolio</span>
-                            </div>
-                        </motion.div>
-                    </div>
-                </section>
-
-
-                {/* DIVIDER: why → black */}
-                <div className="h-px w-full bg-black/10" />
-
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
@@ -1862,6 +1675,193 @@ export function LandingPageClient() {
                         </div>
                     </div>
 
+                </section>
+
+
+                {/* DIVIDER: why → black */}
+                <div className="h-px w-full bg-black/10" />
+
+                {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
+
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
+                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
+
+                            {/* Left: Content Block */}
+                            <div className="space-y-6 md:space-y-12">
+                                <div className="space-y-3 md:space-y-6">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">Why ChainVolio</span>
+                                    </div>
+
+                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                        How On-Chain Attestations Work
+                                    </p>
+
+                                    <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                        One trust layer.<br />
+                                        <span className="text-amber-200/60">Everything connects.</span>
+                                    </h2>
+                                    <div className="h-px w-full max-w-6xl bg-white/10 theme-border-base" />
+
+                                    <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
+                                        Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-wrap gap-8 items-center">
+                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white transition-colors group">
+                                        Explore the architecture
+                                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Built on</span>
+                                        <div className="flex items-center gap-2 px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05]">
+                                            <div className="w-2 h-2 rounded-full bg-[#0d9488]" />
+                                            <span className="text-[9px] font-bold text-white/60">SOLANA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Globe Visual — Aligned with text height */}
+                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808] theme-bg-section2">
+
+                                {/* Title Overlay */}
+                                <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
+                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
+                                </div>
+                                <div className="flex-1 relative z-10 w-full">
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
+                                </div>
+
+                                {/* Top/Bottom Gradients to mask clipping */}
+                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
+                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
+
+                                {/* Floating Stats Overlay — Refined Metrics */}
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05] whitespace-nowrap">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
+                                    </div>
+                                    <div className="w-px h-6 bg-white/10" />
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Features Row — Infinite Carousel on Mobile */}
+                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
+                            <motion.div
+                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
+                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
+                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+                                onAnimationComplete={onAnimationComplete}
+                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
+                                dragConstraints={{ left: -1000, right: 1000 }}
+                                dragElastic={0.2}
+                                onDragEnd={(e: any, info: any) => {
+                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                                        if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
+                                        else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
+                                    }
+                                }}
+                            >
+                                {[
+                                    {
+                                        id: "03",
+                                        title: "Portable Trust",
+                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                        icon: Globe,
+                                    },
+                                    {
+                                        id: "01",
+                                        title: "Beyond Profiles",
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
+                                        icon: Activity,
+                                    },
+                                    {
+                                        id: "02",
+                                        title: "Claims to Proof",
+                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
+                                        icon: ShieldCheck,
+                                    },
+                                    {
+                                        id: "03",
+                                        title: "Portable Trust",
+                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
+                                        icon: Globe,
+                                    },
+                                    {
+                                        id: "01",
+                                        title: "Beyond Profiles",
+                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
+                                        icon: Activity,
+                                    },
+                                ].map((feature, i) => (
+                                    <div
+                                        key={i}
+                                        className={`p-6 bg-transparent transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
+                                    >
+                                        <div className="space-y-4 relative z-10">
+                                            <span className="text-[10px] font-black text-white/25 tracking-widest">{feature.id}</span>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2.5">
+                                                    <feature.icon size={16} className="text-white/50 flex-shrink-0" />
+                                                    <h3 className="text-xl font-bold text-[#fde68a99]">{feature.title}</h3>
+                                                </div>
+                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+                                                    {feature.desc}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Vertical Separator */}
+                                        {i > 0 && i < 3 && (
+                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
+                                        )}
+                                    </div>
+                                ))}
+                            </motion.div>
+
+                            {/* Mobile Pagination Dots */}
+                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50 mb-6">
+                                {[0, 1, 2].map((i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleWhyLoop(i + 1)}
+                                        className={`h-1 rounded-full transition-all duration-300 ${(whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4))
+                                                ? "w-8 bg-white"
+                                                : "w-1.5 bg-white/20"
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Founder Quote */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="max-w-2xl mx-auto mt-8 md:mt-12 text-center px-6"
+                        >
+                            <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
+                            <p className="text-sm md:text-base text-white/50 italic leading-relaxed mb-6 font-normal">
+                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
+                            </p>
+                            <div className="flex flex-col items-center gap-1">
+                                <span className="text-[10px] md:text-[11px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Founder Chainvolio</span>
+                            </div>
+                        </motion.div>
+                    </div>
                 </section>
 
                 <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black theme-bg-page">
