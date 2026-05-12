@@ -6,26 +6,15 @@ import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Toast } from "@/components/ui/Toast";
+import { ShareModal } from "@/components/ui/ShareModal";
 import { ArrowLeft, ArrowRight, Clock, Calendar, User, Share2, Bookmark } from "lucide-react";
 
 export default function BlogPostPage() {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     const handleShare = () => {
-        const shareData = {
-            title: "What Recruiters Look for in Web3 Talent | ChainVolio",
-            text: "Discover what Web3 recruiters actually look for when hiring talent.",
-            url: typeof window !== 'undefined' ? window.location.href : '',
-        };
-
-        if (navigator.share) {
-            navigator.share(shareData).catch((err) => {
-                if (err.name !== 'AbortError') console.error("Error sharing:", err);
-            });
-        } else {
-            navigator.clipboard.writeText(shareData.url);
-            setToast({ message: "Link copied to clipboard!", type: 'success' });
-        }
+        setIsShareModalOpen(true);
     };
 
     const handleBookmark = () => {
@@ -221,6 +210,13 @@ export default function BlogPostPage() {
             </div>
 
             <Footer />
+
+            <ShareModal 
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                title="What Recruiters Look for in Web3 Talent"
+                url={typeof window !== 'undefined' ? window.location.href : ''}
+            />
 
             {toast && (
                 <Toast
