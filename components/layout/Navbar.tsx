@@ -172,7 +172,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
                     {/* Desktop Wallet & Global Notification Bell */}
                     <div className="hidden md:flex items-center gap-2">
-                        <ThemeToggle />
+                        {/* <ThemeToggle /> */}
                         <WalletMultiButton />
                     </div>
                     
