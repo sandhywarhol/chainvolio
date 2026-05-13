@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
+ 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // Skill keywords per category tab
 const CATEGORY_SKILLS: Record<string, string[]> = {
@@ -12,7 +15,9 @@ const CATEGORY_SKILLS: Record<string, string[]> = {
 };
 
 export async function GET(req: NextRequest) {
-    if (!supabase) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    if (!supabase) {
+        return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    }
 
     const { searchParams } = new URL(req.url);
     const page          = Math.max(1, parseInt(searchParams.get("page") || "1"));
@@ -33,8 +38,7 @@ export async function GET(req: NextRequest) {
         // ── 1. Fetch profiles matching search / workType filters ──────────────
         let profileQuery = supabase
             .from("profiles")
-            .select("wallet_address, display_name, bio, skills, work_preference, avatar_url, professional_role, organization, card_number, country, created_at")
-            .is("is_test", null);          // exclude test accounts
+            .select("*");
 
         if (search) {
             profileQuery = profileQuery.or(
@@ -52,6 +56,7 @@ export async function GET(req: NextRequest) {
 
         const { data: rawProfiles, error: profileError } = await profileQuery;
         if (profileError) throw profileError;
+
         if (!rawProfiles?.length) {
             return NextResponse.json({ talents: [], total: 0, page, totalPages: 0 });
         }
@@ -173,6 +178,7 @@ export async function GET(req: NextRequest) {
                 successRate,
                 // Badge
                 status,
+                is_test: p.is_test
             };
         });
 
@@ -189,26 +195,61 @@ export async function GET(req: NextRequest) {
             talents = talents.filter((t) => t.isVerified);
         }
 
+        // ── 8c. Re-enable test filter (relaxed) ─────────────────────────────
+        talents = talents.filter(t => t.is_test !== true);
+
         // ── 9. Sort ───────────────────────────────────────────────────────────
+        const sortTalents = (a: any, b: any) => {
+            // 1. Avatar priority
+            const hasAvatarA = !!a.avatarUrl;
+            const hasAvatarB = !!b.avatarUrl;
+            if (hasAvatarA !== hasAvatarB) return hasAvatarA ? -1 : 1;
+
+            // 2. Skills priority
+            const hasSkillsA = a.skills.length > 0;
+            const hasSkillsB = b.skills.length > 0;
+            if (hasSkillsA !== hasSkillsB) return hasSkillsA ? -1 : 1;
+
+            // 3. Score priority (descending)
+            return b.totalScore - a.totalScore;
+        };
+
         if (sort === "score_asc") {
             talents.sort((a, b) => a.totalScore - b.totalScore);
         } else if (sort === "newest") {
             talents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } else {
-            // score_desc (default)
-            talents.sort((a, b) => b.totalScore - a.totalScore);
+            // default: Highest Score (with Avatar & Skills priority)
+            talents.sort(sortTalents);
         }
 
-        // ── 10. Paginate ──────────────────────────────────────────────────────
-        const total      = talents.length;
-        const totalPages = Math.ceil(total / limit);
-        const offset     = (page - 1) * limit;
-        const paginated  = talents.slice(offset, offset + limit);
+        // ── 10. Split & Paginate ──────────────────────────────────────────────
+        const isOrg = (t: any) => t.verificationType === 'Company / Organization' || t.verificationType === 'Community / DAO';
+        const individuals = talents.filter(t => !isOrg(t));
+        const organizations = talents.filter(t => isOrg(t));
 
-        return NextResponse.json({ talents: paginated, total, page, totalPages });
+        // Limit is 8, so we do 4 and 4
+        const halfLimit = Math.floor(limit / 2);
+        const offset = (page - 1) * halfLimit;
+
+        const paginatedIndividuals = individuals.slice(offset, offset + halfLimit);
+        const paginatedOrganizations = organizations.slice(offset, offset + halfLimit);
+
+        const total = individuals.length + organizations.length;
+        const totalPages = Math.max(
+            Math.ceil(individuals.length / halfLimit),
+            Math.ceil(organizations.length / halfLimit)
+        );
+
+        return NextResponse.json({ 
+            talents: paginatedIndividuals, 
+            organizations: paginatedOrganizations,
+            total, 
+            page, 
+            totalPages 
+        });
 
     } catch (err: any) {
-        console.error("[explore-talent]", err);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

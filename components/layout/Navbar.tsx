@@ -126,6 +126,13 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={devItems}
                         />
 
+                        <Link
+                            href="/explore-talent"
+                            className={`transition-colors py-2 ${isActive('/explore-talent') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
+                        >
+                            Explore Talent
+                        </Link>
+
                         {(publicKey || isGoogleSignedIn) && (
                             <Link
                                 href="/dashboard"
@@ -269,6 +276,12 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                     label="Developer" 
                                                     hasSubmenu
                                                     onClick={() => setActiveMobilePanel('developer')} 
+                                                />
+                                                <MobileNavLink 
+                                                    href="/explore-talent" 
+                                                    icon={<LayoutGrid className="w-5 h-5 text-amber-200/60" />} 
+                                                    label="Explore Talent" 
+                                                    onClick={() => setIsMobileMenuOpen(false)} 
                                                 />
                                             </div>
                                         </div>

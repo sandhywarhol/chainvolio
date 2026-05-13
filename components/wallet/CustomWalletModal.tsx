@@ -476,9 +476,9 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                                     </div>
                                 </div>
                                 <div className="shrink-0 ml-2">
-                                    <div className="px-3 py-1.5 bg-teal-500/10 group-hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all min-w-[60px] flex items-center justify-center">
+                                    <div className="px-3 py-1.5 bg-amber-200/10 group-hover:bg-amber-200/20 border border-amber-200/20 text-amber-200/60 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all min-w-[60px] flex items-center justify-center">
                                         {loadingKey === "google" ? (
-                                            <div className="w-3 h-3 border-2 border-teal-500/30 border-t-teal-400 rounded-full animate-spin" />
+                                            <div className="w-3 h-3 border-2 border-amber-200/30 border-t-amber-200/60 rounded-full animate-spin" />
                                         ) : "Sign In"}
                                     </div>
                                 </div>

@@ -78,12 +78,9 @@ export async function calculateScore(wallet_address: string, preFetchedData?: { 
       activity_score: result.breakdown.activity,
       level: result.level,
       domain_scores: result.domains,
-      top_domain: result.top_domain,
       activity_status: result.activity_status,
       confidence: result.confidence,
       confidence_label: result.confidence_label,
-      trust_score: result.trust_score,
-      reason: result.reason,
     }, { onConflict: "wallet_address" });
     
   if (error) {

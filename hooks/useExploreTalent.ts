@@ -45,11 +45,12 @@ export function useExploreTalent() {
     const [page, setPageState] = useState<number>(() =>
         parseInt(searchParams.get("page") || "1")
     );
-    const [talents,    setTalents]    = useState<TalentProfile[]>([]);
-    const [total,      setTotal]      = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-    const [loading,    setLoading]    = useState(true);
-    const [error,      setError]      = useState("");
+    const [talents,       setTalents]       = useState<TalentProfile[]>([]);
+    const [organizations, setOrganizations] = useState<TalentProfile[]>([]);
+    const [total,         setTotal]         = useState(0);
+    const [totalPages,    setTotalPages]    = useState(0);
+    const [loading,       setLoading]       = useState(true);
+    const [error,         setError]         = useState("");
 
     const searchDebounce = useRef<ReturnType<typeof setTimeout>>();
 
@@ -76,11 +77,13 @@ export function useExploreTalent() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Failed to fetch");
             setTalents(data.talents  || []);
+            setOrganizations(data.organizations || []);
             setTotal(data.total      || 0);
             setTotalPages(data.totalPages || 0);
         } catch (e: any) {
             setError(e.message || "Something went wrong.");
             setTalents([]);
+            setOrganizations([]);
         } finally {
             setLoading(false);
         }
@@ -149,7 +152,7 @@ export function useExploreTalent() {
 
     return {
         // Data
-        talents, total, totalPages, page, loading, error,
+        talents, organizations, total, totalPages, page, loading, error,
         // Filters
         filters, setFilter, setPage, clearFilters, hasFilters,
     };
