@@ -15,14 +15,19 @@ export async function GET(req: NextRequest) {
     if (!supabase) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
 
     const { searchParams } = new URL(req.url);
-    const page      = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit     = 8;
-    const search    = (searchParams.get("search") || "").trim();
-    const category  = (searchParams.get("category") || "all").toLowerCase();
-    const workType  = searchParams.get("workType") || "";
-    const minScore  = parseInt(searchParams.get("minScore") || "0");
-    const maxScore  = parseInt(searchParams.get("maxScore") || "100");
-    const sort      = searchParams.get("sort") || "score_desc";
+    const page          = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit         = 8;
+    const search        = (searchParams.get("search") || "").trim();
+    const category      = (searchParams.get("category") || "all").toLowerCase();
+    const workType      = searchParams.get("workType") || "";
+    const minScore      = parseInt(searchParams.get("minScore") || "0");
+    const maxScore      = parseInt(searchParams.get("maxScore") || "100");
+    const sort          = searchParams.get("sort") || "score_desc";
+    // Future filters (accepted now, wired when UI is ready)
+    const location      = (searchParams.get("location") || "").trim();
+    const ecosystem     = (searchParams.get("ecosystem") || "").trim();
+    const availableOnly = searchParams.get("availableOnly") === "true";
+    const verifiedOnly  = searchParams.get("verifiedOnly")  === "true";
 
     try {
         // ── 1. Fetch profiles matching search / workType filters ──────────────
@@ -39,6 +44,10 @@ export async function GET(req: NextRequest) {
 
         if (workType) {
             profileQuery = profileQuery.contains("work_preference", [workType]);
+        }
+
+        if (location) {
+            profileQuery = profileQuery.ilike("country", `%${location}%`);
         }
 
         const { data: rawProfiles, error: profileError } = await profileQuery;
@@ -168,10 +177,16 @@ export async function GET(req: NextRequest) {
         });
 
         // ── 8. Score-range filter ─────────────────────────────────────────────
-        const minS = (minScore / 100) * 100;  // already 0-100
-        const maxS = (maxScore / 100) * 100;
         if (minScore > 0 || maxScore < 100) {
             talents = talents.filter((t) => t.totalScore >= minScore && t.totalScore <= maxScore);
+        }
+
+        // ── 8b. Availability / verification filters ───────────────────────────
+        if (availableOnly) {
+            talents = talents.filter((t) => t.receiptCount > 0 || t.status === "available");
+        }
+        if (verifiedOnly) {
+            talents = talents.filter((t) => t.isVerified);
         }
 
         // ── 9. Sort ───────────────────────────────────────────────────────────
