@@ -1682,7 +1682,7 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
+                <section className="pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 md:pb-16 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
@@ -1850,14 +1850,14 @@ export function LandingPageClient() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="max-w-2xl mx-auto mt-8 md:mt-12 text-center px-6"
+                            className="max-w-2xl mx-auto mt-6 md:mt-8 text-center px-6"
                         >
                             <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
                             <p className="text-sm md:text-base text-white/50 italic leading-relaxed mb-6 font-normal">
                                 &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
                             </p>
                             <div className="flex flex-col items-center gap-1">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
+                                <span className="text-[9px] md:text-[10px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
                                 <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Founder Chainvolio</span>
                             </div>
                         </motion.div>
