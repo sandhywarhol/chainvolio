@@ -81,11 +81,11 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         } else if (connectionError === "extension_dead") {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
             const msg = isMobile
-                ? `${walletName} tidak merespons. Coba tutup dan buka kembali aplikasi ${walletName}, lalu coba lagi.`
-                : `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser untuk membangunkannya, lalu coba lagi.`;
+                ? `${walletName} is not responding. Try closing and reopening the ${walletName} app, then try again.`
+                : `${walletName} is not responding. Click the ${walletName} icon in your browser toolbar to wake it up, then try again.`;
             setToast({ message: msg, type: "error" });
         } else {
-            setToast({ message: "Koneksi gagal. Silakan coba lagi.", type: "error" });
+            setToast({ message: "Connection failed. Please try again.", type: "error" });
         }
         setLoadingKey(null);
     }, [connectionError, isMobile, loadingKey]);
@@ -97,8 +97,8 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         const timer = setTimeout(() => {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
             const msg = isMobile
-                ? `${walletName} tidak merespons. Coba tutup dan buka kembali aplikasi ${walletName}, lalu coba lagi.`
-                : `${walletName} tidak merespons. Klik ikon ${walletName} di toolbar browser, lalu coba lagi.`;
+                ? `${walletName} is not responding. Try closing and reopening the ${walletName} app, then try again.`
+                : `${walletName} is not responding. Click the ${walletName} icon in your browser toolbar, then try again.`;
             setToast({ message: msg, type: "error" });
             setLoadingKey(null);
         }, 20000);
@@ -398,7 +398,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         {loadingKey?.startsWith("builder-") && (
                             <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
                                 {isMobile
-                                    ? "Menunggu konfirmasi dari wallet — pastikan aplikasi wallet kamu terbuka."
+                                    ? "Waiting for wallet confirmation — make sure your wallet app is open."
                                     : "Check your browser toolbar — the wallet popup may be waiting for your approval."}
                             </p>
                         )}
@@ -488,7 +488,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         {loadingKey?.startsWith("recruiter-") && (
                             <p className="text-[9px] text-amber-400/70 text-center leading-relaxed">
                                 {isMobile
-                                    ? "Menunggu konfirmasi dari wallet — pastikan aplikasi wallet kamu terbuka."
+                                    ? "Waiting for wallet confirmation — make sure your wallet app is open."
                                     : "Check your browser toolbar — the wallet popup may be waiting for your approval."}
                             </p>
                         )}
