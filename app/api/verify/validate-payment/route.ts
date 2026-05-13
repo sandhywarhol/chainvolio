@@ -160,7 +160,7 @@ export async function POST(request: Request) {
 
         // ── Solana Evaluation ──
         try {
-            const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+            const rpcUrl = process.env.SOLANA_RPC || process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
             const connection = new Connection(rpcUrl, "finalized");
 
             let tx: Awaited<ReturnType<typeof connection.getParsedTransaction>> = null;

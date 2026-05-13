@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         // Verify the txSignature on-chain if provided
         if (!skipVerify && cleanTxSignature) {
             try {
-                const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+                const rpcUrl = process.env.SOLANA_RPC || process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
                 const connection = new Connection(rpcUrl, "confirmed");
 
                 // Wait/Poll for the transaction to be visible and confirmed by the RPC
