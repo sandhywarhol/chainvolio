@@ -84,7 +84,7 @@ export async function GET(
             .eq("wallet_address", address)
             .single();
 
-        if (cached && !isStale(cached.last_updated)) {
+        if (cached) {
             return corsJson({
                 wallet:          cached.wallet_address,
                 entity_type:     "individual",

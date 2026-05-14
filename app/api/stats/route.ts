@@ -64,13 +64,70 @@ export async function GET() {
             .select("*", { count: "exact", head: true })
             .in("status", ["Attested", "Verified", "verified"]);
 
+        // ─── 7. Verified Organization Specific Stats ──────────────────────────
+        // Only count stats for wallets that are actually verified as Company/DAO
+        const { data: verifiedOrgs } = await supabase
+            .from("organization_verifications")
+            .select("wallet_address")
+            .eq("status", "verified")
+            .in("type", ["Company / Organization", "Community / DAO"]);
+        
+        const orgWallets = (verifiedOrgs || []).map(v => v.wallet_address);
+        let orgOpportunities = 0;
+        let orgAttestations = 0;
+        let orgEndorsed = 0;
+
+        if (orgWallets.length > 0) {
+            // Sum of opportunities
+            const { count: oppCount } = await supabase
+                .from("hiring_collections")
+                .select("*", { count: "exact", head: true })
+                .in("owner_wallet", orgWallets);
+            orgOpportunities = oppCount || 0;
+
+            // Sum of attestations given
+            const { count: attCount } = await supabase
+                .from("attestations")
+                .select("*", { count: "exact", head: true })
+                .in("attester_wallet", orgWallets);
+            orgAttestations = attCount || 0;
+
+            // Sum of unique endorsed talents
+            const { data: endorsedData } = await supabase
+                .from("attestations")
+                .select("receipt_id")
+                .in("attester_wallet", orgWallets);
+            
+            const rIds = (endorsedData || []).map(d => d.receipt_id);
+            if (rIds.length > 0) {
+                const { data: recs } = await supabase
+                    .from("receipts")
+                    .select("wallet_address")
+                    .in("id", rIds);
+                orgEndorsed = new Set((recs || []).map(r => r.wallet_address)).size;
+            }
+        }
+
+        // 8. Total Skills (Unique across all profiles)
+        const { data: skillsData } = await supabase
+            .from("profiles")
+            .select("skills");
+        
+        const uniqueSkills = new Set(
+            (skillsData || [])
+                .flatMap(p => p.skills || [])
+                .filter(Boolean)
+        );
+
         return NextResponse.json({
             talents: talentsCount || 0,
             verified: verifiedCount || 0,
-            opportunities: opportunitiesCount || 0,
+            opportunities: orgOpportunities || 0, // Using org-specific count
             countries: uniqueCountries.size || 0,
             teamAvatars,
-            verifiedProofs: verifiedProofsCount || 0
+            verifiedProofs: orgAttestations || 0, // Using org-specific count
+            endorsedTalents: orgEndorsed || 0,     // Using org-specific count
+            skills: uniqueSkills.size || 0
         });
     } catch (err) {
         console.error("[stats-api]", err);

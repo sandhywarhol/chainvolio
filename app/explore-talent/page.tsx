@@ -8,7 +8,7 @@ import { useExploreTalent } from "@/hooks/useExploreTalent";
 import { CATEGORIES, WORK_TYPES, SORT_OPTIONS } from "@/types/explore";
 import {
     Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight,
-    Loader2, Users, X, Briefcase, ShieldCheck, Globe
+    Loader2, Users, X, Briefcase, ShieldCheck, Globe, BadgeCheck
 } from "lucide-react";
 import Link from "next/link";
 
@@ -132,7 +132,9 @@ function ExploreTalentInner() {
         opportunities: 0,
         countries: 0,
         teamAvatars: [] as string[],
-        verifiedProofs: 0
+        verifiedProofs: 0,
+        endorsedTalents: 0,
+        skills: 0
     });
 
     useEffect(() => {
@@ -224,9 +226,9 @@ function ExploreTalentInner() {
                     />
                     <StatCard 
                         icon={<Briefcase className="w-5 h-5 text-amber-200/60" />}
-                        value={`${stats.opportunities}+`}
-                        label="Opportunities"
-                        sub="Hiring links created"
+                        value={`${stats.skills}+`}
+                        label="Skills"
+                        sub="Verified expert skills"
                         color="amber"
                     />
                     <StatCard 
@@ -374,14 +376,57 @@ function ExploreTalentInner() {
                     {/* Organizations */}
                     {organizations.length > 0 && (
                         <div>
-                            <div className="mb-6">
-                                <div className="flex items-center gap-3 mb-1.5">
-                                    <div className="w-1 h-4 bg-indigo-400 rounded-full" />
-                                    <h2 className="text-xl font-bold text-white tracking-tight">Verified Organizations</h2>
+                            <div className="relative mb-12 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                                {/* Background Glow */}
+                                <div className="absolute -left-24 -top-24 w-64 h-64 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+                                
+                                <div className="relative space-y-4 max-w-2xl">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                        <ShieldCheck className="w-3.5 h-3.5 text-white/40" />
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Institutional Trust</span>
+                                    </div>
+                                    
+                                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1]">
+                                        Verified
+                                        <br />
+                                        <span className="text-amber-200/60">Organizations & DAOs</span>
+                                    </h2>
+                                    
+                                    <p className="text-white/40 text-sm md:text-base leading-relaxed">
+                                        Explore the backbone of the ecosystem. We verify protocols, DAOs, and service providers to ensure a high-trust professional network for everyone.
+                                    </p>
                                 </div>
-                                <p className="text-[12px] text-white/40 pl-4">
-                                    Explore verified companies, communities, and DAOs actively participating in the ecosystem.
-                                </p>
+
+                                {/* Stats Box */}
+                                <div className="relative flex flex-wrap gap-4 lg:mb-1">
+                                    <div className="w-full sm:w-auto min-w-[160px]">
+                                        <StatCard 
+                                            icon={<Briefcase className="w-5 h-5 text-amber-200/60" />}
+                                            value={`${stats.opportunities}`}
+                                            label="Opportunities"
+                                            sub="Created by orgs"
+                                            color="amber"
+                                        />
+                                    </div>
+                                    <div className="w-full sm:w-auto min-w-[160px]">
+                                        <StatCard 
+                                            icon={<ShieldCheck className="w-5 h-5 text-indigo-400" />}
+                                            value={`${stats.verifiedProofs}`}
+                                            label="Attestations"
+                                            sub="Given by orgs"
+                                            color="indigo"
+                                        />
+                                    </div>
+                                    <div className="w-full sm:w-auto min-w-[160px]">
+                                        <StatCard 
+                                            icon={<BadgeCheck className="w-5 h-5 text-emerald-400" />}
+                                            value={`${stats.endorsedTalents}`}
+                                            label="Endorsed"
+                                            sub="Unique talents"
+                                            color="emerald"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {organizations.map((org) => (

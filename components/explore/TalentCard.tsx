@@ -182,10 +182,10 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                     {/* View Profile */}
                     <Link
                         href={profileUrl}
-                        className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.07] hover:border-white/15 transition-all duration-200 text-[9px] font-bold uppercase tracking-widest text-white/35 hover:text-white/70 group/btn"
+                        className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl bg-white/[0.03] border border-white/10 hover:bg-white hover:text-black transition-all duration-300 text-[10px] font-bold uppercase tracking-widest group/btn shadow-xl active:scale-[0.98]"
                     >
                         View Profile
-                        <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                     </Link>
                 </div>
             </div>
@@ -226,7 +226,7 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                 </div>
 
                 {/* Avatar & Name */}
-                <div className="flex flex-col items-center text-center mb-6">
+                <div className="flex flex-col items-center text-center mb-4">
                     <div className="relative mb-3">
                         <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 bg-white/[0.05] shadow-2xl">
                             {talent.avatarUrl ? (
@@ -250,6 +250,9 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                         </h3>
                         <p className="text-[11px] font-medium text-white/40">
                             {talent.role || "Web3 Builder"}
+                        </p>
+                        <p className="mt-3 text-[11px] text-white/30 leading-relaxed line-clamp-2 max-w-[200px] mx-auto min-h-[2.2rem]">
+                            {talent.bio || "Active contributor building the future of the decentralized web."}
                         </p>
                     </div>
                 </div>
@@ -297,7 +300,7 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                 </div>
 
                 {/* Skills */}
-                <div className="flex flex-wrap justify-center gap-1.5 mb-8">
+                <div className="flex flex-wrap justify-center gap-1.5 mb-5">
                     {visibleSkills.map((skill) => (
                         <span key={skill} className="px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[10px] font-medium text-white/50">
                             {skill}
@@ -306,6 +309,19 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                     {talent.skills.length > 3 && (
                         <span className="text-[10px] text-white/20 font-bold ml-1">+{talent.skills.length - 3}</span>
                     )}
+                </div>
+
+                {/* Location & Timezone */}
+                <div className="flex items-center justify-center gap-3 text-[9px] text-white/20 font-bold uppercase tracking-widest mb-8">
+                    <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3 text-white/30" />
+                        <span className="truncate max-w-[80px]">{talent.country || "Global"}</span>
+                    </div>
+                    <div className="w-1 h-1 rounded-full bg-white/10" />
+                    <div className="flex items-center gap-1.5">
+                        <Globe className="w-3 h-3 text-white/30" />
+                        <span>GMT+7</span>
+                    </div>
                 </div>
 
                 {/* Footer Footer */}
@@ -330,10 +346,10 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                     </div>
                     <Link
                         href={profileUrl}
-                        className="h-10 w-full bg-white/[0.02] hover:bg-white/[0.08] border border-white/[0.05] hover:border-white/15 rounded-xl flex items-center justify-between px-4 transition-all duration-300 cursor-pointer"
+                        className="h-11 w-full bg-white/[0.03] hover:bg-white border border-white/10 hover:border-white rounded-xl flex items-center justify-between px-5 transition-all duration-300 cursor-pointer group/btn active:scale-[0.98] shadow-lg"
                     >
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/80 transition-colors">View Profile</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/80 group-hover:translate-x-1 transition-all duration-300" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-black transition-colors">View Profile</span>
+                        <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-black group-hover:translate-x-1 transition-all duration-300" />
                     </Link>
                 </div>
             </div>

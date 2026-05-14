@@ -88,6 +88,7 @@ export async function calculateScore(
             activity_status:      result.activity_status,
             confidence:           result.confidence,
             confidence_label:     result.confidence_label,
+            last_updated:         new Date().toISOString(),
         }, { onConflict: "wallet_address" });
 
     if (error) {

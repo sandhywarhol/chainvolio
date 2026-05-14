@@ -287,15 +287,9 @@ export async function GET(request: Request) {
     .eq("wallet_address", wallet)
     .maybeSingle();
 
-  // --- Merit-based Builder Auto-Verification & Cache Warmup ---
-  const { data: receipts } = await supabase
-    .from("receipts")
-    .select("id, role, description, start_date, end_date, status, attestation_type, tx_signature, created_at, updated_at")
-    .eq("wallet_address", wallet);
-
-  // Reuse pre-fetched data to recalculate score without extra DB hits
+  // Background score cache warmup — let calculateScore fetch its own data
   if (data) {
-     calculateScore(wallet, { profile: data, receipts: receipts || [] }).catch(err => {
+     calculateScore(wallet).catch(err => {
         console.error("Background score update failed:", err.message);
      });
   }
