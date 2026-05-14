@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         // Fetch all active verified orgs
         const { data: verifiedOrgs, error } = await supabaseServer
             .from("organization_verifications")
-            .select("wallet_address, type, tier, expires_at")
+            .select("wallet_address, type, verifier_tier, expires_at")
             .eq("status", "verified")
             .in("type", ORG_TYPES);
 
