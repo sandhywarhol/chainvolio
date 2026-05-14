@@ -36,12 +36,18 @@ export async function POST(request: Request) {
         // 1. Find collection ID & Filters (Do this early for signature context)
         const { data: collection, error: colError } = await supabase
             .from("hiring_collections")
-            .select("id, eligibility_filters, slug")
+            .select("id, eligibility_filters, slug, metadata")
             .eq("slug", collectionSlug)
             .single();
 
         if (colError || !collection) {
             return errorResponse("ERR_COLLECTION_NOT_FOUND", "The hiring collection does not exist", 404);
+        }
+
+        // 1b. Enforce submission deadline
+        const deadline = collection.metadata?.deadline;
+        if (deadline && new Date(deadline) < new Date()) {
+            return errorResponse("ERR_DEADLINE_PASSED", "This position is no longer accepting applications.", 403);
         }
 
         // --- 2. Advanced Rate Limiting (IP + Wallet Hybrid) ---

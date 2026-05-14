@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, Upload, Lock } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { Toast } from "@/components/ui/Toast";
 
 const WORK_TYPES = ["Full-time", "Part-time", "Contract", "Freelance", "Other"];
 const COMP_TYPES = ["Paid", "Unpaid", "Token", "Equity", "Other"];
@@ -23,10 +25,12 @@ type Props = {
 };
 
 export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }: Props) {
+  const router = useRouter();
   const { publicKey, signMessage } = useWallet();
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
 
   const isEditing = !!initialData?.id;
   const isLocked = initialData?.status === "Attested" || initialData?.status === "Locked";
@@ -47,7 +51,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
 
   const handleImageUpload = async (file: File) => {
     if (form.portfolioImages.length >= 5) {
-      alert("Maximum 5 images per receipt");
+      setToast({ message: "Maximum 5 images per receipt.", type: "error" });
       return;
     }
 
@@ -114,7 +118,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       });
     } catch (err: any) {
       console.error("Error uploading image:", err);
-      alert(err.message || "Failed to upload image");
+      setToast({ message: err.message || "Failed to upload image.", type: "error" });
     } finally {
       setUploadingImage(false);
     }
@@ -130,12 +134,12 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
     setShowConfirm(false);
 
     if (isLocked) {
-      alert("This record is locked and cannot be modified.");
+      setToast({ message: "This record is locked after attestation and cannot be modified.", type: "error" });
       return;
     }
 
     if (!publicKey || !signMessage) {
-      alert("Please connect your wallet to sign this action.");
+      setToast({ message: "Please connect your wallet to sign this action.", type: "error" });
       return;
     }
     setLoading(true);
@@ -146,6 +150,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, actionType);
 
       if (!signedAction) {
+        setToast({ message: "Signing canceled. Please try again.", type: "error" });
         setLoading(false);
         return;
       }
@@ -163,6 +168,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       });
 
       if (res.ok) {
+        setToast({ message: isEditing ? "Receipt updated successfully!" : "Proof of work saved successfully!", type: "success" });
         if (!isEditing) {
           setForm({
             role: "",
@@ -179,14 +185,14 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
           });
         }
         onSuccess?.();
-        if (!isEditing) window.location.reload();
+        if (!isEditing) setTimeout(() => router.refresh(), 800);
       } else {
         const errorData = await res.json();
-        alert(errorData.error?.message || errorData.error || "Failed to save receipt");
+        setToast({ message: errorData.error?.message || errorData.error || "Failed to save receipt.", type: "error" });
       }
     } catch (err) {
       console.error(err);
-      alert("Error saving receipt");
+      setToast({ message: "Error saving receipt. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -334,6 +340,10 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       </div>
 
       <ConfirmationModal isOpen={showConfirm} onClose={() => setShowConfirm(false)} onConfirm={processSubmission} title={isEditing ? "Update Proof of Work?" : "Finalize Proof of Work?"} message={isEditing ? "This will update your record with a new cryptographic signature. Metadata like images and links will be updated." : "Once this receipt is minted, the core details (Role, Organization, Date) cannot be edited or deleted. This ensures trust and immutability."} confirmLabel={isEditing ? "Update Receipt" : "Yes, Mint Receipt"} cancelLabel="Review Again" iconColor="green" confirmButtonColor="green" />
+
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
     </form>
   );
 }

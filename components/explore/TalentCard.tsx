@@ -26,6 +26,7 @@ export interface TalentProfile {
     receiptCount: number;
     successRate: number;
     status: "available" | "top_rated" | "featured" | null;
+    timezone?: string;
     // Social links
     github?: string;
     twitter?: string;
@@ -317,11 +318,15 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                         <MapPin className="w-3 h-3 text-white/30" />
                         <span className="truncate max-w-[80px]">{talent.country || "Global"}</span>
                     </div>
-                    <div className="w-1 h-1 rounded-full bg-white/10" />
-                    <div className="flex items-center gap-1.5">
-                        <Globe className="w-3 h-3 text-white/30" />
-                        <span>GMT+7</span>
-                    </div>
+                    {talent.timezone && (
+                        <>
+                            <div className="w-1 h-1 rounded-full bg-white/10" />
+                            <div className="flex items-center gap-1.5">
+                                <Globe className="w-3 h-3 text-white/30" />
+                                <span>{talent.timezone}</span>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Footer Footer */}

@@ -14,6 +14,11 @@ export function WalletMultiButton() {
   const menuRef = useRef<HTMLDivElement>(null);
   const googleMenuRef = useRef<HTMLDivElement>(null);
 
+  // Auto-close the modal when wallet connects (covers autoConnect silent reconnect)
+  useEffect(() => {
+    if (connected) setIsModalOpen(false);
+  }, [connected]);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (googleMenuRef.current && !googleMenuRef.current.contains(e.target as Node)) {

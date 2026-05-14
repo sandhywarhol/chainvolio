@@ -28,7 +28,7 @@ export async function PATCH(
         // 1. Get the submission and its parent collection to check ownership
         const { data: submission, error: fetchError } = await supabase
             .from("collection_submissions")
-            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title, slug, metadata)")
+            .select("id, collection_id, candidate_wallet, role_strength, hiring_collections(owner_wallet, title, slug, description, metadata)")
             .eq("id", id)
             .single();
 
@@ -152,7 +152,19 @@ export async function PATCH(
                 const recruiterOrg = hc?.metadata?.companyName || jobTitle;
                 const recruiterName = hc?.metadata?.recruiterName || "Verified Recruiter";
                 const recruiterRole = hc?.metadata?.recruiterRole || jobTitle;
-                const jobDescription = hc?.description || `Successfully completed the recruitment process for ${jobTitle} at ${recruiterOrg}.`;
+                const jobDescription = hc?.description || `Successfully hired for ${jobTitle} at ${recruiterOrg}.`;
+
+                // Idempotency guard: skip if a receipt for this tx already exists
+                const { data: existing } = await supabase
+                    .from("receipts")
+                    .select("id")
+                    .eq("tx_signature", cleanTxSignature)
+                    .maybeSingle();
+
+                if (existing) {
+                    console.log("[hiring] Receipt already exists for tx, skipping duplicate creation.");
+                    return NextResponse.json({ ok: true });
+                }
 
                 // Create a verifiable work record (receipt) for the candidate
                 const { data: receipt, error: receiptError } = await supabase
@@ -163,9 +175,9 @@ export async function PATCH(
                         org: recruiterOrg,
                         description: jobDescription,
                         start_date: new Date().toISOString().split('T')[0],
-                        end_date: new Date().toISOString().split('T')[0],
+                        end_date: null,
                         status: "Attested",
-                        tx_signature: cleanTxSignature 
+                        tx_signature: cleanTxSignature
                     })
                     .select()
                     .single();

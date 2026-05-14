@@ -165,6 +165,35 @@ export default function CreateCollection() {
             setToast({ message: "Please connect your wallet to sign this action.", type: "warning" });
             return;
         }
+
+        if (!formData.title.trim() || formData.title.trim().length < 5) {
+            setToast({ message: "Job title must be at least 5 characters.", type: "error" });
+            return;
+        }
+
+        const urlFields: { key: keyof typeof formData; label: string }[] = [
+            { key: "websiteUrl", label: "Website URL" },
+            { key: "twitterUrl", label: "Twitter/X URL" },
+            { key: "linkedinUrl", label: "LinkedIn URL" },
+            { key: "discordUrl", label: "Discord URL" },
+            { key: "telegramUrl", label: "Telegram URL" },
+        ];
+        for (const { key, label } of urlFields) {
+            const val = (formData[key] as string)?.trim();
+            if (val) {
+                try {
+                    const parsed = new URL(val);
+                    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+                        setToast({ message: `${label} must start with http:// or https://.`, type: "error" });
+                        return;
+                    }
+                } catch {
+                    setToast({ message: `${label} is not a valid URL.`, type: "error" });
+                    return;
+                }
+            }
+        }
+
         setLoading(true);
 
         try {
@@ -215,10 +244,14 @@ export default function CreateCollection() {
         }
     };
 
-    const copyToClipboard = () => {
+    const copyToClipboard = async () => {
         if (!createdSlug) return;
         const url = `${window.location.origin}/r/${createdSlug}`;
-        navigator.clipboard.writeText(url);
+        try {
+            await navigator.clipboard.writeText(url);
+        } catch {
+            // clipboard blocked — silent fail
+        }
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -378,8 +411,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. Satoshi (Founder)"
                                                 value={formData.recruiterName}
                                                 onChange={(e) => setFormData({ ...formData, recruiterName: e.target.value })}
-                                                readOnly
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm text-slate-400 cursor-not-allowed"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none transition-all placeholder:text-slate-600 text-sm"
                                             />
                                             <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
                                         </div>
@@ -770,6 +802,7 @@ export default function CreateCollection() {
                                             <input
                                                 type="date"
                                                 value={formData.deadline}
+                                                min={new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                                                 className="w-full bg-[#121214] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-white/20 outline-none transition-colors text-slate-300"
                                             />

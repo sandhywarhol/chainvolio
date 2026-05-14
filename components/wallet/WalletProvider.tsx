@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
-import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
+import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
@@ -24,35 +24,6 @@ function MobileReturnHandler() {
     return null;
 }
 
-/**
- * Disconnects the wallet when the user leaves the page (refresh, tab close, navigation).
- * This removes the active Phantom session so the approval popup is shown again on the next visit,
- * giving users an explicit confirm step on every login.
- */
-function DisconnectOnUnload() {
-    const { connected, disconnect } = useWallet();
-
-    useEffect(() => {
-        const handleUnload = () => {
-            // Try the direct wallet API first (most reliable in beforeunload context)
-            try {
-                const phantom = (window as any).phantom?.solana ?? (window as any).solana;
-                if (phantom?.isPhantom) phantom.disconnect();
-            } catch { /* ignore */ }
-            try {
-                const solflare = (window as any).solflare;
-                if (solflare) solflare.disconnect();
-            } catch { /* ignore */ }
-            // Also call the adapter disconnect so React state stays consistent
-            if (connected) disconnect().catch(() => {});
-        };
-
-        window.addEventListener("beforeunload", handleUnload);
-        return () => window.removeEventListener("beforeunload", handleUnload);
-    }, [connected, disconnect]);
-
-    return null;
-}
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
     const network = WalletAdapterNetwork.Mainnet;
@@ -76,12 +47,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <ConnProv endpoint={endpoint}>
-            {/* autoConnect is disabled so the site never silently reconnects from a
-                cached session — users must go through the wallet approval flow every visit. */}
-            <SolWallProv wallets={wallets} autoConnect={false} onError={() => {}}>
+            <SolWallProv wallets={wallets} autoConnect={true} onError={() => {}}>
                 <ModalProv>
                     <MobileReturnHandler />
-                    <DisconnectOnUnload />
                     {children}
                 </ModalProv>
             </SolWallProv>

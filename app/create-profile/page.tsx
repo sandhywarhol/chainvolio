@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -12,6 +13,7 @@ import { Instagram, Github, Globe, Send, Phone, Mail, Loader2 } from "lucide-rea
 import { Toast } from "@/components/ui/Toast";
 
 export default function CreateProfilePage() {
+  const router = useRouter();
   const { publicKey, connected, signMessage } = useWallet();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -51,32 +53,34 @@ export default function CreateProfilePage() {
     fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data) {
-          setProfileExists(true);
-          setForm({
-            displayName: data.displayName || "",
-            bio: data.bio || "",
-            skills: data.skills || "",
-            twitter: data.twitter || "",
-            github: data.github || "",
-            website: data.website || "",
-            discord: data.discord || "",
-            whatsapp: data.whatsapp || "",
-            email: data.email || "",
-            country: data.country || "",
-            avatarUrl: data.avatarUrl || "",
-            lookingFor: data.lookingFor || "",
-            timezone: data.timezone || "",
-            workPreference: data.workPreference || [],
-            telegram: data.telegram || "",
-            linkedin: data.linkedin || "",
-            instagram: data.instagram || "",
-            role: data.role || "",
-            organization: data.organization || "",
-          });
-        }
+        if (!data || data.error) return; // null = no profile yet, error = API failure
+        setProfileExists(true);
+        setForm({
+          displayName: data.displayName || "",
+          bio: data.bio || "",
+          skills: data.skills || "",
+          twitter: data.twitter || "",
+          github: data.github || "",
+          website: data.website || "",
+          discord: data.discord || "",
+          whatsapp: data.whatsapp || "",
+          email: data.email || "",
+          country: data.country || "",
+          avatarUrl: data.avatarUrl || "",
+          lookingFor: data.lookingFor || "",
+          timezone: data.timezone || "",
+          workPreference: data.workPreference || [],
+          telegram: data.telegram || "",
+          linkedin: data.linkedin || "",
+          instagram: data.instagram || "",
+          role: data.role || "",
+          organization: data.organization || "",
+        });
       })
-      .catch((err) => console.error("Error fetching profile:", err))
+      .catch((err) => {
+        console.error("Error fetching profile:", err);
+        setToast({ message: "Failed to load profile data. Please refresh.", type: "error" });
+      })
       .finally(() => setLoading(false));
   }, [publicKey]);
 
@@ -94,7 +98,6 @@ export default function CreateProfilePage() {
   const handleCroppedImage = async (croppedBlob: Blob) => {
     try {
       setUploading(true);
-      setCropModal({ isOpen: false, image: null });
 
       const { default: imageCompression } = await import("browser-image-compression");
       const compressedFile = await imageCompression(croppedBlob as File, {
@@ -124,6 +127,7 @@ export default function CreateProfilePage() {
 
       const { url } = await res.json();
       setForm((prev) => ({ ...prev, avatarUrl: url }));
+      setCropModal({ isOpen: false, image: null });
     } catch (error: any) {
       setToast({ message: "Error uploading avatar: " + error.message, type: "error" });
     } finally {
@@ -135,6 +139,12 @@ export default function CreateProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!publicKey || !signMessage) return;
+
+    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setToast({ message: "Please enter a valid email address.", type: "error" });
+      return;
+    }
+
     setLoading(true);
     try {
       const { signChainVolioAction } = await import("@/lib/wallet-utils");
@@ -143,8 +153,9 @@ export default function CreateProfilePage() {
       const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, actionType);
 
       if (!signedAction) {
+        setToast({ message: "Signing canceled. Please try again.", type: "error" });
         setLoading(false);
-        return; // User canceled or failed
+        return;
       }
 
       const method = profileExists ? "PATCH" : "POST";
@@ -159,14 +170,11 @@ export default function CreateProfilePage() {
       });
 
       if (res.ok) {
-        window.location.href = "/dashboard";
+        setToast({ message: "Profile saved successfully!", type: "success" });
+        setTimeout(() => router.push("/dashboard"), 1000);
       } else {
         const data = await res.json();
-        if (data.error) {
-          setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
-        } else {
-          setToast({ message: "Profile saved successfully!", type: "success" });
-        }
+        setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
       }
     } catch (error) {
       setToast({ message: "Error saving profile", type: "error" });
@@ -378,7 +386,7 @@ export default function CreateProfilePage() {
               <Globe size={14} className="text-emerald-400" /> Website (optional)
             </label>
             <input
-              type="text"
+              type="url"
               value={form.website}
               onChange={(e) => setForm({ ...form, website: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"

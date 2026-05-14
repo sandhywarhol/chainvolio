@@ -76,13 +76,14 @@ export function useGoogleAuth() {
 
     const signInWithGoogle = useCallback(async () => {
         if (!supabaseAuth) return;
-        await supabaseAuth.auth.signInWithOAuth({
+        const { error } = await supabaseAuth.auth.signInWithOAuth({
             provider: "google",
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
                 queryParams: { access_type: "offline", prompt: "consent" },
             },
         });
+        if (error) throw error;
     }, []);
 
     const signOut = useCallback(async () => {

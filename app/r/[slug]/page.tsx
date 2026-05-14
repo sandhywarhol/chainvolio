@@ -43,11 +43,13 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     }, [slug]);
 
     const [existingSubmission, setExistingSubmission] = useState<any>(null);
+    const [checkingExisting, setCheckingExisting] = useState(false);
 
     useEffect(() => {
         if (!publicKey) {
             setApplicantProfile(null);
             setExistingSubmission(null);
+            setCheckingExisting(false);
             return;
         }
 
@@ -57,7 +59,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             .then(data => setApplicantProfile(data))
             .catch(() => setApplicantProfile(null));
 
-        // 2. Fetch Existing Submission
+        // 2. Fetch Existing Submission — guard against flash with checkingExisting
+        setCheckingExisting(true);
         fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {
@@ -78,7 +81,8 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                     }, 1000);
                 }
             })
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => setCheckingExisting(false));
     }, [publicKey, slug]);
 
     const handleSubmit = async () => {
@@ -111,7 +115,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             if (res.ok) {
                 setSubmitted(true);
             } else {
-                setError(data.error || "Submission failed.");
+                setError(data.error?.message || data.error || "Submission failed.");
             }
         } catch (err) {
             setError("Network error. Please try again.");
@@ -146,7 +150,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     }
 
     return (
-        <main className="min-h-screen text-white selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-black text-white selection:bg-emerald-500/30">
             <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
                 <Link href="/" className="flex items-center gap-2 group">
                     <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
@@ -156,7 +160,11 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             </nav>
 
             <section className="max-w-3xl mx-auto px-6 py-12 relative z-10">
-                {!submitted ? (
+                {checkingExisting ? (
+                    <div className="flex items-center justify-center min-h-[40vh]">
+                        <div className="w-6 h-6 border-2 border-emerald-500/40 border-t-emerald-500 rounded-full animate-spin" />
+                    </div>
+                ) : !submitted ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="text-center mb-16">
                             <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight text-white">
@@ -467,6 +475,17 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                 </div>
                             ) : (
                                 <div className="space-y-10">
+                                    {/* Pre-flight eligibility gate */}
+                                    {collection.eligibility_filters?.verifiedOnly && applicantProfile && !applicantProfile.isVerified && (
+                                        <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex items-start gap-3">
+                                            <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm font-bold text-amber-300">Verification Required</p>
+                                                <p className="text-xs text-amber-400/70 mt-0.5">This position requires a verified profile. Your current profile is unverified — your application may be rejected.</p>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center justify-between gap-4 p-5 bg-black/40 border border-white/5 rounded-2xl">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20 overflow-hidden">
@@ -547,14 +566,31 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
                                         {error && <p className="text-red-400 text-sm py-4 px-6 bg-red-500/10 border border-red-500/20 rounded-xl">{error}</p>}
 
-                                        <div className="pt-4 space-y-4">
-                                            <button
-                                                onClick={handleSubmit}
-                                                disabled={submitting || !primarySignal || !roleStrength}
-                                                className="w-full py-5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-2xl shadow-emerald-500/40"
-                                            >
-                                                {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Submit Verified Credentials <Send className="w-5 h-5" /></>}
-                                            </button>
+                                        <div className="pt-4 space-y-3">
+                                            {collection.metadata?.deadline && new Date(collection.metadata.deadline) < new Date() ? (
+                                                <div className="w-full py-5 bg-slate-800/60 border border-slate-700 rounded-2xl font-bold text-lg text-slate-500 text-center cursor-not-allowed select-none">
+                                                    Applications Closed
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={handleSubmit}
+                                                        disabled={submitting || !primarySignal || !roleStrength}
+                                                        className="w-full py-5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-2xl shadow-emerald-500/40"
+                                                    >
+                                                        {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Submit Verified Credentials <Send className="w-5 h-5" /></>}
+                                                    </button>
+                                                    {(!primarySignal || !roleStrength) && (
+                                                        <p className="text-center text-xs text-slate-500">
+                                                            {!primarySignal && !roleStrength
+                                                                ? "Select your strongest proof of work and role focus to continue."
+                                                                : !primarySignal
+                                                                    ? "Select your strongest proof of work to continue."
+                                                                    : "Select your primary role focus to continue."}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

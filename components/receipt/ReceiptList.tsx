@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clipboard, Lock, Send } from "lucide-react";
+import { Clipboard, Lock, Send, ExternalLink, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Toast } from "@/components/ui/Toast";
 import { ExpandableText } from "@/components/ui/ExpandableText";
@@ -30,6 +30,9 @@ type Receipt = {
   verificationTier?: string;
   isOfficial?: boolean;
   isAttesterVerified?: boolean;
+  attestationId?: string;
+  txSignature?: string;
+  attesterAt?: string;
   createdAt: string;
   updates?: any[];
 };
@@ -74,12 +77,16 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
       .finally(() => setLoading(false));
   }, [walletAddress]);
 
-  const handleCopyVerificationLink = (receiptId: string) => {
+  const handleCopyVerificationLink = async (receiptId: string) => {
     const url = `${window.location.origin}/attest/${receiptId}`;
-    navigator.clipboard.writeText(url);
-    setCopiedId(receiptId);
-    setToastMessage("Verification link copied!");
-    setTimeout(() => setCopiedId(null), 2000);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(receiptId);
+      setToastMessage("Verification link copied!");
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setToastMessage("Failed to copy link. Please copy manually.");
+    }
   };
 
   if (loading) return <p className="text-slate-400">Loading receipts...</p>;
@@ -132,6 +139,33 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
                         <p className="text-[9px] text-slate-500 font-mono truncate">
                           {r.attesterWallet.slice(0, 6)}...{r.attesterWallet.slice(-4)}
                         </p>
+                      </div>
+                      {/* On-chain proof links */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {r.txSignature && (
+                          <a
+                            href={`https://solscan.io/tx/${r.txSignature}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="View transaction on Solscan"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 transition-colors"
+                          >
+                            <ExternalLink className="w-2.5 h-2.5" />
+                            Solscan
+                          </a>
+                        )}
+                        {r.attestationId && (
+                          <a
+                            href={`/memo/${r.attestationId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="View verification memo"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.08] text-[9px] font-bold text-slate-400 hover:text-white transition-colors"
+                          >
+                            <FileText className="w-2.5 h-2.5" />
+                            Memo
+                          </a>
+                        )}
                       </div>
                     </div>
                   );

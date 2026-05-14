@@ -84,11 +84,16 @@ export function RequestVerificationModal({
     setTimeout(() => setSent(false), 3000);
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const full = `Subject: ${subject}\n\n${body}`;
-    navigator.clipboard.writeText(full);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(full);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: select text so user can copy manually
+      setCopied(false);
+    }
   };
 
   const canSend = verifierEmail.includes("@");

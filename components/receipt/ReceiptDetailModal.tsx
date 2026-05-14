@@ -161,7 +161,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                                 <div className="space-y-1">
                                     <p className="text-slate-500 font-bold uppercase">Timestamp</p>
                                     <p className="text-slate-300">
-                                        {receipt.attesterAt ? format(new Date(receipt.attesterAt), "MMM d, yyyy · HH:mm") : "Anchored Dec 2023"}
+                                        {receipt.attesterAt ? format(new Date(receipt.attesterAt), "MMM d, yyyy · HH:mm") : "—"}
                                     </p>
                                 </div>
                                 <div className="space-y-1">

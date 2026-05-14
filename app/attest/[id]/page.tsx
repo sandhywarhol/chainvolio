@@ -53,6 +53,7 @@ export default function AttestPage() {
     const [txHash, setTxHash] = useState("");
     const [memoId, setMemoId] = useState("");
     const [attesterProfile, setAttesterProfile] = useState<any>(null);
+    const [profileLoading, setProfileLoading] = useState(false);
     const [isExternal, setIsExternal] = useState(true);
     const [walletModalOpen, setWalletModalOpen] = useState(false);
 
@@ -83,18 +84,22 @@ export default function AttestPage() {
     const [attestationType, setAttestationType] = useState("Employment verification");
     const [confidenceLevel, setConfidenceLevel] = useState("Confirm");
     const [comment, setComment] = useState("");
-    const [performance, setPerformance] = useState({
-        reliability: 0,
-        technical_skill: 0,
-        communication: 0,
-        leadership: 0,
-        integrity: 0,
+    const [performance, setPerformance] = useState<Record<string, number | null>>({
+        reliability: null,
+        technical_skill: null,
+        communication: null,
+        leadership: null,
+        integrity: null,
     });
 
     useEffect(() => {
         if (!id) return;
         fetch(`/api/attest/${id}`)
-            .then(r => { if (!r.ok) throw new Error("Receipt not found"); return r.json(); })
+            .then(async r => {
+                if (r.status === 404) throw new Error("This work record doesn't exist or has been removed.");
+                if (!r.ok) throw new Error("Server error loading work record. Please try again shortly.");
+                return r.json();
+            })
             .then(setReceipt)
             .catch(e => setError(e.message))
             .finally(() => setLoading(false));
@@ -119,6 +124,7 @@ export default function AttestPage() {
         }
 
         // Regular wallet user: fetch ChainVolio profile
+        setProfileLoading(true);
         fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {
@@ -140,7 +146,8 @@ export default function AttestPage() {
             .catch(() => {
                 setAttesterProfile(null);
                 setIsExternal(true);
-            });
+            })
+            .finally(() => setProfileLoading(false));
     }, [publicKey, isGoogleOrgAttester, googleOrg, googleOrgIsActive, googleOrgPlan]);
 
     // Auto-trigger attestation when wallet connects after lazy-connect flow
@@ -230,7 +237,15 @@ export default function AttestPage() {
             const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
             const conn = new Connection(rpcUrl, "confirmed");
             const tx = new Transaction();
-            const { blockhash } = await conn.getLatestBlockhash("confirmed");
+
+            const RPC_TIMEOUT = 12000; // 12 seconds
+            const blockhashResult = await Promise.race([
+                conn.getLatestBlockhash("confirmed"),
+                new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error("RPC connection timed out. Please check your internet connection and try again.")), RPC_TIMEOUT)
+                ),
+            ]);
+            const { blockhash } = blockhashResult;
 
             tx.recentBlockhash = blockhash;
             tx.feePayer = publicKey;
@@ -267,10 +282,14 @@ export default function AttestPage() {
             }
 
             if (!confirmed) {
-                throw new Error("Transaction took too long to confirm. It might still be successful, please check your wallet.");
+                setTxHash(signature);
+                throw new Error(`Transaction took too long to confirm. Your transaction may still succeed — check Solscan: https://solscan.io/tx/${signature}`);
             }
 
             // 7. Record in database
+            // Set txHash now so it's available even if DB write fails
+            setTxHash(signature);
+
             const res = await fetch("/api/attest", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -297,10 +316,9 @@ export default function AttestPage() {
 
             if (!res.ok) {
                 const d = await res.json();
-                throw new Error(d.error || "Failed to record attestation");
+                throw new Error(d.error || `Attestation recorded on-chain (${signature.slice(0, 8)}…) but failed to save to database. Please contact support with your transaction hash.`);
             }
 
-            setTxHash(signature);
             setSuccess(true);
         } catch (e: any) {
             console.error(e);
@@ -320,8 +338,14 @@ export default function AttestPage() {
     }
 
     if (error && !receipt) return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black theme-bg-page theme-aware">
-            <p className="text-red-400">{error}</p>
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black theme-bg-page theme-aware px-6">
+            <p className="text-red-400 text-center max-w-sm">{error}</p>
+            {txHash && (
+                <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-emerald-400 hover:text-emerald-300 underline">
+                    View transaction on Solscan ↗
+                </a>
+            )}
             <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
         </main>
     );
@@ -488,7 +512,7 @@ export default function AttestPage() {
                         <div>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                    {isGoogleOrgAttester ? "Attesting as Organization" : isExternal ? "Attester Identity (External)" : "Attesting as"}
+                                    {isGoogleOrgAttester ? "Attesting as Organization" : isExternal ? "Your Identity" : "Attesting as"}
                                 </h2>
                                 {!isExternal && !isGoogleOrgAttester && (
                                     <Link href="/create-profile" className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 uppercase tracking-wider">
@@ -556,6 +580,9 @@ export default function AttestPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-3">
+                                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                                        You are not signed in with a ChainVolio account. Your attestation will be recorded as an <span className="text-slate-400 font-semibold">external</span> verification — valid on-chain but without a linked ChainVolio identity. <a href="/create-profile" className="text-emerald-400 hover:text-emerald-300 underline">Create a profile</a> to strengthen your endorsement.
+                                    </p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <label className="block text-xs text-slate-500 mb-1">Full Name *</label>
@@ -640,14 +667,19 @@ export default function AttestPage() {
                                             { key: "integrity", label: "Professional Integrity" },
                                         ].map(({ key, label }) => (
                                             <div key={key} className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                                                <span className="text-sm font-medium text-slate-300">{label}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-slate-300">{label}</span>
+                                                    {performance[key] === null && (
+                                                        <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Not rated</span>
+                                                    )}
+                                                </div>
                                                 <div className="flex gap-1">
-                                                    {[0, 1, 2, 3, 4, 5].map((num) => (
+                                                    {[1, 2, 3, 4, 5].map((num) => (
                                                         <button
                                                             key={num}
                                                             type="button"
                                                             onClick={() => setPerformance(prev => ({ ...prev, [key]: num }))}
-                                                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${performance[key as keyof typeof performance] === num
+                                                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${performance[key] === num
                                                                 ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                                                                 : "bg-slate-700 text-slate-400 hover:bg-slate-600"
                                                                 }`}
@@ -776,7 +808,7 @@ export default function AttestPage() {
                             </div>
                         ) : (
                             <button onClick={handleAttest}
-                                disabled={attesting || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
+                                disabled={attesting || profileLoading || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
                                 className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2">
                                 {attesting ? (
                                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing…</>

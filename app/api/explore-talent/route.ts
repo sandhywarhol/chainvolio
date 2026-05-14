@@ -247,6 +247,7 @@ export async function GET(req: NextRequest) {
                     organization:           p.organization,
                     cardNumber:             p.card_number,
                     country:                p.country,
+                    timezone:               p.timezone || undefined,
                     createdAt:              p.created_at,
                     totalScore,
                     trustScore:             isOrgCard ? totalScore : undefined,

@@ -41,10 +41,14 @@ function truncate(str: string, head = 8, tail = 8) {
 
 function CopyButton({ text, light }: { text: string; light?: boolean }) {
     const [copied, setCopied] = useState(false);
-    const copy = () => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // clipboard blocked (non-https or permission denied) — silent fail
+        }
     };
     return (
         <button onClick={copy} className={`p-1.5 rounded-full transition-all ${light ? "hover:bg-gray-100 text-gray-400" : "hover:bg-slate-800 text-slate-500"
@@ -354,7 +358,7 @@ export default function MemoPage() {
                                             )}
                                         </div>
                                         <p className="text-[10px] font-mono break-all leading-relaxed opacity-60">
-                                            {attestation.tx_signature}
+                                            {attestation.tx_signature || "Off-chain signature only"}
                                         </p>
                                     </div>
 

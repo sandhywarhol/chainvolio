@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { MessageSquarePlus, ChevronDown, ChevronUp, Link as LinkIcon, Image as ImageIcon, X, ExternalLink } from "lucide-react";
 import { formatDateTime } from "@/shared/utils/date";
+import { Toast } from "@/components/ui/Toast";
 
 export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: any, isOwner: boolean, onUpdateAdded?: () => void }) {
+    const router = useRouter();
     const [expanded, setExpanded] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [message, setMessage] = useState("");
@@ -13,13 +16,14 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
     const [evidencePicture, setEvidencePicture] = useState<string | null>(null);
     const [isAddingLink, setIsAddingLink] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type?: "error" | "success" } | null>(null);
     const { publicKey, signMessage } = useWallet();
     const updates = receipt.updates || [];
 
     const handleAddUpdate = async () => {
         if (!message.trim()) return;
         if (!publicKey || !signMessage) {
-            alert("Please connect your wallet to sign this update.");
+            setToast({ message: "Please connect your wallet to sign this update.", type: "error" });
             return;
         }
 
@@ -53,15 +57,14 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                 setIsAdding(false);
                 setIsAddingLink(false);
                 onUpdateAdded?.();
-                // Optionally refresh or update state
-                window.location.reload();
+                router.refresh();
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to add update.");
+                setToast({ message: err.error || "Failed to add update.", type: "error" });
             }
         } catch (e: any) {
             console.error(e);
-            alert("Error adding update");
+            setToast({ message: "Error adding update.", type: "error" });
         } finally {
             setLoading(false);
         }
@@ -72,7 +75,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
-            alert("Image too large. Please use an image under 5MB.");
+            setToast({ message: "Image too large. Please use an image under 5MB.", type: "error" });
             return;
         }
 
@@ -114,6 +117,7 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
     if (!hasUpdates && !isOwner) return null;
 
     return (
+        <>
         <div className="mt-4 pt-4 border-t border-white/[0.05]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
                 <button
@@ -291,5 +295,10 @@ export function ReceiptUpdates({ receipt, isOwner, onUpdateAdded }: { receipt: a
                 </div>
             )}
         </div>
+
+        {toast && (
+            <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        )}
+        </>
     );
 }

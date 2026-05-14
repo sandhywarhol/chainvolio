@@ -73,8 +73,17 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { walletAddress, displayName, signature, nonce, timestamp } = body;
 
-    if (!walletAddress || !displayName) {
+    if (!walletAddress || !displayName?.trim()) {
       return errorResponse("ERR_INVALID_REQUEST", "walletAddress and displayName are required", 400);
+    }
+
+    if (displayName.trim().length > 60) {
+      return errorResponse("ERR_INVALID_REQUEST", "Display name must be 60 characters or fewer", 400);
+    }
+
+    const emailInBody = body.email as string | undefined;
+    if (emailInBody && emailInBody.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInBody.trim())) {
+      return errorResponse("ERR_INVALID_REQUEST", "Invalid email address format", 400);
     }
 
     // --- Signature Verification ---
@@ -153,6 +162,11 @@ export async function PATCH(request: Request) {
     const { walletAddress, signature, nonce, timestamp } = body;
 
     if (!walletAddress) return errorResponse("ERR_INVALID_REQUEST", "Wallet address is required", 400);
+
+    const emailInBody = body.email as string | undefined;
+    if (emailInBody && emailInBody.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInBody.trim())) {
+      return errorResponse("ERR_INVALID_REQUEST", "Invalid email address format", 400);
+    }
 
     // --- Signature Verification ---
     const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";

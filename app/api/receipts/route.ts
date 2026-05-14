@@ -141,16 +141,56 @@ export async function GET(request: Request) {
     }
 }
 
+function isValidHttpUrl(url: string): boolean {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+        return false;
+    }
+}
+
+function validateReceiptBody(body: any): string | null {
+    const { role, org, description, startDate, endDate, evidenceLinks, impact } = body;
+    if (role && role.trim().length > 100) return "Role must be 100 characters or fewer.";
+    if (org && org.trim().length > 100) return "Organization name must be 100 characters or fewer.";
+    if (description && description.trim().length > 1000) return "Description must be 1000 characters or fewer.";
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) return "End date cannot be before start date.";
+    if (Array.isArray(evidenceLinks)) {
+        for (const link of evidenceLinks) {
+            if (link?.url && !isValidHttpUrl(link.url)) {
+                return `Invalid URL: "${link.url}". Only http and https links are allowed.`;
+            }
+        }
+    }
+    return null;
+}
+
+function sanitizeReceiptBody(body: any) {
+    return {
+        role: body.role?.trim() || null,
+        org: body.org?.trim() || null,
+        description: body.description?.trim() || null,
+        evidenceLinks: (body.evidenceLinks || []).filter((l: any) => l?.url?.trim()),
+        impact: (body.impact || []).map((i: string) => i?.trim()).filter(Boolean),
+    };
+}
+
 export async function POST(request: Request) {
     if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
 
     try {
         const body = await request.json();
-        const { walletAddress, role, org, description, startDate, endDate, workType, evidenceLinks, impact, portfolioImages, isExternal, signature, nonce, timestamp } = body;
+        const { walletAddress, startDate, endDate, workType, compensationType, portfolioImages, isExternal, signature, nonce, timestamp } = body;
 
-        if (!walletAddress || !role || !org) {
-            return NextResponse.json({ error: "walletAddress, role and org are required" }, { status: 400 });
+        if (!walletAddress) {
+            return NextResponse.json({ error: "walletAddress is required" }, { status: 400 });
         }
+
+        const validationError = validateReceiptBody(body);
+        if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
+
+        const { role, org, description, evidenceLinks, impact } = sanitizeReceiptBody(body);
 
         // --- Signature Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
@@ -181,8 +221,9 @@ export async function POST(request: Request) {
             start_date: startDate,
             end_date: endDate,
             work_type: workType,
-            evidence_links: evidenceLinks || [],
-            impact: impact || [],
+            compensation_type: compensationType || null,
+            evidence_links: evidenceLinks,
+            impact,
             portfolio_images: portfolioImages || [],
             status: 'Submitted'
         }).select().single();
@@ -205,9 +246,14 @@ export async function PATCH(request: Request) {
 
     try {
         const body = await request.json();
-        const { id, walletAddress, role, org, description, startDate, endDate, workType, evidenceLinks, impact, portfolioImages, signature, nonce, timestamp } = body;
+        const { id, walletAddress, startDate, endDate, workType, compensationType, portfolioImages, signature, nonce, timestamp } = body;
 
         if (!id || !walletAddress) return NextResponse.json({ error: "id and walletAddress are required" }, { status: 400 });
+
+        const validationError = validateReceiptBody(body);
+        if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
+
+        const { role, org, description, evidenceLinks, impact } = sanitizeReceiptBody(body);
 
         // --- Signature Verification ---
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
@@ -237,8 +283,9 @@ export async function PATCH(request: Request) {
             start_date: startDate,
             end_date: endDate,
             work_type: workType,
-            evidence_links: evidenceLinks || [],
-            impact: impact || [],
+            compensation_type: compensationType || null,
+            evidence_links: evidenceLinks,
+            impact,
             portfolio_images: portfolioImages || [],
             updated_at: new Date().toISOString()
         }).eq("id", id).eq("wallet_address", walletAddress).select().single();

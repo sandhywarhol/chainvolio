@@ -108,13 +108,12 @@ export default function DashboardPage() {
 
     const walletAddr = publicKey.toBase58();
     setLoading(true);
+    const controller = new AbortController();
 
-    // Consolidated Dashboard Data Fetch
-    fetch(`/api/dashboard/stats?wallet=${walletAddr}`)
+    fetch(`/api/dashboard/stats?wallet=${walletAddr}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
-        
         setProfile(data.profile);
         setCollections(data.collections || []);
         setAttestationCount(data.attestationCount || 0);
@@ -124,25 +123,36 @@ export default function DashboardPage() {
         setLoading(false);
       })
       .catch((err) => {
+        if (err.name === "AbortError") return;
         console.error("Dashboard fetch error:", err);
         setFetchError(err.message || "Failed to load dashboard");
         setLoading(false);
       });
 
+    return () => controller.abort();
   }, [publicKey, connected]);
 
   const handleDeleteCertificate = async (id: string) => {
     if (!publicKey) return;
-    await fetch(`/api/certificates?id=${id}&wallet=${publicKey.toBase58()}`, { method: "DELETE" });
-    setCertificates(prev => prev.filter(c => c.id !== id));
+    try {
+      const res = await fetch(`/api/certificates?id=${id}&wallet=${publicKey.toBase58()}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      setCertificates(prev => prev.filter(c => c.id !== id));
+    } catch {
+      setToastMessage("Failed to delete certificate. Please try again.");
+    }
   };
 
   const handleCertUploadSuccess = () => {
     if (!publicKey) return;
     fetch(`/api/certificates?wallet=${publicKey.toBase58()}`)
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setCertificates(data); })
-      .catch(() => {});
+      .then(data => {
+        if (Array.isArray(data)) setCertificates(data);
+      })
+      .catch(() => {
+        setToastMessage("Certificate uploaded, but failed to refresh list. Please reload the page.");
+      });
   };
 
   // Google auth resolving

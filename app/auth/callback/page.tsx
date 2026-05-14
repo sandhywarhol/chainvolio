@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAuth } from "@/lib/supabase/auth";
 
-/**
- * Supabase OAuth callback page.
- * After Google sign-in, Supabase redirects here with a `code` query param (PKCE flow).
- * We exchange it for a session, then forward to the dashboard.
- */
 export default function AuthCallbackPage() {
     const router = useRouter();
+    const [authError, setAuthError] = useState<string | null>(null);
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -27,6 +23,8 @@ export default function AuthCallbackPage() {
                 const { error } = await supabaseAuth.auth.exchangeCodeForSession(code);
                 if (error) {
                     console.error("[auth/callback] Code exchange failed:", error.message);
+                    setAuthError("Sign in failed. Please try again.");
+                    return;
                 }
             }
 
@@ -36,8 +34,28 @@ export default function AuthCallbackPage() {
         handleCallback();
     }, [router]);
 
+    if (authError) {
+        return (
+            <main className="min-h-screen flex flex-col items-center justify-center gap-6 text-white bg-black px-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                    <span className="text-red-400 text-xl">✕</span>
+                </div>
+                <div className="text-center">
+                    <p className="text-white font-bold mb-1">Sign In Failed</p>
+                    <p className="text-slate-400 text-sm">{authError}</p>
+                </div>
+                <button
+                    onClick={() => router.replace("/dashboard")}
+                    className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-colors"
+                >
+                    Back to Home
+                </button>
+            </main>
+        );
+    }
+
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">
+        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black">
             <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             <p className="text-slate-400 text-sm">Completing sign in...</p>
         </main>

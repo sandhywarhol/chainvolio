@@ -49,8 +49,11 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { title, description, ownerWallet, filters, signature, nonce, timestamp, ...metadata } = body;
 
-        if (!title || !ownerWallet) {
+        if (!title?.trim() || !ownerWallet) {
             return errorResponse("ERR_INVALID_REQUEST", "Title and ownerWallet are required", 400);
+        }
+        if (title.trim().length < 5) {
+            return errorResponse("ERR_INVALID_REQUEST", "Title must be at least 5 characters.", 400);
         }
 
         // --- Signature Verification ---
@@ -124,12 +127,28 @@ export async function POST(request: Request) {
             }
         }
 
+        // Validate URL fields in metadata
+        const urlFieldNames = ["websiteUrl", "twitterUrl", "linkedinUrl", "discordUrl", "telegramUrl"];
+        for (const field of urlFieldNames) {
+            const val = metadata[field]?.trim();
+            if (val) {
+                try {
+                    const parsed = new URL(val);
+                    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+                        return errorResponse("ERR_INVALID_REQUEST", `${field} must use http or https.`, 400);
+                    }
+                } catch {
+                    return errorResponse("ERR_INVALID_REQUEST", `${field} is not a valid URL.`, 400);
+                }
+            }
+        }
+
         // Set transaction context for RLS
         await supabase.rpc('set_app_wallet', { wallet_addr: ownerWallet });
 
         // Generate a clean slug
         const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-        const randomHash = Math.random().toString(36).substring(2, 7);
+        const randomHash = Math.random().toString(36).substring(2, 10);
         const slug = `${baseSlug}-${randomHash}`;
 
         // --- Trusted Hiring Signal Logic (Benefit System) ---

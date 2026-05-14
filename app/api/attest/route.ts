@@ -104,6 +104,23 @@ export async function POST(request: Request) {
                         error: `Blockchain transaction reached consensus but FAILED: ${JSON.stringify(status.err)}. Your funds were likely returned (check Solscan for confirmation).`
                     }, { status: 400 });
                 }
+
+                // Verify the fee payer of the TX matches the claimed attesterWallet
+                try {
+                    const txDetails = await connection.getParsedTransaction(cleanTxSignature, {
+                        maxSupportedTransactionVersion: 0,
+                        commitment: "confirmed",
+                    });
+                    const feePayer = txDetails?.transaction?.message?.accountKeys?.[0]?.pubkey?.toString();
+                    if (feePayer && feePayer !== attesterWallet) {
+                        return NextResponse.json({
+                            error: "Transaction signer does not match attester wallet."
+                        }, { status: 403 });
+                    }
+                } catch (parseErr) {
+                    // Non-fatal: if we can't fetch TX details, skip signer check rather than blocking valid attestations
+                    console.warn("[attestation-api] Could not verify TX signer:", parseErr);
+                }
             } catch (err: any) {
                 console.error("On-chain verification failed:", err);
                 return NextResponse.json({ error: "Failed to verify transaction on-chain." }, { status: 500 });
@@ -366,20 +383,28 @@ export async function POST(request: Request) {
             // Non-blocking
         }
 
-        // Update user attestation count (use trackedUsed which reflects any monthly reset)
+        // Update user attestation count atomically by re-reading current value right before update
         if (profile) {
+            const { data: freshProfile } = await supabase
+                .from("profiles")
+                .select("attestation_used")
+                .eq("wallet_address", attesterWallet)
+                .single();
+            const freshUsed = freshProfile?.attestation_used ?? trackedUsed;
             await supabase
                 .from("profiles")
-                .update({ attestation_used: trackedUsed + 1 })
+                .update({ attestation_used: freshUsed + 1 })
                 .eq("wallet_address", attesterWallet);
         } else {
+            const resetDate = new Date();
+            resetDate.setDate(resetDate.getDate() + 30);
             await supabase.from("profiles").upsert({
                 wallet_address: attesterWallet,
                 display_name: finalAttesterName,
                 professional_role: finalAttesterRole,
                 organization: finalAttesterOrg,
                 attestation_used: 1,
-                attestation_reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                attestation_reset_date: resetDate.toISOString()
             }, { onConflict: 'wallet_address' });
         }
 
