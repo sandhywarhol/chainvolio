@@ -1,23 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
- 
-export const dynamic = "force-dynamic";
+import { computeOrgTrust } from "@/shared/logic/orgTrust";
+
+export const dynamic   = "force-dynamic";
 export const revalidate = 0;
 
-// Skill keywords per category tab
 const CATEGORY_SKILLS: Record<string, string[]> = {
-    video: ["video editing", "motion", "animation", "video production", "videography", "daVinci", "premiere", "after effects"],
-    design: ["ui/ux", "figma", "branding", "graphic design", "illustration", "product design", "ui", "ux", "visual design"],
+    video:       ["video editing", "motion", "animation", "video production", "videography", "daVinci", "premiere", "after effects"],
+    design:      ["ui/ux", "figma", "branding", "graphic design", "illustration", "product design", "ui", "ux", "visual design"],
     development: ["rust", "solidity", "react", "typescript", "smart contract", "defi", "blockchain", "web3", "frontend", "backend", "full stack", "mobile", "javascript", "python", "go", "anchor"],
-    writing: ["content writing", "copywriting", "technical writing", "documentation", "blog", "writing", "content"],
-    community: ["community", "discord", "social media", "twitter", "ambassador", "community management", "ops"],
-    ai: ["ai", "machine learning", "prompt engineering", "ml", "data science", "gpt", "llm", "artificial intelligence"],
+    writing:     ["content writing", "copywriting", "technical writing", "documentation", "blog", "writing", "content"],
+    community:   ["community", "discord", "social media", "twitter", "ambassador", "community management", "ops"],
+    ai:          ["ai", "machine learning", "prompt engineering", "ml", "data science", "gpt", "llm", "artificial intelligence"],
 };
 
+const ORG_TYPES = ["Company / Organization", "Community / DAO"];
+
+function isOrgVerif(v: any): boolean {
+    if (!v) return false;
+    const expired = v.expires_at ? new Date(v.expires_at) < new Date() : false;
+    return ORG_TYPES.includes(v.type) && !expired;
+}
+
 export async function GET(req: NextRequest) {
-    if (!supabase) {
-        return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
-    }
+    if (!supabase) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
 
     const { searchParams } = new URL(req.url);
     const page          = Math.max(1, parseInt(searchParams.get("page") || "1"));
@@ -28,40 +34,23 @@ export async function GET(req: NextRequest) {
     const minScore      = parseInt(searchParams.get("minScore") || "0");
     const maxScore      = parseInt(searchParams.get("maxScore") || "100");
     const sort          = searchParams.get("sort") || "score_desc";
-    // Future filters (accepted now, wired when UI is ready)
     const location      = (searchParams.get("location") || "").trim();
-    const ecosystem     = (searchParams.get("ecosystem") || "").trim();
     const availableOnly = searchParams.get("availableOnly") === "true";
     const verifiedOnly  = searchParams.get("verifiedOnly")  === "true";
 
     try {
-        // ── 1. Fetch profiles matching search / workType filters ──────────────
-        let profileQuery = supabase
-            .from("profiles")
-            .select("*");
+        // ── 1. Fetch profiles ──────────────────────────────────────────────────
+        let profileQuery = supabase.from("profiles").select("*");
 
-        if (search) {
-            profileQuery = profileQuery.or(
-                `display_name.ilike.%${search}%,skills.ilike.%${search}%,professional_role.ilike.%${search}%`
-            );
-        }
-
-        if (workType) {
-            profileQuery = profileQuery.contains("work_preference", [workType]);
-        }
-
-        if (location) {
-            profileQuery = profileQuery.ilike("country", `%${location}%`);
-        }
+        if (search)   profileQuery = profileQuery.or(`display_name.ilike.%${search}%,skills.ilike.%${search}%,professional_role.ilike.%${search}%`);
+        if (workType) profileQuery = profileQuery.contains("work_preference", [workType]);
+        if (location) profileQuery = profileQuery.ilike("country", `%${location}%`);
 
         const { data: rawProfiles, error: profileError } = await profileQuery;
         if (profileError) throw profileError;
+        if (!rawProfiles?.length) return NextResponse.json({ talents: [], organizations: [], total: 0, page, totalPages: 0 });
 
-        if (!rawProfiles?.length) {
-            return NextResponse.json({ talents: [], total: 0, page, totalPages: 0 });
-        }
-
-        // ── 2. Category skill filter (JS-side on skills string) ───────────────
+        // ── 2. Category filter (JS-side) ───────────────────────────────────────
         let profiles = rawProfiles;
         if (category !== "all" && CATEGORY_SKILLS[category]) {
             const keywords = CATEGORY_SKILLS[category];
@@ -70,37 +59,28 @@ export async function GET(req: NextRequest) {
                 return keywords.some((kw) => s.includes(kw.toLowerCase()));
             });
         }
-        if (!profiles.length) {
-            return NextResponse.json({ talents: [], total: 0, page, totalPages: 0 });
-        }
+        if (!profiles.length) return NextResponse.json({ talents: [], organizations: [], total: 0, page, totalPages: 0 });
 
         const wallets = profiles.map((p) => p.wallet_address);
 
-        // ── 3. Fetch scores for those wallets ─────────────────────────────────
-        const { data: scores } = await supabase
+        // ── 3. Individual CV scores (scores table) ─────────────────────────────
+        const { data: cvScoreRows } = await supabase
             .from("scores")
             .select("wallet_address, total_score, level, activity_status")
             .in("wallet_address", wallets);
 
-        const scoreMap = new Map(
-            (scores || []).map((s) => [s.wallet_address, s])
-        );
+        const cvScoreMap = new Map((cvScoreRows || []).map((s) => [s.wallet_address, s]));
 
-        // ── 4. Fetch org verifications ────────────────────────────────────────
+        // ── 4. Org verifications ───────────────────────────────────────────────
         const { data: verifications } = await supabase
             .from("organization_verifications")
             .select("wallet_address, status, verifier_tier, type, expires_at")
             .in("wallet_address", wallets)
             .eq("status", "verified");
 
-        const verifMap = new Map(
-            (verifications || []).map((v) => {
-                const expired = v.expires_at ? new Date(v.expires_at) < new Date() : false;
-                return [v.wallet_address, { ...v, isExpired: expired }];
-            })
-        );
+        const verifMap = new Map((verifications || []).map((v) => [v.wallet_address, v]));
 
-        // ── 5. Fetch receipt counts per wallet ────────────────────────────────
+        // ── 5. Receipt counts (for individual stats) ───────────────────────────
         const { data: receiptRows } = await supabase
             .from("receipts")
             .select("wallet_address, id")
@@ -111,7 +91,7 @@ export async function GET(req: NextRequest) {
             receiptCountMap.set(r.wallet_address, (receiptCountMap.get(r.wallet_address) || 0) + 1);
         }
 
-        // ── 6. Fetch attested receipt counts ──────────────────────────────────
+        // ── 6. Attested receipt counts ─────────────────────────────────────────
         const receiptIds = (receiptRows || []).map((r) => r.id);
         let attestedReceiptIds = new Set<string>();
         if (receiptIds.length) {
@@ -122,134 +102,168 @@ export async function GET(req: NextRequest) {
             attestedReceiptIds = new Set((attestRows || []).map((a) => a.receipt_id));
         }
 
-        // Build attested count per wallet (receipts that have ≥1 attestation)
         const attestedCountMap = new Map<string, number>();
-        if (receiptRows) {
-            for (const r of receiptRows) {
-                if (attestedReceiptIds.has(r.id)) {
-                    attestedCountMap.set(r.wallet_address, (attestedCountMap.get(r.wallet_address) || 0) + 1);
-                }
+        for (const r of receiptRows || []) {
+            if (attestedReceiptIds.has(r.id)) {
+                attestedCountMap.set(r.wallet_address, (attestedCountMap.get(r.wallet_address) || 0) + 1);
             }
         }
 
-        // ── 7. Merge & enrich ─────────────────────────────────────────────────
-        let talents = profiles.map((p) => {
-            const scoreData = scoreMap.get(p.wallet_address);
-            const verif     = verifMap.get(p.wallet_address);
-            const totalScore = scoreData?.total_score ?? 0;
-            const receipts  = receiptCountMap.get(p.wallet_address) || 0;
-            const attested  = attestedCountMap.get(p.wallet_address) || 0;
-            const successRate = receipts > 0 ? Math.round((attested / receipts) * 100) : 0;
+        // ── 7. Org activity data (attestations given + hiring) ─────────────────
+        const { data: hiringRows } = await supabase
+            .from("hiring_collections")
+            .select("owner_wallet")
+            .in("owner_wallet", wallets);
 
-            const isVerified = !!verif && !verif.isExpired;
-            const verifierTier = verif?.verifier_tier ?? 0;
-            const verificationType = verif?.type ?? null;
+        const hiringCountMap = new Map<string, number>();
+        for (const h of hiringRows || []) {
+            hiringCountMap.set(h.owner_wallet, (hiringCountMap.get(h.owner_wallet) || 0) + 1);
+        }
 
-            const skills = (p.skills || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+        const { data: attGivenRows } = await supabase
+            .from("attestations")
+            .select("attester_wallet, receipt_id")
+            .in("attester_wallet", wallets);
 
-            // Compute status badge
-            let status: "available" | "top_rated" | "featured" | null = null;
-            const activityStatus = (scoreData?.activity_status || "").toLowerCase();
-            if (totalScore >= 90)       status = "top_rated";
-            else if (totalScore >= 75)  status = "featured";
-            else if (activityStatus === "active" || receipts > 0) status = "available";
+        const attestationsGivenMap = new Map<string, number>();
+        const attesterReceiptMap   = new Map<string, string[]>();
+        for (const a of attGivenRows || []) {
+            attestationsGivenMap.set(a.attester_wallet, (attestationsGivenMap.get(a.attester_wallet) || 0) + 1);
+            const rIds = attesterReceiptMap.get(a.attester_wallet) || [];
+            rIds.push(a.receipt_id);
+            attesterReceiptMap.set(a.attester_wallet, rIds);
+        }
 
-            return {
-                walletAddress: p.wallet_address,
-                displayName: p.display_name || "Anonymous",
-                bio: p.bio,
-                skills,
-                workPreference: p.work_preference || [],
-                avatarUrl: p.avatar_url,
-                role: p.professional_role,
-                organization: p.organization,
-                cardNumber: p.card_number,
-                country: p.country,
-                createdAt: p.created_at,
-                // Score
-                totalScore,
-                level: scoreData?.level ?? "Beginner",
-                // Verification
-                isVerified,
-                verifierTier,
-                verificationType,
-                // Stats
-                receiptCount: receipts,
-                successRate,
-                // Badge
-                status,
-                is_test: p.is_test
-            };
-        });
+        // Endorsed count (unique talent wallets this org has attested)
+        const allAttestedIds = Array.from(new Set((attGivenRows || []).map(a => a.receipt_id)));
+        const receiptWalletMap = new Map<string, string>();
+        if (allAttestedIds.length > 0) {
+            const { data: recWalletRows } = await supabase
+                .from("receipts")
+                .select("id, wallet_address")
+                .in("id", allAttestedIds);
+            for (const r of recWalletRows || []) receiptWalletMap.set(r.id, r.wallet_address);
+        }
 
-        // ── 8. Score-range filter ─────────────────────────────────────────────
+        const endorsedCountMap = new Map<string, number>();
+        for (const [attester, rIds] of attesterReceiptMap.entries()) {
+            const unique = new Set<string>();
+            for (const rid of rIds) { const w = receiptWalletMap.get(rid); if (w) unique.add(w); }
+            endorsedCountMap.set(attester, unique.size);
+        }
+
+        // ── 8. Merge & score correctly per entity type ─────────────────────────
+        let allEntries = profiles
+            .filter((p) => p.is_test !== true)
+            .map((p) => {
+                const verif      = verifMap.get(p.wallet_address);
+                const isOrgCard  = !!verif && isOrgVerif(verif);
+                const receipts   = receiptCountMap.get(p.wallet_address) || 0;
+                const attested   = attestedCountMap.get(p.wallet_address) || 0;
+                const skills     = (p.skills || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+
+                let totalScore: number;
+                let displayLevel: string;
+                let activityStatus: string;
+
+                if (isOrgCard) {
+                    // ── Org: compute Trust Score from live activity data ────────
+                    const orgResult = computeOrgTrust(p, {
+                        type:              verif!.type,
+                        tier:              verif!.verifier_tier || 0,
+                        attestationsGiven: attestationsGivenMap.get(p.wallet_address) || 0,
+                        hiringCollections: hiringCountMap.get(p.wallet_address) || 0,
+                    });
+                    totalScore     = orgResult.trust_score;
+                    displayLevel   = orgResult.level;
+                    activityStatus = orgResult.activity_status;
+                } else {
+                    // ── Individual: read CV Score from scores table ────────────
+                    const cv       = cvScoreMap.get(p.wallet_address);
+                    totalScore     = cv?.total_score    ?? 0;
+                    displayLevel   = cv?.level          ?? "Beginner";
+                    activityStatus = cv?.activity_status ?? "active";
+                }
+
+                const successRate = receipts > 0 ? Math.round((attested / receipts) * 100) : 0;
+
+                // Status badge
+                let status: "available" | "top_rated" | "featured" | null = null;
+                if      (totalScore >= 90)                                       status = "top_rated";
+                else if (totalScore >= 75)                                       status = "featured";
+                else if (activityStatus === "active" || receipts > 0 ||
+                         (attestationsGivenMap.get(p.wallet_address) || 0) > 0) status = "available";
+
+                return {
+                    walletAddress:          p.wallet_address,
+                    displayName:            p.display_name || "Anonymous",
+                    bio:                    p.bio,
+                    skills,
+                    workPreference:         p.work_preference || [],
+                    avatarUrl:              p.avatar_url,
+                    role:                   p.professional_role,
+                    organization:           p.organization,
+                    cardNumber:             p.card_number,
+                    country:                p.country,
+                    createdAt:              p.created_at,
+                    totalScore,
+                    level:                  displayLevel,
+                    isVerified:             !!verif && !isOrgVerif(verif) ? false : !!verif,
+                    verifierTier:           verif?.verifier_tier ?? 0,
+                    verificationType:       verif?.type ?? null,
+                    receiptCount:           receipts,
+                    successRate,
+                    status,
+                    // Org-specific stats (used in org cards)
+                    endorsedCount:          endorsedCountMap.get(p.wallet_address) || 0,
+                    hiringCount:            hiringCountMap.get(p.wallet_address)    || 0,
+                    attestationsGivenCount: attestationsGivenMap.get(p.wallet_address) || 0,
+                    isOrg:                  isOrgCard,
+                };
+            });
+
+        // ── 9. Filters ─────────────────────────────────────────────────────────
         if (minScore > 0 || maxScore < 100) {
-            talents = talents.filter((t) => t.totalScore >= minScore && t.totalScore <= maxScore);
+            allEntries = allEntries.filter((t) => t.totalScore >= minScore && t.totalScore <= maxScore);
         }
+        if (availableOnly) allEntries = allEntries.filter((t) => t.receiptCount > 0 || t.status === "available");
+        if (verifiedOnly)  allEntries = allEntries.filter((t) => t.verifierTier > 0);
 
-        // ── 8b. Availability / verification filters ───────────────────────────
-        if (availableOnly) {
-            talents = talents.filter((t) => t.receiptCount > 0 || t.status === "available");
-        }
-        if (verifiedOnly) {
-            talents = talents.filter((t) => t.isVerified);
-        }
-
-        // ── 8c. Re-enable test filter (relaxed) ─────────────────────────────
-        talents = talents.filter(t => t.is_test !== true);
-
-        // ── 9. Sort ───────────────────────────────────────────────────────────
-        const sortTalents = (a: any, b: any) => {
-            // 1. Avatar priority
-            const hasAvatarA = !!a.avatarUrl;
-            const hasAvatarB = !!b.avatarUrl;
-            if (hasAvatarA !== hasAvatarB) return hasAvatarA ? -1 : 1;
-
-            // 2. Skills priority
-            const hasSkillsA = a.skills.length > 0;
-            const hasSkillsB = b.skills.length > 0;
-            if (hasSkillsA !== hasSkillsB) return hasSkillsA ? -1 : 1;
-
-            // 3. Score priority (descending)
+        // ── 10. Sort ───────────────────────────────────────────────────────────
+        const defaultSort = (a: any, b: any) => {
+            // Avatar → skills → score
+            const aAvatar = !!a.avatarUrl, bAvatar = !!b.avatarUrl;
+            if (aAvatar !== bAvatar) return aAvatar ? -1 : 1;
+            const aSkills = a.skills.length > 0, bSkills = b.skills.length > 0;
+            if (aSkills !== bSkills) return aSkills ? -1 : 1;
             return b.totalScore - a.totalScore;
         };
 
-        if (sort === "score_asc") {
-            talents.sort((a, b) => a.totalScore - b.totalScore);
-        } else if (sort === "newest") {
-            talents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        } else {
-            // default: Highest Score (with Avatar & Skills priority)
-            talents.sort(sortTalents);
-        }
+        if      (sort === "score_asc") allEntries.sort((a, b) => a.totalScore - b.totalScore);
+        else if (sort === "newest")    allEntries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        else                           allEntries.sort(defaultSort);
 
-        // ── 10. Split & Paginate ──────────────────────────────────────────────
-        const isOrg = (t: any) => t.verificationType === 'Company / Organization' || t.verificationType === 'Community / DAO';
-        const individuals = talents.filter(t => !isOrg(t));
-        const organizations = talents.filter(t => isOrg(t));
+        // ── 11. Split individuals / organizations ──────────────────────────────
+        const individuals   = allEntries.filter((t) => !t.isOrg);
+        const organizations = allEntries.filter((t) =>  t.isOrg);
 
-        // Limit is 8, so we do 4 and 4
-        const halfLimit = Math.floor(limit / 2);
-        const offset = (page - 1) * halfLimit;
+        // 4 individuals + 4 organizations per page (totals 8 cards)
+        const halfLimit   = Math.floor(limit / 2);
+        const offset      = (page - 1) * halfLimit;
 
-        const paginatedIndividuals = individuals.slice(offset, offset + halfLimit);
+        const paginatedIndividuals   = individuals.slice(offset, offset + halfLimit);
         const paginatedOrganizations = organizations.slice(offset, offset + halfLimit);
 
-        const total = individuals.length + organizations.length;
+        const total      = individuals.length + organizations.length;
         const totalPages = Math.max(
-            Math.ceil(individuals.length / halfLimit),
+            Math.ceil(individuals.length   / halfLimit),
             Math.ceil(organizations.length / halfLimit)
         );
 
-        return NextResponse.json({ 
-            talents: paginatedIndividuals, 
-            organizations: paginatedOrganizations,
-            total, 
-            page, 
-            totalPages 
-        });
+        return NextResponse.json({ talents: paginatedIndividuals, organizations: paginatedOrganizations, total, page, totalPages });
 
     } catch (err: any) {
+        console.error("[explore-talent]", err);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
