@@ -354,6 +354,7 @@ export async function GET(req: NextRequest) {
                         hiringCount:            0,
                         attestationsGivenCount: 0,
                         isOrg:                  true,
+                        timezone:               undefined,
                     });
                 }
             }
