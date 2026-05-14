@@ -134,19 +134,35 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                         {talent.bio || "Building the future of decentralized ecosystems."}
                     </p>
 
-                    {/* Stat grid */}
-                    <div className="grid grid-cols-3 rounded-xl overflow-hidden border border-white/[0.06] bg-white/[0.02]">
-                        {([
-                            { Icon: Users,       value: endorsedCount,     label: "Endorsed" },
-                            { Icon: Briefcase,   value: hiringCount,       label: "Hires"    },
-                            { Icon: ShieldCheck, value: attestationsCount, label: "Attests"  },
-                        ] as const).map((stat, i) => (
-                            <div key={i} className={`flex flex-col items-center py-2.5 gap-0.5 ${i > 0 ? "border-l border-white/[0.06]" : ""}`}>
-                                <stat.Icon className="w-3 h-3 text-white/20 mb-0.5" />
-                                <span className="text-[13px] font-black text-white/70 leading-none">{stat.value}</span>
-                                <span className="text-[8px] font-medium text-white/25 uppercase tracking-wide">{stat.label}</span>
+                    {/* Stat boxes — styled like the hero StatCard */}
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="flex flex-col gap-2 p-2.5 rounded-[14px] border border-amber-500/10 bg-amber-500/[0.03]">
+                            <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.05] flex items-center justify-center">
+                                <Briefcase className="w-3 h-3 text-amber-400/70" />
                             </div>
-                        ))}
+                            <div>
+                                <span className="text-[16px] font-black text-white/80 leading-none block">{hiringCount}</span>
+                                <span className="text-[7.5px] font-bold text-white/25 uppercase tracking-wider mt-0.5 block leading-snug">Opportunities</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-2 p-2.5 rounded-[14px] border border-indigo-500/10 bg-indigo-500/[0.03]">
+                            <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.05] flex items-center justify-center">
+                                <ShieldCheck className="w-3 h-3 text-indigo-400/70" />
+                            </div>
+                            <div>
+                                <span className="text-[16px] font-black text-white/80 leading-none block">{attestationsCount}</span>
+                                <span className="text-[7.5px] font-bold text-white/25 uppercase tracking-wider mt-0.5 block leading-snug">Attestations</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-2 p-2.5 rounded-[14px] border border-emerald-500/10 bg-emerald-500/[0.03]">
+                            <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.05] flex items-center justify-center">
+                                <Users className="w-3 h-3 text-emerald-400/70" />
+                            </div>
+                            <div>
+                                <span className="text-[16px] font-black text-white/80 leading-none block">{endorsedCount}</span>
+                                <span className="text-[7.5px] font-bold text-white/25 uppercase tracking-wider mt-0.5 block leading-snug">Endorsed</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
