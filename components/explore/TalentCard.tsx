@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, BadgeCheck, Star, ShieldCheck, Globe, Github, Linkedin, Twitter, Building2, Users, ArrowRight } from "lucide-react";
+import { MapPin, BadgeCheck, Star, ShieldCheck, Globe, Github, Linkedin, Twitter, Building2, Users, ArrowRight, Briefcase } from "lucide-react";
 
 export interface TalentProfile {
     walletAddress: string;
@@ -17,6 +17,7 @@ export interface TalentProfile {
     cardNumber?: number;
     country?: string;
     totalScore: number;
+    trustScore?: number;        // populated for org cards; equals totalScore for orgs
     level: string;
     isVerified: boolean;
     verifierTier: number;
@@ -24,6 +25,11 @@ export interface TalentProfile {
     receiptCount: number;
     successRate: number;
     status: "available" | "top_rated" | "featured" | null;
+    // Org-specific fields
+    isOrg?: boolean;
+    endorsedCount?: number;
+    hiringCount?: number;
+    attestationsGivenCount?: number;
 }
 
 const STATUS_CONFIG = {
@@ -44,9 +50,106 @@ const STATUS_CONFIG = {
     },
 };
 
-export function TalentCard({ talent }: { talent: TalentProfile }) {
+export function TalentCard({ talent, variant = "default" }: { talent: TalentProfile, variant?: "default" | "square" }) {
     const visibleSkills = talent.skills.slice(0, 3);
     const isOrg = talent.verificationType === 'Company / Organization' || talent.verificationType === 'Community / DAO';
+    
+    if (variant === "square") {
+        const endorsedCount = talent.endorsedCount || 0;
+        const hiringCount = talent.hiringCount || 0;
+        const attestationsCount = talent.attestationsGivenCount || 0;
+
+        return (
+            <div className="group relative block rounded-[24px] bg-[#0d0d0d] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden shadow-2xl flex flex-col p-6 text-center h-full min-h-[320px]">
+                {/* Lighting Effects */}
+                <div className="absolute inset-0 pointer-events-none z-0">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+                </div>
+
+                <div className="relative z-10 w-full flex flex-col flex-1 items-center">
+                    {/* Avatar & Verification */}
+                    <div className="relative mb-3 group-hover:-translate-y-1 transition-transform duration-500">
+                        <div className="w-16 h-16 rounded-[18px] overflow-hidden border border-white/10 bg-white/[0.05] shadow-2xl">
+                            {talent.avatarUrl ? (
+                                <Image
+                                    src={talent.avatarUrl}
+                                    alt={talent.displayName}
+                                    width={64}
+                                    height={64}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white/40 text-xl font-bold">
+                                    {talent.displayName.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        {talent.isVerified && (
+                            <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-[#0d0d0d] border border-emerald-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] z-10" title="Verified Organization">
+                                <BadgeCheck className="w-4 h-4 text-emerald-400" />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Name & Type */}
+                    <h3 className="text-base font-bold text-white mb-1 line-clamp-1 px-2 group-hover:text-indigo-400 transition-colors">
+                        {talent.displayName}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mb-3">
+                        <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">
+                            {talent.verificationType || "Organization"}
+                        </span>
+                    </div>
+
+                    {/* Bio */}
+                    <div className="mb-5 flex-1 w-full">
+                        {talent.bio ? (
+                            <p className="text-[11px] text-white/50 line-clamp-3 leading-relaxed">
+                                {talent.bio}
+                            </p>
+                        ) : (
+                            <p className="text-[11px] text-white/30 italic">
+                                No bio available for this organization.
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Stat Badges */}
+                    <div className="flex flex-wrap justify-center gap-2 mb-6 w-full">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Endorsed Talents">
+                            <Users className="w-3 h-3 text-indigo-400" />
+                            <span className="text-[10px] font-bold">{endorsedCount} <span className="text-white/30 font-normal">Endorsed</span></span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Hiring Activity">
+                            <Briefcase className="w-3 h-3 text-amber-400" />
+                            <span className="text-[10px] font-bold">{hiringCount} <span className="text-white/30 font-normal">Hires</span></span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Attestations Given">
+                            <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                            <span className="text-[10px] font-bold">{attestationsCount} <span className="text-white/30 font-normal">Attestations</span></span>
+                        </div>
+                    </div>
+
+                    {/* Trust Score */}
+                    <div className="flex flex-col items-center mt-auto border-t border-white/5 pt-4 w-full">
+                        <span className="text-2xl font-bold leading-none text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 via-white to-emerald-400">
+                            {talent.trustScore || talent.totalScore}
+                        </span>
+                        <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1.5">
+                            TRUST SCORE
+                        </span>
+                    </div>
+                </div>
+
+                <Link
+                    href={`/cv/${talent.walletAddress}`}
+                    className="absolute inset-0 z-20"
+                    aria-label={`View ${talent.displayName}'s profile`}
+                />
+            </div>
+        );
+    }
     
     return (
         <div
@@ -144,7 +247,7 @@ export function TalentCard({ talent }: { talent: TalentProfile }) {
                     
                     <div className="flex flex-col items-center">
                         <span className="text-[28px] font-bold leading-none text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 via-white to-emerald-400">
-                            {talent.totalScore}
+                            {isOrg ? (talent.trustScore || talent.totalScore) : talent.totalScore}
                         </span>
                         <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] mt-2">
                             {isOrg ? "TRUST SCORE" : "CV SCORE"}
