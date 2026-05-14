@@ -16,14 +16,20 @@ export function computeReputation(
     attestationWeights?: Map<string, number>,
     tierBreakdown?: AttestationTierBreakdown,
     orgStats?: {
-        type: string;
-        tier: number;
-        attestationsGiven: number;
-        hiringCollections: number;
+        type:               string;
+        tier:               number;
+        attestationsGiven:  number;
+        uniqueEndorsed?:    number;
+        hiringCollections:  number;
+        daysVerified?:      number;
     }
 ) {
     if (orgStats) {
-        return computeOrgTrust(profile, orgStats);
+        return computeOrgTrust(profile, {
+            ...orgStats,
+            uniqueEndorsed:  orgStats.uniqueEndorsed  ?? 0,
+            daysVerified:    orgStats.daysVerified     ?? 0,
+        });
     }
     return computeCVScore(profile, receipts, attestationWeights, tierBreakdown);
 }

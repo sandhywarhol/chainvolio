@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
         // ── 4. Org verifications ───────────────────────────────────────────────
         const { data: verifications } = await supabase
             .from("organization_verifications")
-            .select("wallet_address, status, verifier_tier, type, expires_at")
+            .select("wallet_address, status, verifier_tier, type, expires_at, created_at")
             .in("wallet_address", wallets)
             .eq("status", "verified");
 
@@ -168,11 +168,16 @@ export async function GET(req: NextRequest) {
 
                 if (isOrgCard) {
                     // ── Org: compute Trust Score from live activity data ────────
+                    const daysVerified = verif!.created_at
+                        ? Math.floor((Date.now() - new Date(verif!.created_at).getTime()) / (1000 * 60 * 60 * 24))
+                        : 0;
                     const orgResult = computeOrgTrust(p, {
-                        type:              verif!.type,
-                        tier:              verif!.verifier_tier || 0,
-                        attestationsGiven: attestationsGivenMap.get(p.wallet_address) || 0,
-                        hiringCollections: hiringCountMap.get(p.wallet_address) || 0,
+                        type:               verif!.type,
+                        tier:               verif!.verifier_tier || 0,
+                        attestationsGiven:  attestationsGivenMap.get(p.wallet_address) || 0,
+                        uniqueEndorsed:     endorsedCountMap.get(p.wallet_address) || 0,
+                        hiringCollections:  hiringCountMap.get(p.wallet_address) || 0,
+                        daysVerified,
                     });
                     totalScore     = orgResult.trust_score;
                     displayLevel   = orgResult.level;

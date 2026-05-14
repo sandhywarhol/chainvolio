@@ -1,7 +1,6 @@
 import { supabaseServer } from "@/lib/supabase/server";
 import { computeOrgTrust } from "@/shared/logic/orgTrust";
 
-// Types for the verified org check
 const ORG_TYPES = ["Company / Organization", "Community / DAO"] as const;
 type OrgType = typeof ORG_TYPES[number];
 
@@ -17,10 +16,10 @@ function isExpired(expiresAt: string | null): boolean {
 export async function calculateOrgTrust(wallet_address: string) {
     if (!supabaseServer) throw new Error("Supabase internal error");
 
-    // ── Fetch org verification ────────────────────────────────────────────
+    // ── Org verification (+ created_at for tenure) ────────────────────────
     const { data: orgVerif } = await supabaseServer
         .from("organization_verifications")
-        .select("status, type, expires_at, verifier_tier")
+        .select("status, type, expires_at, verifier_tier, created_at")
         .eq("wallet_address", wallet_address)
         .single();
 
@@ -28,15 +27,15 @@ export async function calculateOrgTrust(wallet_address: string) {
         throw new Error("Wallet is not a verified organization");
     }
 
-    // ── Fetch activity data ───────────────────────────────────────────────
-    const [
-        { count: attestationsCount },
-        { count: hiringCount },
-        { data: profile },
-    ] = await Promise.all([
+    const daysVerified = orgVerif.created_at
+        ? Math.floor((Date.now() - new Date(orgVerif.created_at).getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+
+    // ── Parallel: attestations, hiring, profile ────────────────────────────
+    const [attestResult, hiringResult, profileResult] = await Promise.all([
         supabaseServer
             .from("attestations")
-            .select("*", { count: "exact", head: true })
+            .select("receipt_id")
             .eq("attester_wallet", wallet_address),
         supabaseServer
             .from("hiring_collections")
@@ -44,17 +43,33 @@ export async function calculateOrgTrust(wallet_address: string) {
             .eq("owner_wallet", wallet_address),
         supabaseServer
             .from("profiles")
-            .select("bio, website, twitter, discord, github, skills, avatar_url")
+            .select("bio, website, twitter, discord, github, linkedin, skills, avatar_url")
             .eq("wallet_address", wallet_address)
-            .single()
-            .then((r: any) => r),
+            .single(),
     ]);
 
-    const result = computeOrgTrust(profile?.data ?? null, {
+    const attestRows   = attestResult.data  || [];
+    const hiringCount  = hiringResult.count || 0;
+    const profile      = profileResult.data ?? null;
+
+    // ── Unique endorsed: join attestation receipt_ids → receipts wallets ──
+    let uniqueEndorsed = 0;
+    const receiptIds = [...new Set(attestRows.map((a: any) => a.receipt_id).filter(Boolean))];
+    if (receiptIds.length > 0) {
+        const { data: walletRows } = await supabaseServer
+            .from("receipts")
+            .select("wallet_address")
+            .in("id", receiptIds);
+        uniqueEndorsed = new Set((walletRows || []).map((r: any) => r.wallet_address)).size;
+    }
+
+    const result = computeOrgTrust(profile, {
         type:               orgVerif.type,
         tier:               orgVerif.verifier_tier || 0,
-        attestationsGiven:  attestationsCount || 0,
-        hiringCollections:  hiringCount       || 0,
+        attestationsGiven:  attestRows.length,
+        uniqueEndorsed,
+        hiringCollections:  hiringCount,
+        daysVerified,
     });
 
     // ── Persist to organization_scores ────────────────────────────────────
@@ -67,6 +82,7 @@ export async function calculateOrgTrust(wallet_address: string) {
             org_type:             result.org_type,
             base_score:           result.base_score,
             attestations_given:   result.attestations_given,
+            unique_endorsed:      result.unique_endorsed,
             hiring_count:         result.hiring_count,
             profile_completeness: result.profile_completeness,
             level:                result.level,
