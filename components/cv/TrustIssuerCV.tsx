@@ -220,7 +220,7 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
   // Unify display score logic
   const scoreValue = scoreData?.score ?? 0;
-  const displayScore = profile.isVerified ? Math.min(100, Math.max(50, scoreValue + 5)) : scoreValue;
+  const displayScore = scoreValue;
   const reputationLabel = displayScore >= 80 ? "Elite Trust Authority" : "Verified Organization";
 
   return (

@@ -383,11 +383,9 @@ function ExploreTalentInner() {
                                     Explore verified companies, communities, and DAOs actively participating in the ecosystem.
                                 </p>
                             </div>
-                            <div className={organizations.length < 4 ? "flex flex-wrap justify-center gap-6" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {organizations.map((org) => (
-                                    <div key={org.walletAddress} className={organizations.length < 4 ? "w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]" : ""}>
-                                        <TalentCard talent={org} />
-                                    </div>
+                                    <TalentCard key={org.walletAddress} talent={org} variant="square" />
                                 ))}
                             </div>
                         </div>

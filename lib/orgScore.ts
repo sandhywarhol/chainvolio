@@ -31,8 +31,8 @@ export async function calculateOrgTrust(wallet_address: string) {
         ? Math.floor((Date.now() - new Date(orgVerif.created_at).getTime()) / (1000 * 60 * 60 * 24))
         : 0;
 
-    // ── Parallel: attestations, hiring, profile ────────────────────────────
-    const [attestResult, hiringResult, profileResult] = await Promise.all([
+    // ── Parallel: attestations, hiring, profile, subscription ─────────────
+    const [attestResult, hiringResult, profileResult, subResult] = await Promise.all([
         supabaseServer
             .from("attestations")
             .select("receipt_id")
@@ -46,11 +46,25 @@ export async function calculateOrgTrust(wallet_address: string) {
             .select("bio, website, twitter, discord, github, linkedin, skills, avatar_url")
             .eq("wallet_address", wallet_address)
             .single(),
+        supabaseServer
+            .from("org_accounts")
+            .select("subscription_status, plan_name, current_period_end")
+            .eq("wallet_address", wallet_address)
+            .maybeSingle(),
     ]);
 
     const attestRows   = attestResult.data  || [];
     const hiringCount  = hiringResult.count || 0;
     const profile      = profileResult.data ?? null;
+
+    const subRow       = subResult.data;
+    const hasActiveSub = !!(
+        subRow &&
+        subRow.subscription_status !== "canceled" &&
+        subRow.plan_name !== "free" &&
+        subRow.plan_name &&
+        (!subRow.current_period_end || new Date(subRow.current_period_end) > new Date())
+    );
 
     // ── Unique endorsed: join attestation receipt_ids → receipts wallets ──
     let uniqueEndorsed = 0;
@@ -70,6 +84,7 @@ export async function calculateOrgTrust(wallet_address: string) {
         uniqueEndorsed,
         hiringCollections:  hiringCount,
         daysVerified,
+        hasActiveSub,
     });
 
     // ── Persist to organization_scores ────────────────────────────────────

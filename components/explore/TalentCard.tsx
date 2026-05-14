@@ -7,6 +7,7 @@ import { MapPin, BadgeCheck, Star, ShieldCheck, Globe, Github, Linkedin, Twitter
 
 export interface TalentProfile {
     walletAddress: string;
+    authUid?: string;           // set for Google-login orgs; drives /org/[authUid] routing
     displayName: string;
     bio?: string;
     skills: string[];
@@ -25,6 +26,11 @@ export interface TalentProfile {
     receiptCount: number;
     successRate: number;
     status: "available" | "top_rated" | "featured" | null;
+    // Social links
+    github?: string;
+    twitter?: string;
+    linkedin?: string;
+    website?: string;
     // Org-specific fields
     isOrg?: boolean;
     endorsedCount?: number;
@@ -53,100 +59,119 @@ const STATUS_CONFIG = {
 export function TalentCard({ talent, variant = "default" }: { talent: TalentProfile, variant?: "default" | "square" }) {
     const visibleSkills = talent.skills.slice(0, 3);
     const isOrg = talent.verificationType === 'Company / Organization' || talent.verificationType === 'Community / DAO';
+    // Google-login orgs use /org/[authUid]; wallet-based users use /cv/[wallet]
+    const profileUrl = talent.authUid ? `/org/${talent.authUid}` : `/cv/${talent.walletAddress}`;
+    const shortWallet = talent.walletAddress?.startsWith('gauth:') || !talent.walletAddress
+        ? null
+        : `${talent.walletAddress.slice(0, 4)}…${talent.walletAddress.slice(-4)}`;
     
     if (variant === "square") {
-        const endorsedCount = talent.endorsedCount || 0;
-        const hiringCount = talent.hiringCount || 0;
+        const endorsedCount     = talent.endorsedCount || 0;
+        const hiringCount       = talent.hiringCount || 0;
         const attestationsCount = talent.attestationsGivenCount || 0;
+        const score             = talent.trustScore ?? talent.totalScore;
+        const isDao             = talent.verificationType === "Community / DAO";
+        const TypeIcon          = isDao ? Users : Building2;
+        const typeLabel         = isDao ? "Community / DAO" : "Company / Org";
+        const typeBadge         = isDao
+            ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
+            : "bg-amber-500/10 border-amber-500/20 text-amber-400";
 
         return (
-            <div className="group relative block rounded-[24px] bg-[#0d0d0d] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden shadow-2xl flex flex-col p-6 text-center h-full min-h-[320px]">
-                {/* Lighting Effects */}
-                <div className="absolute inset-0 pointer-events-none z-0">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
-                </div>
+            <div className="group relative rounded-[24px] bg-[#0d0d0d] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden flex flex-col">
 
-                <div className="relative z-10 w-full flex flex-col flex-1 items-center">
-                    {/* Avatar & Verification */}
-                    <div className="relative mb-3 group-hover:-translate-y-1 transition-transform duration-500">
-                        <div className="w-16 h-16 rounded-[18px] overflow-hidden border border-white/10 bg-white/[0.05] shadow-2xl">
-                            {talent.avatarUrl ? (
-                                <Image
-                                    src={talent.avatarUrl}
-                                    alt={talent.displayName}
-                                    width={64}
-                                    height={64}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-white/40 text-xl font-bold">
-                                    {talent.displayName.charAt(0).toUpperCase()}
+                {/* ── Header ─────────────────────────────────────────────── */}
+                <div className="relative px-5 pt-5 pb-4">
+                    <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
+                    <div className="relative flex items-start gap-3">
+                        {/* Square logo / avatar */}
+                        <div className="relative flex-shrink-0">
+                            <div className="w-[52px] h-[52px] rounded-[13px] overflow-hidden border border-white/10 bg-white/[0.04] shadow-lg">
+                                {talent.avatarUrl ? (
+                                    <Image
+                                        src={talent.avatarUrl}
+                                        alt={talent.displayName}
+                                        width={52} height={52}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white/25 text-lg font-black">
+                                        {talent.displayName.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                            </div>
+                            {talent.isVerified && (
+                                <div className="absolute -bottom-1 -right-1 w-[18px] h-[18px] rounded-full bg-[#0d0d0d] border border-emerald-500/30 flex items-center justify-center">
+                                    <BadgeCheck className="w-2.5 h-2.5 text-emerald-400" />
                                 </div>
                             )}
                         </div>
-                        {talent.isVerified && (
-                            <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-[#0d0d0d] border border-emerald-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] z-10" title="Verified Organization">
-                                <BadgeCheck className="w-4 h-4 text-emerald-400" />
+
+                        {/* Name + type badge */}
+                        <div className="flex-1 min-w-0 pt-0.5">
+                            <h3 className="text-[13px] font-bold text-white leading-snug line-clamp-1 mb-2 group-hover:text-amber-200/60 transition-colors">
+                                {talent.displayName}
+                            </h3>
+                            <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[8.5px] font-bold uppercase tracking-wider ${typeBadge}`}>
+                                <TypeIcon className="w-2.5 h-2.5" />
+                                {typeLabel}
                             </div>
-                        )}
-                    </div>
-
-                    {/* Name & Type */}
-                    <h3 className="text-base font-bold text-white mb-1 line-clamp-1 px-2 group-hover:text-indigo-400 transition-colors">
-                        {talent.displayName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 mb-3">
-                        <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">
-                            {talent.verificationType || "Organization"}
-                        </span>
-                    </div>
-
-                    {/* Bio */}
-                    <div className="mb-5 flex-1 w-full">
-                        {talent.bio ? (
-                            <p className="text-[11px] text-white/50 line-clamp-3 leading-relaxed">
-                                {talent.bio}
-                            </p>
-                        ) : (
-                            <p className="text-[11px] text-white/30 italic">
-                                No bio available for this organization.
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Stat Badges */}
-                    <div className="flex flex-wrap justify-center gap-2 mb-6 w-full">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Endorsed Talents">
-                            <Users className="w-3 h-3 text-indigo-400" />
-                            <span className="text-[10px] font-bold">{endorsedCount} <span className="text-white/30 font-normal">Endorsed</span></span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Hiring Activity">
-                            <Briefcase className="w-3 h-3 text-amber-400" />
-                            <span className="text-[10px] font-bold">{hiringCount} <span className="text-white/30 font-normal">Hires</span></span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white/70 shadow-sm" title="Attestations Given">
-                            <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                            <span className="text-[10px] font-bold">{attestationsCount} <span className="text-white/30 font-normal">Attestations</span></span>
                         </div>
                     </div>
 
-                    {/* Trust Score */}
-                    <div className="flex flex-col items-center mt-auto border-t border-white/5 pt-4 w-full">
-                        <span className="text-2xl font-bold leading-none text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 via-white to-emerald-400">
-                            {talent.trustScore || talent.totalScore}
-                        </span>
-                        <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1.5">
-                            TRUST SCORE
-                        </span>
+                    {/* Level */}
+                    <div className="relative mt-3 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                        <span className="text-[10px] font-semibold text-white/40 tracking-wide">{talent.level}</span>
                     </div>
                 </div>
 
-                <Link
-                    href={`/cv/${talent.walletAddress}`}
-                    className="absolute inset-0 z-20"
-                    aria-label={`View ${talent.displayName}'s profile`}
-                />
+                <div className="h-px bg-white/[0.05] mx-5" />
+
+                {/* ── Body ───────────────────────────────────────────────── */}
+                <div className="px-5 pt-4 pb-4 flex-1 flex flex-col gap-4">
+                    <p className="text-[11px] text-white/40 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                        {talent.bio || "Building the future of decentralized ecosystems."}
+                    </p>
+
+                    {/* Stat grid */}
+                    <div className="grid grid-cols-3 rounded-xl overflow-hidden border border-white/[0.06] bg-white/[0.02]">
+                        {([
+                            { Icon: Users,       value: endorsedCount,     label: "Endorsed" },
+                            { Icon: Briefcase,   value: hiringCount,       label: "Hires"    },
+                            { Icon: ShieldCheck, value: attestationsCount, label: "Attests"  },
+                        ] as const).map((stat, i) => (
+                            <div key={i} className={`flex flex-col items-center py-2.5 gap-0.5 ${i > 0 ? "border-l border-white/[0.06]" : ""}`}>
+                                <stat.Icon className="w-3 h-3 text-white/20 mb-0.5" />
+                                <span className="text-[13px] font-black text-white/70 leading-none">{stat.value}</span>
+                                <span className="text-[8px] font-medium text-white/25 uppercase tracking-wide">{stat.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* ── Footer ─────────────────────────────────────────────── */}
+                <div className="px-5 pb-5 pt-1 flex items-center justify-between gap-3">
+                    {/* Trust score — same gradient as builder CV score */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                        <span className="text-[18px] font-black leading-none text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 via-white to-emerald-400">
+                            {score}
+                        </span>
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[7px] font-bold text-white/20 uppercase tracking-widest">Trust</span>
+                            <span className="text-[7px] font-bold text-white/20 uppercase tracking-widest">Score</span>
+                        </div>
+                    </div>
+
+                    {/* View Profile */}
+                    <Link
+                        href={profileUrl}
+                        className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.07] hover:border-white/15 transition-all duration-200 text-[9px] font-bold uppercase tracking-widest text-white/35 hover:text-white/70 group/btn"
+                    >
+                        View Profile
+                        <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
+                    </Link>
+                </div>
             </div>
         );
     }
@@ -271,18 +296,24 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                 <div className="mt-auto flex flex-col gap-4">
                     <div className="pt-5 border-t border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            {[Github, Linkedin, Twitter].map((Icon, i) => (
-                                <Icon key={i} className="w-3.5 h-3.5 text-white/20 hover:text-white/40 transition-colors" />
+                            {([
+                                { Icon: Github,   value: talent.github   },
+                                { Icon: Linkedin, value: talent.linkedin },
+                                { Icon: Twitter,  value: talent.twitter  },
+                            ] as const).filter(({ value }) => !!value).map(({ Icon }, i) => (
+                                <Icon key={i} className="w-3.5 h-3.5 text-white/50" />
                             ))}
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="px-2 py-1 rounded bg-white/[0.02] border border-white/[0.06] text-[8px] font-mono text-white/25">
-                                {talent.walletAddress.slice(0, 4)}...{talent.walletAddress.slice(-4)}
+                        {shortWallet && (
+                            <div className="flex items-center gap-2">
+                                <div className="px-2 py-1 rounded bg-white/[0.02] border border-white/[0.06] text-[8px] font-mono text-white/25">
+                                    {shortWallet}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                     <Link
-                        href={`/cv/${talent.walletAddress}`}
+                        href={profileUrl}
                         className="h-10 w-full bg-white/[0.02] hover:bg-white/[0.08] border border-white/[0.05] hover:border-white/15 rounded-xl flex items-center justify-between px-4 transition-all duration-300 cursor-pointer"
                     >
                         <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white/80 transition-colors">View Profile</span>

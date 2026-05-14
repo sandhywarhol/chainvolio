@@ -80,6 +80,34 @@ export async function GET(req: NextRequest) {
 
         const verifMap = new Map((verifications || []).map((v) => [v.wallet_address, v]));
 
+        // ── 4.5. Stored org trust scores (canonical source) ───────────────────
+        const orgWallets = (verifications || []).map((v) => v.wallet_address);
+        const orgScoreMap = new Map<string, { trust_score: number; level: string; activity_status: string }>();
+        if (orgWallets.length) {
+            const { data: orgScoreRows } = await supabase
+                .from("organization_scores")
+                .select("wallet_address, trust_score, level, activity_status")
+                .in("wallet_address", orgWallets);
+            for (const s of orgScoreRows || []) orgScoreMap.set(s.wallet_address, s);
+        }
+
+        // ── 4.6. Subscription status (for live fallback + Google-login orgs) ──
+        const subActiveMap = new Map<string, boolean>();
+        if (orgWallets.length) {
+            const { data: subRows } = await supabase
+                .from("org_accounts")
+                .select("wallet_address, subscription_status, plan_name, current_period_end")
+                .in("wallet_address", orgWallets);
+            const now = new Date();
+            for (const s of subRows || []) {
+                subActiveMap.set(s.wallet_address, !!(
+                    s.subscription_status !== "canceled" &&
+                    s.plan_name && s.plan_name !== "free" &&
+                    (!s.current_period_end || new Date(s.current_period_end) > now)
+                ));
+            }
+        }
+
         // ── 5. Receipt counts (for individual stats) ───────────────────────────
         const { data: receiptRows } = await supabase
             .from("receipts")
@@ -167,21 +195,29 @@ export async function GET(req: NextRequest) {
                 let activityStatus: string;
 
                 if (isOrgCard) {
-                    // ── Org: compute Trust Score from live activity data ────────
-                    const daysVerified = verif!.created_at
-                        ? Math.floor((Date.now() - new Date(verif!.created_at).getTime()) / (1000 * 60 * 60 * 24))
-                        : 0;
-                    const orgResult = computeOrgTrust(p, {
-                        type:               verif!.type,
-                        tier:               verif!.verifier_tier || 0,
-                        attestationsGiven:  attestationsGivenMap.get(p.wallet_address) || 0,
-                        uniqueEndorsed:     endorsedCountMap.get(p.wallet_address) || 0,
-                        hiringCollections:  hiringCountMap.get(p.wallet_address) || 0,
-                        daysVerified,
-                    });
-                    totalScore     = orgResult.trust_score;
-                    displayLevel   = orgResult.level;
-                    activityStatus = orgResult.activity_status;
+                    // ── Org: read stored score; compute live only as fallback ───
+                    const stored = orgScoreMap.get(p.wallet_address);
+                    if (stored) {
+                        totalScore     = stored.trust_score;
+                        displayLevel   = stored.level;
+                        activityStatus = stored.activity_status || "active";
+                    } else {
+                        const daysVerified = verif!.created_at
+                            ? Math.floor((Date.now() - new Date(verif!.created_at).getTime()) / (1000 * 60 * 60 * 24))
+                            : 0;
+                        const orgResult = computeOrgTrust(p, {
+                            type:              verif!.type,
+                            tier:              verif!.verifier_tier || 0,
+                            attestationsGiven: attestationsGivenMap.get(p.wallet_address) || 0,
+                            uniqueEndorsed:    endorsedCountMap.get(p.wallet_address) || 0,
+                            hiringCollections: hiringCountMap.get(p.wallet_address) || 0,
+                            daysVerified,
+                            hasActiveSub:      subActiveMap.get(p.wallet_address) || false,
+                        });
+                        totalScore     = orgResult.trust_score;
+                        displayLevel   = orgResult.level;
+                        activityStatus = orgResult.activity_status;
+                    }
                 } else {
                     // ── Individual: read CV Score from scores table ────────────
                     const cv       = cvScoreMap.get(p.wallet_address);
@@ -201,6 +237,7 @@ export async function GET(req: NextRequest) {
 
                 return {
                     walletAddress:          p.wallet_address,
+                    authUid:                undefined as string | undefined,
                     displayName:            p.display_name || "Anonymous",
                     bio:                    p.bio,
                     skills,
@@ -220,6 +257,10 @@ export async function GET(req: NextRequest) {
                     receiptCount:           receipts,
                     successRate,
                     status,
+                    github:                 p.github   || undefined,
+                    twitter:                p.twitter  || undefined,
+                    linkedin:               p.linkedin || undefined,
+                    website:                p.website  || undefined,
                     // Org-specific stats (used in org cards)
                     endorsedCount:          endorsedCountMap.get(p.wallet_address) || 0,
                     hiringCount:            hiringCountMap.get(p.wallet_address)    || 0,
@@ -227,6 +268,95 @@ export async function GET(req: NextRequest) {
                     isOrg:                  isOrgCard,
                 };
             });
+
+        // ── 8.5. Google-login orgs (org_accounts, not in profiles) ────────────
+        // Only added when no category filter is active (these accounts have no
+        // skills data, so they'd match no category keyword).
+        if (category === "all") {
+            const { data: googleOrgRows } = await supabase
+                .from("org_accounts")
+                .select("auth_uid, org_name, org_type, bio, avatar_url, website, subscription_status, plan_name, current_period_end, created_at, wallet_address")
+                .eq("onboarding_complete", true);
+
+            const profileWalletSet = new Set(wallets);
+            const googleOrgs = (googleOrgRows || []).filter(
+                (g) => !g.wallet_address || !profileWalletSet.has(g.wallet_address)
+            );
+
+            if (googleOrgs.length) {
+                // Fetch verifications for those with a wallet address
+                const gWallets = googleOrgs.map((g) => g.wallet_address).filter(Boolean) as string[];
+                const gVerifMap = new Map<string, any>();
+                if (gWallets.length) {
+                    const { data: gVerifs } = await supabase
+                        .from("organization_verifications")
+                        .select("wallet_address, status, verifier_tier, type, expires_at, created_at")
+                        .in("wallet_address", gWallets)
+                        .eq("status", "verified");
+                    for (const v of gVerifs || []) gVerifMap.set(v.wallet_address, v);
+                }
+
+                const now = new Date();
+                for (const g of googleOrgs) {
+                    const verif         = g.wallet_address ? gVerifMap.get(g.wallet_address) : null;
+                    const validVerif    = verif && (!verif.expires_at || new Date(verif.expires_at) > now);
+                    const tier          = validVerif ? (verif.verifier_tier || 0) : 0;
+                    const daysVerified  = validVerif && verif.created_at
+                        ? Math.floor((Date.now() - new Date(verif.created_at).getTime()) / 86400000)
+                        : Math.floor((Date.now() - new Date(g.created_at).getTime()) / 86400000);
+                    const orgType       = validVerif
+                        ? verif.type
+                        : (g.org_type === "company" ? "Company / Organization" : "Community / DAO");
+                    const hasActiveSub  = !!(
+                        g.subscription_status !== "canceled" &&
+                        g.plan_name && g.plan_name !== "free" &&
+                        (!g.current_period_end || new Date(g.current_period_end) > now)
+                    );
+
+                    const orgResult = computeOrgTrust(
+                        { bio: g.bio, avatar_url: g.avatar_url, website: g.website },
+                        { type: orgType, tier, attestationsGiven: 0, uniqueEndorsed: 0, hiringCollections: 0, daysVerified, hasActiveSub }
+                    );
+
+                    let status: "available" | "top_rated" | "featured" | null = null;
+                    if      (orgResult.trust_score >= 90) status = "top_rated";
+                    else if (orgResult.trust_score >= 75) status = "featured";
+                    else if (hasActiveSub)                status = "available";
+
+                    allEntries.push({
+                        walletAddress:          g.wallet_address || `gauth:${g.auth_uid}`,
+                        authUid:                g.auth_uid,
+                        displayName:            g.org_name || "Anonymous Organization",
+                        bio:                    g.bio,
+                        skills:                 [],
+                        workPreference:         [],
+                        avatarUrl:              g.avatar_url,
+                        role:                   orgType,
+                        organization:           g.org_name,
+                        cardNumber:             null,
+                        country:                null,
+                        createdAt:              g.created_at,
+                        totalScore:             orgResult.trust_score,
+                        trustScore:             orgResult.trust_score,
+                        level:                  orgResult.level,
+                        isVerified:             !!validVerif,
+                        verifierTier:           tier,
+                        verificationType:       orgType,
+                        receiptCount:           0,
+                        successRate:            0,
+                        status,
+                        github:                 undefined,
+                        twitter:                undefined,
+                        linkedin:               undefined,
+                        website:                g.website || undefined,
+                        endorsedCount:          0,
+                        hiringCount:            0,
+                        attestationsGivenCount: 0,
+                        isOrg:                  true,
+                    });
+                }
+            }
+        }
 
         // ── 9. Filters ─────────────────────────────────────────────────────────
         if (minScore > 0 || maxScore < 100) {
@@ -245,13 +375,20 @@ export async function GET(req: NextRequest) {
             return b.totalScore - a.totalScore;
         };
 
-        if      (sort === "score_asc") allEntries.sort((a, b) => a.totalScore - b.totalScore);
-        else if (sort === "newest")    allEntries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        else                           allEntries.sort(defaultSort);
-
-        // ── 11. Split individuals / organizations ──────────────────────────────
+        // ── 11. Split first, then sort each group independently ───────────────
+        // Splitting before sorting guarantees that org cards never displace
+        // individual cards in the ordering (they share the same avatar/skills
+        // priority criteria and would otherwise interleave).
         const individuals   = allEntries.filter((t) => !t.isOrg);
         const organizations = allEntries.filter((t) =>  t.isOrg);
+
+        const sortFn =
+            sort === "score_asc" ? (a: any, b: any) => a.totalScore - b.totalScore :
+            sort === "newest"    ? (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() :
+            defaultSort; // score_desc + default → avatar → skills → score desc
+
+        individuals.sort(sortFn);
+        organizations.sort(sortFn);
 
         // 4 individuals + 4 organizations per page (totals 8 cards)
         const halfLimit   = Math.floor(limit / 2);

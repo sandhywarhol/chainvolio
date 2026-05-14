@@ -90,7 +90,7 @@ export function WalletMultiButton() {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-amber-200/10 hover:bg-amber-200/15 text-amber-200/60 border border-amber-200/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-black hover:bg-neutral-900 text-white border border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
           >
             <Wallet className="w-3.5 h-3.5" />
             {googleSession ? "Link Wallet" : "Sign In"}

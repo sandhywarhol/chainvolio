@@ -1,6 +1,6 @@
 // ─── Trust Score for Company / Organization and Community / DAO ───────────────
 //
-// Five dimensions — total max = 100 pts
+// Six dimensions — total max = 100 pts
 //
 //  1. Tier Base        (0–20)  Verification premium. Starting floor.
 //  2. Network Reach    (0–30)  Unique talent wallets endorsed/attested.
@@ -8,26 +8,29 @@
 //  3. Hiring Activity  (0–20)  Hiring collections created. Max at 5 postings.
 //  4. Profile          (0–15)  Bio, avatar, social links, skills.
 //  5. Tenure           (0–15)  1 pt / 30 days active. Max at 15 months.
+//  6. Subscription     (+20)   Flat bonus for active paid plan. Not capped by 100.
 //
 // Score 100 requires sustained, genuine activity over time.
 // A brand-new org with a complete profile starts around 35 pts.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface OrgTrustInput {
-    type:               string;  // 'Company / Organization' | 'Community / DAO' | etc.
-    tier:               number;  // 1–4
-    attestationsGiven:  number;  // total attestations given (stored for reference)
-    uniqueEndorsed:     number;  // unique talent wallets this org has endorsed ← main metric
-    hiringCollections:  number;  // number of distinct hiring collections
-    daysVerified:       number;  // days since org verification was granted
+    type:               string;   // 'Company / Organization' | 'Community / DAO' | etc.
+    tier:               number;   // 1–4
+    attestationsGiven:  number;   // total attestations given (stored for reference)
+    uniqueEndorsed:     number;   // unique talent wallets this org has endorsed ← main metric
+    hiringCollections:  number;   // number of distinct hiring collections
+    daysVerified:       number;   // days since org verification was granted
+    hasActiveSub?:      boolean;  // active paid subscription (+20 bonus)
 }
 
 export interface OrgTrustBreakdown {
-    tier_base: number;  // (0–20)
-    network:   number;  // (0–30) unique endorsed
-    hiring:    number;  // (0–20)
-    profile:   number;  // (0–15)
-    tenure:    number;  // (0–15)
+    tier_base:    number;  // (0–20)
+    network:      number;  // (0–30) unique endorsed
+    hiring:       number;  // (0–20)
+    profile:      number;  // (0–15)
+    tenure:       number;  // (0–15)
+    subscription: number;  // 0 or 20
 }
 
 export interface OrgTrustResult {
@@ -92,9 +95,14 @@ export function computeOrgTrust(
     // 1 pt per 30 days verified, max 15 months (450 days).
     const tenurePoints = Math.min(15, Math.floor(orgStats.daysVerified / 30));
 
+    // ── 6. Subscription bonus (+20, flat) ─────────────────────────────────
+    // Flat +20 for orgs with an active paid plan. Counted after the cap so
+    // orgs with 80 pts + sub can reach 100, but the base 5 dims stay ≤ 80.
+    const subBonus = orgStats.hasActiveSub ? 20 : 0;
+
     // ── Final score ───────────────────────────────────────────────────────
     const trustScore = Math.min(100, Math.round(
-        tierBase + networkPoints + hiringPoints + profilePoints + tenurePoints
+        tierBase + networkPoints + hiringPoints + profilePoints + tenurePoints + subBonus
     ));
 
     const isActive = orgStats.uniqueEndorsed > 0 || orgStats.hiringCollections > 0;
@@ -115,6 +123,7 @@ export function computeOrgTrust(
     if (networkPoints  > 0) parts.push(`${orgStats.uniqueEndorsed} talent${orgStats.uniqueEndorsed !== 1 ? "s" : ""} endorsed`);
     if (hiringPoints   > 0) parts.push(`${orgStats.hiringCollections} hiring collection${orgStats.hiringCollections !== 1 ? "s" : ""}`);
     if (tenurePoints   > 0) parts.push(`${Math.floor(orgStats.daysVerified / 30)} month${Math.floor(orgStats.daysVerified / 30) !== 1 ? "s" : ""} active`);
+    if (subBonus       > 0) parts.push("active subscription");
     const reason = parts.length > 0
         ? `Tier ${orgStats.tier} org — ${parts.join(", ")}.`
         : `Tier ${orgStats.tier} verified organization, building ecosystem presence.`;
@@ -133,11 +142,12 @@ export function computeOrgTrust(
         activity_status:      isActive ? "active" : "inactive",
         reason,
         breakdown: {
-            tier_base: tierBase,
-            network:   Math.round(networkPoints * 10) / 10,
-            hiring:    hiringPoints,
-            profile:   profilePoints,
-            tenure:    tenurePoints,
+            tier_base:    tierBase,
+            network:      Math.round(networkPoints * 10) / 10,
+            hiring:       hiringPoints,
+            profile:      profilePoints,
+            tenure:       tenurePoints,
+            subscription: subBonus,
         },
         // API compatibility
         score:         trustScore,
