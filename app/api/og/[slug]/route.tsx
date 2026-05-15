@@ -16,7 +16,7 @@ export async function GET(
         console.log(`[OG_IMAGE_API] Received wallet: ${cleanSlug}`);
 
         const { origin } = new URL(request.url);
-        const bgUrl = `${origin}/homepage/og%20image%20for%20all.jpg`;
+        const bgUrl = `${origin}/og%20image/OG%20Image%20Homepage.png`;
 
         return new ImageResponse(
             (

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, Code, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
@@ -32,7 +32,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const { isGoogleSignedIn } = useGoogleAuth();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides' | 'developer'>('main');
+    const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides'>('main');
     const [scrolled, setScrolled] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -81,10 +81,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         { label: "Attestation / Proof Standards", href: "/guides/attestation", onClick: onAttestationClick },
     ];
     
-    const devItems = [
-        { label: "Overview", href: "/developers" },
-        { label: "API Docs", href: "/api-docs" },
-    ];
 
     return (
         <nav className={`theme-preserve fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
@@ -106,12 +102,12 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             items={whyItems}
                         />
 
-
-                        <NavDropdown
-                            label="Guides"
-                            href="/guides"
-                            items={guidesItems}
-                        />
+                        <Link
+                            href="/explore-talent"
+                            className={`transition-colors py-2 ${isActive('/explore-talent') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
+                        >
+                            Explore Talent
+                        </Link>
 
                         <Link
                             href="/blog"
@@ -121,17 +117,10 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         </Link>
 
                         <NavDropdown
-                            label="Developer"
-                            href="/api-docs"
-                            items={devItems}
+                            label="Guides"
+                            href="/guides"
+                            items={guidesItems}
                         />
-
-                        <Link
-                            href="/explore-talent"
-                            className={`transition-colors py-2 ${isActive('/explore-talent') ? 'text-white' : 'text-white/40 hover:text-white/90'}`}
-                        >
-                            Explore Talent
-                        </Link>
 
                         {(publicKey || isGoogleSignedIn) && (
                             <Link
@@ -253,35 +242,29 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                         <div className="space-y-4">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Explore Platform</p>
                                             <div className="flex flex-col gap-2">
-                                                <MobileNavLink 
-                                                    icon={<Layers className="w-5 h-5 text-emerald-400" />} 
-                                                    label="Products" 
+                                                <MobileNavLink
+                                                    icon={<Layers className="w-5 h-5 text-emerald-400" />}
+                                                    label="Products"
                                                     hasSubmenu
-                                                    onClick={() => setActiveMobilePanel('products')} 
+                                                    onClick={() => setActiveMobilePanel('products')}
                                                 />
-                                                <MobileNavLink 
-                                                    icon={<BookOpen className="w-5 h-5 text-indigo-400" />} 
-                                                    label="Guides" 
+                                                <MobileNavLink
+                                                    href="/explore-talent"
+                                                    icon={<LayoutGrid className="w-5 h-5 text-amber-200/60" />}
+                                                    label="Explore Talent"
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                />
+                                                <MobileNavLink
+                                                    href="/blog"
+                                                    icon={<HelpCircle className="w-5 h-5 text-amber-400" />}
+                                                    label="Blog"
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                />
+                                                <MobileNavLink
+                                                    icon={<BookOpen className="w-5 h-5 text-indigo-400" />}
+                                                    label="Guides"
                                                     hasSubmenu
-                                                    onClick={() => setActiveMobilePanel('guides')} 
-                                                />
-                                                <MobileNavLink 
-                                                    href="/blog" 
-                                                    icon={<HelpCircle className="w-5 h-5 text-amber-400" />} 
-                                                    label="Blog" 
-                                                    onClick={() => setIsMobileMenuOpen(false)} 
-                                                />
-                                                <MobileNavLink 
-                                                    icon={<Code className="w-5 h-5 text-cyan-400" />} 
-                                                    label="Developer" 
-                                                    hasSubmenu
-                                                    onClick={() => setActiveMobilePanel('developer')} 
-                                                />
-                                                <MobileNavLink 
-                                                    href="/explore-talent" 
-                                                    icon={<LayoutGrid className="w-5 h-5 text-amber-200/60" />} 
-                                                    label="Explore Talent" 
-                                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                                    onClick={() => setActiveMobilePanel('guides')}
                                                 />
                                             </div>
                                         </div>
@@ -332,13 +315,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                     title="Guides" 
                                     isOpen={activeMobilePanel === 'guides'}
                                     items={guidesItems}
-                                    onBack={() => setActiveMobilePanel('main')}
-                                    onClose={() => setIsMobileMenuOpen(false)}
-                                />
-                                <MobileSubPanel 
-                                    title="Developer" 
-                                    isOpen={activeMobilePanel === 'developer'}
-                                    items={devItems}
                                     onBack={() => setActiveMobilePanel('main')}
                                     onClose={() => setIsMobileMenuOpen(false)}
                                 />

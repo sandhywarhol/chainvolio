@@ -34,12 +34,16 @@ export function Footer() {
 
                     {/* Terms & Privacy (Right on Desktop, 2nd on Mobile) */}
                     <div className="flex flex-col items-center md:items-end w-full md:w-1/3 order-2 md:order-3">
-                        <div className="flex items-center gap-3 text-[9px] font-semibold text-white/40">
+                        <div className="flex flex-wrap items-center gap-3 text-[9px] font-semibold text-white/40">
                             <Link href="/terms" className="hover:text-white/80 transition-colors">Terms of Service</Link>
                             <span className="text-white/40">•</span>
                             <Link href="/privacy-policy" className="hover:text-white/80 transition-colors">Privacy Policy</Link>
                             <span className="text-white/40">•</span>
                             <Link href="/whitepaper" className="hover:text-white/80 transition-colors">Whitepaper</Link>
+                            <span className="text-white/40">•</span>
+                            <Link href="/developers" className="hover:text-white/80 transition-colors">Developer</Link>
+                            <span className="text-white/40">•</span>
+                            <Link href="/api-docs" className="hover:text-white/80 transition-colors">API Docs</Link>
                         </div>
                     </div>
 
@@ -92,6 +96,9 @@ export function Footer() {
                             <Link href="/terms" className="hover:text-white/80 transition-colors">Terms of Service</Link>
                             <Link href="/privacy-policy" className="hover:text-white/80 transition-colors">Privacy Policy</Link>
                             <Link href="/whitepaper" className="hover:text-white/80 transition-colors">Whitepaper</Link>
+                            <span className="text-white/10">•</span>
+                            <Link href="/developers" className="hover:text-white/80 transition-colors">Developer</Link>
+                            <Link href="/api-docs" className="hover:text-white/80 transition-colors">API Docs</Link>
                         </div>
                     </div>
 

@@ -13,28 +13,18 @@ export async function generateMetadata({ params }: { params: { wallet: string } 
     const name = profile?.display_name || `${wallet.slice(0, 5)}...${wallet.slice(-4)}`;
     const title = `${name} | ChainVolio Professional Identity`;
     const description = profile?.bio || "View on-chain verified work history and professional proof of work.";
-    const ogImage = `https://www.chainvolio.xyz/homepage/og%20image%20for%20all.jpg?v=5`;
     return {
         title,
         description,
         openGraph: {
             title,
             description,
-            type: "website",
-            images: [
-                {
-                    url: ogImage,
-                    width: 1200,
-                    height: 630,
-                    alt: `ChainVolio CV: ${name}`,
-                },
-            ],
+            type: "profile",
         },
         twitter: {
             card: "summary_large_image",
             title,
             description,
-            images: [ogImage],
         },
     };
 }

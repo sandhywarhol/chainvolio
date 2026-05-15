@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: { profileName: stri
             const name = org.org_name || params.profileName;
             const title = `${name} | ChainVolio Professional Identity`;
             const description = org.bio || `View the cryptographically verified professional identity of ${name}.`;
-            const ogImage = `https://www.chainvolio.xyz/homepage/og%20image%20for%20all.jpg?v=5`;
+            const ogImage = `https://www.chainvolio.xyz/og%20image/OG%20Image%20Homepage.png`;
             return {
                 title,
                 description,
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: { profileName: stri
     const name = data.display_name || params.profileName;
     const title = `${name} | ChainVolio Professional Identity`;
     const description = data.bio || `View the cryptographically verified professional identity of ${name}.`;
-    const ogImage = `https://www.chainvolio.xyz/homepage/og%20image%20for%20all.jpg?v=5`;
+    const ogImage = `https://www.chainvolio.xyz/og%20image/OG%20Image%20Homepage.png`;
 
     return {
         title,
