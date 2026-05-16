@@ -80,10 +80,14 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             // User dismissed the wallet popup — just clear the spinner, no toast
         } else if (connectionError === "extension_dead") {
             const walletName = loadingKey.replace(/^(builder|recruiter)-/, "");
-            const msg = isMobile
-                ? `${walletName} is not responding. Try closing and reopening the ${walletName} app, then try again.`
-                : `${walletName} is not responding. Click the ${walletName} icon in your browser toolbar to wake it up, then try again.`;
-            setToast({ message: msg, type: "error" });
+            if (isMobile) {
+                setToast({ message: `${walletName} is not responding. Try closing and reopening the ${walletName} app, then try again.`, type: "error" });
+            } else {
+                // Retries in useWalletConnect already woke the Phantom MV3 service worker.
+                // A reload will autoConnect successfully — no manual action needed.
+                setToast({ message: `Reconnecting to ${walletName}...`, type: "success" });
+                setTimeout(() => window.location.reload(), 800);
+            }
         } else {
             setToast({ message: "Connection failed. Please try again.", type: "error" });
         }
