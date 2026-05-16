@@ -1507,23 +1507,21 @@ export function LandingPageClient() {
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
-                        <div className="space-y-2 md:space-y-4 md:flex-1">
-                            <div className="max-w-xl space-y-2 md:space-y-4">
-                                {/* badge */}
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99]">Signal vs noise</span>
-                                </div>
-                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                    Why Web3 Work History Can&apos;t Be Verified
-                                </p>
-                                <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-                                    From Noise to<br />
-                                    <span className="text-amber-200/60">Verifiable Signal</span>
-                                </h2>
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row-reverse md:items-start md:justify-between gap-6 md:gap-8">
+                        <div className="space-y-2 md:space-y-4 flex flex-col md:items-end text-left md:text-right md:flex-1">
+                            {/* badge */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99]">Signal vs noise</span>
                             </div>
+                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
+                                Why Web3 Work History Can&apos;t Be Verified
+                            </p>
+                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                From Noise to<br />
+                                <span className="text-amber-200/60">Verifiable Signal</span>
+                            </h2>
                         </div>
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-right md:pt-20">
+                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-left md:pt-20">
                             Work history is fragmented and impossible to verify.<br />
                             ChainVolio transforms scattered contributions<br />
                             into a single, verifiable identity.
@@ -1534,7 +1532,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Full-bleed animation canvas ── */}
-                    <div className="relative w-full h-[180px] sm:h-[400px] md:h-[580px]">
+                    <div className="relative w-full h-[160px] sm:h-[300px] md:h-[420px]">
                         <SignalNoiseVisual />
 
                         {/* Radial vignette — lines fade at edges */}
@@ -2570,13 +2568,13 @@ function SignalNoiseVisual() {
         // Three layers of rays for depth — dense short inner, mid, long sparse outer
         const makeLayers = () => {
             const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-            const countA = isMobile ? 60 : 100;
-            const countB = isMobile ? 80 : 140;
-            const countC = isMobile ? 60 : 100;
+            const countA = isMobile ? 80 : 120;
+            const countB = isMobile ? 120 : 240; // Increased medium rays
+            const countC = isMobile ? 100 : 200; // Increased outer rays
 
             const layerA = Array.from({ length: countA }, (_, i) => ({
                 baseAngle: (i / countA) * Math.PI * 2 + Math.random() * 0.12,
-                length: 40 + Math.random() * 80,
+                length: 30 + Math.random() * 60,
                 wobbleAmp: 0.04 + Math.random() * 0.06,
                 wobbleSpeed: 0.6 + Math.random() * 1.2,
                 wobblePhase: Math.random() * Math.PI * 2,
@@ -2586,29 +2584,39 @@ function SignalNoiseVisual() {
                 iconIdx: -1
             }));
 
-            const layerB = Array.from({ length: countB }, (_, i) => ({
-                baseAngle: (i / countB) * Math.PI * 2 + Math.random() * 0.15,
-                length: 150 + Math.random() * 180,
-                wobbleAmp: 0.03 + Math.random() * 0.07,
-                wobbleSpeed: 0.3 + Math.random() * 0.8,
-                wobblePhase: Math.random() * Math.PI * 2,
-                opacity: 0.08 + Math.random() * 0.20,
-                thickness: 0.4 + Math.random() * 0.45,
-                dotR: 0.8 + Math.random() * 1.2,
-                iconIdx: -1
-            }));
+            const layerB = Array.from({ length: countB }, (_, i) => {
+                const baseAngle = (i / countB) * Math.PI * 2 + Math.random() * 0.15;
+                // Horizontal bias: make rays longer on the left/right sides
+                const aspectMult = 1 + Math.abs(Math.cos(baseAngle)) * 0.6;
+                return {
+                    baseAngle,
+                    length: (120 + Math.random() * 160) * aspectMult,
+                    wobbleAmp: 0.03 + Math.random() * 0.07,
+                    wobbleSpeed: 0.3 + Math.random() * 0.8,
+                    wobblePhase: Math.random() * Math.PI * 2,
+                    opacity: 0.08 + Math.random() * 0.20,
+                    thickness: 0.4 + Math.random() * 0.45,
+                    dotR: 0.8 + Math.random() * 1.2,
+                    iconIdx: -1
+                };
+            });
 
-            const layerC = Array.from({ length: countC }, (_, i) => ({
-                baseAngle: (i / countC) * Math.PI * 2 + Math.random() * 0.2,
-                length: 320 + Math.random() * 230,
-                wobbleAmp: 0.02 + Math.random() * 0.04,
-                wobbleSpeed: 0.2 + Math.random() * 0.5,
-                wobblePhase: Math.random() * Math.PI * 2,
-                opacity: 0.05 + Math.random() * 0.12,
-                thickness: 0.3 + Math.random() * 0.35,
-                dotR: 1.0 + Math.random() * 1.5,
-                iconIdx: -1
-            }));
+            const layerC = Array.from({ length: countC }, (_, i) => {
+                const baseAngle = (i / countC) * Math.PI * 2 + Math.random() * 0.2;
+                // Stronger horizontal bias for outer rays
+                const aspectMult = 1 + Math.abs(Math.cos(baseAngle)) * 1.2;
+                return {
+                    baseAngle,
+                    length: (250 + Math.random() * 250) * aspectMult,
+                    wobbleAmp: 0.02 + Math.random() * 0.04,
+                    wobbleSpeed: 0.2 + Math.random() * 0.5,
+                    wobblePhase: Math.random() * Math.PI * 2,
+                    opacity: 0.05 + Math.random() * 0.12,
+                    thickness: 0.3 + Math.random() * 0.35,
+                    dotR: 1.0 + Math.random() * 1.5,
+                    iconIdx: -1
+                };
+            });
 
             // Helper to assign icons to a layer evenly across 360 degrees to prevent overlaps
             const assignIconsToLayer = (layer: any[], iconIndices: number[], angleOffset: number = 0) => {
