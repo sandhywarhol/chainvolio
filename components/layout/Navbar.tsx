@@ -28,7 +28,7 @@ interface NavbarProps {
 
 export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier, verificationTier }: NavbarProps) {
 
-    const { publicKey } = useWallet();
+    const { publicKey, connecting } = useWallet();
     const { isGoogleSignedIn } = useGoogleAuth();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -169,7 +169,14 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     {/* Desktop Wallet & Global Notification Bell */}
                     <div className="hidden md:flex items-center gap-2">
                         {/* <ThemeToggle /> */}
-                        <WalletMultiButton />
+                        {connecting && !publicKey ? (
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/40 text-xs font-bold uppercase tracking-widest">
+                                <span className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+                                Connecting
+                            </div>
+                        ) : (
+                            <WalletMultiButton />
+                        )}
                     </div>
                     
                     <NotificationBell />

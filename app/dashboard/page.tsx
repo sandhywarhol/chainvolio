@@ -73,7 +73,7 @@ type HiringCollection = {
 };
 
 export default function DashboardPage() {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, connecting } = useWallet();
   const { session, orgAccount, loading: googleLoading } = useGoogleAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
@@ -102,7 +102,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!connected || !publicKey) {
-      setLoading(false);
+      // Don't flip loading=false while autoConnect is still in flight — that
+      // would expose an empty Sign-In screen for a frame before the wallet
+      // connects and triggers this effect again with connected=true.
+      if (!connecting) setLoading(false);
       return;
     }
 
@@ -130,7 +133,7 @@ export default function DashboardPage() {
       });
 
     return () => controller.abort();
-  }, [publicKey, connected]);
+  }, [publicKey, connected, connecting]);
 
   const handleDeleteCertificate = async (id: string) => {
     if (!publicKey) return;
@@ -166,8 +169,14 @@ export default function DashboardPage() {
     return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} />;
   }
 
+  // autoConnect is still running — show loading so the Sign-In screen never
+  // flashes for returning users whose wallet connects silently in the background.
+  if (!publicKey && connecting) {
+    return <LoadingScreen message="Connecting wallet..." />;
+  }
+
   if (!publicKey) {
-    // Not signed in at all
+    // Definitely not signed in (autoConnect finished or never started)
     return (
       <main className="min-h-screen text-white relative bg-black theme-bg-page theme-aware">
         <Navbar />

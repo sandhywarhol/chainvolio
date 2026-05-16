@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletAdapterNetwork, WalletError, WalletAdapter } from "@solana/wallet-adapter-base";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { clusterApiUrl } from "@solana/web3.js";
@@ -47,7 +47,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <ConnProv endpoint={endpoint}>
-            <SolWallProv wallets={wallets} autoConnect={true} onError={() => {}}>
+            <SolWallProv wallets={wallets} autoConnect={true} onError={(error: WalletError, adapter: WalletAdapter | undefined) => {
+                // autoConnect errors are non-fatal — user can still connect manually via Sign In.
+                // Log so they're visible in DevTools without crashing the app.
+                console.warn(`[WalletProvider] autoConnect error (${adapter?.name ?? "unknown"}):`, error.name, error.message);
+            }}>
                 <ModalProv>
                     <MobileReturnHandler />
                     {children}
