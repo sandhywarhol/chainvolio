@@ -1,7 +1,7 @@
 "use client";
 
 // Force re-compile: v2-floating-card
-import React, { useState, useEffect, useRef } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -1095,6 +1095,24 @@ const PARTNERS = [
     { src: "/logos/X.png", name: "X" },
 ];
 
+// Isolated component so useSearchParams doesn't suspend the whole page.
+// Wrapped in its own <Suspense> inside LandingPageClient.
+function SearchParamsConsumer({ onModal }: { onModal: (modal: string) => void }) {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    // Stable ref so the effect deps don't include the inline arrow from the parent.
+    const onModalRef = useRef(onModal);
+    onModalRef.current = onModal;
+    useEffect(() => {
+        const modal = searchParams.get('modal');
+        if (modal === 'how') { router.push('/guides/how-it-works'); return; }
+        if (modal === 'recruiters' || modal === 'talent' || modal === 'ask' || modal === 'screening' || modal === 'attestation') {
+            onModalRef.current(modal);
+        }
+    }, [searchParams, router]);
+    return null;
+}
+
 export function LandingPageClient() {
     const { publicKey, connected } = useWallet();
     const [profile, setProfile] = useState<any>(null);
@@ -1103,7 +1121,6 @@ export function LandingPageClient() {
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const heroVideoRef = useRef<HTMLVideoElement>(null);
-    const searchParams = useSearchParams();
     const { theme } = useTheme();
     const router = useRouter();
 
@@ -1122,17 +1139,6 @@ export function LandingPageClient() {
             heroVideoRef.current.playbackRate = 0.5;
         }
     }, []);
-
-    useEffect(() => {
-        const modal = searchParams.get('modal');
-        if (modal === 'how') {
-            router.push('/guides/how-it-works');
-            return;
-        }
-        if (modal === 'recruiters' || modal === 'talent' || modal === 'ask' || modal === 'screening' || modal === 'attestation') {
-            setActiveModal(modal as any);
-        }
-    }, [searchParams, router]);
 
     // Mobile Carousel States
     const [problemIdx, setProblemIdx] = useState(1);
@@ -1213,6 +1219,9 @@ export function LandingPageClient() {
 
     return (
         <div className="min-h-screen flex flex-col relative selection:bg-teal-500/30 selection:text-white">
+            <Suspense fallback={null}>
+                <SearchParamsConsumer onModal={(modal) => setActiveModal(modal as any)} />
+            </Suspense>
             <Navbar
                 isVerified={!!profile?.isVerified}
                 verifierTier={profile?.verifierTier}
