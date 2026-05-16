@@ -9,6 +9,6 @@ export const supabase: SupabaseClient | null =
         // Disable auth management on this client — it is used for DB queries only.
         // Auth sessions are managed exclusively by lib/supabase/auth.ts (supabaseAuth).
         // Having two clients with auth enabled causes session conflicts in localStorage.
-        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'chainvolio-db-client' },
       })
     : null;

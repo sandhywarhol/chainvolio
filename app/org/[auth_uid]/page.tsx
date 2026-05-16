@@ -187,7 +187,7 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
                     </a>
                   )}
                   {org.linkedin && (
-                    <a href={org.linkedin.startsWith("http") ? org.linkedin : `https://linkedin.com/company/${org.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+                    <a href={org.linkedin.startsWith("http") ? org.linkedin : `https://linkedin.com/company/${org.linkedin.replace(/^(www\.)?linkedin\.com\/company\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors">
                       <LinkedInIcon className="w-3.5 h-3.5" /> LinkedIn
                     </a>
                   )}

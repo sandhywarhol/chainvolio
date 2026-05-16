@@ -459,7 +459,7 @@ export default function DashboardPage() {
 
                     {profile?.linkedin && (
                       <a
-                        href={profile.linkedin.startsWith('http') ? profile.linkedin : `https://${profile.linkedin}`}
+                        href={profile.linkedin.startsWith('http') ? profile.linkedin : `https://linkedin.com/in/${profile.linkedin.replace(/^(www\.)?linkedin\.com\/in\//, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all"

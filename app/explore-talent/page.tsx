@@ -126,15 +126,24 @@ function ExploreTalentInner() {
         filters, setFilter, setPage, page, totalPages, hasFilters, clearFilters
     } = useExploreTalent();
 
-    const [stats, setStats] = useState({
-        talents: 0,
-        verified: 0,
-        opportunities: 0,
-        countries: 0,
-        teamAvatars: [] as string[],
-        verifiedProofs: 0,
-        endorsedTalents: 0,
-        skills: 0
+    const [stats, setStats] = useState<{
+        talents: number | null;
+        verified: number | null;
+        opportunities: number | null;
+        countries: number | null;
+        teamAvatars: string[];
+        verifiedProofs: number | null;
+        endorsedTalents: number | null;
+        skills: number | null;
+    }>({
+        talents: null,
+        verified: null,
+        opportunities: null,
+        countries: null,
+        teamAvatars: [],
+        verifiedProofs: null,
+        endorsedTalents: null,
+        skills: null
     });
 
     useEffect(() => {
@@ -203,37 +212,37 @@ function ExploreTalentInner() {
                                 ))}
                             </div>
                             <p className="text-[11px] text-white/30 font-bold uppercase tracking-widest">
-                                Trusted by <span className="text-white/60">{stats.verified > 0 ? `${stats.verified}+` : 'verified'}</span> teams worldwide
+                                Trusted by <span className="text-white/60">{stats.verified != null && stats.verified > 0 ? `${stats.verified}+` : 'verified'}</span> teams worldwide
                             </p>
                         </div>
                     )}
                 </div>
 
                 <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-                    <StatCard 
+                    <StatCard
                         icon={<Users className="w-5 h-5 text-indigo-400" />}
-                        value={`${stats.talents}+`}
+                        value={stats.talents != null ? `${stats.talents}+` : "—"}
                         label="Talents"
                         sub="Active creators in the network"
                         color="indigo"
                     />
-                    <StatCard 
+                    <StatCard
                         icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
-                        value={`${stats.verifiedProofs || stats.verified}+`}
+                        value={stats.verifiedProofs != null || stats.verified != null ? `${stats.verifiedProofs ?? stats.verified}+` : "—"}
                         label="Verified"
                         sub="Proof of work verified"
                         color="emerald"
                     />
-                    <StatCard 
+                    <StatCard
                         icon={<Briefcase className="w-5 h-5 text-amber-200/60" />}
-                        value={`${stats.skills}+`}
+                        value={stats.skills != null ? `${stats.skills}+` : "—"}
                         label="Skills"
                         sub="Verified expert skills"
                         color="amber"
                     />
-                    <StatCard 
+                    <StatCard
                         icon={<Globe className="w-5 h-5 text-cyan-400" />}
-                        value={`${stats.countries}+`}
+                        value={stats.countries != null ? `${stats.countries}+` : "—"}
                         label="Countries"
                         sub="Global talent community"
                         color="cyan"

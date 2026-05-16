@@ -359,7 +359,7 @@ function OrgEditProfileWalletContent() {
                                 <label className="block text-xs font-bold text-slate-400 mb-1.5">LinkedIn</label>
                                 <div className="relative">
                                     <LinkedInIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.linkedin} onChange={set("linkedin")} placeholder="linkedin.com/company/..."
+                                    <input type="text" value={form.linkedin} onChange={set("linkedin")} placeholder="company-name"
                                         className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
                                 </div>
                             </div>

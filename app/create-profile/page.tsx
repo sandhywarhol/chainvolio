@@ -363,7 +363,7 @@ export default function CreateProfilePage() {
                 value={form.linkedin}
                 onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="linkedin.com/in/username"
+                placeholder="username"
               />
             </div>
             <div>
