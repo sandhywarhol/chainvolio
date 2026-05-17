@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     siteName: "ChainVolio",
     images: [
       {
-        url: "/og%20image/OG%20Image%20Homepage.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "ChainVolio: Verifiable Identity for Web3",
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ChainVolio - Verifiable Identity for Web3",
     description: "Build a work history that cannot be faked. Backed by on-chain proof and attestations.",
-    images: ["/og%20image/OG%20Image%20Homepage.png"],
+    images: ["/og-image.png"],
     creator: "@chainvolio",
     site: "@chainvolio",
   },
