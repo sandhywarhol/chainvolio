@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const DISMISS_KEY = "chainvolio_recruiter_prompt_dismissed";
 const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -12,6 +13,7 @@ const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 // Not shown if visitor is already signed in (wallet or Google).
 export function RecruiterSoftPrompt() {
     const { session, loading, signInWithGoogle } = useGoogleAuth();
+    const { connected } = useWallet();
     const [visible, setVisible] = useState(false);
     const [dismissed, setDismissed] = useState(false);
 
@@ -32,7 +34,7 @@ export function RecruiterSoftPrompt() {
 
     // Listen for scroll past 60%
     useEffect(() => {
-        if (dismissed || loading || session) return;
+        if (dismissed || loading || session || connected) return;
 
         const handleScroll = () => {
             const scrolled = window.scrollY + window.innerHeight;
@@ -57,7 +59,7 @@ export function RecruiterSoftPrompt() {
     }, []);
 
     // Don't render if already signed in, dismissed, or not yet triggered
-    if (!visible || dismissed || session) return null;
+    if (!visible || dismissed || session || connected) return null;
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-[9000] flex justify-center px-4 pb-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
