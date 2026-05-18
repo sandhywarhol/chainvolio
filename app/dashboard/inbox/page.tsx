@@ -141,11 +141,17 @@ export default function InboxPage() {
         );
     }
 
-    const tabs: { key: Tab; label: string; Icon: React.ElementType; count: number; unread: number }[] = [
-        { key: "requests",      label: "Requests",      Icon: Users,        count: pendingRequests.length, unread: 0 },
-        { key: "conversations", label: "Conversations", Icon: MessageSquare,count: acceptedConvs.length,   unread: candidateUnread },
-        { key: "outreach",      label: "My Outreach",   Icon: Send,         count: recruiterConvs.length,  unread: recruiterUnread },
+    // Only show tabs that have data; fall back to showing outreach (for recruiters) or requests (for candidates)
+    const allTabs: { key: Tab; label: string; Icon: React.ElementType; count: number; unread: number }[] = [
+        { key: "requests",      label: "Requests",      Icon: Users,         count: pendingRequests.length, unread: 0 },
+        { key: "conversations", label: "Conversations", Icon: MessageSquare, count: acceptedConvs.length,   unread: candidateUnread },
+        { key: "outreach",      label: "My Outreach",   Icon: Send,          count: recruiterConvs.length,  unread: recruiterUnread },
     ];
+    const visibleTabs = allTabs.filter((t) => t.count > 0);
+    // If all empty: show "My Outreach" as default (most likely role for a first-time user here)
+    const tabs = visibleTabs.length > 0 ? visibleTabs : [allTabs[2]];
+    // If the current active tab is no longer in the visible set, switch to first visible
+    const resolvedTab = tabs.find((t) => t.key === activeTab) ? activeTab : tabs[0].key;
 
     return (
         <main className="min-h-screen text-white bg-black theme-bg-page theme-aware">
@@ -168,38 +174,40 @@ export default function InboxPage() {
                     )}
                 </div>
 
-                {/* Tabs */}
-                <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-2xl mb-6">
-                    {tabs.map(({ key, label, Icon, count, unread }) => {
-                        const isActive = activeTab === key;
-                        return (
-                            <button
-                                key={key}
-                                onClick={() => setActiveTab(key)}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
-                                    isActive ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
-                                }`}
-                            >
-                                <Icon className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">{label}</span>
-                                {unread > 0 ? (
-                                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
-                                        {unread}
-                                    </span>
-                                ) : count > 0 ? (
-                                    <span className={`flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1 ${
-                                        isActive ? "bg-white/20 text-white" : "bg-white/10 text-white/50"
-                                    }`}>
-                                        {count}
-                                    </span>
-                                ) : null}
-                            </button>
-                        );
-                    })}
-                </div>
+                {/* Tabs — only rendered when there are multiple visible tabs */}
+                {tabs.length > 1 && (
+                    <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-2xl mb-6">
+                        {tabs.map(({ key, label, Icon, count, unread }) => {
+                            const isActive = resolvedTab === key;
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setActiveTab(key)}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
+                                        isActive ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
+                                    }`}
+                                >
+                                    <Icon className="w-3.5 h-3.5" />
+                                    <span className="hidden sm:inline">{label}</span>
+                                    {unread > 0 ? (
+                                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
+                                            {unread}
+                                        </span>
+                                    ) : count > 0 ? (
+                                        <span className={`flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1 ${
+                                            isActive ? "bg-white/20 text-white" : "bg-white/10 text-white/50"
+                                        }`}>
+                                            {count}
+                                        </span>
+                                    ) : null}
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
 
                 {/* Tab: Interview Requests */}
-                {activeTab === "requests" && (
+                {resolvedTab === "requests" && (
                     <div className="space-y-3">
                         {pendingRequests.length === 0 ? (
                             <div className="text-center py-16 space-y-3">
@@ -222,7 +230,7 @@ export default function InboxPage() {
                 )}
 
                 {/* Tab: Conversations (as candidate) */}
-                {activeTab === "conversations" && (
+                {resolvedTab === "conversations" && (
                     <div className="space-y-2">
                         {acceptedConvs.length === 0 ? (
                             <div className="text-center py-16 space-y-3">
@@ -269,7 +277,7 @@ export default function InboxPage() {
                 )}
 
                 {/* Tab: My Outreach (as recruiter) */}
-                {activeTab === "outreach" && (
+                {resolvedTab === "outreach" && (
                     <div className="space-y-2">
                         {recruiterConvs.length === 0 ? (
                             <div className="text-center py-16 space-y-3">
