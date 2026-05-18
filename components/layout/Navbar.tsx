@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useInboxCount } from "@/hooks/useInboxCount";
 
 
 interface NavbarProps {
@@ -30,6 +31,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     const { publicKey, connecting } = useWallet();
     const { isGoogleSignedIn } = useGoogleAuth();
+    const inboxCount = useInboxCount();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides'>('main');
@@ -182,19 +184,29 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     {publicKey && (
                         <Link
                             href="/dashboard/inbox"
-                            className={`hidden md:flex p-2 rounded-full transition-colors ${pathname === '/dashboard/inbox' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
+                            className={`hidden md:flex relative p-2 rounded-full transition-colors ${pathname === '/dashboard/inbox' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
                             title="Inbox"
                         >
                             <Inbox className="w-5 h-5" />
+                            {inboxCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white px-1 leading-none">
+                                    {inboxCount > 99 ? "99+" : inboxCount}
+                                </span>
+                            )}
                         </Link>
                     )}
                     {!publicKey && isGoogleSignedIn && (
                         <Link
                             href="/dashboard/outreach"
-                            className={`hidden md:flex p-2 rounded-full transition-colors ${pathname === '/dashboard/outreach' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
+                            className={`hidden md:flex relative p-2 rounded-full transition-colors ${pathname === '/dashboard/outreach' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
                             title="My Outreach"
                         >
                             <Inbox className="w-5 h-5" />
+                            {inboxCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white px-1 leading-none">
+                                    {inboxCount > 99 ? "99+" : inboxCount}
+                                </span>
+                            )}
                         </Link>
                     )}
                     <NotificationBell />

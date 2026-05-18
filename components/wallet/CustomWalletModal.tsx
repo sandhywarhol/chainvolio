@@ -114,14 +114,31 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     useEffect(() => {
         if (!connected || !isOpen || step !== "select" || !loadingKey) return;
 
-        if (recruiterModeRef.current) {
-            setLoadingKey(null);
-            setStep("org-type");
-            return;
-        }
-
         const handleConnected = async () => {
             const address = publicKey?.toBase58();
+
+            if (recruiterModeRef.current) {
+                // Block Builder wallets from entering the Recruiter onboarding flow.
+                if (address) {
+                    try {
+                        const res = await fetch(`/api/check-wallet?wallet=${address}&mode=recruiter`);
+                        const check = await res.json();
+                        if (check.allowed === false) {
+                            setToast({ message: check.reason, type: "error" });
+                            disconnect();
+                            setLoadingKey(null);
+                            return;
+                        }
+                    } catch {
+                        // Allow on API error — don't block
+                    }
+                }
+                setLoadingKey(null);
+                setStep("org-type");
+                return;
+            }
+
+            // Builder path
             if (address) {
                 try {
                     const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
@@ -150,22 +167,6 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
 
     const effectivelyAvailable = (available: boolean) => available || isMobile;
     const noneAvailable = !phantomAvailable && !solflareAvailable;
-
-    const checkRoleAllowed = async (address: string, mode: 'builder' | 'recruiter') => {
-        try {
-            const res = await fetch(`/api/check-wallet?wallet=${address}&mode=${mode}`);
-            const check = await res.json();
-            if (check.allowed === false) {
-                setToast({ message: check.reason, type: "error" });
-                setLoadingKey(null);
-                return false;
-            }
-            return true;
-        } catch (error) {
-            console.error("Check role error:", error);
-            return true; // Fallback to allow if API fails
-        }
-    };
 
     const handleBuilderConnect = async (walletName: string) => {
         const key = `builder-${walletName}`;

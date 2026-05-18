@@ -80,11 +80,16 @@ export function NotificationBell() {
             if (!supabase) return;
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            
+
+            // Only clean up transient nudge-type notifications (no related_id).
+            // Milestone/achievement notifications (profile_complete, builder badge, etc.)
+            // use a stable related_id for deduplication — deleting them causes them to
+            // be recreated as unread on the next sync.
             await supabase
                 .from("notifications")
                 .delete()
                 .eq("wallet_address", publicKey.toBase58())
+                .is("related_id", null)
                 .lt("created_at", sevenDaysAgo.toISOString());
         };
 
