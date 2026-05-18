@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
             // Wallet already has a builder profile → always allow (returning builder)
             if (profileResult.data) {
-                return NextResponse.json({ allowed: true });
+                return NextResponse.json({ allowed: true, isNew: false });
             }
 
             // New wallet — only block if it's a verified org
@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
                     reason: "This wallet is already registered as a Recruiter. You cannot use it to create a Builder profile."
                 });
             }
+
+            // Brand-new wallet with no profile and no org — allow and signal isNew
+            return NextResponse.json({ allowed: true, isNew: true });
         } else if (mode === 'recruiter') {
             const { data: profileData, error: profileErr } = await supabase
                 .from("profiles")

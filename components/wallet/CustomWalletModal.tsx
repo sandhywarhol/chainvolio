@@ -139,6 +139,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             }
 
             // Builder path
+            let isNewBuilder = false;
             if (address) {
                 try {
                     const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
@@ -149,13 +150,18 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         setLoadingKey(null);
                         return;
                     }
+                    isNewBuilder = check.isNew === true;
                 } catch {
                     // Allow on API error — don't block login
                 }
             }
             setLoadingKey(null);
             onClose();
-            router.refresh();
+            if (isNewBuilder) {
+                router.push("/dashboard");
+            } else {
+                router.refresh();
+            }
         };
 
         handleConnected();
