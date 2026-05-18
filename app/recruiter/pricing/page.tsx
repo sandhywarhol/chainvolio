@@ -35,6 +35,7 @@ const TIERS = [
             { label: "10 saved candidates" },
             { label: "Basic candidate browsing" },
             { label: "Shortlist candidates" },
+            { label: "2 direct messages to candidates / month" },
         ],
     },
     {
@@ -55,6 +56,7 @@ const TIERS = [
             { label: "20 recognized attestations / month" },
             { label: "Hiring links marked as Trusted Community Opportunity" },
             { label: "Candidates can verify your community is legit" },
+            { label: "Unlimited direct messages to candidates" },
         ],
     },
     {
@@ -76,6 +78,7 @@ const TIERS = [
             { label: "40 attestations / month" },
             { label: "Hiring links appear as verified institutional sources" },
             { label: "\"Institutional Trust\" signal visible to every candidate" },
+            { label: "Unlimited direct messages to candidates" },
         ],
     },
 ] as const;
@@ -102,6 +105,14 @@ const COMPARISON = [
             { label: "Verified badge on profile", values: [false, true, true] },
             { label: "Badge type", values: ["-", "Community", "Company / Org"] },
             { label: "Institutional trust signal", values: [false, "Collective", "Institutional"] },
+        ]
+    },
+    {
+        category: "Candidate Outreach",
+        rows: [
+            { label: "Direct messages to candidates", values: ["2 / month", "Unlimited", "Unlimited"] },
+            { label: "Interview request system", values: [true, true, true] },
+            { label: "Candidate can accept / decline", values: [true, true, true] },
         ]
     },
     {

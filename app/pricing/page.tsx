@@ -82,6 +82,7 @@ const TIERS = [
             { label: "Collective Authority (4/5 attestation power)" },
             { label: "Candidates can verify your community is legitimate" },
             { label: "Verified identity publicly auditable on Solana" },
+            { label: "Unlimited direct messages to candidates" },
         ],
     },
     {
@@ -107,6 +108,7 @@ const TIERS = [
             { label: "\"Institutional Trust\" signal visible to every candidate" },
             { label: "Attestations carry full organizational credibility on-chain" },
             { label: "Organization identity anchored and verifiable by anyone" },
+            { label: "Unlimited direct messages to candidates" },
         ],
     },
 ] as const;
@@ -135,6 +137,7 @@ const COMPARISON = [
             { label: "Hiring collections", values: ["5", "10", "Unlimited", "Unlimited"] },
             { label: "Hiring link marked as trusted source", values: [false, false, true, true] },
             { label: "Trust badge on hiring links", values: [false, false, true, true] },
+            { label: "Direct messages to candidates", values: [false, false, "Unlimited", "Unlimited"] },
         ]
     },
     {

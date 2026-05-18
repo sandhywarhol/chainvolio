@@ -113,7 +113,7 @@ export default function VerifiedOrganizationPage() {
                         {
                             icon: <TrendingUp className="w-6 h-6 text-emerald-400" />,
                             title: "Amplify Your Hiring Power",
-                            items: ["Create and manage opportunities", "Showcase hiring activity publicly", "Turn hiring into a visible trust signal"]
+                            items: ["Create and manage opportunities", "Showcase hiring activity publicly", "Turn hiring into a visible trust signal", "Send unlimited direct messages to candidates"]
                         },
                         {
                             icon: <RefreshCw className="w-6 h-6 text-blue-400" />,
