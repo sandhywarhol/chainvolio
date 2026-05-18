@@ -143,20 +143,21 @@ export async function syncUserStatus(wallet: string) {
                 });
             }
         } else {
+            const incompleteKey = `prof-incomplete-${wallet}`;
             const { data: existingIncomplete } = await supabase
                 .from("notifications")
                 .select("id")
                 .eq("wallet_address", wallet)
-                .eq("type", "profile_incomplete")
-                .eq("is_read", false)
-                .limit(1);
+                .eq("related_id", incompleteKey)
+                .maybeSingle();
 
-            if (!existingIncomplete || existingIncomplete.length === 0) {
+            if (!existingIncomplete) {
                 await supabase.from("notifications").insert({
                     wallet_address: wallet,
                     title: "Boost Your Visibility",
                     message: "Complete your profile to unlock higher trust matching and community features.",
                     type: 'profile_incomplete',
+                    related_id: incompleteKey,
                     link: '/dashboard',
                     is_read: false
                 });
