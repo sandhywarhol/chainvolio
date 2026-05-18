@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft, Inbox } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
@@ -179,6 +179,15 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         )}
                     </div>
                     
+                    {publicKey && (
+                        <Link
+                            href="/dashboard/inbox"
+                            className={`hidden md:flex p-2 rounded-full transition-colors ${pathname === '/dashboard/inbox' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
+                            title="Inbox"
+                        >
+                            <Inbox className="w-5 h-5" />
+                        </Link>
+                    )}
                     <NotificationBell />
 
                     {/* Mobile Wallet & Menu Toggle */}

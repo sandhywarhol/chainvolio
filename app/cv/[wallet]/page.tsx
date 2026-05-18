@@ -22,6 +22,8 @@ import { CertificatePreviewModal } from "@/components/profile/CertificatePreview
 import { TrustIssuerCV } from "@/components/cv/TrustIssuerCV";
 import { RecruiterSoftPrompt } from "@/components/cv/RecruiterSoftPrompt";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { RecruiterContactModal } from "@/components/messaging/RecruiterContactModal";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 type Profile = {
   displayName: string;
@@ -540,6 +542,9 @@ export default function CVPage(props: any) {
   const [isCertsLoading, setIsCertsLoading] = useState(false);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [contactedConversationId, setContactedConversationId] = useState<string | null>(null);
+  const { isGoogleSignedIn } = useGoogleAuth();
 
   const verifiedHiringRecords = useMemo(() => {
     return receipts.filter(r => 
@@ -1165,6 +1170,29 @@ export default function CVPage(props: any) {
 
             </div>
 
+            {/* Contact Candidate — shown to any logged-in user who is not the candidate */}
+            {(!!publicKey || isGoogleSignedIn) && publicKey?.toBase58() !== wallet && profile && (
+              <div className="mt-4 flex justify-end">
+                {contactedConversationId ? (
+                  <a
+                    href="/dashboard/inbox"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 text-xs font-bold uppercase tracking-widest transition-all"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    View Conversation
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setContactModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-white/90 text-black text-xs font-black uppercase tracking-widest transition-all shadow-sm"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Contact Candidate
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Recruiter Trust Disclaimer */}
             <div className="mt-8 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -1519,6 +1547,20 @@ export default function CVPage(props: any) {
         </footer>
       </section>
       <RecruiterSoftPrompt />
+
+      {profile && (
+        <RecruiterContactModal
+          isOpen={contactModalOpen}
+          onClose={() => setContactModalOpen(false)}
+          candidateWallet={wallet as string}
+          candidateName={profile.displayName}
+          onSuccess={(conversationId, isExisting) => {
+            setContactModalOpen(false);
+            setContactedConversationId(conversationId);
+          }}
+        />
+      )}
+
       <Footer />
     </main>
   );
