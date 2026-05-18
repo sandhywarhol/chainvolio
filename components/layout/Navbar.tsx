@@ -37,6 +37,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides'>('main');
     const [scrolled, setScrolled] = useState(false);
     const [mounted, setMounted] = useState(false);
+    // Safety net: if autoConnect hangs for >6s, stop blocking the Sign In button
+    const [connectingTimedOut, setConnectingTimedOut] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -65,6 +67,17 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
             setTimeout(() => setActiveMobilePanel('main'), 500);
         }
     }, [isMobileMenuOpen]);
+
+    // If autoConnect is still "connecting" after 6s with no wallet, stop hiding Sign In.
+    // This prevents the UI from being permanently blocked when Phantom is locked or unresponsive.
+    useEffect(() => {
+        if (connecting && !publicKey) {
+            const timer = setTimeout(() => setConnectingTimedOut(true), 6000);
+            return () => clearTimeout(timer);
+        } else {
+            setConnectingTimedOut(false);
+        }
+    }, [connecting, publicKey]);
 
     const isActive = (path: string) => pathname === path;
 
@@ -171,7 +184,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     {/* Desktop Wallet & Global Notification Bell */}
                     <div className="hidden md:flex items-center gap-2">
                         {/* <ThemeToggle /> */}
-                        {connecting && !publicKey ? (
+                        {connecting && !publicKey && !connectingTimedOut ? (
                             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/40 text-xs font-bold uppercase tracking-widest">
                                 <span className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
                                 Connecting
