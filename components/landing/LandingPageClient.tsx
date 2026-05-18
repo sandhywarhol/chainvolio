@@ -1083,13 +1083,21 @@ const SLIDES = [
 
 const PARTNERS = [
     { src: "/logos/solana.png", name: "Solana" },
+    { src: "/logos/behance.png", name: "Behance" },
     { src: "/logos/github.png", name: "GitHub" },
+    { src: "/logos/google drive.png", name: "Google Drive" },
     { src: "/logos/linkedin.png", name: "LinkedIn" },
+    { src: "/logos/dribbble.png", name: "Dribbble" },
     { src: "/logos/phantom.png", name: "Phantom" },
+    { src: "/logos/slack.png", name: "Slack" },
     { src: "/logos/discord.png", name: "Discord" },
+    { src: "/logos/dropbox.png", name: "Dropbox" },
     { src: "/logos/superteam.png", name: "Superteam" },
+    { src: "/logos/figma.png", name: "Figma" },
     { src: "/logos/notion.png", name: "Notion" },
+    { src: "/logos/canva.png", name: "Canva" },
     { src: "/logos/alchemy.png", name: "Alchemy" },
+    { src: "/logos/pdf.png", name: "PDF" },
     { src: "/logos/telegram.png", name: "Telegram" },
     { src: "/logos/solflare.png", name: "Solflare" },
     { src: "/logos/X.png", name: "X" },
@@ -2563,6 +2571,22 @@ function SignalNoiseVisual() {
             loadedIcons.push(img);
         });
 
+        const EXTRA_LOGOS = [
+            "/logos/behance.png",
+            "/logos/google drive.png",
+            "/logos/dribbble.png",
+            "/logos/slack.png",
+            "/logos/dropbox.png",
+            "/logos/figma.png",
+            "/logos/canva.png",
+            "/logos/pdf.png"
+        ];
+        EXTRA_LOGOS.forEach(url => {
+            const img = new window.Image();
+            img.src = url;
+            loadedIcons.push(img);
+        });
+
         let W = 0, H = 0;
 
         // Three layers of rays for depth — dense short inner, mid, long sparse outer
@@ -2650,8 +2674,9 @@ function SignalNoiseVisual() {
             assignIconsToLayer(layerB, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 0);
 
             // Less important icons (10-14): Resume, Code, Trophy, Briefcase, Web3
+            // New Image Logos (15-22): Behance, Google Drive, Dribbble, Slack, Dropbox, Figma, Canva, PDF
             // Place evenly on Layer C (far distance), offset angle so they don't align perfectly with Layer B
-            assignIconsToLayer(layerC, [10, 11, 12, 13, 14], Math.PI / 5);
+            assignIconsToLayer(layerC, [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22], Math.PI / 5);
 
             return [...layerA, ...layerB, ...layerC];
         };
