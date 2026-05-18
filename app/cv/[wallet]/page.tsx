@@ -1537,7 +1537,7 @@ export default function CVPage(props: any) {
         return (
           <div className="fixed bottom-0 inset-x-0 z-[9000] px-4 pb-5 md:pb-6 pointer-events-none">
             <div className="max-w-3xl mx-auto pointer-events-auto">
-              <div className="flex items-center justify-between gap-4 px-4 md:px-5 py-3 md:py-3.5 rounded-2xl border border-white/[0.10] bg-black/90 backdrop-blur-2xl shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.7)]">
+              <div className="flex items-center justify-between gap-4 px-4 md:px-5 py-3 md:py-3.5 rounded-2xl border border-white/[0.10] bg-black/40 backdrop-blur-2xl shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.5)]">
 
                 {/* Candidate brief */}
                 <div className="flex items-center gap-3 min-w-0">
