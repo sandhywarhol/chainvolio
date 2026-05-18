@@ -802,7 +802,7 @@ export default function CVPage(props: any) {
   return (
     <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-      <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
+      <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-28">
         {(!profile && !loading) ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (
@@ -1170,34 +1170,6 @@ export default function CVPage(props: any) {
 
             </div>
 
-            {/* Contact Candidate — only for verified org/company/community recruiters viewing a non-org profile */}
-            {(() => {
-              const viewerIsRecruiter = isGoogleSignedIn || (
-                !!viewerProfile?.isVerified && isRecruiterTier(viewerProfile?.verificationType)
-              );
-              const candidateIsOrg = isRecruiterTier(profile?.verificationType);
-              return viewerIsRecruiter && !candidateIsOrg && publicKey?.toBase58() !== wallet && profile;
-            })() && (
-              <div className="mt-4 flex justify-end">
-                {contactedConversationId ? (
-                  <a
-                    href="/dashboard/outreach"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 text-xs font-bold uppercase tracking-widest transition-all"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    View Conversation
-                  </a>
-                ) : (
-                  <button
-                    onClick={() => setContactModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-white/90 text-black text-xs font-black uppercase tracking-widest transition-all shadow-sm"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Contact Candidate
-                  </button>
-                )}
-              </div>
-            )}
 
             {/* Recruiter Trust Disclaimer */}
             <div className="mt-8 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-start gap-3">
@@ -1553,6 +1525,66 @@ export default function CVPage(props: any) {
         </footer>
       </section>
       <RecruiterSoftPrompt />
+
+      {/* ── Sticky Recruiter CTA Bar ── */}
+      {(() => {
+        const viewerIsRecruiter = isGoogleSignedIn || (
+          !!viewerProfile?.isVerified && isRecruiterTier(viewerProfile?.verificationType)
+        );
+        const candidateIsOrg = isRecruiterTier(profile?.verificationType);
+        if (!viewerIsRecruiter || candidateIsOrg || publicKey?.toBase58() === wallet || !profile) return null;
+
+        return (
+          <div className="fixed bottom-0 inset-x-0 z-[9000] px-4 pb-5 md:pb-6 pointer-events-none">
+            <div className="max-w-3xl mx-auto pointer-events-auto">
+              <div className="flex items-center justify-between gap-4 px-4 md:px-5 py-3 md:py-3.5 rounded-2xl border border-white/[0.10] bg-black/90 backdrop-blur-2xl shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.7)]">
+
+                {/* Candidate brief */}
+                <div className="flex items-center gap-3 min-w-0">
+                  {profile.avatarUrl ? (
+                    <img src={profile.avatarUrl} alt={profile.displayName} className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-white/10" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-xs font-black text-white flex-shrink-0">
+                      {profile.displayName?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-white truncate">{profile.displayName}</p>
+                    <p className="text-[10px] text-white/35 truncate">
+                      {profile.role || (profile.isVerified ? "Verified Builder" : "Web3 Builder")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                {contactedConversationId ? (
+                  <div className="flex items-center gap-2.5 flex-shrink-0">
+                    <span className="hidden sm:flex items-center gap-1 text-[11px] text-emerald-400 font-bold">
+                      <Check className="w-3 h-3" /> Sent
+                    </span>
+                    <a
+                      href="/dashboard/inbox"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-widest transition-all"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>View Conversation</span>
+                    </a>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setContactModalOpen(true)}
+                    className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_32px_rgba(52,211,153,0.5)] flex-shrink-0"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Contact Candidate</span>
+                    <span className="sm:hidden">Contact</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {profile && (
         <RecruiterContactModal
