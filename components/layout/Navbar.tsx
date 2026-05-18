@@ -188,6 +188,15 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             <Inbox className="w-5 h-5" />
                         </Link>
                     )}
+                    {!publicKey && isGoogleSignedIn && (
+                        <Link
+                            href="/dashboard/outreach"
+                            className={`hidden md:flex p-2 rounded-full transition-colors ${pathname === '/dashboard/outreach' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
+                            title="My Outreach"
+                        >
+                            <Inbox className="w-5 h-5" />
+                        </Link>
+                    )}
                     <NotificationBell />
 
                     {/* Mobile Wallet & Menu Toggle */}

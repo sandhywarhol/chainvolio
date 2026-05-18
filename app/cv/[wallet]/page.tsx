@@ -1175,7 +1175,7 @@ export default function CVPage(props: any) {
               <div className="mt-4 flex justify-end">
                 {contactedConversationId ? (
                   <a
-                    href="/dashboard/inbox"
+                    href="/dashboard/outreach"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 text-xs font-bold uppercase tracking-widest transition-all"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
