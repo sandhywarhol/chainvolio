@@ -1573,7 +1573,7 @@ export default function CVPage(props: any) {
                 ) : (
                   <button
                     onClick={() => setContactModalOpen(true)}
-                    className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_32px_rgba(52,211,153,0.5)] flex-shrink-0"
+                    className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_32px_rgba(52,211,153,0.5)] flex-shrink-0"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Contact Candidate</span>
