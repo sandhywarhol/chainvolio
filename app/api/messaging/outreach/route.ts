@@ -144,6 +144,20 @@ export async function POST(request: Request) {
                 if (!isValid) return err("ERR_SIGNATURE", sigError || "Signature verification failed", 401);
             }
 
+            // Verify the sender is a verified org/company/community account
+            const { data: orgVerif } = await supabase
+                .from("organization_verifications")
+                .select("type, status, expires_at")
+                .eq("wallet_address", recruiterWallet)
+                .maybeSingle();
+
+            const isExpired = orgVerif?.expires_at ? new Date(orgVerif.expires_at) < new Date() : false;
+            const senderIsRecruiter = orgVerif?.status === "verified" && !isExpired && isRecruiterTier(orgVerif?.type ?? "");
+
+            if (!senderIsRecruiter) {
+                return err("ERR_FORBIDDEN", "Only verified organization accounts (company, community, DAO) can contact candidates.", 403);
+            }
+
             // Fetch recruiter profile snapshot
             const { data: recProfile } = await supabase
                 .from("profiles")
@@ -151,7 +165,7 @@ export async function POST(request: Request) {
                 .eq("wallet_address", recruiterWallet)
                 .maybeSingle();
 
-            recruiterName = recProfile?.display_name || `${recruiterWallet.slice(0, 4)}...${recruiterWallet.slice(-4)}`;
+            recruiterName = recProfile?.display_name || orgVerif?.type || `${recruiterWallet.slice(0, 4)}...${recruiterWallet.slice(-4)}`;
             recruiterCompany = recProfile?.organization || null;
             recruiterAvatarUrl = recProfile?.avatar_url || null;
         }

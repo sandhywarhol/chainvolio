@@ -1170,8 +1170,14 @@ export default function CVPage(props: any) {
 
             </div>
 
-            {/* Contact Candidate — shown to any logged-in user who is not the candidate */}
-            {(!!publicKey || isGoogleSignedIn) && publicKey?.toBase58() !== wallet && profile && (
+            {/* Contact Candidate — only for verified org/company/community recruiters viewing a non-org profile */}
+            {(() => {
+              const viewerIsRecruiter = isGoogleSignedIn || (
+                !!viewerProfile?.isVerified && isRecruiterTier(viewerProfile?.verificationType)
+              );
+              const candidateIsOrg = isRecruiterTier(profile?.verificationType);
+              return viewerIsRecruiter && !candidateIsOrg && publicKey?.toBase58() !== wallet && profile;
+            })() && (
               <div className="mt-4 flex justify-end">
                 {contactedConversationId ? (
                   <a
