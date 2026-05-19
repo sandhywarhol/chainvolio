@@ -48,7 +48,10 @@ import {
     HelpCircle,
     LayoutGrid,
     FileQuestion,
-    Activity
+    Activity,
+    X,
+    Plus,
+    Briefcase
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -1242,118 +1245,271 @@ export function LandingPageClient() {
                 onAttestationClick={() => router.push('/guides/attestation')}
             />
 
-            <main className="flex-1 flex flex-col relative overflow-hidden bg-black theme-bg-page theme-aware">
+            <main className="flex-1 flex flex-col relative overflow-hidden theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
 
                 {/* HERO SECTION */}
-                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 flex flex-col items-center text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                        <span className={`text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap ${
-                            theme === 'light'
-                                ? 'theme-cyan-badge-text'
-                                : 'text-amber-200/60'
-                        }`}>
-                            Trust layer for Web3
-                        </span>
-                    </div>
-
-                    <h1 className="text-[24px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight sm:tracking-[-0.04em] leading-[1.2] mb-6 sm:mb-8 text-white max-w-5xl px-2">
-                        <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
-                        <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                            Resume <span className="text-amber-200/60">That Recruiters Trust.</span>
-                        </span>
-                    </h1>
-
-                    <p className="text-white/40 text-[13px] md:text-xl font-normal max-w-[310px] sm:max-w-2xl mb-10 sm:mb-12 leading-relaxed mx-auto">
-                        Signed by real people. Anchored on Solana.<br />
-                        Cryptographically verified. Share anywhere with one link.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-0 relative z-50 pointer-events-auto">
-                        <button
-                            onClick={() => setIsWalletModalOpen(true)}
-                            className="premium-shimmer-button w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black font-bold text-sm sm:text-base rounded-2xl hover:bg-white/90 transition-all flex items-center justify-center gap-2"
-                        >
-                            Build Your Reputation
-                        </button>
-                        <button
-                            onClick={() => router.push('/hiring/create')}
-                            className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white/[0.05] hover:bg-white/[0.08] text-white font-bold text-sm sm:text-base rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
-                        >
-                            Discover Talent <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    {/* HERO VISUAL - Clean Slide Preview */}
-                    <div className="relative w-full max-w-4xl mx-auto group mt-0 sm:-mt-12 pt-4 pb-4 px-4 sm:px-0">
-                        <div className="relative overflow-hidden transition-all duration-1000" style={{ clipPath: "inset(0 0 5% 0)" }}>
-                            <div className="aspect-[14/10] sm:aspect-[16/10] relative min-h-[160px] sm:min-h-[220px] scale-[0.85] sm:scale-100">
-                                {filteredSlides.map((slide, index) => (
-                                    <div
-                                        key={index}
-                                        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                                            }`}
-                                    >
-                                        <Image
-                                            src={slide.src}
-                                            alt={slide.label}
-                                            fill
-                                            className="object-contain drop-shadow-lg"
-                                            priority={index === 0}
-                                        />
-                                    </div>
-                                ))}
-
-                                {/* Swipe Detection for Mobile Hero */}
-                                <motion.div
-                                    className="absolute inset-0 z-30 md:hidden cursor-grab active:cursor-grabbing"
-                                    drag="x"
-                                    dragConstraints={{ left: 0, right: 0 }}
-                                    dragElastic={0.2}
-                                    onDragEnd={(e: any, info: any) => {
-                                        if (info.offset.x < -40) setCurrentSlide((prev) => (prev + 1) % filteredSlides.length);
-                                        if (info.offset.x > 40) setCurrentSlide((prev) => (prev - 1 + filteredSlides.length) % filteredSlides.length);
-                                    }}
-                                />
-
-                                {/* Multi-layered Bottom Gradient for Smooth Blending */}
-                                <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
-                                <div className="theme-solid-black absolute bottom-0 left-0 w-full h-12 bg-black z-20 pointer-events-none"></div>
+                {/* Radial gradient background — matches reference */}
+                <div className="absolute inset-0 pointer-events-none z-0" style={{ background: "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(60,58,70,0.55) 0%, rgba(25,24,30,0.6) 45%, transparent 75%)" }} />
+                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 max-w-5xl mx-auto flex flex-col w-full">
+                    
+                    <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-10 lg:gap-16 mb-1 sm:mb-2 w-full">
+                        {/* Left Side: Title */}
+                        <div className="flex-1 max-w-xl text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
+                                <span className={`text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap ${
+                                    theme === 'light'
+                                        ? 'theme-cyan-badge-text'
+                                        : 'text-amber-200/60'
+                                }`}>
+                                    Trust layer for Web3
+                                </span>
                             </div>
+
+                            <h1 className="text-[18px] sm:text-2xl md:text-3xl lg:text-[34px] font-bold tracking-tight sm:tracking-[-0.01em] leading-[1.25] text-white">
+                                <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
+                                <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
+                                    Resume <span className="text-amber-200/60">That Recruiters Trust.</span>
+                                </span>
+                            </h1>
                         </div>
 
-                        {/* Slide Caption & Navigation */}
-                        <div className="mt-2 sm:mt-4 space-y-4 sm:space-y-6 flex flex-col items-center">
-                            <div className="h-10 relative w-full flex justify-center">
-                                {filteredSlides.map((slide, index) => (
-                                    <div
-                                        key={index}
-                                        className={`absolute transition-all duration-700 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
-                                            }`}
-                                    >
-                                        <div className="w-1 h-1 rounded-full bg-emerald-500/60" />
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
-                                            {slide.label}
+                        {/* Right Side: Description */}
+                        <div className="flex-none lg:w-[380px] flex flex-col items-start lg:items-end text-left lg:text-right lg:pb-0">
+                            <p className="text-white/40 text-[11px] sm:text-[12px] md:text-[13px] font-normal leading-relaxed">
+                                Signed by real people. Anchored on Solana.<br />
+                                Cryptographically verified. Share anywhere with one link.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* HERO VISUAL - App UI Card Mockup */}
+                    <div className="relative w-full mt-6 sm:mt-8 pb-16">
+                        {/* Perspective wrapper for 3D standing effect */}
+                        <div style={{ perspective: "1800px" }}>
+                        {/* Outer frame with deep shadow — card appears to "stand" */}
+                        <div
+                            className="relative w-full rounded-2xl overflow-hidden border border-white/[0.12]"
+                            style={{
+                                background: "#111113",
+                                boxShadow: [
+                                    "0 0 0 1px rgba(255,255,255,0.07)",
+                                    "0 2px 4px rgba(0,0,0,0.4)",
+                                    "0 8px 16px rgba(0,0,0,0.5)",
+                                    "0 24px 48px rgba(0,0,0,0.6)",
+                                    "0 48px 96px rgba(0,0,0,0.5)",
+                                    "0 80px 160px rgba(0,0,0,0.4)",
+                                ].join(", "),
+                                transform: "rotateX(2deg)",
+                                transformOrigin: "center bottom",
+                            }}
+                        >
+                            {/* Window chrome bar */}
+                            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]" style={{ background: "#0e0e10" }}>
+                                <div className="flex gap-1.5">
+                                    <div className="w-3 h-3 rounded-full bg-white/10" />
+                                    <div className="w-3 h-3 rounded-full bg-white/10" />
+                                    <div className="w-3 h-3 rounded-full bg-white/10" />
+                                </div>
+                                <div className="flex-1 mx-4">
+                                    <div className="mx-auto w-48 h-5 rounded-md bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+                                        <span className="text-[10px] text-white/20 font-mono">chainvolio.xyz/alex-rivera</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* App body: 2-column layout like real dashboard */}
+                            <div className="flex h-[460px] sm:h-[540px] overflow-hidden">
+
+                                {/* ── Left: Profile Panel ── */}
+                                <div className="w-[220px] sm:w-[260px] border-r border-white/[0.06] flex flex-col overflow-y-auto flex-shrink-0 p-5 gap-5" style={{ background: "#0e0e10" }}>
+
+                                    {/* Avatar + Name */}
+                                    <div className="flex flex-col items-center text-center gap-2">
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-purple-500/20 border-2 border-white/10 flex items-center justify-center text-xl font-black text-white/60">
+                                            AR
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                                                <span className="text-sm font-bold text-white">Alex Rivera</span>
+                                                {/* Verified badge */}
+                                                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-400 uppercase tracking-wider">
+                                                    <ShieldCheck className="w-2.5 h-2.5" /> Verified
+                                                </span>
+                                            </div>
+                                            {/* CV ID */}
+                                            <span className="font-mono text-[9px] tracking-widest text-white/25 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.07] mt-1 inline-block">
+                                                CV ID #00142
+                                            </span>
+                                        </div>
+                                        {/* Role & Org */}
+                                        <p className="text-[11px] text-white/50">
+                                            Rust Developer <span className="text-white/20">at</span> Nexus Protocol
                                         </p>
+                                        {/* Location + Timezone */}
+                                        <div className="flex items-center gap-3 text-white/25 text-[10px]">
+                                            <span className="flex items-center gap-1"><MapPin className="w-2.5 h-2.5" /> Indonesia</span>
+                                            <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> UTC+7</span>
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* Dot Indicators */}
-                            <div className="flex items-center gap-3">
-                                {filteredSlides.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setCurrentSlide(index)}
-                                        className={`h-1.5 rounded-full transition-all duration-300 theme-dot-indicator ${index === currentSlide
-                                                ? "w-8 bg-white active"
-                                                : "w-1.5 bg-white/20 hover:bg-white/40"
-                                            }`}
-                                        aria-label={`Go to slide ${index + 1}`}
-                                    />
-                                ))}
+                                    {/* Looking For pill */}
+                                    <div className="flex justify-center">
+                                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/40 text-[10px]">
+                                            <Briefcase className="w-3 h-3" /> Open to full-time
+                                        </span>
+                                    </div>
+
+                                    {/* Bio */}
+                                    <p className="text-[10px] text-white/35 leading-relaxed text-center">
+                                        Smart contract engineer focused on DeFi protocols and on-chain identity. Building the future of verifiable work history.
+                                    </p>
+
+                                    {/* Skills */}
+                                    <div className="flex flex-wrap justify-center gap-1.5">
+                                        {["Rust", "Solana", "Anchor", "DeFi", "TypeScript", "Web3"].map((s, i) => (
+                                            <span key={i} className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[9px] text-white/50 font-medium">{s}</span>
+                                        ))}
+                                    </div>
+
+                                    {/* Social Links */}
+                                    <div className="flex items-center justify-center gap-2">
+                                        {[
+                                            { label: "X", bg: "hover:bg-white/10" },
+                                            { label: "GH", bg: "hover:bg-white/10" },
+                                            { label: "LI", bg: "hover:bg-blue-500/10" },
+                                            { label: "✉", bg: "hover:bg-white/10" },
+                                        ].map((s, i) => (
+                                            <div key={i} className={`w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center text-[9px] text-white/30 cursor-default ${s.bg} transition-colors`}>
+                                                {s.label}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Profile completion bar */}
+                                    <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] space-y-2">
+                                        <div className="flex justify-between text-[9px] text-white/25">
+                                            <span className="uppercase tracking-widest font-black">Profile Completion</span>
+                                            <span className="font-bold text-white/40">85%</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
+                                            <div className="h-full bg-white/40 rounded-full" style={{ width: "85%" }} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ── Right: Dashboard Main Content ── */}
+                                <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "#111113" }}>
+                                    {/* Topbar */}
+                                    <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+                                        <div className="flex items-center gap-2">
+                                            <LayoutDashboard className="w-3.5 h-3.5 text-white/30" />
+                                            <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">Dashboard</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07]">
+                                                <ExternalLink className="w-3 h-3 text-white/20" />
+                                                <span className="text-[9px] text-white/30 font-mono hidden sm:block">chainvolio.xyz/alex-rivera/142</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                                                <Share2 className="w-3 h-3 text-emerald-400" />
+                                                <span className="text-[9px] text-emerald-400 font-bold hidden sm:block">Share</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+
+                                        {/* Attestation Usage */}
+                                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2.5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Attestation Usage</span>
+                                                <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Verified Pro</span>
+                                            </div>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-xl font-black text-white">3</span>
+                                                <span className="text-white/25 text-sm">/ 10 this month</span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
+                                                <div className="h-full bg-gradient-to-r from-white/40 to-white/60 rounded-full" style={{ width: "30%" }} />
+                                            </div>
+                                            <p className="text-[9px] text-white/20 font-mono">Resets Jun 1, 2026</p>
+                                        </div>
+
+                                        {/* Work History / Receipts */}
+                                        <div>
+                                            <div className="flex items-center justify-between mb-2.5">
+                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Work History</span>
+                                                <span className="text-[9px] text-white/20 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Receipt</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {[
+                                                    { org: "Nexus Protocol", role: "Core Infrastructure Dev", sig: "5k2R...j8Wq", verified: true, color: "#60a5fa" },
+                                                    { org: "Superteam DAO", role: "Grant Contributor", sig: "3m9T...x4Zp", verified: true, color: "#f472b6" },
+                                                    { org: "Raydium Labs", role: "Smart Contract Auditor", sig: "7w1E...k2Lm", verified: false, color: "#94a3b8" },
+                                                ].map((r, i) => (
+                                                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 transition-colors">
+                                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0"
+                                                            style={{ background: r.color + "15", color: r.color, border: `1px solid ${r.color}25` }}>
+                                                            {r.org[0]}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-[11px] font-bold text-white/70 truncate">{r.org}</p>
+                                                            <p className="text-[10px] text-white/30 truncate">{r.role}</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                            <code className="text-[9px] text-white/20 font-mono hidden sm:block">{r.sig}</code>
+                                                            {r.verified
+                                                                ? <span className="flex items-center gap-0.5 text-[9px] text-emerald-400"><ShieldCheck className="w-3 h-3" /></span>
+                                                                : <span className="text-[9px] text-white/20 border border-white/10 px-1.5 py-0.5 rounded text-[8px]">Pending</span>}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Hiring Center */}
+                                        <div>
+                                            <div className="flex items-center justify-between mb-2.5">
+                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Hiring Collections</span>
+                                                <span className="text-[9px] bg-white/[0.05] border border-white/[0.08] text-white/30 px-2 py-0.5 rounded-full">2 Collections</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {[
+                                                    { title: "Senior Rust Engineers — Q2 2026", slug: "rust-engineers-q2" },
+                                                    { title: "Web3 Frontend — Internship", slug: "frontend-intern" },
+                                                ].map((c, i) => (
+                                                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                                                        <FolderOpen className="w-3.5 h-3.5 text-white/25 flex-shrink-0" />
+                                                        <span className="text-[11px] text-white/50 truncate flex-1">{c.title}</span>
+                                                        <ExternalLink className="w-3 h-3 text-white/15 flex-shrink-0" />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
                             </div>
+                        {/* Close the outer card div and perspective wrapper */}
+                        </div>
                         </div>
 
+                        {/* Ground shadow — the card "casts" this shadow on the floor */}
+                        <div
+                            className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
+                            style={{
+                                bottom: "-8px",
+                                width: "80%",
+                                height: "60px",
+                                background: "radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, transparent 70%)",
+                                filter: "blur(16px)",
+                                zIndex: 5,
+                            }}
+                        />
+
+                        {/* Bottom fade to blend into page */}
+                        <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#0d0d0f] via-[#0d0d0f]/80 to-transparent pointer-events-none z-10 hidden" />
                     </div>
 
                     <div className="mt-8 sm:mt-16 w-full max-w-[1400px] relative z-50">
