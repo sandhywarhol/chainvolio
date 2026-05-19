@@ -1248,42 +1248,35 @@ export function LandingPageClient() {
             <main className="flex-1 flex flex-col relative overflow-hidden theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
 
                 {/* HERO SECTION */}
-                {/* Radial gradient background — matches reference */}
-                <div className="absolute inset-0 pointer-events-none z-0" style={{ background: "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(60,58,70,0.55) 0%, rgba(25,24,30,0.6) 45%, transparent 75%)" }} />
-                <section className="relative pt-20 sm:pt-24 md:pt-32 pb-4 sm:pb-8 md:pb-12 px-4 sm:px-6 z-20 max-w-5xl mx-auto flex flex-col w-full">
-                    
-                    <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-10 lg:gap-16 mb-1 sm:mb-2 w-full">
-                        {/* Left Side: Title */}
-                        <div className="flex-1 max-w-xl text-left">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-6 group transition-all hover:border-emerald-500/20 hover:bg-emerald-500/[0.02]">
-                                <span className={`text-[10px] md:text-[11px] font-bold tracking-[0.1em] whitespace-nowrap ${
-                                    theme === 'light'
-                                        ? 'theme-cyan-badge-text'
-                                        : 'text-amber-200/60'
-                                }`}>
-                                    Trust layer for Web3
-                                </span>
-                            </div>
+                {/* Background spotlight — center of glow sits ~35% down the page (lower-half of hero), Linear-style */}
+                <div className="absolute inset-0 pointer-events-none z-0" style={{ background: "radial-gradient(ellipse 110% 35% at 50% 35%, rgba(72,68,90,0.36) 0%, rgba(32,30,40,0.18) 45%, transparent 70%)" }} />
+                <section className="relative pt-20 sm:pt-28 md:pt-36 pb-0 px-4 sm:px-6 z-20 max-w-[1100px] mx-auto flex flex-col w-full">
 
-                            <h1 className="text-[18px] sm:text-2xl md:text-3xl lg:text-[34px] font-bold tracking-tight sm:tracking-[-0.01em] leading-[1.25] text-white">
-                                <span className="block drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Build a Verifiable Web3</span>
-                                <span className="text-white drop-shadow-[0_0_40px_rgba(20,241,149,0.1)]">
-                                    Resume <span className="text-amber-200/60">That Recruiters Trust.</span>
-                                </span>
-                            </h1>
-                        </div>
-
-                        {/* Right Side: Description */}
-                        <div className="flex-none lg:w-[380px] flex flex-col items-start lg:items-end text-left lg:text-right lg:pb-0">
-                            <p className="text-white/40 text-[11px] sm:text-[12px] md:text-[13px] font-normal leading-relaxed">
-                                Signed by real people. Anchored on Solana.<br />
-                                Cryptographically verified. Share anywhere with one link.
-                            </p>
+                    {/* Announcement badge — top right corner, Linear-style */}
+                    <div className="flex justify-end mb-8 sm:mb-10">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.09] bg-white/[0.025] backdrop-blur-md">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400/70 animate-pulse flex-shrink-0" />
+                            <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em] whitespace-nowrap">
+                                Trust layer for Web3
+                            </span>
+                            <ArrowRight className="w-3 h-3 text-white/25 flex-shrink-0" />
                         </div>
                     </div>
 
+                    {/* Headline — large, left-aligned, Linear proportions */}
+                    <h1 className="text-[36px] sm:text-[50px] md:text-[58px] lg:text-[66px] font-bold tracking-[-0.025em] leading-[1.08] text-white max-w-[820px] mb-5 sm:mb-6">
+                        Build a Verifiable Web3
+                        <br />Resume <span className="text-amber-200/60">That Recruiters Trust.</span>
+                    </h1>
+
+                    {/* Subtitle — below headline, left-aligned, narrow */}
+                    <p className="text-white/40 text-[14px] sm:text-[15px] font-normal leading-relaxed max-w-[500px]">
+                        Signed by real people. Anchored on Solana.
+                        <br />Cryptographically verified. Share anywhere with one link.
+                    </p>
+
                     {/* HERO VISUAL - App UI Card Mockup */}
-                    <div className="relative w-full mt-6 sm:mt-8 pb-16">
+                    <div className="relative w-full mt-10 sm:mt-14 pb-16">
                         {/* Perspective wrapper for 3D standing effect */}
                         <div style={{ perspective: "1800px" }}>
                         {/* Outer frame with deep shadow — card appears to "stand" */}
@@ -1512,26 +1505,23 @@ export function LandingPageClient() {
                         <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#0d0d0f] via-[#0d0d0f]/80 to-transparent pointer-events-none z-10 hidden" />
                     </div>
 
-                    <div className="mt-8 sm:mt-16 w-full max-w-[1400px] relative z-50">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 mb-6 sm:mb-12">
-                            Powering the Web3 career stack
-                        </p>
-                        <div className="w-full py-4 overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                    {/* Partner logos — Linear-style static row, center-aligned, grayscale */}
+                    <div className="mt-4 sm:mt-6 w-full relative z-50 border-t border-white/[0.06] pt-8 sm:pt-10">
+                        <div className="w-full overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)' }}>
                             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
                                 {[...PARTNERS, ...PARTNERS].map((partner, i) => (
-                                    <div key={`${partner.name}-${i}`} className="flex items-center mx-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default group/partner">
+                                    <div key={`${partner.name}-${i}`} className="flex items-center mx-10 grayscale opacity-35 hover:grayscale-0 hover:opacity-80 transition-all duration-500 cursor-default">
                                         <img
                                             src={partner.src}
                                             alt={partner.name}
                                             loading="lazy"
                                             decoding="async"
-                                            className="h-5 sm:h-6 w-auto object-contain transition-transform group-hover/partner:scale-110"
+                                            className="h-5 sm:h-[22px] w-auto object-contain"
                                         />
                                     </div>
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </section>
 
