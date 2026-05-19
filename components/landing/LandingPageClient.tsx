@@ -1275,22 +1275,37 @@ export function LandingPageClient() {
                         <br />Cryptographically verified. Share anywhere with one link.
                     </p>
 
-                    {/* HERO VISUAL - App UI Card Mockup */}
-                    <div className="relative w-full mt-10 sm:mt-14 pb-16">
+                    {/* HERO VISUAL - Studio product photography presentation */}
+                    <div className="relative w-full mt-10 sm:mt-14 rounded-[28px] sm:rounded-[36px] overflow-hidden"
+                        style={{ background: "linear-gradient(175deg, #f0f0f4 0%, #e4e4e9 40%, #d5d5db 80%, rgba(213,213,219,0) 100%)" }}
+                    >
+                        {/* DSLR lens vignette — natural light falloff darkening the edges/corners */}
+                        <div className="absolute inset-0 pointer-events-none z-10"
+                            style={{ background: "radial-gradient(ellipse 92% 82% at 50% 28%, transparent 26%, rgba(0,0,0,0.58) 100%)" }} />
+                        {/* Studio key light — soft diffused spotlight from top center */}
+                        <div className="absolute inset-0 pointer-events-none z-10"
+                            style={{ background: "radial-gradient(ellipse 68% 48% at 50% 0%, rgba(255,255,255,0.52) 0%, transparent 56%)" }} />
+                        {/* Subtle ambient bounce light from floor */}
+                        <div className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none z-10"
+                            style={{ background: "radial-gradient(ellipse 55% 80% at 50% 100%, rgba(255,255,255,0.07) 0%, transparent 65%)" }} />
+
+                        {/* Frame padding — breathing room around the mockup */}
+                        <div className="relative z-20 px-5 sm:px-10 md:px-16 pt-10 sm:pt-14">
                         {/* Perspective wrapper for 3D standing effect */}
                         <div style={{ perspective: "1800px" }}>
-                        {/* Outer frame with deep shadow — card appears to "stand" */}
+                        {/* App card — elevated dark UI on light studio floor */}
                         <div
-                            className="relative w-full rounded-2xl overflow-hidden border border-white/[0.12]"
+                            className="relative w-full rounded-2xl overflow-hidden"
                             style={{
                                 background: "#111113",
+                                border: "1px solid rgba(0,0,0,0.06)",
                                 boxShadow: [
-                                    "0 0 0 1px rgba(255,255,255,0.07)",
-                                    "0 2px 4px rgba(0,0,0,0.4)",
-                                    "0 8px 16px rgba(0,0,0,0.5)",
-                                    "0 24px 48px rgba(0,0,0,0.6)",
-                                    "0 48px 96px rgba(0,0,0,0.5)",
-                                    "0 80px 160px rgba(0,0,0,0.4)",
+                                    "inset 0 0 0 0.5px rgba(255,255,255,0.05)",
+                                    "0 2px 6px rgba(0,0,0,0.10)",
+                                    "0 8px 24px rgba(0,0,0,0.18)",
+                                    "0 24px 60px rgba(0,0,0,0.22)",
+                                    "0 60px 120px rgba(0,0,0,0.24)",
+                                    "0 100px 200px rgba(0,0,0,0.18)",
                                 ].join(", "),
                                 transform: "rotateX(2deg)",
                                 transformOrigin: "center bottom",
@@ -1488,21 +1503,22 @@ export function LandingPageClient() {
                         </div>
                         </div>
 
-                        {/* Ground shadow — the card "casts" this shadow on the floor */}
+                        {/* Realistic floor shadow — soft diffused shadow the floating card casts */}
                         <div
-                            className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
+                            className="pointer-events-none mx-auto"
                             style={{
-                                bottom: "-8px",
-                                width: "80%",
-                                height: "60px",
-                                background: "radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, transparent 70%)",
-                                filter: "blur(16px)",
-                                zIndex: 5,
+                                width: "65%",
+                                height: "52px",
+                                marginTop: "-4px",
+                                background: "radial-gradient(ellipse at center, rgba(0,0,0,0.16) 0%, transparent 70%)",
+                                filter: "blur(22px)",
                             }}
                         />
+                        </div>{/* close frame padding */}
 
-                        {/* Bottom fade to blend into page */}
-                        <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#0d0d0f] via-[#0d0d0f]/80 to-transparent pointer-events-none z-10 hidden" />
+                        {/* Fade studio background back into dark page */}
+                        <div className="h-16 sm:h-20 pointer-events-none"
+                            style={{ background: "linear-gradient(to bottom, #d5d5db, #0d0d0f)" }} />
                     </div>
 
                     {/* Partner logos — Linear-style static row, center-aligned, grayscale */}
