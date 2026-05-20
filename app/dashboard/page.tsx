@@ -18,7 +18,7 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox, Building2, PenLine } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
 import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
@@ -314,6 +314,12 @@ export default function DashboardPage() {
   }
   const walletAddress = publicKey.toBase58();
 
+  // True when the wallet holder registered as a Community/DAO or Company/Org
+  const isWalletRecruiter = !!profile && (
+    isRecruiterTier(profile?.verificationType) ||
+    (profile?.verificationStatus === "pending" && isRecruiterTier(profile?.pendingVerificationType ?? ""))
+  );
+
   return (
     <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "#000000" }}>
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
@@ -336,7 +342,12 @@ export default function DashboardPage() {
           </div>
           {/* Nav */}
           <nav className="flex-1 px-2 py-3 space-y-0.5">
-            {([
+            {(isWalletRecruiter ? [
+              { Icon: Building2,     label: "Overview",            id: "profile",      href: undefined },
+              { Icon: FolderOpen,    label: "Hiring Center",       id: "hiring",       href: undefined },
+              { Icon: LayoutDashboard, label: "Projects & Programs", id: "projects",   href: undefined },
+              { Icon: Inbox,         label: "Inbox",               id: "inbox",        href: undefined },
+            ] : [
               { Icon: User,        label: "Profile",           id: "profile",       href: undefined },
               { Icon: ShieldCheck, label: "Credential",        id: "credential",    href: undefined },
               { Icon: FileCheck2,  label: "Proof of Work",     id: "proof-work",    href: undefined },
@@ -371,9 +382,13 @@ export default function DashboardPage() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate" style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }}>{profile?.displayName || '—'}</p>
-              {profile?.isVerified
-                ? <p style={{ fontSize: 9, color: "#4ade80", fontWeight: 700, marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>{getVerificationLabel(profile.verificationTier) || "Verified"}</p>
-                : <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)", fontWeight: 500, marginTop: 2 }}>Unverified</p>
+              {isWalletRecruiter
+                ? <p style={{ fontSize: 9, color: profile?.isVerified ? "#4ade80" : "rgba(255,255,255,0.22)", fontWeight: 700, marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    {profile?.isVerified ? (profile.verificationTier ?? "Verified") : profile?.verificationStatus === "pending" ? "Pending" : "Unverified"}
+                  </p>
+                : profile?.isVerified
+                  ? <p style={{ fontSize: 9, color: "#4ade80", fontWeight: 700, marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>{getVerificationLabel(profile.verificationTier) || "Verified"}</p>
+                  : <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)", fontWeight: 500, marginTop: 2 }}>Unverified</p>
               }
             </div>
           </div>
@@ -383,7 +398,12 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-y-auto min-w-0 flex flex-col" style={{ background: "#0a0b0e" }}>
           {/* Top bar */}
           {(() => {
-            const tabMeta: Record<string, { title: string; desc: string }> = {
+            const tabMeta: Record<string, { title: string; desc: string }> = isWalletRecruiter ? {
+              profile:  { title: "Overview",             desc: "Manage your organization profile and activity." },
+              hiring:   { title: "Hiring Center",        desc: "Manage your hiring collections and sourcing." },
+              projects: { title: "Projects & Programs",  desc: "Showcase your initiatives, hackathons, and programs." },
+              inbox:    { title: "Inbox",                desc: "Direct messages and candidate conversations." },
+            } : {
               profile:     { title: "Profile",           desc: "Manage your professional identity and information." },
               credential:  { title: "Credential",        desc: "Your verified credentials and badges." },
               "proof-work":{ title: "Proof of Work",     desc: "Your work history and contributions." },
@@ -400,7 +420,7 @@ export default function DashboardPage() {
                   <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>{meta.title}</p>
                   <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{meta.desc}</p>
                 </div>
-                {activeTab === "profile" && (
+                {activeTab === "profile" && !isWalletRecruiter && (
                   <button
                     onClick={showInlineEdit ? () => setShowInlineEdit(false) : openInlineEdit}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all hover:bg-white/[0.05]"
@@ -411,6 +431,16 @@ export default function DashboardPage() {
                       {showInlineEdit ? "Cancel" : "Edit Profile"}
                     </span>
                   </button>
+                )}
+                {isWalletRecruiter && activeTab === "profile" && (
+                  <Link
+                    href="/org/edit-profile-wallet"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all hover:bg-white/[0.05]"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}
+                  >
+                    <ExternalLink style={{ width: 10, height: 10, color: "rgba(255,255,255,0.4)" }} />
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>Edit Profile</span>
+                  </Link>
                 )}
               </div>
             );
@@ -463,18 +493,23 @@ export default function DashboardPage() {
               Create Profile
             </Link>
           </div>
-        ) : isRecruiterTier(profile?.verificationType) || (profile?.verificationStatus === "pending" && isRecruiterTier(profile?.pendingVerificationType ?? "")) ? (
-          // ── Org Dashboard (Community / Company accounts) ──────────────────────
-          <OrgDashboard
-            profile={profile}
-            walletAddress={walletAddress}
-            collections={collections}
-            attestationCount={attestationCount}
-            onRequestVerification={(renewal) => {
-              setIsRenewal(renewal);
-              setShowVerificationModal(true);
-            }}
-          />
+        ) : isWalletRecruiter ? (
+          // ── Org Dashboard (Community / Company wallet accounts) ───────────────
+          activeTab === "inbox" ? (
+            <InboxPanel />
+          ) : (
+            <OrgDashboard
+              profile={profile}
+              walletAddress={walletAddress}
+              collections={collections}
+              attestationCount={attestationCount}
+              activeSection={activeTab === "hiring" ? "hiring" : activeTab === "projects" ? "projects" : undefined}
+              onRequestVerification={(renewal) => {
+                setIsRenewal(renewal);
+                setShowVerificationModal(true);
+              }}
+            />
+          )
         ) : (
           <>
             {/* ── PROFILE tab ── */}
@@ -1370,6 +1405,121 @@ export default function DashboardPage() {
         <aside className="hidden lg:flex w-[260px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0a0b0e", borderLeft: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="px-4 py-4 space-y-3">
 
+          {isWalletRecruiter ? (
+            /* ── RECRUITER RIGHT PANEL ── */
+            <>
+              {/* Share Page */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Share Organization Page</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Copy your public organization link to share with candidates.</p>
+                <button
+                  onClick={async () => {
+                    const name = encodeURIComponent((profile?.displayName ?? "Org").replace(/\s+/g, "-"));
+                    const id = String(profile?.cardNumber ?? 1).padStart(5, "0");
+                    const url = `${window.location.origin}/${name}/${id}`;
+                    try { await navigator.clipboard.writeText(url); setToastMessage("Organization link copied!"); } catch { setToastMessage("Failed to copy link."); }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600 }}
+                >
+                  <Copy style={{ width: 11, height: 11 }} /> Copy Link
+                </button>
+              </div>
+
+              {/* View Public Page */}
+              {profile?.cardNumber && (
+                <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>View Public Page</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>See how your organization appears to candidates and partners.</p>
+                  <Link
+                    href={`/${encodeURIComponent((profile.displayName ?? "Org").replace(/\s+/g, "-"))}/${String(profile.cardNumber).padStart(5, "0")}`}
+                    target="_blank"
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
+                  >
+                    <ExternalLink style={{ width: 11, height: 11 }} /> View Page
+                  </Link>
+                </div>
+              )}
+
+              {/* Edit Profile */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Edit Organization Profile</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Update your organization's bio, socials, and contact info.</p>
+                <Link
+                  href="/org/edit-profile-wallet"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
+                >
+                  <PenLine style={{ width: 11, height: 11 }} /> Edit Profile
+                </Link>
+              </div>
+
+              {/* Verify / Renew / Upgrade */}
+              {!profile?.isVerified ? (
+                <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(74,222,128,0.12)" }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Get Verified</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Verified organizations unlock attestation signing and trusted hiring.</p>
+                  <button
+                    onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                    style={{ border: "1px solid rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.05)", fontSize: 11, color: "#4ade80", fontWeight: 600 }}
+                  >
+                    <ShieldCheck style={{ width: 11, height: 11 }} /> Apply for Verification
+                  </button>
+                </div>
+              ) : profile?.isExpired ? (
+                <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.03)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Verification Expired</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Renew your organization verification to keep your trusted status.</p>
+                  <button
+                    onClick={() => { setIsRenewal(true); setShowVerificationModal(true); }}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                    style={{ border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.05)", fontSize: 11, color: "#f87171", fontWeight: 600 }}
+                  >
+                    <RefreshCw style={{ width: 11, height: 11 }} /> Renew Verification
+                  </button>
+                </div>
+              ) : profile?.verifierTier && profile.verifierTier < 4 ? (
+                <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Upgrade Tier</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Unlock higher attestation quotas and more hiring collections.</p>
+                  <button
+                    onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                    style={{ border: "1px solid rgba(251,191,36,0.25)", background: "rgba(251,191,36,0.05)", fontSize: 11, color: "#fbbf24", fontWeight: 600 }}
+                  >
+                    <ShieldCheck style={{ width: 11, height: 11 }} /> Upgrade
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Hiring quick stats */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 8 }}>Hiring Overview</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Collections</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{collections.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Attestations</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{attestationCount}</span>
+                  </div>
+                  {profile?.attestationQuota != null && (
+                    <>
+                      <div className="mt-1 h-1 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${Math.min(100, ((profile.attestationUsed ?? 0) / profile.attestationQuota) * 100)}%`, background: "rgba(255,255,255,0.35)" }} />
+                      </div>
+                      <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)" }}>{profile.attestationUsed ?? 0} / {profile.attestationQuota} attestations this month</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            /* ── BUILDER RIGHT PANEL ── */
+            <>
             {/* Share Your Profile */}
             <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Share Your Profile</p>
@@ -1457,25 +1607,41 @@ export default function DashboardPage() {
             )}
 
             {/* Profile Completion */}
-            {profile && profile.completionPercentage < 100 && (
+            {profile && (
               <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-2">
                   <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Profile Completion</p>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{profile.completionPercentage}%</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: profile.completionPercentage >= 100 ? "#4ade80" : "rgba(255,255,255,0.4)" }}>{profile.completionPercentage}%</span>
                 </div>
-                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Complete your profile to increase visibility and opportunities.</p>
-                <div className="h-1.5 w-full rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.06)" }}>
-                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${profile.completionPercentage}%`, background: "rgba(255,255,255,0.4)" }} />
+                <div className="h-1 w-full rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${profile.completionPercentage}%`, background: profile.completionPercentage >= 100 ? "rgba(74,222,128,0.6)" : "rgba(255,255,255,0.35)" }} />
                 </div>
-                <Link
-                  href="/create-profile"
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
-                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 600, display: "flex" }}
-                >
-                  Complete Profile
-                </Link>
+                <div className="space-y-1.5">
+                  {[
+                    { done: !!profile.displayName, label: "Profile information" },
+                    { done: !!profile.bio,          label: "Bio added" },
+                    { done: !!profile.skills,       label: "Skills added" },
+                    { done: receipts.length > 0,    label: `Proof of work (${receipts.length}/3)` },
+                    { done: !!profile.isVerified,   label: "Identity verified" },
+                  ].map(({ done, label }) => (
+                    <div key={label} className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: done ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.04)", border: done ? "1px solid rgba(34,197,94,0.25)" : "1px solid rgba(255,255,255,0.1)" }}>
+                        {done && (
+                          <svg width="7" height="7" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5l2.5 2.5L8 3" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 9.5, color: done ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)" }}>{label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            </>
+          )}
 
           </div>
         </aside>

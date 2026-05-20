@@ -84,9 +84,10 @@ type Props = {
   onRequestVerification: (isRenewal: boolean) => void;
   googleOrgAccount?: OrgAccount | null;
   accessToken?: string | null;
+  activeSection?: "hiring" | "projects" | undefined;
 };
 
-export function OrgDashboard({ profile, walletAddress, collections, attestationCount, onRequestVerification, googleOrgAccount, accessToken }: Props) {
+export function OrgDashboard({ profile, walletAddress, collections, attestationCount, onRequestVerification, googleOrgAccount, accessToken, activeSection }: Props) {
   const [hiringExpanded, setHiringExpanded] = useState(true);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -374,6 +375,89 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const actionBadgeClass = isGooglePath
     ? planBadge.className
     : (profile.isVerified ? badge.color : "bg-slate-700/50 text-slate-500 border-slate-600/50");
+
+  // ── Hiring-only view (when activeSection === "hiring") ───────────────────────
+  if (activeSection === "hiring") {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {hiringExpanded !== undefined && (
+          <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-slate-700/50"><LayoutDashboard className="w-4 h-4 text-slate-500" /></div>
+                <div>
+                  <h2 className="text-sm font-black text-white flex items-center gap-2">
+                    Hiring Center
+                    {collections.length > 0 && <span className="text-[10px] font-bold bg-white/5 text-white/50 px-2 py-0.5 rounded-full border border-white/10">{collections.length}</span>}
+                  </h2>
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    {effectiveHiringLimit === null
+                      ? <span className="text-white/60 font-bold">Unlimited access</span>
+                      : <span className={isAtEffectiveLimit ? "text-rose-400 font-bold" : ""}>{hiringUsed}/{effectiveHiringLimit} used</span>
+                    }
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/hiring/create"
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors ${isAtEffectiveLimit ? "text-slate-500 cursor-not-allowed pointer-events-none" : "text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"}`}
+              >
+                <Plus className="w-3 h-3" /> New Collection
+              </Link>
+            </div>
+            <div className="px-4 pb-4 pt-4">
+              {collections.length > 0 ? (
+                <div className="grid gap-3">
+                  {collections.map(col => (
+                    <div key={col.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
+                      <div>
+                        <h3 className="text-sm font-bold text-white group-hover:text-white/80 transition-colors">{col.title}</h3>
+                        <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
+                          <span>{new Date(col.created_at).toLocaleDateString()}</span>
+                          <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={e => e.stopPropagation()}>
+                            Public Page <ExternalLink className="w-2.5 h-2.5" />
+                          </Link>
+                        </div>
+                      </div>
+                      <Link href={`/hiring/${col.slug}/dashboard`} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10">
+                        Dashboard
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
+                  <h3 className="text-sm font-bold text-white mb-2">Source Talent for Your {orgLabel}</h3>
+                  <p className="text-xs text-slate-500 mb-4 max-w-sm">Create a hiring collection to discover and track verified talent.</p>
+                  <Link href="/hiring/create" className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold rounded-lg transition-all border border-white/10">Create First Collection</Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+      </div>
+    );
+  }
+
+  // ── Projects-only view (when activeSection === "projects") ────────────────────
+  if (activeSection === "projects") {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {ProjectsSection}
+        {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+        {showProjectForm && (
+          <OrgProjectForm
+            ownerWallet={walletAddress}
+            ownerAuthUid={googleOrgAccount?.auth_uid}
+            accessToken={accessToken}
+            onSuccess={(p) => { setProjects(prev => [p, ...prev]); setShowProjectForm(false); }}
+            onClose={() => setShowProjectForm(false)}
+          />
+        )}
+      </div>
+    );
+  }
 
   // ── Unified Org Dashboard ─────────────────────────────────────────────────────
   return (
