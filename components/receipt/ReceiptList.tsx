@@ -40,9 +40,11 @@ type Receipt = {
 type Props = {
   walletAddress: string;
   onEdit?: (receipt: Receipt) => void;
+  onViewDetail?: (receipt: Receipt) => void;
+  hideTimeline?: boolean;
 };
 
-export function ReceiptList({ walletAddress, onEdit }: Props) {
+export function ReceiptList({ walletAddress, onEdit, onViewDetail, hideTimeline = false }: Props) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -94,7 +96,7 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
 
   return (
     <>
-      {receipts.length > 0 && (
+      {receipts.length > 0 && !hideTimeline && (
         <WorkTimeline
           receipts={receipts}
           onSelectReceipt={(r) => onEdit && onEdit(r)}
@@ -107,7 +109,10 @@ export function ReceiptList({ walletAddress, onEdit }: Props) {
             id={`receipt-${r.id}`}
             className="p-4 rounded-lg bg-white/[0.03] border border-white/[0.06] scroll-mt-24 transition-all duration-500"
           >
-            <div className="flex justify-between items-start gap-4">
+            <div
+              className={`flex justify-between items-start gap-4 ${onViewDetail ? "cursor-pointer" : ""}`}
+              onClick={onViewDetail ? () => onViewDetail(r) : undefined}
+            >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold">{r.role}</h3>

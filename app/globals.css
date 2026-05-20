@@ -96,15 +96,25 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 3px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-white/5;
+    background: transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-white/20 rounded-full hover:bg-white/30 transition-colors;
+    background: rgba(255,255,255,0.12);
+    border-radius: 100px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.22);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.12) transparent;
   }
 
   .scrollbar-hide::-webkit-scrollbar {

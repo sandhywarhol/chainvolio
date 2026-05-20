@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
     try {
         // 1. Fetch Profile and Verification in Parallel
-        const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes] = await Promise.all([
+        const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes, scoreRes] = await Promise.all([
             supabase
                 .from("profiles")
                 .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test, attestation_used, attestation_reset_date")
@@ -41,7 +41,12 @@ export async function GET(request: Request) {
                 .from("user_certificates")
                 .select("id, title, issuer_name, date_issued, file_url, file_type, created_at")
                 .eq("wallet_address", wallet)
-                .order("created_at", { ascending: false })
+                .order("created_at", { ascending: false }),
+            supabase
+                .from("scores")
+                .select("total_score, level")
+                .eq("wallet_address", wallet)
+                .maybeSingle(),
         ]);
 
         const profile = profileRes.data;
@@ -114,7 +119,7 @@ export async function GET(request: Request) {
         syncUserStatus(wallet).catch(console.error);
 
         return NextResponse.json({
-            profile: identity,
+            profile: { ...identity, cvScore: scoreRes?.data?.total_score ?? null, cvLevel: scoreRes?.data?.level ?? null },
             collections: collectionsRes.data || [],
             attestationCount: attestationsRes.count || 0,
             certificates: certsRes.data || []

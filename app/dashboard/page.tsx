@@ -18,12 +18,19 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
 import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { format } from "date-fns";
+import { WorkTimeline } from "@/components/profile/WorkTimeline";
+import { CountrySelector } from "@/components/ui/CountrySelector";
+import { SkillSelector } from "@/components/ui/SkillSelector";
+import { ImageCropModal } from "@/components/ui/ImageCropModal";
+import { signChainVolioAction } from "@/lib/wallet-utils";
+import { ReceiptDetailModal } from "@/components/receipt/ReceiptDetailModal";
+import { InboxPanel } from "@/components/dashboard/InboxPanel";
 
 
 type Profile = {
@@ -63,6 +70,8 @@ type Profile = {
   canAttest?: boolean;
   completionPercentage: number;
   isProfileComplete: boolean;
+  cvScore?: number | null;
+  cvLevel?: string | null;
 };
 
 type HiringCollection = {
@@ -73,7 +82,7 @@ type HiringCollection = {
 };
 
 export default function DashboardPage() {
-  const { publicKey, connected, connecting } = useWallet();
+  const { publicKey, connected, connecting, signMessage } = useWallet();
   const { session, orgAccount, loading: googleLoading } = useGoogleAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
@@ -90,6 +99,19 @@ export default function DashboardPage() {
   const [showCertModal, setShowCertModal] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [receipts, setReceipts] = useState<any[]>([]);
+  const [showInlineEdit, setShowInlineEdit] = useState(false);
+  const [editForm, setEditForm] = useState({
+    displayName: "", bio: "", skills: "", role: "", organization: "",
+    country: "", timezone: "", twitter: "", github: "", website: "",
+    discord: "", whatsapp: "", email: "", telegram: "", linkedin: "",
+    instagram: "", lookingFor: "", workPreference: [] as string[], avatarUrl: "",
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editUploading, setEditUploading] = useState(false);
+  const [editCropModal, setEditCropModal] = useState<{ isOpen: boolean; image: string | null }>({ isOpen: false, image: null });
+  const [selectedReceiptForDetail, setSelectedReceiptForDetail] = useState<any>(null);
 
   const getProfileUrl = () => {
     if (!profile || !publicKey) return `${window.location.origin}/cv/${publicKey?.toBase58()}`;
@@ -113,9 +135,11 @@ export default function DashboardPage() {
     setLoading(true);
     const controller = new AbortController();
 
-    fetch(`/api/dashboard/stats?wallet=${walletAddr}`, { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
+    Promise.all([
+      fetch(`/api/dashboard/stats?wallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()),
+      fetch(`/api/receipts?wallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()).catch(() => []),
+    ])
+      .then(([data, recs]) => {
         if (data.error) throw new Error(data.error);
         setProfile(data.profile);
         setCollections(data.collections || []);
@@ -123,6 +147,10 @@ export default function DashboardPage() {
         if (Array.isArray(data.certificates)) {
           setCertificates(data.certificates);
         }
+        const recsArr = Array.isArray(recs) ? recs : (recs.receipts || []);
+        setReceipts(recsArr.filter((r: any) =>
+          r.attestationType !== "Hiring Proof" && !r.description?.includes("Official Verified Hiring Proof")
+        ));
         setLoading(false);
       })
       .catch((err) => {
@@ -156,6 +184,96 @@ export default function DashboardPage() {
       .catch(() => {
         setToastMessage("Certificate uploaded, but failed to refresh list. Please reload the page.");
       });
+  };
+
+  const openInlineEdit = () => {
+    if (!profile) return;
+    setEditForm({
+      displayName: profile.displayName || "",
+      bio: profile.bio || "",
+      skills: profile.skills || "",
+      role: profile.role || "",
+      organization: profile.organization || "",
+      country: profile.country || "",
+      timezone: profile.timezone || "",
+      twitter: profile.twitter || "",
+      github: profile.github || "",
+      website: profile.website || "",
+      discord: profile.discord || "",
+      whatsapp: profile.whatsapp || "",
+      email: profile.email || "",
+      telegram: profile.telegram || "",
+      linkedin: profile.linkedin || "",
+      instagram: profile.instagram || "",
+      lookingFor: profile.lookingFor || "",
+      workPreference: profile.workPreference || [],
+      avatarUrl: profile.avatarUrl || "",
+    });
+    setShowInlineEdit(true);
+  };
+
+  const handleEditImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => setEditCropModal({ isOpen: true, image: reader.result as string }));
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const handleEditCroppedImage = async (croppedBlob: Blob) => {
+    try {
+      setEditUploading(true);
+      const { default: imageCompression } = await import("browser-image-compression");
+      const compressed = await imageCompression(croppedBlob as File, { maxSizeMB: 0.5, maxWidthOrHeight: 400, useWebWorker: true, fileType: "image/webp" });
+      const fileName = `${publicKey?.toBase58()}-${Date.now()}.webp`;
+      const fd = new FormData();
+      fd.append("file", compressed, fileName);
+      fd.append("bucket", "avatars");
+      fd.append("path", fileName);
+      const res = await fetch("/api/storage/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      setEditForm(prev => ({ ...prev, avatarUrl: url }));
+      setEditCropModal({ isOpen: false, image: null });
+    } catch (error: any) {
+      setToastMessage("Error uploading avatar: " + error.message);
+    } finally {
+      setEditUploading(false);
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!publicKey || !signMessage) return;
+    if (editForm.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email.trim())) {
+      setToastMessage("Please enter a valid email address.");
+      return;
+    }
+    setEditLoading(true);
+    try {
+      const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+      if (!signedAction) {
+        setToastMessage("Signing canceled. Please try again.");
+        return;
+      }
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: publicKey.toBase58(), ...editForm, ...signedAction }),
+      });
+      if (res.ok) {
+        setProfile(prev => prev ? { ...prev, ...editForm } : null);
+        setToastMessage("Profile updated successfully!");
+        setShowInlineEdit(false);
+      } else {
+        const data = await res.json();
+        setToastMessage(data.error?.message || data.error || "Failed to update profile.");
+      }
+    } catch {
+      setToastMessage("Error saving profile");
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   // Google auth resolving
@@ -197,12 +315,110 @@ export default function DashboardPage() {
   const walletAddress = publicKey.toBase58();
 
   return (
-    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "#000000" }}>
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
+      <div className="flex-shrink-0" style={{ height: 96 }} />{/* navbar spacer */}
 
+      {/* ── 3-PANEL BODY ── */}
+      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-3 flex flex-col">
+        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
 
-      <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
+        {/* ── LEFT SIDEBAR ── */}
+        <aside className="hidden md:flex w-[220px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+          {/* Logo */}
+          <div className="flex items-center px-4 h-[46px] flex-shrink-0 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
+            </div>
+            <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 18, width: "auto", objectFit: "contain" }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginLeft: 6, letterSpacing: "-0.01em" }}>chainvolio</span>
+          </div>
+          {/* Nav */}
+          <nav className="flex-1 px-2 py-3 space-y-0.5">
+            {([
+              { Icon: User,        label: "Profile",           id: "profile",       href: undefined },
+              { Icon: ShieldCheck, label: "Credential",        id: "credential",    href: undefined },
+              { Icon: FileCheck2,  label: "Proof of Work",     id: "proof-work",    href: undefined },
+              { Icon: FolderOpen,  label: "Hiring Collection", id: "hiring",        href: undefined },
+              { Icon: Activity,    label: "Attestation Usage", id: "attestation",   href: undefined },
+              { Icon: Briefcase,   label: "Career Timeline",   id: "timeline",      href: undefined },
+              { Icon: Send,        label: "My Applications",   id: "applications",  href: undefined },
+              { Icon: Inbox,       label: "Inbox",             id: "inbox",         href: undefined },
+            ] as Array<{ Icon: React.ElementType; label: string; id: string; href?: string }>).map(({ Icon, label, id, href }) => {
+              const active = activeTab === id;
+              const cls = "w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md relative transition-colors text-left";
+              const sty = active ? { background: "rgba(255,255,255,0.07)" } : {};
+              const inner = (
+                <>
+                  {active && <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.4)" }} />}
+                  <Icon style={{ width: 13, height: 13, color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, fontWeight: active ? 600 : 500, color: active ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.42)" }}>{label}</span>
+                </>
+              );
+              return href
+                ? <Link key={id} href={href} className={cls} style={sty}>{inner}</Link>
+                : <button key={id} onClick={() => setActiveTab(id)} className={cls} style={sty}>{inner}</button>;
+            })}
+          </nav>
+          {/* User */}
+          <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+              {profile?.avatarUrl
+                ? <img src={profile.avatarUrl} alt={profile?.displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ background: "#2a2a2e", color: "rgba(255,255,255,0.5)" }}>{profile?.displayName?.[0] || '?'}</div>
+              }
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate" style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }}>{profile?.displayName || '—'}</p>
+              {profile?.isVerified
+                ? <p style={{ fontSize: 9, color: "#4ade80", fontWeight: 700, marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>{getVerificationLabel(profile.verificationTier) || "Verified"}</p>
+                : <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)", fontWeight: 500, marginTop: 2 }}>Unverified</p>
+              }
+            </div>
+          </div>
+        </aside>
+
+        {/* ── CENTER PANEL ── */}
+        <div className="flex-1 overflow-y-auto min-w-0 flex flex-col" style={{ background: "#0a0b0e" }}>
+          {/* Top bar */}
+          {(() => {
+            const tabMeta: Record<string, { title: string; desc: string }> = {
+              profile:     { title: "Profile",           desc: "Manage your professional identity and information." },
+              credential:  { title: "Credential",        desc: "Your verified credentials and badges." },
+              "proof-work":{ title: "Proof of Work",     desc: "Your work history and contributions." },
+              hiring:      { title: "Hiring Collection", desc: "Manage your talent hiring collections." },
+              attestation: { title: "Attestation Usage", desc: "Track your monthly attestation usage." },
+              timeline:    { title: "Career Timeline",   desc: "Your verified professional career timeline." },
+              applications:{ title: "My Applications",   desc: "Track your job applications and opportunities." },
+              inbox:       { title: "Inbox",             desc: "Recruiter outreach & your conversations." },
+            };
+            const meta = tabMeta[activeTab] ?? tabMeta.profile;
+            return (
+              <div className="flex items-center justify-between px-5 h-[46px] flex-shrink-0 sticky top-0 z-10" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>{meta.title}</p>
+                  <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{meta.desc}</p>
+                </div>
+                {activeTab === "profile" && (
+                  <button
+                    onClick={showInlineEdit ? () => setShowInlineEdit(false) : openInlineEdit}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all hover:bg-white/[0.05]"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)", background: showInlineEdit ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)" }}
+                  >
+                    <ExternalLink style={{ width: 10, height: 10, color: "rgba(255,255,255,0.4)" }} />
+                    <span style={{ fontSize: 11, color: showInlineEdit ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.45)", fontWeight: 500 }}>
+                      {showInlineEdit ? "Cancel" : "Edit Profile"}
+                    </span>
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+      <section id="profile" className="flex-1">
         {loading ? (
           <LoadingScreen message="Aggregating professional reputation..." />
         ) : fetchError ? (
@@ -261,17 +477,18 @@ export default function DashboardPage() {
           />
         ) : (
           <>
-            <div className="mb-12">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+            {/* ── PROFILE tab ── */}
+            {activeTab === "profile" && <>
+            {/* ── PROFILE HEADER CARD ── */}
+            <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div className="flex flex-col md:flex-row items-start gap-4">
               <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
                 {profile.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt={profile.displayName}
-                    className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-700 shadow-xl"
-                  />
+                  <div className="w-[52px] h-[52px] rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.1)" }}>
+                    <img src={profile.avatarUrl} alt={profile.displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
                 ) : (
-                  <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-800 border-4 border-slate-700 flex items-center justify-center text-slate-500 text-3xl md:text-4xl font-bold shadow-xl">
+                  <div className="w-[52px] h-[52px] rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0" style={{ background: "#1e1e22", color: "rgba(255,255,255,0.4)", border: "2px solid rgba(255,255,255,0.08)" }}>
                     {profile.displayName?.[0] || '?'}
                   </div>
                 )}
@@ -347,36 +564,6 @@ export default function DashboardPage() {
                       )}
                     </div>
 
-                    <div className="flex flex-row md:flex-row items-center gap-2 justify-center md:justify-end w-full md:w-auto">
-                      {(!profile?.isVerified && !profile?.isExpired) ? (
-                        <button
-                          onClick={() => {
-                            setIsRenewal(false);
-                            setShowVerificationModal(true);
-                          }}
-                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 text-[10px] md:text-sm font-medium transition-colors border border-emerald-500/20 flex items-center gap-1.5 md:gap-2"
-                        >
-                          <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Verify
-                        </button>
-                      ) : (profile?.isVerified && profile?.verifierTier && profile.verifierTier < 4) ? (
-                        <button
-                          onClick={() => {
-                            setIsRenewal(false);
-                            setShowVerificationModal(true);
-                          }}
-                          className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-500/5 hover:bg-amber-500/10 text-amber-300 text-[10px] md:text-sm font-medium transition-all border border-amber-500/20 flex items-center gap-1.5 md:gap-2 shadow-[0_0_15px_rgba(245,158,11,0.05)] active:scale-95"
-                        >
-                          <ShieldCheck className="w-3 md:w-4 h-3 md:h-4" /> Upgrade
-                        </button>
-                      ) : null}
-
-                      <Link
-                        href="/create-profile"
-                        className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-[10px] md:text-sm font-medium transition-colors border border-slate-600"
-                      >
-                        Edit
-                      </Link>
-                    </div>
                   </div>
 
                   {/* Profile Identity (Role/Organization) */}
@@ -546,17 +733,214 @@ export default function DashboardPage() {
                       </a>
                     )}
                   </div>
+
+                  {/* Achievement Badges — same style as public CV */}
+                  {(profile.isProfileComplete || receipts.length > 0 || profile.isVerified) && (
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2">
+                      {profile.isProfileComplete && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest text-emerald-200/80 bg-emerald-500/[0.05] border-emerald-500/20">
+                          <svg className="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                          Ready
+                        </span>
+                      )}
+                      {receipts.length > 0 && (() => {
+                        const totalMonths = receipts.reduce((acc, r) => {
+                          const start = new Date(r.startDate || r.start_date || 0);
+                          const end = (r.endDate || r.end_date) ? new Date(r.endDate || r.end_date) : new Date();
+                          return acc + Math.max(0, (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30));
+                        }, 0);
+                        const years = Math.floor(totalMonths / 12);
+                        if (years < 1) return null;
+                        return (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border-blue-500/30">
+                            <Clock className="w-3 h-3" strokeWidth={3} />
+                            {years}Y Exp
+                          </span>
+                        );
+                      })()}
+                      {receipts.filter(r => r.status === "Attested").length > 0 && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 h-6 rounded border text-[10px] font-black uppercase tracking-widest text-emerald-200/80 bg-emerald-500/[0.05] border-emerald-500/20">
+                          <ShieldCheck className="w-3 h-3 text-emerald-300" strokeWidth={3} />
+                          {receipts.filter(r => r.status === "Attested").length} Attested
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
+            </div>{/* end profile header card */}
+
+            {/* ── INLINE EDIT FORM ── */}
+            {showInlineEdit && (
+              <div className="mb-3 rounded-xl overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Edit Profile</p>
+                  <button onClick={() => setShowInlineEdit(false)} style={{ fontSize: 18, color: "rgba(255,255,255,0.3)", lineHeight: 1 }}>×</button>
+                </div>
+                <form onSubmit={handleEditSubmit} className="px-4 py-4 space-y-4">
+                  {/* Avatar */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.1)" }}>
+                      {editForm.avatarUrl
+                        ? <img src={editForm.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                        : <div className="w-full h-full flex items-center justify-center text-lg font-bold" style={{ background: "#1e1e22", color: "rgba(255,255,255,0.3)" }}>{editForm.displayName?.[0] || "?"}</div>
+                      }
+                    </div>
+                    <div>
+                      <input type="file" accept="image/*" onChange={handleEditImageUpload} disabled={editUploading}
+                        className="block text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white/5 file:text-white/50 hover:file:bg-white/10 file:transition-colors" />
+                      {editUploading && <p className="text-[10px] text-emerald-400 mt-1">Uploading...</p>}
+                    </div>
+                  </div>
+
+                  {/* Display name */}
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Display name *</label>
+                    <input required value={editForm.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} maxLength={60}
+                      className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors"
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
+                      placeholder="Name or pseudonym" />
+                  </div>
+
+                  {/* Role + Org */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Current Role</label>
+                      <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
+                        placeholder="CEO, Developer..." />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Organization</label>
+                      <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
+                        placeholder="Company / DAO" />
+                    </div>
+                  </div>
+
+                  {/* Bio */}
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Bio</label>
+                    <textarea value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} rows={3}
+                      className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none resize-none"
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
+                      placeholder="Brief intro about you" />
+                  </div>
+
+                  {/* Skills */}
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Primary Skills</label>
+                    <SkillSelector value={editForm.skills} onChange={val => setEditForm(p => ({ ...p, skills: val }))} maxSkills={8} />
+                  </div>
+
+                  {/* Country */}
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Country</label>
+                    <CountrySelector value={editForm.country} onChange={val => setEditForm(p => ({ ...p, country: val }))} />
+                  </div>
+
+                  {/* Timezone + Looking For */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Timezone</label>
+                      <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}>
+                        <option value="">Select</option>
+                        {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
+                          <option key={tz} value={tz}>{tz}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Looking For</label>
+                      <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
+                        placeholder="Open to remote roles..." />
+                    </div>
+                  </div>
+
+                  {/* Work Preference */}
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 6 }}>Availability</label>
+                    <div className="flex flex-wrap gap-2">
+                      {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
+                        <button key={type} type="button"
+                          onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
+                          className="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
+                          style={editForm.workPreference.includes(type)
+                            ? { background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.4)", color: "#4ade80" }
+                            : { background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }
+                          }>{type}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Social links */}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12 }}>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Social Links</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { key: "twitter", label: "Twitter / X", placeholder: "@username" },
+                        { key: "github", label: "GitHub", placeholder: "username" },
+                        { key: "linkedin", label: "LinkedIn", placeholder: "username" },
+                        { key: "telegram", label: "Telegram", placeholder: "@username" },
+                        { key: "discord", label: "Discord", placeholder: "user#1234" },
+                        { key: "instagram", label: "Instagram", placeholder: "@username" },
+                        { key: "website", label: "Website", placeholder: "https://..." },
+                        { key: "email", label: "Email", placeholder: "hello@example.com" },
+                        { key: "whatsapp", label: "WhatsApp", placeholder: "+628..." },
+                      ].map(({ key, label, placeholder }) => (
+                        <div key={key}>
+                          <label style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", display: "block", marginBottom: 3 }}>{label}</label>
+                          <input
+                            type={key === "email" ? "email" : "text"}
+                            value={(editForm as any)[key]}
+                            onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))}
+                            className="w-full px-3 py-1.5 rounded-lg text-white outline-none"
+                            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", fontSize: 12 }}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Submit */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <button type="submit" disabled={editLoading}
+                      className="flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
+                      style={{ background: "rgba(255,255,255,0.9)", color: "#0d0e11" }}>
+                      {editLoading ? "Saving…" : "Save Changes"}
+                    </button>
+                    <button type="button" onClick={() => setShowInlineEdit(false)}
+                      className="px-4 py-2.5 rounded-lg text-sm transition-all"
+                      style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                {editCropModal.isOpen && editCropModal.image && (
+                  <ImageCropModal
+                    image={editCropModal.image}
+                    onCropComplete={handleEditCroppedImage}
+                    onClose={() => setEditCropModal({ isOpen: false, image: null })}
+                  />
+                )}
+              </div>
+            )}{/* end inline edit form */}
 
         {/* Organization Impact - For Verified Orgs */}
         {profile?.isVerified && (
-          <div className="mb-6 pb-6 border-b border-slate-800/60 overflow-hidden">
-            <div 
+          <div id="attestation" className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+            <div
               onClick={() => setIsImpactExpanded(!isImpactExpanded)}
-              className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:border-white/10 hover:bg-white/[0.03] transition-all group"
+              className="flex items-center justify-between px-4 py-2.5 cursor-pointer transition-all hover:bg-white/[0.02]"
+              style={{ background: "rgba(255,255,255,0.02)" }}
             >
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${isImpactExpanded ? (
@@ -681,12 +1065,21 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ── ATTESTATION USAGE (All Users) ── */}
-        <div className="mb-6 pb-6 border-b border-slate-800/60">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Attestation Usage</h2>
-            <span className="text-[10px] text-slate-600 font-mono">Resets monthly</span>
+            </>}{/* end profile tab */}
+
+            {/* ── ATTESTATION USAGE tab ── */}
+            {activeTab === "attestation" && <>
+        <div className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="flex items-center justify-between px-4 py-2" style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <Activity style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+              </div>
+              <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Attestation Usage</p>
+            </div>
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Resets monthly</span>
           </div>
+          <div className="px-4 py-3">
 
           {(() => {
             const used = profile?.attestationUsed ?? 0;
@@ -764,20 +1157,24 @@ export default function DashboardPage() {
               </div>
             );
           })()}
+          </div>
         </div>
+            </>}{/* end attestation tab */}
 
-        <div className="mb-6 pb-6 border-b border-slate-800/60 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden">
+            {/* ── HIRING COLLECTION tab ── */}
+            {activeTab === "hiring" && <>
+        <div id="hiring" className="mb-3 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
           <div
             onClick={() => setIsHiringExpanded(!isHiringExpanded)}
-            className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.03] hover:border-white/10 transition-all group"
+            className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-all hover:bg-white/[0.02]"
+            style={{ background: "rgba(255,255,255,0.02)" }}
           >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${isHiringExpanded ? 'bg-white/10' : 'bg-slate-500/10'} transition-colors`}>
-                <LayoutDashboard className={`w-5 h-5 ${isHiringExpanded ? 'text-white' : 'text-slate-500'} transition-colors`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-base font-bold text-white">Hiring Center</h2>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <FolderOpen style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                  <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Hiring Collection</p>
                   {collections.length > 0 && !isHiringExpanded && (
                     <span className="text-[10px] font-bold bg-white/10 text-white/60 px-2 py-0.5 rounded-full border border-white/10">
                       {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'}
@@ -808,21 +1205,14 @@ export default function DashboardPage() {
                   );
                 })()}
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {!isHiringExpanded && (
-                <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.02] text-[10px] font-bold text-slate-500">
-                  {isHiringExpanded ? 'Hide' : 'Quick Access'}
-                </div>
-              )}
-              {isHiringExpanded ? <ChevronUp className="w-4 h-4 text-white/30 group-hover:text-white/60" /> : <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-400" />}
-            </div>
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{collections.length} Collections</span>
+            {isHiringExpanded ? <ChevronUp style={{ width: 12, height: 12, opacity: 0.3, flexShrink: 0 }} /> : <ChevronDown style={{ width: 12, height: 12, opacity: 0.25, flexShrink: 0 }} />}
           </div>
 
           {isHiringExpanded && (
-            <div className="mt-4 animate-in slide-in-from-top-2 fade-in duration-300">
-              <div className="flex items-center justify-between mb-4 px-1">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Talent Collections</p>
+            <div className="px-4 py-3 animate-in slide-in-from-top-2 fade-in duration-300" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+              <div className="flex items-center justify-between mb-3">
+                <p style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Talent Collections</p>
                 <Link 
                   href="/hiring/create"
                   className="text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2"
@@ -872,39 +1262,38 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* ── VERIFIED CREDENTIALS ── */}
-        <div className="mb-6 pb-6 border-b border-slate-800/60">
-          <CertificateSection
-            certs={certificates}
-            isOwner={true}
-            onDelete={handleDeleteCertificate}
-            onAdd={() => setShowCertModal(true)}
-          />
-        </div>
+            </>}{/* end hiring tab */}
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-          <h2 className="text-lg font-semibold">Proof of Work</h2>
-          <div className="flex flex-wrap gap-2 md:gap-3">
-            <Link
-              href={`/cv/${walletAddress}`}
-              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-medium transition-colors"
-            >
-              View CV
-            </Link>
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs md:text-sm font-medium transition-colors"
-            >
-              Share
-            </button>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-white text-black hover:bg-white/90 text-xs md:text-sm font-bold shadow-lg"
-            >
-              {showForm ? "Close" : "+ Add Proof"}
-            </button>
+            {/* ── CREDENTIAL tab ── */}
+            {activeTab === "credential" && <>
+        <div id="credentials" className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="px-4 py-3" style={{ background: "rgba(255,255,255,0.02)" }}>
+            <CertificateSection
+              certs={certificates}
+              isOwner={true}
+              onDelete={handleDeleteCertificate}
+              onAdd={() => setShowCertModal(true)}
+            />
           </div>
         </div>
+
+            </>}{/* end credential tab */}
+
+            {/* ── PROOF OF WORK tab ── */}
+            {activeTab === "proof-work" && <>
+        <div id="proof-of-work" className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="flex items-center justify-between px-4 py-2.5" style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <FileCheck2 style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+              </div>
+              <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Proof of Work</p>
+            </div>
+            <div className="flex items-center gap-2">
+            <button onClick={() => setShowForm(!showForm)} className="px-3 py-1.5 rounded-lg transition-all hover:bg-white/90" style={{ background: "rgba(255,255,255,0.9)", color: "#0d0e11", fontSize: 11, fontWeight: 700 }}>{showForm ? "Close" : "+ Add Proof"}</button>
+            </div>
+          </div>
+          <div className="px-4 py-3">
 
         {showForm || editingReceipt ? (
           <ReceiptForm
@@ -923,15 +1312,179 @@ export default function DashboardPage() {
 
         <ReceiptList
           walletAddress={walletAddress}
+          hideTimeline={true}
+          onViewDetail={(r) => setSelectedReceiptForDetail(r)}
           onEdit={(r) => {
             setEditingReceipt(r);
             setShowForm(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
+          </div>{/* end proof-of-work inner */}
+        </div>{/* end proof-of-work card */}
+            </>}{/* end proof-work tab */}
+
+            {/* ── CAREER TIMELINE tab ── */}
+            {activeTab === "timeline" && (
+              receipts.filter(r => r.startDate || r.start_date).length > 0 ? (
+                <div className="py-2">
+                  <WorkTimeline
+                    receipts={receipts.filter(r =>
+                      r.attestationType !== "Hiring Proof" &&
+                      !r.description?.includes("Official Verified Hiring Proof")
+                    )}
+                    onSelectReceipt={() => {}}
+                    inline={true}
+                  />
+                </div>
+              ) : (
+                <div className="py-12 rounded-xl flex flex-col items-center justify-center text-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <Briefcase style={{ width: 28, height: 28, color: "rgba(255,255,255,0.1)", marginBottom: 12 }} />
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>No career timeline yet</p>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>Add proof of work entries with start and end dates to build your timeline.</p>
+                </div>
+              )
+            )}
+            {/* ── MY APPLICATIONS tab ── */}
+            {activeTab === "applications" && (
+              <div className="py-16 rounded-xl flex flex-col items-center justify-center text-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <Send style={{ width: 20, height: 20, color: "rgba(255,255,255,0.2)" }} />
+                </div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>My Applications</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", lineHeight: 1.6, maxWidth: 280 }}>Track the companies and opportunities you've applied to. This feature is coming soon.</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  Coming Soon
+                </span>
+              </div>
+            )}
+            {/* ── INBOX tab ── */}
+            {activeTab === "inbox" && <InboxPanel />}
           </>
         )}
       </section>
+          </div>{/* end scrollable content */}
+        </div>{/* end center panel */}
+
+        {/* ── RIGHT PANEL ── */}
+        <aside className="hidden lg:flex w-[260px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0a0b0e", borderLeft: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="px-4 py-4 space-y-3">
+
+            {/* Share Your Profile */}
+            <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Share Your Profile</p>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Share your professional profile with employers and collaborators.</p>
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600 }}
+              >
+                <Share2 style={{ width: 11, height: 11 }} /> Share Profile
+              </button>
+            </div>
+
+            {/* View Your CV */}
+            <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>View Your CV</p>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Preview and download your professional CV.</p>
+              <Link
+                href={`/cv/${walletAddress}`}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
+              >
+                <FileText style={{ width: 11, height: 11 }} /> View CV
+              </Link>
+            </div>
+
+            {/* Upgrade / Verify / Renew */}
+            {(!profile?.isVerified && !profile?.isExpired) ? (
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Get Verified</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Unlock verified status and increase your attestation power.</p>
+                <button
+                  onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                  style={{ border: "1px solid rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.05)", fontSize: 11, color: "#4ade80", fontWeight: 600 }}
+                >
+                  <ShieldCheck style={{ width: 11, height: 11 }} /> Verify Now
+                </button>
+              </div>
+            ) : profile?.isExpired ? (
+              <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.03)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Verification Expired</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Renew your verification to restore your verified status.</p>
+                <button
+                  onClick={() => { setIsRenewal(true); setShowVerificationModal(true); }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                  style={{ border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.05)", fontSize: 11, color: "#f87171", fontWeight: 600 }}
+                >
+                  <RefreshCw style={{ width: 11, height: 11 }} /> Renew Now
+                </button>
+              </div>
+            ) : profile?.isVerified && profile?.verifierTier && profile.verifierTier < 4 ? (
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Upgrade to Next Tier</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Unlock more features and increase your attestation limits.</p>
+                <button
+                  onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                  style={{ border: "1px solid rgba(251,191,36,0.25)", background: "rgba(251,191,36,0.05)", fontSize: 11, color: "#fbbf24", fontWeight: 600 }}
+                >
+                  <ShieldCheck style={{ width: 11, height: 11 }} /> Upgrade
+                </button>
+              </div>
+            ) : null}
+
+            {/* CV Score */}
+            {profile && profile.cvScore != null && (
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 8 }}>CV Score</p>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: "rgba(255,255,255,0.88)", letterSpacing: "-0.03em" }}>{profile.cvScore}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {profile.cvLevel && (
+                      <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.75)", marginBottom: 3 }}>{profile.cvLevel}</p>
+                    )}
+                    <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(profile.cvScore, 100)}%`, background: "rgba(255,255,255,0.35)" }} />
+                    </div>
+                    <p style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", marginTop: 3 }}>Out of 100</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Profile Completion */}
+            {profile && profile.completionPercentage < 100 && (
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center justify-between mb-1">
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Profile Completion</p>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{profile.completionPercentage}%</span>
+                </div>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Complete your profile to increase visibility and opportunities.</p>
+                <div className="h-1.5 w-full rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${profile.completionPercentage}%`, background: "rgba(255,255,255,0.4)" }} />
+                </div>
+                <Link
+                  href="/create-profile"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 600, display: "flex" }}
+                >
+                  Complete Profile
+                </Link>
+              </div>
+            )}
+
+          </div>
+        </aside>
+
+        </div>{/* end inner rounded box */}
+      </div>{/* end 3-panel body */}
+
+      {/* Bottom vignette gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-[60]" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }} />
 
       {showVerificationModal && profile && (
         <VerificationRequestModal
@@ -968,6 +1521,13 @@ export default function DashboardPage() {
           walletAddress={publicKey.toBase58()}
           onClose={() => setShowCertModal(false)}
           onSuccess={handleCertUploadSuccess}
+        />
+      )}
+
+      {selectedReceiptForDetail && (
+        <ReceiptDetailModal
+          receipt={selectedReceiptForDetail}
+          onClose={() => setSelectedReceiptForDetail(null)}
         />
       )}
 

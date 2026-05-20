@@ -199,7 +199,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 rounded-lg bg-slate-800/50 border border-slate-700 mb-8 space-y-4">
+    <form onSubmit={handleSubmit} className="p-5 rounded-xl mb-4 space-y-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}>
       {isLocked && (
         <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-400 mb-6">
           <Lock className="w-5 h-5 flex-shrink-0" aria-label="Locked" />
@@ -211,43 +211,43 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       )}
 
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Role / Job Title (optional)</label>
-        <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="e.g. Smart Contract Developer, Independent Builder" />
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Role / Job Title (optional)</label>
+        <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors" placeholder="e.g. Smart Contract Developer, Independent Builder" />
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Organization / Project (optional)</label>
-        <input type="text" value={form.org} onChange={(e) => setForm({ ...form, org: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" placeholder="e.g. Project or company name" />
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Organization / Project (optional)</label>
+        <input type="text" value={form.org} onChange={(e) => setForm({ ...form, org: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors" placeholder="e.g. Project or company name" />
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Job description *</label>
-        <textarea required value={form.description} maxLength={500} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-20 disabled:opacity-50" placeholder="Summary of tasks and contributions" />
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Job description *</label>
+        <textarea required value={form.description} maxLength={500} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white resize-none h-20 disabled:opacity-40 transition-colors" placeholder="Summary of tasks and contributions" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-slate-400 mb-1">Start date *</label>
-          <input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" />
+          <label className="block text-xs text-white/40 mb-1.5 font-medium">Start date *</label>
+          <input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors" />
         </div>
         <div>
-          <label className="block text-sm text-slate-400 mb-1">End date *</label>
-          <input type="date" required value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50" />
+          <label className="block text-xs text-white/40 mb-1.5 font-medium">End date *</label>
+          <input type="date" required value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors" />
         </div>
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Work type *</label>
-        <select value={form.workType} onChange={(e) => setForm({ ...form, workType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50">
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Work type *</label>
+        <select value={form.workType} onChange={(e) => setForm({ ...form, workType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors">
           {WORK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Compensation (optional)</label>
-        <select value={form.compensationType} onChange={(e) => setForm({ ...form, compensationType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none disabled:opacity-50">
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Compensation (optional)</label>
+        <select value={form.compensationType} onChange={(e) => setForm({ ...form, compensationType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors">
           <option value="">None</option>
           {COMP_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm text-slate-400 mb-2">Impact / Outcomes (optional, max 5)</label>
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Impact / Outcomes (optional, max 5)</label>
         <div className="space-y-2">
           {form.impact.map((item: string, index: number) => (
             <div key={index} className="flex gap-2">
@@ -255,7 +255,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
                 const newImpact = [...form.impact];
                 newImpact[index] = e.target.value;
                 setForm({ ...form, impact: newImpact });
-              }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50" placeholder="e.g., Launched MVP with 1,000+ users" />
+              }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] outline-none text-sm text-white disabled:opacity-40 transition-colors" placeholder="e.g., Launched MVP with 1,000+ users" />
               {!isLocked && (
                 <button type="button" onClick={() => {
                   const newImpact = form.impact.filter((_: string, i: number) => i !== index);
@@ -271,9 +271,9 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       </div>
 
       <div>
-        <label className="block text-sm text-slate-400 mb-2">Portfolio Images (optional, max 5)</label>
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Portfolio Images (optional, max 5)</label>
         {!isLocked && form.portfolioImages.length < 5 && (
-          <div className="relative border-2 border-dashed border-slate-700 hover:border-slate-600 rounded-lg p-6 text-center transition-colors mb-3">
+          <div className="relative border border-dashed border-white/[0.12] hover:border-white/25 rounded-lg p-6 text-center transition-colors mb-3">
             <input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 handleImageUpload(e.target.files[0]);
@@ -287,7 +287,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
         <div className="flex flex-wrap gap-2">
           {form.portfolioImages.map((img: any, index: number) => (
             <div key={index} className="relative group">
-              <img src={img.thumbnailUrl} alt={`Portfolio ${index + 1}`} className="w-16 h-16 rounded object-cover border border-slate-700" />
+              <img src={img.thumbnailUrl} alt={`Portfolio ${index + 1}`} className="w-16 h-16 rounded object-cover border border-white/10" />
               {!isLocked && (
                 <button type="button" onClick={() => setForm({ ...form, portfolioImages: form.portfolioImages.filter((_: any, i: number) => i !== index) })} className="absolute -top-2 -right-2 p-1 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"><X className="w-3 h-3" /></button>
               )}
@@ -297,7 +297,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       </div>
 
       <div>
-        <label className="block text-sm text-slate-400 mb-2">Evidence Links</label>
+        <label className="block text-xs text-white/40 mb-1.5 font-medium">Evidence Links</label>
         <div className="space-y-3">
           {form.evidenceLinks.map((link: any, index: number) => (
             <div key={index} className="flex flex-col sm:flex-row gap-2">
@@ -305,7 +305,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
                 const newLinks = [...form.evidenceLinks];
                 newLinks[index].label = e.target.value;
                 setForm({ ...form, evidenceLinks: newLinks });
-              }} disabled={isLocked} className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50">
+              }} disabled={isLocked} className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] outline-none text-sm text-white disabled:opacity-40 transition-colors">
                 {LINK_LABELS.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
               <div className="flex gap-2 flex-1">
@@ -313,7 +313,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
                   const newLinks = [...form.evidenceLinks];
                   newLinks[index].url = e.target.value;
                   setForm({ ...form, evidenceLinks: newLinks });
-                }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 outline-none text-sm disabled:opacity-50" placeholder="https://..." />
+                }} disabled={isLocked} className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] outline-none text-sm text-white disabled:opacity-40 transition-colors" placeholder="https://..." />
                 {!isLocked && (
                   <button type="button" onClick={() => setForm({ ...form, evidenceLinks: form.evidenceLinks.filter((_: any, i: number) => i !== index) })} className="px-3 py-2 text-red-400 hover:bg-red-400/10 rounded-lg text-sm">✕</button>
                 )}
@@ -328,7 +328,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
 
       <div className="flex gap-3">
         {onCancel && (
-          <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 font-medium">
+          <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-lg font-medium transition-colors" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
             Cancel
           </button>
         )}

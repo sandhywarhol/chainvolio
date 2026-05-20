@@ -140,7 +140,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         {(publicKey || isGoogleSignedIn) && (
                             <Link
                                 href="/dashboard"
-                                className={`transition-colors py-2 ${isActive('/dashboard') ? 'text-emerald-400 font-extrabold' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+                                className={`transition-all py-1.5 px-3 rounded-full border ${isActive('/dashboard') ? 'border-white/25 text-white/80 font-semibold bg-white/[0.04]' : 'border-transparent text-white/45 hover:text-white/70 hover:border-white/15'}`}
                             >
                                 Dashboard
                             </Link>
@@ -193,34 +193,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         )}
                     </div>
                     
-                    {publicKey && (
-                        <Link
-                            href="/dashboard/inbox"
-                            className={`hidden md:flex relative p-2 rounded-full transition-colors ${pathname === '/dashboard/inbox' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
-                            title="Inbox"
-                        >
-                            <Inbox className="w-5 h-5" />
-                            {inboxCount > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white px-1 leading-none">
-                                    {inboxCount > 99 ? "99+" : inboxCount}
-                                </span>
-                            )}
-                        </Link>
-                    )}
-                    {!publicKey && isGoogleSignedIn && (
-                        <Link
-                            href="/dashboard/outreach"
-                            className={`hidden md:flex relative p-2 rounded-full transition-colors ${pathname === '/dashboard/outreach' ? 'text-white' : 'text-white/40 hover:text-white'} hover:bg-white/5`}
-                            title="My Outreach"
-                        >
-                            <Inbox className="w-5 h-5" />
-                            {inboxCount > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white px-1 leading-none">
-                                    {inboxCount > 99 ? "99+" : inboxCount}
-                                </span>
-                            )}
-                        </Link>
-                    )}
                     <NotificationBell />
 
                     {/* Mobile Wallet & Menu Toggle */}
