@@ -1276,24 +1276,26 @@ export function LandingPageClient() {
                     </p>
 
                     {/* HERO VISUAL - App UI Card Mockup */}
-                    <div className="relative w-full mt-6 sm:mt-8 pb-16 flex items-center justify-center h-[220px] min-[400px]:h-[260px] sm:h-[345px] md:h-[450px] lg:h-[560px] overflow-visible">
-                        {/* Ambient glow behind cards */}
-                        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(99,91,255,0.07) 0%, transparent 70%)" }} />
+                    <div className="relative w-full mt-6 sm:mt-8 flex items-center justify-center h-[220px] min-[400px]:h-[260px] sm:h-[345px] md:h-[450px] lg:h-[560px] overflow-hidden rounded-[20px] sm:rounded-[28px]"
+                        style={{ background: "radial-gradient(ellipse 140% 100% at 50% 0%, #ebebef 0%, #e3e3e8 45%, #d8d8de 100%)" }}>
+                        {/* DSLR vignette — natural lens falloff */}
+                        <div className="absolute inset-0 pointer-events-none z-10" style={{ background: "radial-gradient(ellipse 90% 85% at 50% 30%, transparent 25%, rgba(0,0,0,0.5) 100%)" }} />
+                        {/* Studio key light from top */}
+                        <div className="absolute inset-0 pointer-events-none z-10" style={{ background: "radial-gradient(ellipse 65% 45% at 50% 0%, rgba(255,255,255,0.45) 0%, transparent 55%)" }} />
+                        {/* Bottom fade back to dark page */}
+                        <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none z-20" style={{ background: "linear-gradient(to bottom, transparent, #0d0d0f)" }} />
                         {/* Container scaled responsively */}
                         <div 
                             className="w-[960px] h-[540px] absolute scale-[0.38] min-[400px]:scale-[0.45] sm:scale-[0.6] md:scale-[0.8] lg:scale-100 origin-top transition-all duration-300 flex-shrink-0"
                         >
                             {/* ── LINEAR-STYLE 3-PANEL APP MOCKUP ── */}
-                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)" }}>
+                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.08)" }}>
 
                                 {/* ── LEFT SIDEBAR ── */}
                                 <div className="w-[195px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
                                     {/* Logo */}
-                                    <div className="flex items-center gap-2.5 px-4 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                        <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)" }}>
-                                            <ShieldCheck style={{ width: 11, height: 11, color: "white" }} />
-                                        </div>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", letterSpacing: "-0.01em" }}>chainvolio</span>
+                                    <div className="flex items-center px-4 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                        <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 20, width: "auto", objectFit: "contain" }} />
                                     </div>
                                     {/* Nav items */}
                                     <div className="px-2 py-2.5 flex-1 space-y-0.5">
@@ -1325,8 +1327,8 @@ export function LandingPageClient() {
                                     </div>
                                     {/* User at bottom */}
                                     <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, rgba(120,100,70,0.5), rgba(70,55,90,0.5))", border: "1px solid rgba(255,255,255,0.1)" }}>
-                                            <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.65)" }}>AR</span>
+                                        <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                                            <img src="/homepage/cv%20example.png" alt="Alex Rivera" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }}>Alex Rivera</p>
@@ -1354,8 +1356,8 @@ export function LandingPageClient() {
                                         {/* Profile header card */}
                                         <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                                             <div className="flex items-start gap-3">
-                                                <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, rgba(100,80,60,0.5), rgba(60,50,80,0.5))", border: "2px solid rgba(255,255,255,0.08)" }}>
-                                                    <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,0.65)" }}>AR</span>
+                                                <div className="w-[50px] h-[50px] rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.08)" }}>
+                                                    <img src="/homepage/cv%20example.png" alt="Alex Rivera" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 mb-1">
@@ -1460,7 +1462,7 @@ export function LandingPageClient() {
                                 {/* ── RIGHT PANEL ── */}
                                 <div className="w-[230px] flex-shrink-0 flex flex-col" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }} />
-                                    <div className="px-4 py-4 space-y-3 overflow-y-auto flex-1">
+                                    <div className="px-4 py-4 space-y-3 overflow-hidden flex-1">
                                         {/* Share Your Profile */}
                                         <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                                             <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 3 }}>Share Your Profile</p>
