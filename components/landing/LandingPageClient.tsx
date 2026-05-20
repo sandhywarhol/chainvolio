@@ -1275,251 +1275,256 @@ export function LandingPageClient() {
                         <br />Cryptographically verified. Share anywhere with one link.
                     </p>
 
-                    {/* HERO VISUAL - Studio product photography presentation */}
-                    <div className="relative w-full mt-10 sm:mt-14 rounded-[28px] sm:rounded-[36px] overflow-hidden"
-                        style={{ background: "linear-gradient(175deg, #f0f0f4 0%, #e4e4e9 40%, #d5d5db 80%, rgba(213,213,219,0) 100%)" }}
-                    >
-                        {/* DSLR lens vignette — natural light falloff darkening the edges/corners */}
-                        <div className="absolute inset-0 pointer-events-none z-10"
-                            style={{ background: "radial-gradient(ellipse 92% 82% at 50% 28%, transparent 26%, rgba(0,0,0,0.58) 100%)" }} />
-                        {/* Studio key light — soft diffused spotlight from top center */}
-                        <div className="absolute inset-0 pointer-events-none z-10"
-                            style={{ background: "radial-gradient(ellipse 68% 48% at 50% 0%, rgba(255,255,255,0.52) 0%, transparent 56%)" }} />
-                        {/* Subtle ambient bounce light from floor */}
-                        <div className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none z-10"
-                            style={{ background: "radial-gradient(ellipse 55% 80% at 50% 100%, rgba(255,255,255,0.07) 0%, transparent 65%)" }} />
-
-                        {/* Frame padding — breathing room around the mockup */}
-                        <div className="relative z-20 px-5 sm:px-10 md:px-16 pt-10 sm:pt-14">
-                        {/* Perspective wrapper for 3D standing effect */}
-                        <div style={{ perspective: "1800px" }}>
-                        {/* App card — elevated dark UI on light studio floor */}
-                        <div
-                            className="relative w-full rounded-2xl overflow-hidden"
-                            style={{
-                                background: "#111113",
-                                border: "1px solid rgba(0,0,0,0.06)",
-                                boxShadow: [
-                                    "inset 0 0 0 0.5px rgba(255,255,255,0.05)",
-                                    "0 2px 6px rgba(0,0,0,0.10)",
-                                    "0 8px 24px rgba(0,0,0,0.18)",
-                                    "0 24px 60px rgba(0,0,0,0.22)",
-                                    "0 60px 120px rgba(0,0,0,0.24)",
-                                    "0 100px 200px rgba(0,0,0,0.18)",
-                                ].join(", "),
-                                transform: "rotateX(2deg)",
-                                transformOrigin: "center bottom",
-                            }}
+                    {/* HERO VISUAL - App UI Card Mockup */}
+                    <div className="relative w-full mt-6 sm:mt-8 pb-16 flex items-center justify-center h-[220px] min-[400px]:h-[260px] sm:h-[345px] md:h-[450px] lg:h-[560px] overflow-visible">
+                        {/* Ambient glow behind cards */}
+                        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(99,91,255,0.07) 0%, transparent 70%)" }} />
+                        {/* Container scaled responsively */}
+                        <div 
+                            className="w-[960px] h-[540px] absolute scale-[0.38] min-[400px]:scale-[0.45] sm:scale-[0.6] md:scale-[0.8] lg:scale-100 origin-top transition-all duration-300 flex-shrink-0"
                         >
-                            {/* Window chrome bar */}
-                            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]" style={{ background: "#0e0e10" }}>
-                                <div className="flex gap-1.5">
-                                    <div className="w-3 h-3 rounded-full bg-white/10" />
-                                    <div className="w-3 h-3 rounded-full bg-white/10" />
-                                    <div className="w-3 h-3 rounded-full bg-white/10" />
-                                </div>
-                                <div className="flex-1 mx-4">
-                                    <div className="mx-auto w-48 h-5 rounded-md bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                                        <span className="text-[10px] text-white/20 font-mono">chainvolio.xyz/alex-rivera</span>
+                            {/* ── LINEAR-STYLE 3-PANEL APP MOCKUP ── */}
+                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)" }}>
+
+                                {/* ── LEFT SIDEBAR ── */}
+                                <div className="w-[195px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                                    {/* Logo */}
+                                    <div className="flex items-center gap-2.5 px-4 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                        <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)" }}>
+                                            <ShieldCheck style={{ width: 11, height: 11, color: "white" }} />
+                                        </div>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", letterSpacing: "-0.01em" }}>chainvolio</span>
+                                    </div>
+                                    {/* Nav items */}
+                                    <div className="px-2 py-2.5 flex-1 space-y-0.5">
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md relative" style={{ background: "rgba(255,255,255,0.07)" }}>
+                                            <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.4)" }} />
+                                            <User style={{ width: 13, height: 13, color: "rgba(255,255,255,0.8)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>Profile</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md">
+                                            <ShieldCheck style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }}>Credential</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md">
+                                            <FileCheck2 style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }}>Proof of Work</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md">
+                                            <FolderOpen style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }}>Hiring Collection</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md">
+                                            <Activity style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }}>Attestation Usage</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 px-3 py-[6px] rounded-md">
+                                            <Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }}>Career Timeline</span>
+                                        </div>
+                                    </div>
+                                    {/* User at bottom */}
+                                    <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, rgba(120,100,70,0.5), rgba(70,55,90,0.5))", border: "1px solid rgba(255,255,255,0.1)" }}>
+                                            <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.65)" }}>AR</span>
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }}>Alex Rivera</p>
+                                            <p style={{ fontSize: 9.5, color: "#4ade80", fontWeight: 600, marginTop: 2, letterSpacing: "0.03em" }}>VERIFIED</p>
+                                        </div>
+                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity: 0.3, flexShrink: 0 }}><path d="M3 4l2 2 2-2" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* App body: 2-column layout like real dashboard */}
-                            <div className="flex h-[460px] sm:h-[540px] overflow-hidden">
-
-                                {/* ── Left: Profile Panel ── */}
-                                <div className="w-[220px] sm:w-[260px] border-r border-white/[0.06] flex flex-col overflow-y-auto flex-shrink-0 p-5 gap-5" style={{ background: "#0e0e10" }}>
-
-                                    {/* Avatar + Name */}
-                                    <div className="flex flex-col items-center text-center gap-2">
-                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-purple-500/20 border-2 border-white/10 flex items-center justify-center text-xl font-black text-white/60">
-                                            AR
-                                        </div>
+                                {/* ── CENTER PANEL ── */}
+                                <div className="flex-1 flex flex-col min-w-0">
+                                    {/* Top bar */}
+                                    <div className="flex items-center justify-between px-5 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                         <div>
-                                            <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                                                <span className="text-sm font-bold text-white">Alex Rivera</span>
-                                                {/* Verified badge */}
-                                                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-400 uppercase tracking-wider">
-                                                    <ShieldCheck className="w-2.5 h-2.5" /> Verified
-                                                </span>
-                                            </div>
-                                            {/* CV ID */}
-                                            <span className="font-mono text-[9px] tracking-widest text-white/25 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.07] mt-1 inline-block">
-                                                CV ID #00142
-                                            </span>
+                                            <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>Profile</p>
+                                            <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>Manage your professional identity and information.</p>
                                         </div>
-                                        {/* Role & Org */}
-                                        <p className="text-[11px] text-white/50">
-                                            Rust Developer <span className="text-white/20">at</span> Nexus Protocol
-                                        </p>
-                                        {/* Location + Timezone */}
-                                        <div className="flex items-center gap-3 text-white/25 text-[10px]">
-                                            <span className="flex items-center gap-1"><MapPin className="w-2.5 h-2.5" /> Indonesia</span>
-                                            <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> UTC+7</span>
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md cursor-pointer" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}>
+                                            <ExternalLink style={{ width: 10, height: 10, color: "rgba(255,255,255,0.4)" }} />
+                                            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>Edit Profile</span>
                                         </div>
                                     </div>
-
-                                    {/* Looking For pill */}
-                                    <div className="flex justify-center">
-                                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/40 text-[10px]">
-                                            <Briefcase className="w-3 h-3" /> Open to full-time
-                                        </span>
-                                    </div>
-
-                                    {/* Bio */}
-                                    <p className="text-[10px] text-white/35 leading-relaxed text-center">
-                                        Smart contract engineer focused on DeFi protocols and on-chain identity. Building the future of verifiable work history.
-                                    </p>
-
-                                    {/* Skills */}
-                                    <div className="flex flex-wrap justify-center gap-1.5">
-                                        {["Rust", "Solana", "Anchor", "DeFi", "TypeScript", "Web3"].map((s, i) => (
-                                            <span key={i} className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[9px] text-white/50 font-medium">{s}</span>
-                                        ))}
-                                    </div>
-
-                                    {/* Social Links */}
-                                    <div className="flex items-center justify-center gap-2">
-                                        {[
-                                            { label: "X", bg: "hover:bg-white/10" },
-                                            { label: "GH", bg: "hover:bg-white/10" },
-                                            { label: "LI", bg: "hover:bg-blue-500/10" },
-                                            { label: "✉", bg: "hover:bg-white/10" },
-                                        ].map((s, i) => (
-                                            <div key={i} className={`w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center text-[9px] text-white/30 cursor-default ${s.bg} transition-colors`}>
-                                                {s.label}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Profile completion bar */}
-                                    <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] space-y-2">
-                                        <div className="flex justify-between text-[9px] text-white/25">
-                                            <span className="uppercase tracking-widest font-black">Profile Completion</span>
-                                            <span className="font-bold text-white/40">85%</span>
-                                        </div>
-                                        <div className="h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
-                                            <div className="h-full bg-white/40 rounded-full" style={{ width: "85%" }} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* ── Right: Dashboard Main Content ── */}
-                                <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "#111113" }}>
-                                    {/* Topbar */}
-                                    <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
-                                        <div className="flex items-center gap-2">
-                                            <LayoutDashboard className="w-3.5 h-3.5 text-white/30" />
-                                            <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">Dashboard</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07]">
-                                                <ExternalLink className="w-3 h-3 text-white/20" />
-                                                <span className="text-[9px] text-white/30 font-mono hidden sm:block">chainvolio.xyz/alex-rivera/142</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                                                <Share2 className="w-3 h-3 text-emerald-400" />
-                                                <span className="text-[9px] text-emerald-400 font-bold hidden sm:block">Share</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-
-                                        {/* Attestation Usage */}
-                                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2.5">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Attestation Usage</span>
-                                                <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Verified Pro</span>
-                                            </div>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-xl font-black text-white">3</span>
-                                                <span className="text-white/25 text-sm">/ 10 this month</span>
-                                            </div>
-                                            <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
-                                                <div className="h-full bg-gradient-to-r from-white/40 to-white/60 rounded-full" style={{ width: "30%" }} />
-                                            </div>
-                                            <p className="text-[9px] text-white/20 font-mono">Resets Jun 1, 2026</p>
-                                        </div>
-
-                                        {/* Work History / Receipts */}
-                                        <div>
-                                            <div className="flex items-center justify-between mb-2.5">
-                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Work History</span>
-                                                <span className="text-[9px] text-white/20 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Receipt</span>
-                                            </div>
-                                            <div className="space-y-2">
-                                                {[
-                                                    { org: "Nexus Protocol", role: "Core Infrastructure Dev", sig: "5k2R...j8Wq", verified: true, color: "#60a5fa" },
-                                                    { org: "Superteam DAO", role: "Grant Contributor", sig: "3m9T...x4Zp", verified: true, color: "#f472b6" },
-                                                    { org: "Raydium Labs", role: "Smart Contract Auditor", sig: "7w1E...k2Lm", verified: false, color: "#94a3b8" },
-                                                ].map((r, i) => (
-                                                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 transition-colors">
-                                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0"
-                                                            style={{ background: r.color + "15", color: r.color, border: `1px solid ${r.color}25` }}>
-                                                            {r.org[0]}
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-[11px] font-bold text-white/70 truncate">{r.org}</p>
-                                                            <p className="text-[10px] text-white/30 truncate">{r.role}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                                                            <code className="text-[9px] text-white/20 font-mono hidden sm:block">{r.sig}</code>
-                                                            {r.verified
-                                                                ? <span className="flex items-center gap-0.5 text-[9px] text-emerald-400"><ShieldCheck className="w-3 h-3" /></span>
-                                                                : <span className="text-[9px] text-white/20 border border-white/10 px-1.5 py-0.5 rounded text-[8px]">Pending</span>}
+                                    {/* Body */}
+                                    <div className="flex-1 overflow-hidden px-5 py-4">
+                                        {/* Profile header card */}
+                                        <div className="rounded-xl p-4 mb-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, rgba(100,80,60,0.5), rgba(60,50,80,0.5))", border: "2px solid rgba(255,255,255,0.08)" }}>
+                                                    <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,0.65)" }}>AR</span>
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "-0.02em" }}>Alex Rivera</span>
+                                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)" }}>
+                                                            <CheckCircle2 style={{ width: 8, height: 8, color: "#4ade80" }} />
+                                                            <span style={{ fontSize: 9, fontWeight: 700, color: "#4ade80", letterSpacing: "0.05em" }}>VERIFIED</span>
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Hiring Center */}
-                                        <div>
-                                            <div className="flex items-center justify-between mb-2.5">
-                                                <span className="text-[9px] font-black text-white/25 uppercase tracking-widest">Hiring Collections</span>
-                                                <span className="text-[9px] bg-white/[0.05] border border-white/[0.08] text-white/30 px-2 py-0.5 rounded-full">2 Collections</span>
-                                            </div>
-                                            <div className="space-y-2">
-                                                {[
-                                                    { title: "Senior Rust Engineers — Q2 2026", slug: "rust-engineers-q2" },
-                                                    { title: "Web3 Frontend — Internship", slug: "frontend-intern" },
-                                                ].map((c, i) => (
-                                                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                                                        <FolderOpen className="w-3.5 h-3.5 text-white/25 flex-shrink-0" />
-                                                        <span className="text-[11px] text-white/50 truncate flex-1">{c.title}</span>
-                                                        <ExternalLink className="w-3 h-3 text-white/15 flex-shrink-0" />
+                                                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 5 }}>Rust Developer at Nexus Protocol</p>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="flex items-center gap-1">
+                                                            <MapPin style={{ width: 10, height: 10, color: "rgba(255,255,255,0.25)" }} />
+                                                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Indonesia</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Clock style={{ width: 10, height: 10, color: "rgba(255,255,255,0.25)" }} />
+                                                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>UTC+7</span>
+                                                        </div>
                                                     </div>
-                                                ))}
+                                                    <div className="flex items-center gap-3 mt-2 flex-wrap">
+                                                        <div className="flex items-center gap-1">
+                                                            <Mail style={{ width: 9, height: 9, color: "rgba(255,255,255,0.2)" }} />
+                                                            <span style={{ fontSize: 9.5, color: "rgba(255,255,255,0.35)" }}>alex@chainvolio.xyz</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Globe style={{ width: 9, height: 9, color: "rgba(255,255,255,0.2)" }} />
+                                                            <span style={{ fontSize: 9.5, color: "rgba(255,255,255,0.35)" }}>chainvolio.xyz/alex-rivera</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Linkedin style={{ width: 9, height: 9, color: "rgba(255,255,255,0.2)" }} />
+                                                            <span style={{ fontSize: 9.5, color: "rgba(255,255,255,0.35)" }}>LinkedIn</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "12px 0" }} />
+                                            <div className="mb-3">
+                                                <p style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 5 }}>Bio</p>
+                                                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>Smart contract engineer focused on DeFi protocols and on-chain identity.<br/>Building the future of verifiable work history.</p>
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 5 }}>Skills</p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {["Rust", "Solana", "Anchor", "DeFi", "TypeScript", "Web3"].map(skill => (
+                                                        <span key={skill} style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 500, padding: "2px 8px", borderRadius: 5, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>{skill}</span>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-
+                                        {/* Section rows */}
+                                        <div className="space-y-1.5">
+                                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}><ShieldCheck style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} /></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Credential</p>
+                                                    <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.26)" }}>Manage and showcase your verified credentials and certificates.</p>
+                                                </div>
+                                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>3 Credentials</span>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.25 }}><path d="M3.5 5l2.5 2.5 2.5-2.5" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                            </div>
+                                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}><FileCheck2 style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} /></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Proof of Work</p>
+                                                    <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.26)" }}>Showcase your work experience, contributions, and achievements.</p>
+                                                </div>
+                                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>2 Proofs</span>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.25 }}><path d="M3.5 5l2.5 2.5 2.5-2.5" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                            </div>
+                                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}><FolderOpen style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} /></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Hiring Collection</p>
+                                                    <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.26)" }}>Your hiring collections and saved opportunities.</p>
+                                                </div>
+                                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>0 Collections</span>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.25 }}><path d="M3.5 5l2.5 2.5 2.5-2.5" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                            </div>
+                                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}><Activity style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} /></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Attestation Usage</p>
+                                                    <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.26)" }}>Track your attestation usage and subscription metrics.</p>
+                                                    <div className="mt-1.5 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}><div className="h-full rounded-full" style={{ width: "30%", background: "rgba(255,255,255,0.4)" }} /></div>
+                                                </div>
+                                                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>3 / 10 this month</span>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.25 }}><path d="M3.5 5l2.5 2.5 2.5-2.5" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                            </div>
+                                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}><Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} /></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Career Timeline</p>
+                                                    <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.26)" }}>Your professional journey and verified career history.</p>
+                                                </div>
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.25 }}><path d="M3.5 5l2.5 2.5 2.5-2.5" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                            </div>
-                        {/* Close the outer card div and perspective wrapper */}
-                        </div>
-                        </div>
-
-                        {/* Realistic floor shadow — soft diffused shadow the floating card casts */}
-                        <div
-                            className="pointer-events-none mx-auto"
-                            style={{
-                                width: "65%",
-                                height: "52px",
-                                marginTop: "-4px",
-                                background: "radial-gradient(ellipse at center, rgba(0,0,0,0.16) 0%, transparent 70%)",
-                                filter: "blur(22px)",
-                            }}
-                        />
-                        </div>{/* close frame padding */}
-
-                        {/* Fade studio background back into dark page */}
-                        <div className="h-16 sm:h-20 pointer-events-none"
-                            style={{ background: "linear-gradient(to bottom, #d5d5db, #0d0d0f)" }} />
-                    </div>
+                                {/* ── RIGHT PANEL ── */}
+                                <div className="w-[230px] flex-shrink-0 flex flex-col" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }} />
+                                    <div className="px-4 py-4 space-y-3 overflow-y-auto flex-1">
+                                        {/* Share Your Profile */}
+                                        <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                            <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 3 }}>Share Your Profile</p>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 9 }}>Share your professional profile with employers and collaborators.</p>
+                                            <div className="flex items-center justify-center gap-2 py-1.5 rounded-lg cursor-pointer" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
+                                                <Share2 style={{ width: 11, height: 11, color: "rgba(255,255,255,0.55)" }} />
+                                                <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Share Profile</span>
+                                            </div>
+                                        </div>
+                                        {/* View Your CV */}
+                                        <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                            <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 3 }}>View Your CV</p>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 9 }}>Preview and download your professional CV.</p>
+                                            <div className="flex items-center justify-center gap-2 py-1.5 rounded-lg cursor-pointer" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
+                                                <FileText style={{ width: 11, height: 11, color: "rgba(255,255,255,0.55)" }} />
+                                                <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>View CV</span>
+                                            </div>
+                                        </div>
+                                        {/* Upgrade to Pro */}
+                                        <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                            <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 3 }}>Upgrade to Pro</p>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 9 }}>Unlock more features and increase your attestation limits.</p>
+                                            <div className="flex items-center justify-center gap-2 py-1.5 rounded-lg cursor-pointer" style={{ border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
+                                                <Award style={{ width: 11, height: 11, color: "rgba(255,255,255,0.7)" }} />
+                                                <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.75)" }}>Upgrade</span>
+                                            </div>
+                                        </div>
+                                        {/* Profile Completion */}
+                                        <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                            <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 3 }}>Profile Completion</p>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 10 }}>Complete your profile to increase visibility and opportunities.</p>
+                                            <div className="flex justify-center mb-3">
+                                                <div className="relative" style={{ width: 60, height: 60 }}>
+                                                    <svg viewBox="0 0 60 60" style={{ width: 60, height: 60, transform: "rotate(-90deg)" }}>
+                                                        <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5"/>
+                                                        <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="5" strokeDasharray="157.08" strokeDashoffset="23.56" strokeLinecap="round"/>
+                                                    </svg>
+                                                    <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>85%</span>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.25)" }}><Check style={{ width: 8, height: 8, color: "#4ade80" }} /></div>
+                                                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Add profile information</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.25)" }}><Check style={{ width: 8, height: 8, color: "#4ade80" }} /></div>
+                                                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Add credentials (3/3)</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }} />
+                                                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)" }}>Add proof of work (2/3)</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.25)" }}><Check style={{ width: 8, height: 8, color: "#4ade80" }} /></div>
+                                                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Complete career timeline</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>{/* end 3-panel absolute inset flex */}
+                        </div>{/* end scaled 960x540 container */}
+                    </div>{/* end hero outer relative */}
 
                     {/* Partner logos — Linear-style static row, center-aligned, grayscale */}
                     <div className="mt-4 sm:mt-6 w-full relative z-50 border-t border-white/[0.06] pt-8 sm:pt-10">
