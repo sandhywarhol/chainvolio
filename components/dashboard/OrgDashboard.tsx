@@ -85,9 +85,11 @@ type Props = {
   googleOrgAccount?: OrgAccount | null;
   accessToken?: string | null;
   activeSection?: "hiring" | "projects" | undefined;
+  hideActionBar?: boolean;
+  hideDetailSections?: boolean;
 };
 
-export function OrgDashboard({ profile, walletAddress, collections, attestationCount, onRequestVerification, googleOrgAccount, accessToken, activeSection }: Props) {
+export function OrgDashboard({ profile, walletAddress, collections, attestationCount, onRequestVerification, googleOrgAccount, accessToken, activeSection, hideActionBar = false, hideDetailSections = false }: Props) {
   const [hiringExpanded, setHiringExpanded] = useState(true);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -464,7 +466,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       {/* Action bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {!hideActionBar && <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${actionBadgeClass}`}>
             {actionBadgeText}
@@ -533,7 +535,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             Edit Profile
           </Link>
         </div>
-      </div>
+      </div>}
 
       {/* Payment failed banner (Google only) */}
       {isPastDue && (
@@ -933,11 +935,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         </div>
       )}
 
-      {/* Projects & Programs */}
-      {ProjectsSection}
+      {/* Projects & Programs — only when not using sidebar tab layout */}
+      {isGooglePath && !hideDetailSections && ProjectsSection}
 
-      {/* Hiring Center */}
-      <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
+      {/* Hiring Center — only when not using sidebar tab layout */}
+      {isGooglePath && !hideDetailSections && <div className="rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden">
         <div
           onClick={() => setHiringExpanded(!hiringExpanded)}
           className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors group"
@@ -1013,7 +1015,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             )}
           </div>
         )}
-      </div>
+      </div>}
 
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       {showProjectForm && (

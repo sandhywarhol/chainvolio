@@ -608,20 +608,21 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                 {/* ── HEADER ──────────────────────────────────────────────── */}
                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
                     <div className="space-y-6 md:flex-1">
-                        <div className="max-w-2xl space-y-6">
+                        <div className="max-w-2xl space-y-5">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-amber-200/60">WEB3 RESUME</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/40">WEB3 RESUME</span>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>
-                                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                <p className="text-[13px] md:text-[15px] font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>
+                                <h2 className="text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.1]">
                                     A resume you don't<br /><span className="text-amber-200/60">have to explain.</span>
                                 </h2>
                             </div>
                         </div>
                     </div>
                     <div className="lg:max-w-xs pb-2">
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal max-w-2xl leading-relaxed text-right lg:pt-24">
+                        <p className="text-white/40 text-[12px] md:text-[13px] font-normal max-w-2xl leading-relaxed text-right lg:pt-24">
                             Turn your work into verifiable on-chain proof. Build a resume that recruiters can instantly trust.
                         </p>
                     </div>
@@ -731,8 +732,8 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                                             <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
                                         </div>
                                         <div className="space-y-2">
-                                            <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
-                                            <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+                                            <h3 className="text-[15px] font-bold text-white/70 transition-colors">{item.title}</h3>
+                                            <p className="text-[12px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
                                                 {item.desc}
                                             </p>
                                         </div>

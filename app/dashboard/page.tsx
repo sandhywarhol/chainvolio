@@ -343,7 +343,7 @@ export default function DashboardPage() {
           {/* Nav */}
           <nav className="flex-1 px-2 py-3 space-y-0.5">
             {(isWalletRecruiter ? [
-              { Icon: Building2,     label: "Overview",            id: "profile",      href: undefined },
+              { Icon: Building2,     label: "Profile",             id: "profile",      href: undefined },
               { Icon: FolderOpen,    label: "Hiring Center",       id: "hiring",       href: undefined },
               { Icon: LayoutDashboard, label: "Projects & Programs", id: "projects",   href: undefined },
               { Icon: Inbox,         label: "Inbox",               id: "inbox",        href: undefined },
@@ -372,6 +372,29 @@ export default function DashboardPage() {
                 : <button key={id} onClick={() => setActiveTab(id)} className={cls} style={sty}>{inner}</button>;
             })}
           </nav>
+          {/* Hiring Overview (recruiter only) */}
+          {isWalletRecruiter && (
+            <div className="px-3 pb-3 space-y-1.5">
+              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 6 }}>Hiring Overview</p>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.32)" }}>Collections</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>{collections.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.32)" }}>Attestations</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>{attestationCount}</span>
+              </div>
+              {profile?.attestationQuota != null && (
+                <>
+                  <div className="mt-1 h-0.5 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.min(100, ((profile.attestationUsed ?? 0) / profile.attestationQuota) * 100)}%`, background: "rgba(255,255,255,0.3)" }} />
+                  </div>
+                  <p style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>{profile.attestationUsed ?? 0} / {profile.attestationQuota} this month</p>
+                </>
+              )}
+            </div>
+          )}
+
           {/* User */}
           <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
             <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
@@ -399,7 +422,7 @@ export default function DashboardPage() {
           {/* Top bar */}
           {(() => {
             const tabMeta: Record<string, { title: string; desc: string }> = isWalletRecruiter ? {
-              profile:  { title: "Overview",             desc: "Manage your organization profile and activity." },
+              profile:  { title: "Profile",              desc: "Manage your organization profile and activity." },
               hiring:   { title: "Hiring Center",        desc: "Manage your hiring collections and sourcing." },
               projects: { title: "Projects & Programs",  desc: "Showcase your initiatives, hackathons, and programs." },
               inbox:    { title: "Inbox",                desc: "Direct messages and candidate conversations." },
@@ -504,6 +527,7 @@ export default function DashboardPage() {
               collections={collections}
               attestationCount={attestationCount}
               activeSection={activeTab === "hiring" ? "hiring" : activeTab === "projects" ? "projects" : undefined}
+              hideActionBar={true}
               onRequestVerification={(renewal) => {
                 setIsRenewal(renewal);
                 setShowVerificationModal(true);
@@ -1494,28 +1518,6 @@ export default function DashboardPage() {
                 </div>
               ) : null}
 
-              {/* Hiring quick stats */}
-              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 8 }}>Hiring Overview</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Collections</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{collections.length}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Attestations</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{attestationCount}</span>
-                  </div>
-                  {profile?.attestationQuota != null && (
-                    <>
-                      <div className="mt-1 h-1 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                        <div className="h-full rounded-full" style={{ width: `${Math.min(100, ((profile.attestationUsed ?? 0) / profile.attestationQuota) * 100)}%`, background: "rgba(255,255,255,0.35)" }} />
-                      </div>
-                      <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)" }}>{profile.attestationUsed ?? 0} / {profile.attestationQuota} attestations this month</p>
-                    </>
-                  )}
-                </div>
-              </div>
             </>
           ) : (
             /* ── BUILDER RIGHT PANEL ── */
@@ -1728,14 +1730,14 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
   const [googleCollections, setGoogleCollections] = useState<{ id: string; title: string; slug: string; created_at: string }[]>([]);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [isRenewalGoogle, setIsRenewalGoogle] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // New Google users who haven't completed onboarding → org setup
   const needsOnboarding = !orgAccount || !orgAccount.onboarding_complete;
   useEffect(() => {
     if (needsOnboarding) router.replace("/onboarding/org");
   }, [needsOnboarding, router]);
 
-  // Collections fetch (runs regardless; skips if no orgAccount)
   useEffect(() => {
     if (!orgAccount?.auth_uid || !session?.access_token) return;
     fetch(`/api/hiring/collections?auth_uid=${orgAccount.auth_uid}`, {
@@ -1746,9 +1748,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
       .catch(() => {});
   }, [orgAccount, session]);
 
-  if (needsOnboarding) {
-    return <LoadingScreen message="Setting up your organization..." />;
-  }
+  if (needsOnboarding) return <LoadingScreen message="Setting up your organization..." />;
 
   const googleProfile = {
     displayName: orgAccount?.org_name ?? session.user.email?.split("@")[0] ?? "My Organization",
@@ -1767,25 +1767,199 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
     isProfileComplete: false,
   };
 
+  const formattedName = encodeURIComponent((orgAccount?.org_name ?? "Org").replace(/\s+/g, "-"));
+  const cleanId = String(orgAccount?.org_id_number ?? 1).padStart(5, "0");
+  const publicPageUrl = `/${formattedName}/${cleanId}`;
+
+  const googleNavTabs = [
+    { Icon: Building2,      label: "Profile",             id: "profile"   },
+    { Icon: FolderOpen,     label: "Hiring Center",       id: "hiring"    },
+    { Icon: LayoutDashboard,label: "Projects & Programs", id: "projects"  },
+    { Icon: Inbox,          label: "Inbox",               id: "inbox"     },
+  ] as Array<{ Icon: React.ElementType; label: string; id: string }>;
+
+  const tabMeta: Record<string, { title: string; desc: string }> = {
+    profile:  { title: "Profile",             desc: "Manage your organization profile and activity." },
+    hiring:   { title: "Hiring Center",       desc: "Manage your hiring collections and sourcing." },
+    projects: { title: "Projects & Programs", desc: "Showcase your initiatives, hackathons, and programs." },
+    inbox:    { title: "Inbox",               desc: "Direct messages and candidate conversations." },
+  };
+  const meta = tabMeta[activeTab] ?? tabMeta.profile;
+
   return (
-    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "#000000" }}>
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       <Navbar />
-      <section className="flex-1 max-w-3xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8">
-        <OrgDashboard
-          profile={googleProfile}
-          walletAddress={null}
-          collections={googleCollections}
-          attestationCount={0}
-          onRequestVerification={(renewal) => {
-            setIsRenewalGoogle(renewal);
-            setShowVerifyModal(true);
-          }}
-          googleOrgAccount={orgAccount}
-          accessToken={session.access_token}
-        />
-      </section>
-      <Footer />
+      <div className="flex-shrink-0" style={{ height: 96 }} />
+
+      {/* ── 3-PANEL BODY ── */}
+      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-3 flex flex-col">
+        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+
+          {/* ── LEFT SIDEBAR ── */}
+          <aside className="hidden md:flex w-[220px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+            {/* Logo */}
+            <div className="flex items-center px-4 h-[46px] flex-shrink-0 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
+              </div>
+              <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 18, width: "auto", objectFit: "contain" }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginLeft: 6, letterSpacing: "-0.01em" }}>chainvolio</span>
+            </div>
+            {/* Nav */}
+            <nav className="flex-1 px-2 py-3 space-y-0.5">
+              {googleNavTabs.map(({ Icon, label, id }) => {
+                const active = activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setActiveTab(id)}
+                    className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md relative transition-colors text-left"
+                    style={active ? { background: "rgba(255,255,255,0.07)" } : {}}
+                  >
+                    {active && <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.4)" }} />}
+                    <Icon style={{ width: 13, height: 13, color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                    <span style={{ fontSize: 12, fontWeight: active ? 600 : 500, color: active ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.42)" }}>{label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            {/* Hiring Overview */}
+            <div className="px-3 pb-3 space-y-1.5">
+              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 6 }}>Hiring Overview</p>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.32)" }}>Collections</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>{googleCollections.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.32)" }}>Saved Candidates</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>{orgAccount?.saved_candidates_count ?? 0}</span>
+              </div>
+            </div>
+            {/* User */}
+            <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+              <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                {googleProfile.avatarUrl
+                  ? <img src={googleProfile.avatarUrl} alt={googleProfile.displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ background: "#2a2a2e", color: "rgba(255,255,255,0.5)" }}>{googleProfile.displayName?.[0] || "?"}</div>
+                }
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate" style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }}>{googleProfile.displayName}</p>
+                <p style={{ fontSize: 9, color: "rgba(255,255,255,0.22)", fontWeight: 500, marginTop: 2 }}>Google Account</p>
+              </div>
+            </div>
+          </aside>
+
+          {/* ── CENTER PANEL ── */}
+          <div className="flex-1 overflow-y-auto min-w-0 flex flex-col" style={{ background: "#0a0b0e" }}>
+            {/* Top bar */}
+            <div className="flex items-center justify-between px-5 h-[46px] flex-shrink-0 sticky top-0 z-10" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>{meta.title}</p>
+                <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{meta.desc}</p>
+              </div>
+              {activeTab === "profile" && (
+                <Link
+                  href="/org/edit-profile"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}
+                >
+                  <ExternalLink style={{ width: 10, height: 10, color: "rgba(255,255,255,0.4)" }} />
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>Edit Profile</span>
+                </Link>
+              )}
+            </div>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+              {activeTab === "inbox" ? (
+                <InboxPanel />
+              ) : (
+                <OrgDashboard
+                  profile={googleProfile}
+                  walletAddress={null}
+                  collections={googleCollections}
+                  attestationCount={0}
+                  hideActionBar={true}
+                  hideDetailSections={true}
+                  activeSection={activeTab === "hiring" ? "hiring" : activeTab === "projects" ? "projects" : undefined}
+                  onRequestVerification={(renewal) => {
+                    setIsRenewalGoogle(renewal);
+                    setShowVerifyModal(true);
+                  }}
+                  googleOrgAccount={orgAccount}
+                  accessToken={session.access_token}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* ── RIGHT PANEL ── */}
+          <aside className="hidden lg:flex w-[260px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0a0b0e", borderLeft: "1px solid rgba(255,255,255,0.05)" }}>
+            <div className="px-4 py-4 space-y-3">
+              {/* Share Page */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Share Organization Page</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Copy your public organization link to share with candidates.</p>
+                <button
+                  onClick={async () => {
+                    const url = `${window.location.origin}${publicPageUrl}`;
+                    try { await navigator.clipboard.writeText(url); setToastMessage("Organization link copied!"); } catch { setToastMessage("Failed to copy link."); }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600 }}
+                >
+                  <Copy style={{ width: 11, height: 11 }} /> Copy Link
+                </button>
+              </div>
+
+              {/* View Public Page */}
+              {orgAccount?.org_id_number && (
+                <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>View Public Page</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>See how your organization appears to candidates and partners.</p>
+                  <Link
+                    href={publicPageUrl} target="_blank"
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
+                  >
+                    <ExternalLink style={{ width: 11, height: 11 }} /> View Page
+                  </Link>
+                </div>
+              )}
+
+              {/* Edit Profile */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Edit Organization Profile</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Update your organization's bio, socials, and contact info.</p>
+                <Link
+                  href="/org/edit-profile"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
+                  style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
+                >
+                  <PenLine style={{ width: 11, height: 11 }} /> Edit Profile
+                </Link>
+              </div>
+
+              {/* Upgrade Plan */}
+              <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(74,222,128,0.12)" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>Upgrade Plan</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Unlock verified status, more collections, and trusted hiring tools.</p>
+                <Link
+                  href="/recruiter/pricing"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all"
+                  style={{ border: "1px solid rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.05)", fontSize: 11, color: "#4ade80", fontWeight: 600, display: "flex" }}
+                >
+                  <ShieldCheck style={{ width: 11, height: 11 }} /> View Plans
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-[60]" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }} />
 
       {showVerifyModal && (
         <VerificationRequestModal
@@ -1801,6 +1975,8 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
           onSuccess={() => { setShowVerifyModal(false); setIsRenewalGoogle(false); }}
         />
       )}
+
+      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
     </main>
   );
 }

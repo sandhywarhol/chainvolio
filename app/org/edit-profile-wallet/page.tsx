@@ -52,10 +52,11 @@ function OrgEditProfileWalletContent() {
 
     useEffect(() => {
         if (!publicKey) return;
-        fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
+        // Use dashboard/stats which aggregates org data from organization_verifications
+        fetch(`/api/dashboard/stats?wallet=${publicKey.toBase58()}`)
             .then(r => r.json())
-            .then(data => {
-                if (data) {
+            .then(({ profile: data }) => {
+                if (data?.displayName) {
                     setProfileExists(true);
                     const fetchedType = (data.verificationType && data.verificationType !== "unverified")
                         ? data.verificationType

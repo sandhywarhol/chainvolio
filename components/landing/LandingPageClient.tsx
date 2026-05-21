@@ -564,17 +564,14 @@ function AttestationBlock() {
             <div className="space-y-10">
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Core Feature</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/40">Verifiable Work History with On-Chain Attestations</span>
                     </div>
-                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                        Verifiable Work History with On-Chain Attestations
-                    </p>
-                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
+                    <h3 className="text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.06] mb-5">
                         Proof of work,<br /><span className="text-amber-200/60">not claims.</span>
                     </h3>
-                    <div className="h-px w-full max-w-6xl bg-white/10" />
-                    <p className="text-white/40 text-sm md:text-lg leading-relaxed font-normal max-w-md">
+                    <div className="h-px w-full max-w-6xl bg-white/10 mb-5" />
+                    <p className="text-white/40 text-[12px] md:text-[13px] leading-relaxed font-normal max-w-md">
                         Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
                     </p>
                 </div>
@@ -1021,18 +1018,14 @@ function HiringBlock() {
             <div className="space-y-10 order-1 lg:order-2">
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
-                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[#fde68a99]">Use Case</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] text-white/40">How to Hire Verified Web3 Talent</span>
                     </div>
-
-                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                        How to Hire Verified Web3 Talent
-                    </p>
-                    <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.06]">
+                    <h3 className="text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-amber-200/60">not profiles.</span>
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10" />
-                    <p className="text-white/40 text-[13px] md:text-lg leading-relaxed font-normal max-w-md">
+                    <p className="text-white/40 text-[12px] md:text-[13px] leading-relaxed font-normal max-w-md">
                         Discover talent through verified work history and trusted signals. Filter noise and identify candidates with real, proven contributions.
                     </p>
                 </div>
@@ -1060,10 +1053,10 @@ function HiringBlock() {
                                 <f.icon className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: active === f.slide ? f.color : f.color + "55" }} />
                             </motion.div>
                             <div>
-                                <p className={`text-sm font-bold mb-1 ${active === f.slide ? "text-white/90" : "text-white/50"}`}>
+                                <p className={`text-[12px] font-bold mb-1 ${active === f.slide ? "text-white/90" : "text-white/50"}`}>
                                     {f.label}
                                 </p>
-                                <p className={`text-xs leading-relaxed ${active === f.slide ? "text-white/40" : "text-white/20"}`}>
+                                <p className={`text-[11px] leading-relaxed ${active === f.slide ? "text-white/40" : "text-white/20"}`}>
                                     {f.desc}
                                 </p>
                             </div>
@@ -1306,7 +1299,7 @@ export function LandingPageClient() {
                             className="w-[960px] h-[540px] absolute left-1/2 -translate-x-1/2 top-0 scale-[0.45] min-[400px]:scale-[0.52] sm:scale-[0.7] md:scale-[0.88] lg:scale-[1.1] origin-top transition-all duration-300 flex-shrink-0"
                         >
                             {/* ── LINEAR-STYLE 3-PANEL APP MOCKUP ── */}
-                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 36px 80px -18px rgba(0,0,0,0.98), 0 12px 32px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
+                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 36px 60px -8px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
                                 {/* Spotlight — thin cone from top-center */}
                                 <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 45% 28% at 50% -1%, rgba(255,255,255,0.07) 0%, transparent 80%)" }} />
 
@@ -1622,7 +1615,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* Partner logos — same background as Problem section */}
-                <div className="w-full relative z-50 pt-8 sm:pt-10 pb-8" style={{ background: "#060608" }}>
+                <div className="w-full relative z-50 py-8" style={{ background: "#060608" }}>
                     <p className="text-center text-[10px] font-bold uppercase tracking-[0.18em] mb-6" style={{ color: "rgba(255,255,255,0.18)" }}>Powering the Web3 career stack</p>
                     <div className="w-full overflow-hidden relative" style={{ maskImage: 'linear-gradient(to right, transparent 0%, black 28%, black 72%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 28%, black 72%, transparent 100%)' }}>
                         <div className="flex animate-marquee whitespace-nowrap items-center w-max">
@@ -1651,35 +1644,32 @@ export function LandingPageClient() {
                 <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#060608] theme-bg-section">
 
                     <div className="max-w-[1240px] mx-auto">
-                        <div className="text-center mb-10 md:mb-14 space-y-6">
-                            {/* Pill Badge - Editorial Light Style */}
-                            <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">The problem</span>
+                        <div className="text-center mb-8 space-y-6">
+                            {/* Pill Badge */}
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.1em] text-white/40 uppercase">Why Web3 Hiring Is Broken</span>
                             </div>
 
-                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                Why Web3 Hiring Is Broken
-                            </p>
-
-                            <h2 className="text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
+                            <h2 className="text-[22px] sm:text-3xl md:text-4xl lg:text-[44px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
                                 Your work is real. <span className="text-amber-200/60">Your proof isn&apos;t.</span>
                             </h2>
                             <div className="w-full max-w-6xl mx-auto h-px bg-white/10 mt-12 theme-border-base" />
 
 
 
-                            <p className="text-white/40 text-[13px] md:text-base font-normal max-w-3xl mx-auto mt-6">
+                            <p className="text-white/40 text-[12px] md:text-[13px] font-normal max-w-3xl mx-auto mt-6">
                                 Hiring runs on claims, not proof. There is no reliable way to verify real work.
                             </p>
                         </div>
 
                         {/* NEW ANIMATED PROBLEM DIAGRAM */}
-                        <div className="theme-invert-diagram relative w-full max-w-6xl mx-auto mt-16 mb-24">
+                        <div className="theme-invert-diagram relative w-full max-w-6xl mx-auto mt-8 mb-8">
                             <ProblemDiagram />
                         </div>
 
                         {/* BENTO CARDS SECTION - Minimal Editorial Style (Light) */}
-                        <div className="relative mt-14 pb-12 -mx-4 sm:mx-0 overflow-hidden">
+                        <div className="relative mt-8 -mx-4 sm:mx-0 overflow-hidden">
                             <motion.div
                                 className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
                                 animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${problemIdx * 85}vw` : 0 }}
@@ -1744,7 +1734,7 @@ export function LandingPageClient() {
                                                     <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">{item.title}</h3>
+                                                    <h3 className="text-[15px] font-bold text-white/70 transition-colors">{item.title}</h3>
                                                     <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
                                                         {item.desc}
                                                     </p>
@@ -1781,29 +1771,23 @@ export function LandingPageClient() {
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
                     {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-12 md:pt-12 md:pb-4 flex flex-col md:flex-row-reverse md:items-start md:justify-between gap-6 md:gap-8">
-                        <div className="space-y-2 md:space-y-4 flex flex-col md:items-end text-left md:text-right md:flex-1">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
+                        <div className="text-center space-y-6 mb-6">
                             {/* badge */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.12em] text-[#fde68a99]">Signal vs noise</span>
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40">Why Web3 Work History Can&apos;t Be Verified</span>
                             </div>
-                            <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                Why Web3 Work History Can&apos;t Be Verified
-                            </p>
-                            <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-                                From Noise to<br />
-                                <span className="text-amber-200/60">Verifiable Signal</span>
+                            <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
+                                From Noise to <span className="text-amber-200/60">Verifiable Signal</span>
                             </h2>
+                            <div className="h-px w-full max-w-6xl mx-auto bg-white/10" />
+                            <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-2xl mx-auto">
+                                Work history is fragmented and impossible to verify. ChainVolio transforms scattered contributions into a single, verifiable identity.
+                            </p>
                         </div>
-                        <p className="text-white/40 text-[13px] md:text-lg font-normal leading-relaxed max-w-xl md:text-left md:pt-20">
-                            Work history is fragmented and impossible to verify.<br />
-                            ChainVolio transforms scattered contributions<br />
-                            into a single, verifiable identity.
-                        </p>
                     </div>
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mb-4">
-                        <div className="h-px w-full bg-white/10" />
-                    </div>
+
 
                     {/* ── Full-bleed animation canvas ── */}
                     <div className="relative w-full h-[160px] sm:h-[300px] md:h-[420px]">
@@ -1855,7 +1839,7 @@ export function LandingPageClient() {
                     </div>
 
                     {/* ── Bottom outcome row — the answer to the problems above ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pb-8 md:pb-12">
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
                         <div className="relative overflow-hidden">
                             <motion.div
                                 className="flex md:grid md:grid-cols-3 w-full md:gap-8"
@@ -1876,35 +1860,35 @@ export function LandingPageClient() {
                                     {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "#fde68a99",
+                                        accent: "rgba(255,255,255,0.4)",
                                         icon: Activity,
                                         id: "03"
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "#fde68a99",
+                                        accent: "rgba(255,255,255,0.4)",
                                         icon: User,
                                         id: "01"
                                     },
                                     {
                                         label: "On-Chain Attestation",
                                         desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
-                                        accent: "#fde68a99",
+                                        accent: "rgba(255,255,255,0.4)",
                                         icon: ShieldCheck,
                                         id: "02"
                                     },
                                     {
                                         label: "Verified Signal",
                                         desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "#fde68a99",
+                                        accent: "rgba(255,255,255,0.4)",
                                         icon: Activity,
                                         id: "03"
                                     },
                                     {
                                         label: "One Unified Profile",
                                         desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "#fde68a99",
+                                        accent: "rgba(255,255,255,0.4)",
                                         icon: User,
                                         id: "01"
                                     },
@@ -1916,7 +1900,7 @@ export function LandingPageClient() {
                                         <div className="flex items-start gap-8">
                                             {/* Big Number */}
                                             <div className="flex-shrink-0 pt-2">
-                                                <span className="text-4xl font-black text-white/10 group-hover:text-[#fde68a99] transition-colors duration-500 tracking-tighter leading-none">
+                                                <span className="text-4xl font-black text-white/10 group-hover:text-white/40 transition-colors duration-500 tracking-tighter leading-none">
                                                     {item.id}
                                                 </span>
                                             </div>
@@ -1927,7 +1911,7 @@ export function LandingPageClient() {
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-2.5">
                                                     <item.icon size={16} className="text-white/40" />
-                                                    <h3 className="text-xl font-bold text-[#fde68a99] transition-colors">
+                                                    <h3 className="text-[15px] font-bold text-white/70 transition-colors">
                                                         {item.label}
                                                     </h3>
                                                 </div>
@@ -1963,29 +1947,26 @@ export function LandingPageClient() {
                 <div className="h-px w-full bg-black/10" />
 
                 {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 md:pb-16 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
 
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
                         <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
 
                             {/* Left: Content Block */}
-                            <div className="space-y-6 md:space-y-12">
-                                <div className="space-y-3 md:space-y-6">
+                            <div className="space-y-6 md:space-y-10">
+                                <div className="space-y-6">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] text-[#fde68a99] uppercase">Why ChainVolio</span>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.1em] text-white/40 uppercase">How On-Chain Attestations Work</span>
                                     </div>
 
-                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                        How On-Chain Attestations Work
-                                    </p>
-
-                                    <h2 className="text-[28px] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                                    <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
                                         One trust layer.<br />
                                         <span className="text-amber-200/60">Everything connects.</span>
                                     </h2>
-                                    <div className="h-px w-full max-w-6xl bg-white/10 theme-border-base" />
+                                    <div className="h-px w-full max-w-6xl bg-white/10 mb-5 theme-border-base" />
 
-                                    <p className="text-white/40 text-[13px] md:text-xl leading-relaxed max-w-xl font-normal">
+                                    <p className="text-white/40 text-[12px] md:text-[13px] leading-relaxed max-w-xl font-normal">
                                         Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
                                     </p>
                                 </div>
@@ -2094,7 +2075,7 @@ export function LandingPageClient() {
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2.5">
                                                     <feature.icon size={16} className="text-white/50 flex-shrink-0" />
-                                                    <h3 className="text-xl font-bold text-[#fde68a99]">{feature.title}</h3>
+                                                    <h3 className="text-[15px] font-bold text-white/70">{feature.title}</h3>
                                                 </div>
                                                 <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
                                                     {feature.desc}
@@ -2134,7 +2115,7 @@ export function LandingPageClient() {
                             className="max-w-2xl mx-auto mt-6 md:mt-8 text-center px-6"
                         >
                             <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
-                            <p className="text-sm md:text-base text-white/50 italic leading-relaxed mb-6 font-normal">
+                            <p className="text-[12px] md:text-[13px] text-white/50 italic leading-relaxed mb-6 font-normal">
                                 &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
                             </p>
                             <div className="flex flex-col items-center gap-1">
@@ -2150,29 +2131,21 @@ export function LandingPageClient() {
 
                     <div className="max-w-[1200px] mx-auto relative">
 
-                        {/* ── Header: compact, left + right split ── */}
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-4">
-                            <div className="space-y-2 md:space-y-4 md:flex-1">
-                                <div className="max-w-xl space-y-2 md:space-y-4">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">
-                                            The Solution
-                                        </span>
-                                    </div>
-                                    <p className="text-lg md:text-xl font-normal text-white/60 tracking-tight">
-                                        Build a Verifiable Web3 Resume with On-Chain Proof
-                                    </p>
-                                    <h3 className="text-[28px] sm:text-4xl md:text-5xl lg:text-[52px] font-bold text-white tracking-tight leading-[1.06]">
-                                        Build a reputation<br /><span className="text-amber-200/60">that travels.</span>
-                                    </h3>
-                                </div>
-
+                        {/* ── Header: left-aligned ── */}
+                        <div className="text-left space-y-6 mb-6">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.08em] text-white/40">Build a Verifiable Web3 Resume with On-Chain Proof</span>
                             </div>
-                            <p className="text-white/40 text-sm md:text-lg font-normal leading-relaxed max-w-xs md:text-right md:pt-20">
+                            <h3 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.3]">
+                                Build a reputation <span className="text-amber-200/60">that travels.</span>
+                            </h3>
+                            <div className="h-px w-full max-w-6xl bg-white/10" />
+                            <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-2xl">
                                 Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
                             </p>
                         </div>
-                        <div className="w-full max-w-[1240px] mx-auto h-px bg-white/10 mt-12 mb-12" />
+
 
                         {/* ── Interactive Flow ── */}
                         <div className="relative w-full max-w-[860px] mx-auto mb-4">
@@ -2228,7 +2201,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* CORE FEATURE SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#0D0D0D] theme-bg-section">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
                     <div className="max-w-[1200px] mx-auto relative z-10">
                         <AttestationBlock />
                     </div>
@@ -2246,7 +2219,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-20 sm:py-24 md:py-32 relative z-10 overflow-hidden bg-black theme-bg-page">
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 overflow-hidden bg-black theme-bg-page">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -2269,11 +2242,11 @@ export function LandingPageClient() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.9, ease: "easeOut" }}
                         >
-                            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.06]">
+                            <h2 className="text-[28px] md:text-[40px] font-bold text-white mb-6 tracking-tight leading-[1.06]">
                                 Start Building Your<br />
                                 <span className="text-amber-200/60">Verifiable Web3 Resume.</span>
                             </h2>
-                            <p className="text-white/40 text-base md:text-lg mb-12 max-w-lg mx-auto leading-relaxed font-normal">
+                            <p className="text-white/40 text-[12px] md:text-[13px] mb-12 max-w-lg mx-auto leading-relaxed font-normal">
                                 Signed by real people. Anchored on Solana.<br />
                                 Cryptographically verified. Share anywhere with one link.
                             </p>

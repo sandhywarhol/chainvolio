@@ -3,15 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft, Inbox } from "lucide-react";
+import { ChevronDown, Menu, X, ShieldCheck, Layers, HelpCircle, BookOpen, Shield, LayoutGrid, User, Briefcase, LogOut, Wallet, ChevronRight, ChevronLeft } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { NotificationBell } from "./NotificationBell";
 import { usePathname } from "next/navigation";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-
-import { useInboxCount } from "@/hooks/useInboxCount";
 
 
 interface NavbarProps {
@@ -31,7 +29,6 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     const { publicKey, connecting } = useWallet();
     const { isGoogleSignedIn } = useGoogleAuth();
-    const inboxCount = useInboxCount();
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides'>('main');
