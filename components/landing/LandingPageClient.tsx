@@ -1859,6 +1859,23 @@ export function LandingPageClient() {
                             ))}
                         </div>
 
+                        {/* Context footer row */}
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-1">
+                            <div className="flex flex-wrap items-center gap-4">
+                                <Link href="/guides/how-it-works" className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/35 hover:text-white/70 transition-colors group">
+                                    Explore the architecture
+                                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                </Link>
+                                <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-white/[0.06] bg-white/[0.02]">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#0d9488]" />
+                                    <span className="text-[9px] font-bold text-white/35 tracking-widest">BUILT ON SOLANA</span>
+                                </div>
+                            </div>
+                            <p className="text-[11px] text-white/25 italic">
+                                Recruiters see proof, not promises — real contributors rise above the noise.
+                            </p>
+                        </div>
+
                         {/* Founder Quote */}
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
