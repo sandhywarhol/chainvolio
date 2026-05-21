@@ -228,7 +228,7 @@ function MockProfileUI() {
             </div>
 
             {/* 2. Main Content Area */}
-            <div className="flex-1 flex flex-col bg-[#0a0a0a] overflow-y-auto md:overflow-hidden">
+            <div className="flex-1 flex flex-col bg-[#060608] overflow-y-auto md:overflow-hidden">
                 {/* Content Header */}
                 <div className="h-14 border-b border-white/5 px-8 flex items-center justify-between bg-white/[0.01]">
                     <div className="flex items-center gap-4">
@@ -668,7 +668,7 @@ function AttestationBlock() {
 // --- Floating Feature Card (Overlay) ---
 function FloatingVerificationCard() {
     return (
-        <div className="theme-preserve w-[340px] bg-[#0c0c0c]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
+        <div className="theme-preserve w-[340px] bg-[#060608]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
             style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
         >
             {/* Card Header */}
@@ -1164,8 +1164,6 @@ export function LandingPageClient() {
 
     // Mobile Carousel States
     const [problemIdx, setProblemIdx] = useState(1);
-    const [whyIdx, setWhyIdx] = useState(1);
-    const [solutionIdx, setSolutionIdx] = useState(1);
     const [isAnimating, setIsAnimating] = useState(false);
 
     const problems = [
@@ -1181,29 +1179,10 @@ export function LandingPageClient() {
         setProblemIdx(newIdx);
     };
 
-    const handleWhyLoop = (newIdx: number) => {
-        if (isAnimating) return;
-        setIsAnimating(true);
-        setWhyIdx(newIdx);
-    };
-
-    const handleSolutionLoop = (newIdx: number) => {
-        if (isAnimating) return;
-        setIsAnimating(true);
-        setSolutionIdx(newIdx);
-    };
-
     const onAnimationComplete = () => {
         setIsAnimating(false);
-        // Teleport for Problem
         if (problemIdx === 0) setProblemIdx(3);
         if (problemIdx === 4) setProblemIdx(1);
-        // Teleport for Why
-        if (whyIdx === 0) setWhyIdx(3);
-        if (whyIdx === 4) setWhyIdx(1);
-        // Teleport for Solution
-        if (solutionIdx === 0) setSolutionIdx(3);
-        if (solutionIdx === 4) setSolutionIdx(1);
     };
 
     useEffect(() => {
@@ -1770,349 +1749,123 @@ export function LandingPageClient() {
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
-                    {/* ── Top text block ── */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="text-center space-y-6 mb-6">
-                            {/* badge */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
-                                <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40">Why Web3 Work History Can&apos;t Be Verified</span>
-                            </div>
-                            <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
-                                From Noise to <span className="text-amber-200/60">Verifiable Signal</span>
-                            </h2>
-                            <div className="h-px w-full max-w-6xl mx-auto bg-white/10" />
-                            <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-2xl mx-auto">
-                                Work history is fragmented and impossible to verify. ChainVolio transforms scattered contributions into a single, verifiable identity.
-                            </p>
+                    {/* Header */}
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 text-center space-y-4 mb-10 md:mb-14">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                            <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40 uppercase">Verified Work History</span>
                         </div>
+                        <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
+                            From noise to <span className="text-amber-200/60">verifiable signal.</span>
+                        </h2>
+                        <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-xl mx-auto">
+                            Work history is scattered and impossible to verify. ChainVolio anchors every contribution on-chain — cryptographically signed, portable, impossible to fake.
+                        </p>
                     </div>
 
 
-                    {/* ── Full-bleed animation canvas ── */}
-                    <div className="relative w-full h-[160px] sm:h-[300px] md:h-[420px]">
-                        <SignalNoiseVisual />
-
-                        {/* Radial vignette — lines fade at edges */}
-                        <div className="absolute inset-0 pointer-events-none z-10 theme-signal-vignette" />
-
-                        {/* Top + bottom bleed so canvas merges with section bg */}
-                        <div className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10 theme-signal-fade-to" />
-                        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10 theme-signal-fade-from" />
-
-                        {/* ── Central Logo Node ── */}
-                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                            <div className="relative flex items-center justify-center">
-                                {/* Outer pulse rings */}
-                                <motion.div
-                                    animate={{ scale: [1, 3.2], opacity: [0.12, 0] }}
-                                    transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 0 }}
-                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/20"
-                                />
-                                <motion.div
-                                    animate={{ scale: [1, 2.2], opacity: [0.18, 0] }}
-                                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/25"
-                                />
-                                <motion.div
-                                    animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 1.4 }}
-                                    className="absolute w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30"
-                                />
-
-                                {/* Logo container */}
-                                <motion.div
-                                    animate={{ opacity: [0.75, 1, 0.75] }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative w-12 h-12 md:w-16 md:h-16 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_60px_rgba(255,255,255,0.06)]"
-                                >
-                                    <Image
-                                        src="/logo.png"
-                                        alt="ChainVolio"
-                                        width={24}
-                                        height={24}
-                                        className="md:w-[36px] md:h-[36px] opacity-80"
-                                    />
-                                </motion.div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ── Bottom outcome row — the answer to the problems above ── */}
+                    {/* Split Visuals */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="relative overflow-hidden">
-                            <motion.div
-                                className="flex md:grid md:grid-cols-3 w-full md:gap-8"
-                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${solutionIdx * 85}vw` : 0 }}
-                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
-                                onAnimationComplete={onAnimationComplete}
-                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.7}
-                                onDragEnd={(e: any, info: any) => {
-                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                                        if (info.offset.x < -30) handleSolutionLoop(solutionIdx + 1);
-                                        else if (info.offset.x > 30) handleSolutionLoop(solutionIdx - 1);
-                                    }
-                                }}
-                            >
-                                {[
-                                    {
-                                        label: "Verified Signal",
-                                        desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "rgba(255,255,255,0.4)",
-                                        icon: Activity,
-                                        id: "03"
-                                    },
-                                    {
-                                        label: "One Unified Profile",
-                                        desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "rgba(255,255,255,0.4)",
-                                        icon: User,
-                                        id: "01"
-                                    },
-                                    {
-                                        label: "On-Chain Attestation",
-                                        desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims.",
-                                        accent: "rgba(255,255,255,0.4)",
-                                        icon: ShieldCheck,
-                                        id: "02"
-                                    },
-                                    {
-                                        label: "Verified Signal",
-                                        desc: "Recruiters see proof, not promises. Real contributors rise above the noise automatically.",
-                                        accent: "rgba(255,255,255,0.4)",
-                                        icon: Activity,
-                                        id: "03"
-                                    },
-                                    {
-                                        label: "One Unified Profile",
-                                        desc: "Every contribution, from grants to project roles, lives in a single portable identity you fully own.",
-                                        accent: "rgba(255,255,255,0.4)",
-                                        icon: User,
-                                        id: "01"
-                                    },
-                                ].map((item, i) => (
-                                    <div
-                                        key={i}
-                                        className={`p-6 bg-transparent transition-all duration-300 w-[80vw] md:w-auto flex-shrink-0 md:px-10 md:py-8 pb-8 px-5 mx-2 md:mx-0 group ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
-                                    >
-                                        <div className="flex items-start gap-8">
-                                            {/* Big Number */}
-                                            <div className="flex-shrink-0 pt-2">
-                                                <span className="text-4xl font-black text-white/10 group-hover:text-white/40 transition-colors duration-500 tracking-tighter leading-none">
-                                                    {item.id}
-                                                </span>
-                                            </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
 
-                                            {/* Vertical Divider */}
-                                            <div className="w-px h-20 bg-gradient-to-b from-transparent via-white/10 to-transparent flex-shrink-0 mt-1" />
-
-                                            <div className="space-y-4">
-                                                <div className="flex items-center gap-2.5">
-                                                    <item.icon size={16} className="text-white/40" />
-                                                    <h3 className="text-[15px] font-bold text-white/70 transition-colors">
-                                                        {item.label}
-                                                    </h3>
-                                                </div>
-                                                <p className="text-[13px] text-white/30 leading-relaxed group-hover:text-white/50 transition-colors duration-300 max-w-sm">
-                                                    {item.desc}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </motion.div>
-
-                            {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50">
-                                {[0, 1, 2].map((i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleSolutionLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${(solutionIdx === i + 1 || (i === 2 && solutionIdx === 0) || (i === 0 && solutionIdx === 4))
-                                                ? "w-8 bg-white"
-                                                : "w-1.5 bg-white/20"
-                                            }`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                </section>
-
-
-                {/* DIVIDER: why → black */}
-                <div className="h-px w-full bg-black/10" />
-
-                {/* REDESIGNED: COMPETITIVE POSITIONING — Premium Editorial Layout */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 bg-[#080808] theme-bg-section2 overflow-hidden">
-
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-start">
-
-                            {/* Left: Content Block */}
-                            <div className="space-y-6 md:space-y-10">
-                                <div className="space-y-6">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                        <span className="text-[10px] md:text-[11px] font-black tracking-[0.1em] text-white/40 uppercase">How On-Chain Attestations Work</span>
-                                    </div>
-
-                                    <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
-                                        One trust layer.<br />
-                                        <span className="text-amber-200/60">Everything connects.</span>
-                                    </h2>
-                                    <div className="h-px w-full max-w-6xl bg-white/10 mb-5 theme-border-base" />
-
-                                    <p className="text-white/40 text-[12px] md:text-[13px] leading-relaxed max-w-xl font-normal">
-                                        Traditional tools created isolated silos. ChainVolio turns Web3 contributions into verifiable signals, shareable across platforms.
-                                    </p>
+                            {/* Left: Noise Animation */}
+                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
+                                <div className="absolute top-4 left-4 z-20">
+                                    <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Problem</span>
                                 </div>
 
-                                <div className="flex flex-wrap gap-8 items-center">
-                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-white/60 hover:text-white transition-colors group">
-                                        Explore the architecture
-                                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Built on</span>
-                                        <div className="flex items-center gap-2 px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05]">
-                                            <div className="w-2 h-2 rounded-full bg-[#0d9488]" />
-                                            <span className="text-[9px] font-bold text-white/60">SOLANA</span>
-                                        </div>
+                                <div className="absolute inset-0">
+                                    <SignalNoiseVisual />
+                                </div>
+
+                                <div className="absolute inset-0 pointer-events-none z-10 theme-signal-vignette" />
+                                <div className="absolute top-0 left-0 right-0 h-16 pointer-events-none z-10 theme-signal-fade-to" />
+                                <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-10 theme-signal-fade-from" />
+
+                                {/* Central Logo Node */}
+                                <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                                    <div className="relative flex items-center justify-center">
+                                        <motion.div
+                                            animate={{ scale: [1, 3.2], opacity: [0.12, 0] }}
+                                            transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 0 }}
+                                            className="absolute w-12 h-12 rounded-full border border-white/20"
+                                        />
+                                        <motion.div
+                                            animate={{ scale: [1, 2.2], opacity: [0.18, 0] }}
+                                            transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
+                                            className="absolute w-12 h-12 rounded-full border border-white/25"
+                                        />
+                                        <motion.div
+                                            animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
+                                            transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 1.4 }}
+                                            className="absolute w-12 h-12 rounded-full border border-white/30"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0.75, 1, 0.75] }}
+                                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                            className="relative w-12 h-12 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center"
+                                        >
+                                            <Image src="/logo.png" alt="ChainVolio" width={24} height={24} className="opacity-80" />
+                                        </motion.div>
                                     </div>
+                                </div>
+
+                                <div className="absolute bottom-4 left-4 z-20">
+                                    <p className="text-[10px] text-white/20 font-medium">Fragmented. Unverifiable. Invisible.</p>
                                 </div>
                             </div>
 
-                            {/* Right: Globe Visual — Aligned with text height */}
-                            <div className="relative w-full max-w-[560px] mx-auto lg:ml-auto group overflow-hidden flex flex-col h-full min-h-[220px] sm:min-h-[280px] md:min-h-[380px] mb-8 bg-[#080808] theme-bg-section2">
-
-                                {/* Title Overlay */}
-                                <div className="absolute top-10 left-10 z-20 flex items-center gap-3">
+                            {/* Right: Globe — Trust Network */}
+                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
+                                <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
-                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em]">Global Trust Graph</span>
-                                </div>
-                                <div className="flex-1 relative z-10 w-full">
-                                    <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
+                                    <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Solution</span>
                                 </div>
 
-                                {/* Top/Bottom Gradients to mask clipping */}
-                                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] via-[#080808]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
-                                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080808] via-[#080808]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
+                                <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
 
-                                {/* Floating Stats Overlay — Refined Metrics */}
-                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-8 px-4 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05] whitespace-nowrap">
+                                <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#060608] via-[#060608]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
+                                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
+
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">Low-cost attestations (~$0.001)</span>
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Cost</span>
+                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">~$0.001 per attestation</span>
                                     </div>
-                                    <div className="w-px h-6 bg-white/10" />
+                                    <div className="w-px h-5 bg-white/10" />
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Latency</span>
+                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Speed</span>
                                         <span className="text-[9px] sm:text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Features Row — Infinite Carousel on Mobile */}
-                        <div className="relative mt-4 md:mt-8 mb-6 md:mb-8 -mx-4 sm:mx-0">
-                            <motion.div
-                                className="flex md:grid md:grid-cols-3 w-max md:w-full touch-pan-y cursor-grab active:cursor-grabbing md:cursor-default md:active:cursor-default relative z-30"
-                                animate={{ x: typeof window !== 'undefined' && window.innerWidth < 768 ? `-${whyIdx * 85}vw` : 0 }}
-                                transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
-                                onAnimationComplete={onAnimationComplete}
-                                drag={typeof window !== 'undefined' && window.innerWidth < 768 ? "x" : false}
-                                dragConstraints={{ left: -1000, right: 1000 }}
-                                dragElastic={0.2}
-                                onDragEnd={(e: any, info: any) => {
-                                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                                        if (info.offset.x < -40) handleWhyLoop(whyIdx + 1);
-                                        else if (info.offset.x > 40) handleWhyLoop(whyIdx - 1);
-                                    }
-                                }}
-                            >
-                                {[
-                                    {
-                                        id: "03",
-                                        title: "Portable Trust",
-                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        icon: Globe,
-                                    },
-                                    {
-                                        id: "01",
-                                        title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
-                                        icon: Activity,
-                                    },
-                                    {
-                                        id: "02",
-                                        title: "Claims to Proof",
-                                        desc: "Traditional resumes rely on trust. We anchor work history with attestations and on-chain records.",
-                                        icon: ShieldCheck,
-                                    },
-                                    {
-                                        id: "03",
-                                        title: "Portable Trust",
-                                        desc: "Your verified history can be shared across platforms, including LinkedIn, Twitter, or your own portfolio.",
-                                        icon: Globe,
-                                    },
-                                    {
-                                        id: "01",
-                                        title: "Beyond Profiles",
-                                        desc: "LinkedIn shows who you are. ChainVolio adds verifiable signals to what you've done.",
-                                        icon: Activity,
-                                    },
-                                ].map((feature, i) => (
-                                    <div
-                                        key={i}
-                                        className={`p-6 bg-transparent transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 md:px-12 md:p-10 pb-8 px-5 mx-2 md:mx-0 ${(i === 0 || i === 4) ? 'md:hidden' : ''}`}
-                                    >
-                                        <div className="space-y-4 relative z-10">
-                                            <span className="text-[10px] font-black text-white/25 tracking-widest">{feature.id}</span>
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2.5">
-                                                    <feature.icon size={16} className="text-white/50 flex-shrink-0" />
-                                                    <h3 className="text-[15px] font-bold text-white/70">{feature.title}</h3>
-                                                </div>
-                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
-                                                    {feature.desc}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Vertical Separator */}
-                                        {i > 0 && i < 3 && (
-                                            <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
-                                        )}
+                        {/* 3-column feature cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 border border-white/[0.06] rounded-2xl overflow-hidden">
+                            {[
+                                { id: "01", icon: User, title: "One Unified Profile", desc: "Every contribution — grants, project roles, DAO work — lives in a single portable identity you fully own." },
+                                { id: "02", icon: ShieldCheck, title: "On-Chain Attestation", desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims." },
+                                { id: "03", icon: Globe, title: "Portable Trust", desc: "Your verified history is shareable across platforms — LinkedIn, Twitter, or anywhere you share your work." },
+                            ].map((item, i) => (
+                                <div key={i} className={`p-6 md:p-8 space-y-3 ${i < 2 ? 'border-b md:border-b-0 md:border-r border-white/[0.06]' : ''}`}>
+                                    <span className="text-[10px] font-black text-white/20 tracking-widest">{item.id}</span>
+                                    <div className="flex items-center gap-2.5">
+                                        <item.icon size={15} className="text-white/40" />
+                                        <h3 className="text-[14px] font-bold text-white/70">{item.title}</h3>
                                     </div>
-                                ))}
-                            </motion.div>
-
-                            {/* Mobile Pagination Dots */}
-                            <div className="flex justify-center gap-1.5 mt-2 md:hidden relative z-50 mb-6">
-                                {[0, 1, 2].map((i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleWhyLoop(i + 1)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${(whyIdx === i + 1 || (i === 2 && whyIdx === 0) || (i === 0 && whyIdx === 4))
-                                                ? "w-8 bg-white"
-                                                : "w-1.5 bg-white/20"
-                                            }`}
-                                    />
-                                ))}
-                            </div>
+                                    <p className="text-[12px] text-white/30 leading-relaxed">{item.desc}</p>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Founder Quote */}
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="max-w-2xl mx-auto mt-6 md:mt-8 text-center px-6"
+                            className="max-w-2xl mx-auto mt-10 md:mt-14 text-center px-6"
                         >
                             <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
                             <p className="text-[12px] md:text-[13px] text-white/50 italic leading-relaxed mb-6 font-normal">
@@ -2124,10 +1877,11 @@ export function LandingPageClient() {
                             </div>
                         </motion.div>
                     </div>
+
                 </section>
 
-                <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black theme-bg-page">
-                    <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-black to-transparent pointer-events-none z-30"></div>
+                <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#060608] theme-bg-section">
+                    <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-[#060608] to-transparent pointer-events-none z-30"></div>
 
                     <div className="max-w-[1200px] mx-auto relative">
 
@@ -2179,7 +1933,7 @@ export function LandingPageClient() {
                             <div className="relative scale-[0.65] min-[440px]:scale-[0.75] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[350px] h-[650px] md:w-[1200px] md:h-[650px]">
                                 <div className="relative w-full h-full group">
                                     {/* Main Dashboard Mockup */}
-                                    <div className="theme-preserve w-full h-full bg-[#0a0a0a] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
+                                    <div className="theme-preserve w-full h-full bg-[#060608] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
                                         style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
                                     >
                                         <MockProfileUI />
@@ -2208,7 +1962,7 @@ export function LandingPageClient() {
                 </section>
 
                 {/* USE CASE SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#080808] theme-bg-section2">
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
                     <div className="max-w-[1200px] mx-auto space-y-16 relative z-10">
 
                         {/* BLOCK 2 — HIRING */}
@@ -2219,7 +1973,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 overflow-hidden bg-black theme-bg-page">
+                <section className="py-16 sm:py-20 md:py-24 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
                     {/* Subtle grid */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
                         backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
@@ -2232,8 +1986,8 @@ export function LandingPageClient() {
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
                     />
                     {/* Top + bottom fade */}
-                    <div className="theme-cta-fade absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
-                    <div className="theme-cta-fade absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+                    <div className="theme-cta-fade absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#060608] to-transparent pointer-events-none" />
+                    <div className="theme-cta-fade absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#060608] to-transparent pointer-events-none" />
 
                     <div className="relative max-w-[760px] mx-auto text-center z-10">
                         <motion.div
