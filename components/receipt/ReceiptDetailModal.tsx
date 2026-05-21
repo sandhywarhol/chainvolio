@@ -26,7 +26,7 @@ export function ReceiptDetailModal({ receipt, onClose }: ReceiptDetailModalProps
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div className="flex items-center gap-2.5">
                         {receipt.attestationType === "Hiring Proof"
-                            ? <ShieldCheck className="w-4.5 h-4.5" style={{ color: "rgba(255,255,255,0.5)" }} />
+                            ? <ShieldCheck className="w-[18px] h-[18px]" style={{ color: "rgba(255,255,255,0.5)" }} />
                             : <Briefcase className="w-[18px] h-[18px]" style={{ color: "rgba(255,255,255,0.5)" }} />
                         }
                         <h3 className="text-base font-bold" style={{ color: "rgba(255,255,255,0.88)" }}>
