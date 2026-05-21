@@ -2,13 +2,13 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { 
-    AlertCircle, 
-    ShieldCheck, 
-    Zap, 
-    BarChart3, 
-    ExternalLink, 
-    Layers, 
+import {
+    AlertCircle,
+    ShieldCheck,
+    Zap,
+    BarChart3,
+    ExternalLink,
+    Layers,
     ChevronRight,
     CircleDashed,
     CheckCircle2,
@@ -19,22 +19,22 @@ import {
 
 export default function WhyPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white bg-black theme-bg-page theme-aware">
 
             <Navbar />
 
             {/* Ambient Background Glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/[0.02] blur-[160px] rounded-full" />
-                <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/[0.02] blur-[160px] rounded-full" />
-                <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/[0.02] blur-[160px] rounded-full" />
+                <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-white/[0.01] blur-[160px] rounded-full" />
+                <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-white/[0.01] blur-[160px] rounded-full" />
+                <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-white/[0.01] blur-[160px] rounded-full" />
             </div>
 
-            {/* 1. HERO SECTION - Statement-driven, Editorial spacing */}
+            {/* 1. HERO SECTION */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <Layers className="w-3 h-3 text-teal-400" />
-                    <span className="text-caption text-teal-400/80">Introduction</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/[0.08] bg-white/[0.02] mb-8">
+                    <Layers className="w-3 h-3 text-white/40" />
+                    <span className="text-caption text-amber-200/60">Introduction</span>
                 </div>
 
                 <h1 className="text-h1 mb-8">
@@ -48,16 +48,16 @@ export default function WhyPage() {
 
             <div className="max-w-[1240px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
-            {/* 2. THE THRESHOLD - Problem vs Solution (Quiet Comparison) */}
+            {/* 2. THE THRESHOLD - Problem vs Solution */}
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
                     {/* The Old Way */}
-                    <div className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-red-500/20 transition-all duration-500">
+                    <div className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 transition-all duration-500">
                         <div className="space-y-6">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <AlertCircle className="w-4 h-4 text-red-500/40" />
-                                    <span className="text-caption text-red-500/40 font-bold">The Vulnerability</span>
+                                    <AlertCircle className="w-4 h-4 text-white/25" />
+                                    <span className="text-caption text-white/25 font-bold">The Vulnerability</span>
                                 </div>
                                 <h2 className="text-h2">Paper Credentials.</h2>
                                 <p className="text-body">
@@ -80,16 +80,15 @@ export default function WhyPage() {
                         </div>
                     </div>
 
-                    {/* The ChainVolio Way - Calm Confidence */}
-                    <div className="group relative p-8 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-emerald-500/30 transition-all duration-500 shadow-[0_20px_50px_rgba(16,185,129,0.05)]">
-                        {/* Subtle inner glow */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
-                        
+                    {/* The ChainVolio Way */}
+                    <div className="group relative p-8 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/20 transition-all duration-500">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] blur-3xl rounded-full pointer-events-none" />
+
                         <div className="space-y-6 relative z-10">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <ShieldCheck className="w-4 h-4 text-teal-400" />
-                                    <span className="text-caption text-teal-400">The Standard</span>
+                                    <ShieldCheck className="w-4 h-4 text-amber-200/60" />
+                                    <span className="text-caption text-amber-200/60">The Standard</span>
                                 </div>
                                 <h2 className="text-h2">On-Chain Reality.</h2>
                                 <p className="text-body text-white/60">
@@ -104,7 +103,7 @@ export default function WhyPage() {
                                     "Auditable integrity for institutional actors"
                                 ].map((item, i) => (
                                     <li key={i} className="flex items-center gap-3 text-white/90">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-white/50 shrink-0" />
                                         <span className="text-body text-inherit font-medium">{item}</span>
                                     </li>
                                 ))}
@@ -116,11 +115,11 @@ export default function WhyPage() {
 
             <div className="max-w-[1240px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
-            {/* 3. CORE PRINCIPLES - Grid without Card Heavy Design */}
+            {/* 3. CORE PRINCIPLES */}
             <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="max-w-xl mb-16">
                     <div className="flex items-center gap-2 mb-4">
-                        <Zap className="w-5 h-5 text-teal-400" />
+                        <Zap className="w-5 h-5 text-white/40" />
                         <h2 className="text-h2">Designed for Substance.</h2>
                     </div>
                     <p className="text-body">
@@ -152,7 +151,7 @@ export default function WhyPage() {
                         }
                     ].map((card, i) => (
                         <div key={i} className="group p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all duration-500">
-                            <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center text-teal-400 mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center text-white/40 mb-6 group-hover:scale-110 transition-transform duration-500">
                                 {card.icon}
                             </div>
                             <h3 className="text-h3 mb-2 flex items-center gap-2">
@@ -167,19 +166,19 @@ export default function WhyPage() {
 
             <div className="max-w-[1240px] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
 
-            {/* 4. THE COMPARISON - Understated Table */}
+            {/* 4. THE COMPARISON TABLE */}
             <section className="relative z-40 py-24 px-8 max-w-[1000px] mx-auto w-full">
                 <div className="text-center mb-16 space-y-4">
                     <div className="flex items-center justify-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-teal-400" />
+                        <BarChart3 className="w-5 h-5 text-white/40" />
                         <h2 className="text-h2">The Calibration</h2>
                     </div>
                     <p className="text-caption text-white/30">Truth vs Fabrication</p>
                 </div>
 
                 <div className="p-4 md:p-8 rounded-[32px] bg-white/[0.01] border border-white/5 backdrop-blur-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
-                    
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
                     {/* Desktop View */}
                     <div className="hidden md:block">
                         <table className="w-full text-left">
@@ -195,8 +194,8 @@ export default function WhyPage() {
                                         <td className="py-6 text-caption text-white/20 group-hover:text-white/40 transition-colors">{row[0]}</td>
                                         <td className="py-6 text-body text-white/20 text-center">{row[1]}</td>
                                         <td className="py-6 text-body text-white text-right">
-                                            <div className="inline-flex items-center justify-end gap-3 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 transition-all group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20">
-                                                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                            <div className="inline-flex items-center justify-end gap-3 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] transition-all group-hover:bg-white/[0.07] group-hover:border-white/20">
+                                                <span className="w-1 h-1 rounded-full bg-white/40 animate-pulse" />
                                                 {row[2]}
                                             </div>
                                         </td>
@@ -216,16 +215,16 @@ export default function WhyPage() {
                             ["Interoperability", "Systemic Isolation", "Universal Wallet-Native ID"]
                         ].map((row, i) => (
                             <div key={i} className="space-y-4 break-words">
-                                <div className="text-caption text-emerald-400/60 uppercase tracking-[0.3em] text-[10px]">{row[0]}</div>
+                                <div className="text-caption text-amber-200/60 uppercase tracking-[0.3em] text-[10px]">{row[0]}</div>
                                 <div className="grid grid-cols-1 gap-4">
                                     <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
                                         <div className="text-[10px] uppercase tracking-widest text-white/20 mb-1">Legacy</div>
                                         <div className="text-sm text-white/40">{row[1]}</div>
                                     </div>
-                                    <div className="p-4 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/10">
-                                        <div className="text-[10px] uppercase tracking-widest text-emerald-400/40 mb-1">ChainVolio</div>
+                                    <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                                        <div className="text-[10px] uppercase tracking-widest text-amber-200/60 mb-1">ChainVolio</div>
                                         <div className="text-sm text-white flex items-center gap-2">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                            <span className="w-1.5 h-1.5 rounded-full bg-white/40 shrink-0" />
                                             {row[2]}
                                         </div>
                                     </div>
@@ -236,15 +235,13 @@ export default function WhyPage() {
                 </div>
             </section>
 
-
-
-            {/* 5. CLOSING STATEMENT - Pure Typography */}
+            {/* 5. CLOSING STATEMENT */}
             <section className="relative z-40 py-40 px-8 text-center overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-emerald-500/[0.02] blur-[120px] rounded-full pointer-events-none" />
-                
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-white/[0.01] blur-[120px] rounded-full pointer-events-none" />
+
                 <div className="max-w-4xl mx-auto space-y-8 relative z-10">
                     <div className="flex flex-col items-center gap-6 mb-4">
-                        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-teal-400 shadow-2xl">
+                        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-white/40 shadow-2xl">
                             <ExternalLink className="w-8 h-8" />
                         </div>
                         <h2 className="text-h1 flex flex-col items-center">

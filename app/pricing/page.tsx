@@ -9,10 +9,10 @@ import { Toast } from "@/components/ui/Toast";
 
 // ─── Color palette (matches modal) ─────────────────────────────────────────
 const C = {
-    emerald: { text: "text-emerald-300", bg: "bg-emerald-500/5", border: "border-emerald-500/20", bar: "bg-emerald-400", glow: "shadow-emerald-500/10", hex: "#6ee7b7" },
-    pink:    { text: "text-rose-300",    bg: "bg-rose-500/5",    border: "border-rose-500/20",    bar: "bg-rose-400",    glow: "shadow-rose-500/10",    hex: "#fda4af" },
-    blue:    { text: "text-blue-300",    bg: "bg-blue-500/5",    border: "border-blue-500/20",    bar: "bg-blue-400",    glow: "shadow-blue-500/10",    hex: "#93c5fd" },
-    amber:   { text: "text-amber-300",   bg: "bg-amber-500/5",   border: "border-amber-500/20",   bar: "bg-amber-400",   glow: "shadow-amber-500/10",   hex: "#fcd34d" },
+    emerald: { text: "text-white/60",      bg: "bg-white/[0.03]",     border: "border-white/[0.08]",     bar: "bg-white/50",       glow: "shadow-white/5",        hex: "rgba(255,255,255,0.25)" },
+    pink:    { text: "text-white/50",      bg: "bg-white/[0.03]",     border: "border-white/[0.08]",     bar: "bg-white/40",       glow: "shadow-white/5",        hex: "rgba(255,255,255,0.2)" },
+    blue:    { text: "text-white/50",      bg: "bg-white/[0.03]",     border: "border-white/[0.08]",     bar: "bg-white/40",       glow: "shadow-white/5",        hex: "rgba(255,255,255,0.2)" },
+    amber:   { text: "text-amber-200/80",  bg: "bg-amber-200/[0.05]", border: "border-amber-200/15",     bar: "bg-amber-300/60",   glow: "shadow-amber-500/10",   hex: "#fcd34d" },
 } as const;
 type CK = keyof typeof C;
 
@@ -428,8 +428,8 @@ export default function PricingPage() {
                         },
                     ].map(({ icon: Icon, title, body }) => (
                         <div key={title} className="rounded-xl bg-white/[0.02] border border-white/6 p-6">
-                            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
-                                <Icon className="w-4 h-4 text-emerald-400" />
+                            <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4">
+                                <Icon className="w-4 h-4 text-white/40" />
                             </div>
                             <h3 className="text-[13px] font-black text-white mb-2">{title}</h3>
                             <p className="text-[12px] text-white/35 leading-relaxed font-medium">{body}</p>

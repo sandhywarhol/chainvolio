@@ -432,8 +432,8 @@ function DashboardBg() {
             </motion.div>
 
             {/* Gradient Masks for Edge Fade Out */}
-            <div className="absolute inset-y-0 left-0 w-32 md:w-64 bg-gradient-to-r from-black to-transparent z-10" />
-            <div className="absolute inset-y-0 right-0 w-32 md:w-64 bg-gradient-to-l from-black to-transparent z-10" />
+            <div className="absolute inset-y-0 left-0 w-32 md:w-64 bg-gradient-to-r from-[#060608] to-transparent z-10" />
+            <div className="absolute inset-y-0 right-0 w-32 md:w-64 bg-gradient-to-l from-[#060608] to-transparent z-10" />
         </div>
     );
 }
@@ -599,7 +599,7 @@ function PublicCVCardMockup() {
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
     return (
-        <section className="theme-preserve py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-black overflow-hidden">
+        <section className="theme-preserve py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#060608] overflow-hidden">
             
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_65%)] pointer-events-none" />
 
@@ -654,12 +654,12 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
 
                     {/* Edge vignette — softer, only darkens outer edges */}
                     <div className="absolute inset-0 pointer-events-none"
-                        style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent, black 95%)" }}
+                        style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent, #060608 95%)" }}
                     />
                     {/* Bottom fade — reduced on mobile to prevent covering the card */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 sm:h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 bottom-0 h-16 sm:h-32 bg-gradient-to-t from-[#060608] to-transparent pointer-events-none z-10" />
                     {/* Top fade — reduced on mobile */}
-                    <div className="absolute inset-x-0 top-0 h-16 sm:h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 top-0 h-16 sm:h-32 bg-gradient-to-b from-[#060608] to-transparent pointer-events-none z-10" />
 
                     {/* Foreground: CV Card floating on top */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pointer-events-none gap-4 md:gap-4">

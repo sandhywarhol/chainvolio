@@ -684,7 +684,7 @@ html[data-theme="light"] .theme-aware .theme-fade-from-black {
 
 /* ── Signal vs Noise Vignette & Background ── */
 .theme-signal-bg {
-  background-color: #000000 !important;
+  background-color: #060608 !important;
 }
 
 html[data-theme="light"] .theme-aware .theme-signal-bg {
@@ -692,7 +692,7 @@ html[data-theme="light"] .theme-aware .theme-signal-bg {
 }
 
 .theme-signal-vignette {
-  background: radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #000 92%);
+  background: radial-gradient(ellipse 68% 62% at 50% 50%, transparent 35%, #060608 92%);
 }
 
 html[data-theme="light"] .theme-aware .theme-signal-vignette {
@@ -700,11 +700,11 @@ html[data-theme="light"] .theme-aware .theme-signal-vignette {
 }
 
 .theme-signal-fade-to {
-  background: linear-gradient(to bottom, #000, transparent);
+  background: linear-gradient(to bottom, #060608, transparent);
 }
 
 .theme-signal-fade-from {
-  background: linear-gradient(to top, #000, transparent);
+  background: linear-gradient(to top, #060608, transparent);
 }
 
 html[data-theme="light"] .theme-aware .theme-signal-fade-to {

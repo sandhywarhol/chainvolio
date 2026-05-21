@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function WhitepaperPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white bg-black theme-bg-page theme-aware">
             {/* Very subtle noise texture */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -14,7 +14,7 @@ export default function WhitepaperPage() {
             {/* Hero Section */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[900px] mx-auto w-full text-center">
                 <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-teal-400/60">Whitepaper</span>
+                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-amber-200/60">Whitepaper</span>
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tighter text-white leading-[0.85] mb-8">
@@ -88,7 +88,7 @@ export default function WhitepaperPage() {
                     <div className="space-y-4 text-white/60 font-light leading-relaxed text-sm md:text-base">
                         <p>The full structured attestation payload is stored in the ChainVolio database. This includes: Ratings, Performance metrics, Text comments, Role descriptions, and Contributor names.</p>
                         <p>The canonical attestation data exists off-chain. However, the off-chain data is cryptographically bound to the on-chain hash.</p>
-                        <p className="border-l-2 border-teal-500/50 pl-4 py-1 italic">
+                        <p className="border-l-2 border-white/20 pl-4 py-1 italic">
                             If any character in the stored data is altered, the SHA-256 hash will no longer match the on-chain record. This renders the attestation cryptographically invalid.
                         </p>
                         <p>This creates strong integrity guarantees without incurring high on-chain storage costs.</p>
@@ -142,7 +142,7 @@ export default function WhitepaperPage() {
                     <div className="space-y-6 text-white/60 font-light leading-relaxed text-sm md:text-base">
 
                         <div className="border-l border-white/10 pl-6 relative">
-                            <div className="absolute w-2 h-2 bg-teal-500 rounded-full -left-[4.5px] top-1.5 shadow-[0_0_10px_rgba(20,184,166,0.5)]"></div>
+                            <div className="absolute w-2 h-2 bg-white/50 rounded-full -left-[4.5px] top-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"></div>
                             <h3 className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Phase 1</h3>
                             <p>Hybrid attestation infrastructure live on Solana. Wallet-signed attestations. Hash anchoring via SPL Memo. Off-chain structured data.</p>
                         </div>
@@ -197,7 +197,7 @@ export default function WhitepaperPage() {
                 <div className="pt-12 text-center py-12">
                     <p className="text-[12px] text-white/40 font-bold uppercase tracking-[0.6em] mb-2">Not speculative.</p>
                     <p className="text-[12px] text-white/40 font-bold uppercase tracking-[0.6em] mb-2">Not hype-driven.</p>
-                    <p className="text-[12px] text-teal-400 font-bold uppercase tracking-[0.6em]">Infrastructure first.</p>
+                    <p className="text-[12px] text-amber-200/60 font-bold uppercase tracking-[0.6em]">Infrastructure first.</p>
                 </div>
 
             </section>

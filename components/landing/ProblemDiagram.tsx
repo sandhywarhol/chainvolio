@@ -259,7 +259,15 @@ export default function ProblemDiagram() {
                     <mask id="signalMask" maskUnits="userSpaceOnUse">
                         <rect x="0" y="0" width={W} height={H} fill="url(#cloudAbsorption)" />
                     </mask>
+                    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+                        <stop offset="80%" stopColor="#94a3b8" stopOpacity="0.02" />
+                        <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+                    </radialGradient>
                 </defs>
+
+                {/* --- Center Ambient Glow --- */}
+                <ellipse cx="550" cy="240" rx="460" ry="190" fill="url(#centerGlow)" pointerEvents="none" />
 
                 {/* --- Narrative Stage Labels --- */}
                 <g style={{ opacity: 0.8 }}>

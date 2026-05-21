@@ -1749,18 +1749,30 @@ export function LandingPageClient() {
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
-                    {/* Header */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 text-center space-y-4 mb-10 md:mb-14">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                            <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40 uppercase">Verified Work History</span>
+                    {/* Header — split layout */}
+                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mb-10 md:mb-14">
+                        <div className="flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-16 pb-8">
+
+                            {/* Left: subtext — bottom aligned */}
+                            <div className="lg:flex-1">
+                                <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-md">
+                                    Work history is scattered and impossible to verify. ChainVolio anchors every contribution on-chain, cryptographically signed, portable, impossible to fake.
+                                </p>
+                            </div>
+
+                            {/* Right: pill + heading — right aligned */}
+                            <div className="flex flex-col items-end text-right space-y-6 lg:flex-1">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40 uppercase">Verified Work History</span>
+                                </div>
+                                <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.45]">
+                                    From noise to<br /><span className="text-amber-200/60">verifiable signal.</span>
+                                </h2>
+                            </div>
                         </div>
-                        <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.3]">
-                            From noise to <span className="text-amber-200/60">verifiable signal.</span>
-                        </h2>
-                        <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-xl mx-auto">
-                            Work history is scattered and impossible to verify. ChainVolio anchors every contribution on-chain — cryptographically signed, portable, impossible to fake.
-                        </p>
+                        {/* Full-width divider line — spans from left description to right heading */}
+                        <div className="h-px w-full bg-white/15" />
                     </div>
 
 
@@ -1872,7 +1884,7 @@ export function LandingPageClient() {
                                 </div>
                             </div>
                             <p className="text-[11px] text-white/25 italic">
-                                Recruiters see proof, not promises — real contributors rise above the noise.
+                                Recruiters see proof, not promises. Real contributors rise above the noise.
                             </p>
                         </div>
 

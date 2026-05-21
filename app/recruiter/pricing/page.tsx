@@ -9,11 +9,11 @@ import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import type { PlanName } from "@/lib/plans";
 
 const C = {
-    slate: { text: "text-slate-400", bg: "bg-slate-500/10", border: "border-slate-500/20", bar: "bg-slate-500", glow: "shadow-slate-500/20", hex: "#64748b" },
-    emerald: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", bar: "bg-emerald-500", glow: "shadow-emerald-500/20", hex: "#10b981" },
-    pink:    { text: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/20",    bar: "bg-pink-500",    glow: "shadow-pink-500/20",    hex: "#ec4899" },
-    blue:    { text: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20",    bar: "bg-blue-500",    glow: "shadow-blue-500/20",    hex: "#3b82f6" },
-    amber:   { text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20",   bar: "bg-amber-500",   glow: "shadow-amber-500/20",   hex: "#f59e0b" },
+    slate:   { text: "text-white/35",    bg: "bg-white/[0.02]",     border: "border-white/[0.06]",   bar: "bg-white/20",     glow: "shadow-white/5",        hex: "rgba(255,255,255,0.15)" },
+    emerald: { text: "text-white/55",    bg: "bg-white/[0.03]",     border: "border-white/[0.08]",   bar: "bg-white/45",     glow: "shadow-white/5",        hex: "rgba(255,255,255,0.2)" },
+    pink:    { text: "text-white/50",    bg: "bg-white/[0.03]",     border: "border-white/[0.08]",   bar: "bg-white/40",     glow: "shadow-white/5",        hex: "rgba(255,255,255,0.18)" },
+    blue:    { text: "text-white/50",    bg: "bg-white/[0.03]",     border: "border-white/[0.08]",   bar: "bg-white/40",     glow: "shadow-white/5",        hex: "rgba(255,255,255,0.18)" },
+    amber:   { text: "text-amber-200/80", bg: "bg-amber-200/[0.05]", border: "border-amber-200/15",  bar: "bg-amber-300/60", glow: "shadow-amber-500/10",   hex: "#f59e0b" },
 } as const;
 type CK = keyof typeof C;
 
@@ -196,7 +196,7 @@ export default function RecruiterPricingPage() {
 
             {/* Background texture */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.05),transparent)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,255,255,0.02),transparent)]" />
                 <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
             </div>
 
@@ -204,13 +204,13 @@ export default function RecruiterPricingPage() {
 
                 {/* Hero */}
                 <div className="text-center mb-16 md:mb-20">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.02] border border-white/[0.08] text-amber-200/60 text-[10px] font-black uppercase tracking-[0.2em] mb-5">
                         <Building2 className="w-3 h-3" />
                         For Organizations &amp; Recruiters
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 leading-none">
                         Get Your Organization{" "}
-                        <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
+                        <span className="text-amber-200/60">
                             Verified
                         </span>
                     </h1>
@@ -239,7 +239,7 @@ export default function RecruiterPricingPage() {
                                     </div>
                                 )}
                                 {isCurrent && (
-                                    <div className="absolute top-0 right-4 text-[8px] font-black uppercase tracking-widest text-white px-2.5 py-1.5 rounded-b-lg bg-emerald-500">
+                                    <div className="absolute top-0 right-4 text-[8px] font-black uppercase tracking-widest text-black px-2.5 py-1.5 rounded-b-lg bg-white/60">
                                         Current Plan
                                     </div>
                                 )}

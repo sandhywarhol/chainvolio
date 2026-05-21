@@ -19,10 +19,10 @@ function StatCard({
     icon: React.ReactNode; value: string; label: string; sub: string; color: string 
 }) {
     const colorClasses = {
-        indigo: "border-indigo-500/10 bg-indigo-500/[0.02]",
-        emerald: "border-emerald-500/10 bg-emerald-500/[0.02]",
+        indigo: "border-white/[0.06] bg-white/[0.02]",
+        emerald: "border-white/[0.06] bg-white/[0.02]",
         amber: "border-amber-200/10 bg-amber-200/[0.02]",
-        cyan: "border-cyan-500/10 bg-cyan-500/[0.02]",
+        cyan: "border-white/[0.06] bg-white/[0.02]",
     }[color as 'indigo' | 'emerald' | 'amber' | 'cyan'];
 
     return (
@@ -163,7 +163,7 @@ function ExploreTalentInner() {
                 <div className="lg:col-span-7 space-y-8">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mb-6">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Talent Ecosystem</span>
                         </div>
                         <h1 className="text-h1 mb-6">
@@ -220,14 +220,14 @@ function ExploreTalentInner() {
 
                 <div className="lg:col-span-5 grid grid-cols-2 gap-4">
                     <StatCard
-                        icon={<Users className="w-5 h-5 text-indigo-400" />}
+                        icon={<Users className="w-5 h-5 text-white/40" />}
                         value={stats.talents != null ? `${stats.talents}+` : "—"}
                         label="Talents"
                         sub="Active creators in the network"
                         color="indigo"
                     />
                     <StatCard
-                        icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
+                        icon={<ShieldCheck className="w-5 h-5 text-white/40" />}
                         value={stats.verifiedProofs != null || stats.verified != null ? `${stats.verifiedProofs ?? stats.verified}+` : "—"}
                         label="Verified"
                         sub="Proof of work verified"
@@ -241,7 +241,7 @@ function ExploreTalentInner() {
                         color="amber"
                     />
                     <StatCard
-                        icon={<Globe className="w-5 h-5 text-cyan-400" />}
+                        icon={<Globe className="w-5 h-5 text-white/40" />}
                         value={stats.countries != null ? `${stats.countries}+` : "—"}
                         label="Countries"
                         sub="Global talent community"
@@ -357,7 +357,7 @@ function ExploreTalentInner() {
                         <div>
                             <div className="mb-6">
                                 <div className="flex items-center gap-3 mb-1.5">
-                                    <div className="w-1 h-4 bg-emerald-400 rounded-full" />
+                                    <div className="w-1 h-4 bg-white/30 rounded-full" />
                                     <h2 className="text-xl font-bold text-white tracking-tight">Featured Creators</h2>
                                 </div>
                                 <p className="text-[12px] text-white/40 pl-4">
@@ -387,7 +387,7 @@ function ExploreTalentInner() {
                         <div>
                             <div className="relative mb-12 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                                 {/* Background Glow */}
-                                <div className="absolute -left-24 -top-24 w-64 h-64 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+                                <div className="absolute -left-24 -top-24 w-64 h-64 bg-white/[0.01] rounded-full blur-[100px] pointer-events-none" />
                                 
                                 <div className="relative space-y-4 max-w-2xl">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
@@ -418,8 +418,8 @@ function ExploreTalentInner() {
                                         />
                                     </div>
                                     <div className="w-full sm:w-auto min-w-[160px]">
-                                        <StatCard 
-                                            icon={<ShieldCheck className="w-5 h-5 text-indigo-400" />}
+                                        <StatCard
+                                            icon={<ShieldCheck className="w-5 h-5 text-white/40" />}
                                             value={`${stats.verifiedProofs}`}
                                             label="Attestations"
                                             sub="Given by orgs"
@@ -427,8 +427,8 @@ function ExploreTalentInner() {
                                         />
                                     </div>
                                     <div className="w-full sm:w-auto min-w-[160px]">
-                                        <StatCard 
-                                            icon={<BadgeCheck className="w-5 h-5 text-emerald-400" />}
+                                        <StatCard
+                                            icon={<BadgeCheck className="w-5 h-5 text-white/40" />}
                                             value={`${stats.endorsedTalents}`}
                                             label="Endorsed"
                                             sub="Unique talents"
