@@ -74,7 +74,7 @@ function getLandDots(): Promise<Float32Array> {
       return [x0, x1, y0, y1];
     });
 
-    const TARGET = 2400;
+    const TARGET = 800;
     const buf = new Float32Array(TARGET * 4);
     let count = 0, tries = 0;
 
@@ -269,7 +269,7 @@ export default function GlobeCanvas({ className }: { className?: string }) {
 
       const dots = dotsRef.current;
       const n = dots.length / 4;
-      const R = (Math.min(dims.w, dims.h) / 2) * dpr;
+      const R = (Math.min(dims.w, dims.h) / 2) * 0.70 * dpr;
       const cx = (size / 2) * dpr, cy = (size / 2) * dpr;
 
       ctx.clearRect(0, 0, canvas!.width, canvas!.height);
@@ -347,17 +347,24 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         const depth = (erz + 1) * 0.5;
 
 
-        // Stronger organic pulse
-        const pulse = (
-          Math.sin(time * (0.012 + rand * 0.008) + rand * 20) * 0.7 + 
-          Math.sin(time * (0.03 + rand * 0.015) + rand * 10) * 0.3
-        ) * 0.5 + 0.5;
-        
-        // Twinkle (kelap-kelip) effect
-        const twinkle = Math.sin(time * (0.06 + rand * 0.04) + rand * 100) * 0.5 + 0.5;
+        const isHub = networkRef.current?.hubs.some(h => h.idx === i);
 
-        const alpha = Math.min(0.98, (0.15 + depth * 0.35 + elev * 0.45) * (0.6 + rand * 0.4) * (0.5 + pulse * 0.5) * (0.7 + twinkle * 0.3));
-        const radius = (0.35 + depth * 0.5 + elev * 2.5 + rand * 0.8 + pulse * 0.4) * dpr;
+        let alpha, radius;
+        if (isHub || rand > 0.97) {
+          // Active/prominent dots pulse and twinkle slightly
+          const pulse = (
+            Math.sin(time * (0.012 + rand * 0.008) + rand * 20) * 0.7 + 
+            Math.sin(time * (0.03 + rand * 0.015) + rand * 10) * 0.3
+          ) * 0.5 + 0.5;
+          const twinkle = Math.sin(time * (0.06 + rand * 0.04) + rand * 100) * 0.5 + 0.5;
+          
+          alpha = Math.min(0.98, (0.25 + depth * 0.45 + elev * 0.4) * (0.7 + rand * 0.3) * (0.8 + twinkle * 0.2));
+          radius = (0.8 + depth * 0.9 + elev * 2.5 + pulse * 0.4) * dpr;
+        } else {
+          // Standard background dots are stable, clear and sharp (no flickering or glow)
+          alpha = (0.28 + depth * 0.42) * (0.75 + rand * 0.25);
+          radius = (0.75 + depth * 0.65) * dpr;
+        }
 
         ctx.fillStyle = "#ffffff";
         ctx.globalAlpha = alpha;
@@ -365,12 +372,11 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Subtler glow for prominent dots
-        if (rand > 0.94) {
-          const isHub = networkRef.current?.hubs.some(h => h.idx === i);
-          ctx.globalAlpha = alpha * (isHub ? 0.6 : 0.25);
+        // Hubs have a distinct, clean glow to emphasize connectivity
+        if (isHub) {
+          ctx.globalAlpha = alpha * 0.4;
           ctx.beginPath();
-          ctx.arc(sx, sy, radius * (isHub ? 3.5 : 2.2), 0, Math.PI * 2);
+          ctx.arc(sx, sy, radius * 3.5, 0, Math.PI * 2);
           const hubColor = networkRef.current?.hubs.find(h => h.idx === i)?.color;
           ctx.fillStyle = hubColor || "#ffffff";
           ctx.fill();
@@ -596,7 +602,7 @@ export default function GlobeCanvas({ className }: { className?: string }) {
     // Map container position → canvas-relative position
     const cx = nx * (dims.w / sz) + (sz - dims.w) / 2 / sz;
     const cy = ny * (dims.h / sz) + (sz - dims.h) / 2 / sz;
-    const onGlobe = Math.hypot(cx - 0.5, cy - 0.5) < 0.47;
+    const onGlobe = Math.hypot(cx - 0.5, cy - 0.5) < 0.38;
     pauseRef.current = onGlobe;
     cursorRef.current = onGlobe ? { x: nx, y: ny } : null;
   }

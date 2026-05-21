@@ -1778,10 +1778,10 @@ export function LandingPageClient() {
 
                     {/* Split Visuals */}
                     <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+                        <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 mb-3">
 
                             {/* Left: Noise Animation */}
-                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
+                            <div className="relative w-full h-[200px] sm:h-[280px] md:h-[340px] lg:flex-1 lg:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
                                 <div className="absolute top-4 left-4 z-20">
                                     <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Problem</span>
                                 </div>
@@ -1828,13 +1828,13 @@ export function LandingPageClient() {
                             </div>
 
                             {/* Right: Globe — Trust Network */}
-                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
+                            <div className="relative w-[200px] h-[200px] sm:w-[280px] sm:h-[280px] md:w-[340px] md:h-[340px] lg:w-[340px] lg:h-[340px] mx-auto lg:mx-0 flex-shrink-0 overflow-hidden">
                                 <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
                                     <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Solution</span>
                                 </div>
 
-                                <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.95] sm:scale-[1.05] md:scale-[1.15] theme-globe-canvas" />
+                                <GlobeCanvas className="absolute inset-0 w-full h-full theme-globe-canvas" />
 
                                 <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#060608] via-[#060608]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
                                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
@@ -1853,20 +1853,41 @@ export function LandingPageClient() {
                             </div>
                         </div>
 
+
                         {/* 3-column feature cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 border border-white/[0.06] rounded-2xl overflow-hidden">
+                        <div className="grid grid-cols-1 md:grid-cols-3 mt-8 relative overflow-hidden">
                             {[
                                 { id: "01", icon: User, title: "One Unified Profile", desc: "Every contribution, such as grants, project roles, or DAO work, lives in a single portable identity you fully own." },
                                 { id: "02", icon: ShieldCheck, title: "On-Chain Attestation", desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims." },
                                 { id: "03", icon: Globe, title: "Portable Trust", desc: "Your verified history is shareable across platforms like LinkedIn, Twitter, or anywhere you share your work." },
                             ].map((item, i) => (
-                                <div key={i} className={`p-6 md:p-8 space-y-3 ${i < 2 ? 'border-b md:border-b-0 md:border-r border-white/[0.06]' : ''}`}>
-                                    <span className="text-[10px] font-black text-white/20 tracking-widest">{item.id}</span>
-                                    <div className="flex items-center gap-2.5">
-                                        <item.icon size={15} className="text-white/40" />
-                                        <h3 className="text-[14px] font-bold text-white/70">{item.title}</h3>
+                                <div key={i} className="p-6 transition-colors group relative px-5">
+                                    <div className="flex items-start gap-6">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl ${
+                                            theme === 'light'
+                                            ? 'bg-brand-cyan border border-brand-cyan shadow-cyan-900/10 theme-preserve'
+                                            : 'bg-white/10 group-hover:bg-white border border-white/10 shadow-black/5'
+                                        }`}>
+                                            <item.icon size={20} className={`transition-colors duration-500 ${
+                                                theme === 'light' ? 'text-white' : 'text-white/60 group-hover:text-black'
+                                            }`} />
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-black text-white/40 tracking-widest">{item.id}</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-[15px] font-bold text-white/70 transition-colors">{item.title}</h3>
+                                                <p className="text-[13px] text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">{item.desc}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p className="text-[12px] text-white/30 leading-relaxed">{item.desc}</p>
+
+                                    {/* Vertical Separator */}
+                                    {i < 2 && (
+                                        <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent theme-fade-border" />
+                                    )}
                                 </div>
                             ))}
                         </div>
