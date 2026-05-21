@@ -18,7 +18,7 @@ import {
 
 export default function TrustPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white pb-20 bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white pb-20 bg-black theme-bg-page theme-aware">
             {/* Refined noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -26,15 +26,15 @@ export default function TrustPage() {
 
             {/* Ambient Background Glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[10%] -left-[5%] w-[40%] h-[40%] bg-emerald-500/[0.03] blur-[120px] rounded-full" />
-                <div className="absolute bottom-[20%] -right-[5%] w-[35%] h-[35%] bg-blue-500/[0.03] blur-[120px] rounded-full" />
+                <div className="absolute top-[10%] -left-[5%] w-[40%] h-[40%] bg-white/[0.01] blur-[120px] rounded-full" />
+                <div className="absolute bottom-[20%] -right-[5%] w-[35%] h-[35%] bg-white/[0.01] blur-[120px] rounded-full" />
             </div>
 
             {/* Hero Section */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <Shield className="w-3 h-3 text-emerald-400" />
-                    <span className="text-caption text-emerald-400/80">Trust Architecture</span>
+                    <Shield className="w-3 h-3 text-white/40" />
+                    <span className="text-caption text-amber-200/60">Trust Architecture</span>
                 </div>
 
                 <h1 className="text-h1 mb-8">
@@ -55,7 +55,7 @@ export default function TrustPage() {
                     <div className="space-y-10 group/section">
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/40">
                                     <Lock className="w-5 h-5" />
                                 </div>
                                 <h2 className="text-h2">What We Enforce</h2>
@@ -71,13 +71,13 @@ export default function TrustPage() {
                             ].map((item, i) => (
                                 <article key={i} className="relative h-full flex flex-col p-8 rounded-[32px] bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden group/card">
                                     <div className="flex gap-4 items-start">
-                                        <div className="p-2 rounded-lg bg-emerald-500/5 text-emerald-400/60 group-hover/card:text-emerald-400 group-hover/card:bg-emerald-500/10 transition-colors">
+                                        <div className="p-2 rounded-lg bg-white/[0.03] text-white/30 group-hover/card:text-white/60 group-hover/card:bg-white/[0.06] transition-colors">
                                             {item.icon}
                                         </div>
                                         <div>
                                             <h3 className="text-caption mb-1.5 flex items-center gap-2">
                                                 {item.title}
-                                                <CheckCircle2 className="w-3 h-3 text-emerald-500/40" />
+                                                <CheckCircle2 className="w-3 h-3 text-white/25" />
                                             </h3>
                                             <p className="text-body group-hover/card:text-white/60 transition-colors">{item.text}</p>
                                         </div>
@@ -123,12 +123,12 @@ export default function TrustPage() {
 
             {/* Closing Line */}
             <section className="relative z-40 py-40 px-8 text-center border-t border-white/5 overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-emerald-500/[0.02] blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-white/[0.01] blur-[120px] rounded-full pointer-events-none" />
                 
                 <div className="max-w-4xl mx-auto space-y-8 relative z-10">
                     <div className="flex flex-col items-center gap-6 mb-4">
                         <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl relative group p-4">
-                            <div className="w-16 h-16 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-emerald-400 shadow-2xl">
+                            <div className="w-16 h-16 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-white/40 shadow-2xl">
                                 <Shield className="w-8 h-8" />
                             </div>
                         </div>
@@ -142,7 +142,7 @@ export default function TrustPage() {
                     </p>
                     <div className="pt-8">
                         <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/10 text-white/60 hover:text-white transition-all cursor-default">
-                            <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+                            <ArrowUpRight className="w-5 h-5 text-white/40" />
                             <span className="text-caption text-inherit">Built on Solana</span>
                         </div>
                     </div>

@@ -611,7 +611,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         <div className="max-w-2xl space-y-5">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/40">WEB3 RESUME</span>
+                                <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Web3 Resume</span>
                             </div>
                             <div className="space-y-3">
                                 <p className="text-[13px] md:text-[15px] font-normal text-white/60 tracking-tight">What is a Web3 Resume?</p>

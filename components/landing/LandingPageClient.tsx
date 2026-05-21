@@ -565,7 +565,7 @@ function AttestationBlock() {
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/40">Verifiable Work History with On-Chain Attestations</span>
+                        <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Verifiable Work History with On-Chain Attestations</span>
                     </div>
                     <h3 className="text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.06] mb-5">
                         Proof of work,<br /><span className="text-amber-200/60">not claims.</span>
@@ -1019,7 +1019,7 @@ function HiringBlock() {
                 <div className="space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] text-white/40">How to Hire Verified Web3 Talent</span>
+                        <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">How to Hire Verified Web3 Talent</span>
                     </div>
                     <h3 className="text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.06]">
                         Hire based on real proof,<br /><span className="text-amber-200/60">not profiles.</span>
@@ -1627,7 +1627,7 @@ export function LandingPageClient() {
                             {/* Pill Badge */}
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
                                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                <span className="text-[10px] md:text-[11px] font-black tracking-[0.1em] text-white/40 uppercase">Why Web3 Hiring Is Broken</span>
+                                <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Why Web3 Hiring Is Broken</span>
                             </div>
 
                             <h2 className="text-[22px] sm:text-3xl md:text-4xl lg:text-[44px] font-bold tracking-tighter leading-[1.1] text-white max-w-6xl mx-auto whitespace-normal md:whitespace-nowrap">
@@ -1764,10 +1764,10 @@ export function LandingPageClient() {
                             <div className="flex flex-col items-end text-right space-y-6 lg:flex-1">
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                     <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                    <span className="text-[10px] md:text-[11px] font-black tracking-[0.08em] text-white/40 uppercase">Verified Work History</span>
+                                    <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Verified Work History</span>
                                 </div>
-                                <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.45]">
-                                    From noise to<br /><span className="text-amber-200/60">verifiable signal.</span>
+                                <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.45] whitespace-normal md:whitespace-nowrap">
+                                    From noise to <span className="text-amber-200/60">verifiable signal.</span>
                                 </h2>
                             </div>
                         </div>
@@ -1834,7 +1834,7 @@ export function LandingPageClient() {
                                     <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Solution</span>
                                 </div>
 
-                                <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.65] sm:scale-[0.70] theme-globe-canvas" />
+                                <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.95] sm:scale-[1.05] md:scale-[1.15] theme-globe-canvas" />
 
                                 <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#060608] via-[#060608]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
                                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
@@ -1856,9 +1856,9 @@ export function LandingPageClient() {
                         {/* 3-column feature cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 border border-white/[0.06] rounded-2xl overflow-hidden">
                             {[
-                                { id: "01", icon: User, title: "One Unified Profile", desc: "Every contribution — grants, project roles, DAO work — lives in a single portable identity you fully own." },
+                                { id: "01", icon: User, title: "One Unified Profile", desc: "Every contribution, such as grants, project roles, or DAO work, lives in a single portable identity you fully own." },
                                 { id: "02", icon: ShieldCheck, title: "On-Chain Attestation", desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims." },
-                                { id: "03", icon: Globe, title: "Portable Trust", desc: "Your verified history is shareable across platforms — LinkedIn, Twitter, or anywhere you share your work." },
+                                { id: "03", icon: Globe, title: "Portable Trust", desc: "Your verified history is shareable across platforms like LinkedIn, Twitter, or anywhere you share your work." },
                             ].map((item, i) => (
                                 <div key={i} className={`p-6 md:p-8 space-y-3 ${i < 2 ? 'border-b md:border-b-0 md:border-r border-white/[0.06]' : ''}`}>
                                     <span className="text-[10px] font-black text-white/20 tracking-widest">{item.id}</span>
@@ -1918,7 +1918,7 @@ export function LandingPageClient() {
                         <div className="text-left space-y-6 mb-6">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
                                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.08em] text-white/40">Build a Verifiable Web3 Resume with On-Chain Proof</span>
+                                <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Build a Verifiable Web3 Resume with On-Chain Proof</span>
                             </div>
                             <h3 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold text-white tracking-tight leading-[1.3]">
                                 Build a reputation <span className="text-amber-200/60">that travels.</span>
@@ -2003,13 +2003,7 @@ export function LandingPageClient() {
 
                 {/* 5. FINAL CTA */}
                 <section className="py-16 sm:py-20 md:py-24 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
-                    {/* Subtle grid */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
-                        backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-                        backgroundSize: "88px 88px",
-                        maskImage: "radial-gradient(circle at center, white 0%, transparent 80%)",
-                        WebkitMaskImage: "radial-gradient(circle at center, white 0%, transparent 80%)"
-                    }} />
+
                     {/* Radial glow center */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] rounded-full pointer-events-none"
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
@@ -2025,14 +2019,10 @@ export function LandingPageClient() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.9, ease: "easeOut" }}
                         >
-                            <h2 className="text-[28px] md:text-[40px] font-bold text-white mb-6 tracking-tight leading-[1.06]">
+                            <h2 className="text-[28px] md:text-[40px] font-bold text-white mb-10 tracking-tight leading-[1.06]">
                                 Start Building Your<br />
                                 <span className="text-amber-200/60">Verifiable Web3 Resume.</span>
                             </h2>
-                            <p className="text-white/40 text-[12px] md:text-[13px] mb-12 max-w-lg mx-auto leading-relaxed font-normal">
-                                Signed by real people. Anchored on Solana.<br />
-                                Cryptographically verified. Share anywhere with one link.
-                            </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 px-4">
                                 <button

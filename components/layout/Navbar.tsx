@@ -158,10 +158,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     <Link
                         href="/verified-organization"
                         className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${isVerified
-                            ? verifierTier === 3
-                                ? "bg-teal-500/10 border-teal-400/20 text-teal-400"
-                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                            ? "bg-white/[0.04] border-white/[0.12] text-white/70"
+                            : "bg-white/[0.02] border-white/[0.08] text-amber-200/60 hover:bg-white/[0.05]"
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -237,7 +235,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             {/* Header */}
                             <div className="flex items-center justify-between p-6 border-b border-white/[0.05] bg-black/20">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
+                                    <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/10">
                                         <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-5 h-5 object-contain" />
                                     </div>
                                     <span className="font-black text-white tracking-tight uppercase text-xs">Navigation</span>
@@ -261,7 +259,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Explore Platform</p>
                                             <div className="flex flex-col gap-2">
                                                 <MobileNavLink
-                                                    icon={<Layers className="w-5 h-5 text-emerald-400" />}
+                                                    icon={<Layers className="w-5 h-5 text-white/40" />}
                                                     label="Products"
                                                     hasSubmenu
                                                     onClick={() => setActiveMobilePanel('products')}
@@ -279,7 +277,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                     onClick={() => setIsMobileMenuOpen(false)}
                                                 />
                                                 <MobileNavLink
-                                                    icon={<BookOpen className="w-5 h-5 text-indigo-400" />}
+                                                    icon={<BookOpen className="w-5 h-5 text-white/40" />}
                                                     label="Guides"
                                                     hasSubmenu
                                                     onClick={() => setActiveMobilePanel('guides')}
@@ -296,7 +294,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                         href="/dashboard" 
                                                         icon={<LayoutGrid className="w-5 h-5" />} 
                                                         label="Dashboard" 
-                                                        color="text-emerald-400"
+                                                        color="text-white/60"
                                                         onClick={() => setIsMobileMenuOpen(false)} 
                                                     />
                                                 )}
@@ -499,7 +497,7 @@ function MobileNavLink({ href, icon, label, onClick, color = "text-white/60", ha
                     {label}
                 </span>
             </div>
-            <ChevronRight className={`w-4 h-4 transition-colors ${hasSubmenu ? 'text-emerald-500' : 'text-slate-700'}`} />
+            <ChevronRight className={`w-4 h-4 transition-colors ${hasSubmenu ? 'text-white/30' : 'text-slate-700'}`} />
         </div>
     );
 

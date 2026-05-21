@@ -5,14 +5,14 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function AboutPage() {
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white bg-black theme-bg-page theme-aware">
 
             <Navbar />
 
             {/* Hero Section */}
             <section className="relative z-40 pt-24 pb-20 px-4 md:px-8 max-w-[1240px] mx-auto w-full text-center">
                 <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-teal-400/60">Platform Mission</span>
+                    <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-amber-200/60">Platform Mission</span>
                 </div>
 
                 <h1 className="text-3xl sm:text-5xl md:text-[80px] font-bold font-display tracking-tight text-white leading-[0.85] mb-8">
@@ -32,7 +32,7 @@ export default function AboutPage() {
 
                     {/* What is Chainvolio */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">01. Definition</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">01. Definition</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">What Is ChainVolio?</h2>
                         <p className="text-white/40 font-medium leading-relaxed">
                             ChainVolio is a Web3-native professional trust infrastructure. It enables professionals, peers, and recruiters to record verifiable career milestones as permanent on-chain transactions.
@@ -50,7 +50,7 @@ export default function AboutPage() {
 
                     {/* Why Chainvolio Exists */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">02. Purpose</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">02. Purpose</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Why We Exist.</h2>
                         <p className="text-white/40 font-medium leading-relaxed">
                             Web3 hiring is uniquely challenging. Teams are global, remote, and often pseudonymous. In this environment, trust cannot rely on institutional credentials alone.
@@ -62,7 +62,7 @@ export default function AboutPage() {
 
                     {/* What It Is and Is Not */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">03. Framework</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">03. Framework</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Scope and Limitations.</h2>
                         <p className="text-white/40 font-medium leading-relaxed">
                             It is important to understand what ChainVolio is and is not. ChainVolio provides infrastructure for recording professional claims and attestations as blockchain transactions.
@@ -74,7 +74,7 @@ export default function AboutPage() {
 
                     {/* Who Is Behind Chainvolio */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">04. The Core</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">04. The Core</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Behind the Project.</h2>
                         <p className="text-white/40 font-medium leading-relaxed">
                             ChainVolio is an independent, builder-led initiative focused on decentralized identity and the future of work. The project is grounded in real-world industry experience and long-term infrastructure thinking rather than short-term trends.
@@ -86,7 +86,7 @@ export default function AboutPage() {
 
                     {/* Vision */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">05. The Goal</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">05. The Goal</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Long-Term Vision.</h2>
                         <p className="text-white/40 font-medium leading-relaxed">
                             Our goal is for a ChainVolio profile to become the default professional link in Web3. When someone says “drop your CV,” it should mean sharing a verifiable on-chain history.
@@ -98,7 +98,7 @@ export default function AboutPage() {
 
                     {/* Contact Section */}
                     <div className="space-y-6">
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-teal-400/60 font-bold">06. Connection</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60 font-bold">06. Connection</span>
                         <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Get in Touch.</h2>
                         <div className="grid grid-cols-1 gap-4">
                             <a href="mailto:sandhywarhol@gmail.com" className="p-6 rounded-xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.04] transition-colors">

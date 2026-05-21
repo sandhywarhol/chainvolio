@@ -26,7 +26,7 @@ export default function StatusPage() {
     ];
 
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white pb-20 bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white pb-20 bg-black theme-bg-page theme-aware">
             {/* Refined noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -36,7 +36,7 @@ export default function StatusPage() {
                 {/* Hero Section */}
                 <section className="relative z-40 pt-32 pb-12 px-8 max-w-[1240px] mx-auto w-full text-center">
                     <div className="inline-block px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-4">
-                        <span className="text-caption text-emerald-400/80">Transparency</span>
+                        <span className="text-caption text-amber-200/60">Transparency</span>
                     </div>
 
                     <h1 className="text-h1 mb-8">

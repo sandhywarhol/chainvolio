@@ -25,7 +25,7 @@ export default function SecurityPage() {
     const [showPdfNotice, setShowPdfNotice] = useState(false);
 
     return (
-        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500/30 selection:text-white bg-black theme-bg-page theme-aware">
             {/* Refined noise texture overlay */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -33,15 +33,15 @@ export default function SecurityPage() {
 
             {/* Ambient Background Glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[15%] -left-[5%] w-[45%] h-[45%] bg-emerald-500/[0.03] blur-[150px] rounded-full" />
-                <div className="absolute bottom-[20%] -right-[5%] w-[40%] h-[40%] bg-blue-500/[0.03] blur-[150px] rounded-full" />
+                <div className="absolute top-[15%] -left-[5%] w-[45%] h-[45%] bg-white/[0.01] blur-[150px] rounded-full" />
+                <div className="absolute bottom-[20%] -right-[5%] w-[40%] h-[40%] bg-white/[0.01] blur-[150px] rounded-full" />
             </div>
 
             {/* 1. HERO SECTION */}
             <section className="relative z-40 pt-24 pb-20 px-8 max-w-[1240px] mx-auto w-full text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/[0.02] mb-8">
-                    <Lock className="w-3 h-3 text-emerald-400" />
-                    <span className="text-caption text-emerald-400/80">System Posture</span>
+                    <Lock className="w-3 h-3 text-white/40" />
+                    <span className="text-caption text-amber-200/60">System Posture</span>
                 </div>
 
                 <h1 className="text-h1 mb-8">
@@ -64,7 +64,7 @@ export default function SecurityPage() {
             {/* 2. CORE SECURITY PRINCIPLES */}
             <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="mb-16 flex items-center gap-3">
-                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                    <ShieldCheck className="w-5 h-5 text-white/40" />
                     <h2 className="text-h2">
                         Core Security Principles
                     </h2>
@@ -87,14 +87,14 @@ export default function SecurityPage() {
                             desc: "ChainVolio does not custody keys. Identity authority remains with user wallets. We only verify cryptographic proofs."
                         }
                     ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-emerald-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(16,185,129,0.02)]">
-                            <div className="p-3 rounded-xl bg-emerald-500/5 text-emerald-400 mb-8 group-hover:bg-emerald-500/10 group-hover:text-emerald-300 transition-all w-fit">
+                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-white/10 transition-all duration-500 group">
+                            <div className="p-3 rounded-xl bg-white/[0.04] text-white/40 mb-8 group-hover:bg-white/[0.08] group-hover:text-white/60 transition-all w-fit">
                                 {item.icon}
                             </div>
                             <h3 className="text-caption text-white font-bold mb-4">{item.title}</h3>
                             <p className="text-body group-hover:text-white/50 mb-6">{item.desc}</p>
                             <div className="pt-4 border-t border-white/[0.05] flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40 animate-pulse" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
                                 <span className="text-caption !tracking-[0.15em] opacity-40 group-hover:opacity-60 transition-opacity">Verified Invariant</span>
                             </div>
                         </div>
@@ -107,7 +107,7 @@ export default function SecurityPage() {
             {/* 3. ISOLATION & ABUSE RESISTANCE */}
             <section className="relative z-40 py-24 px-8 max-w-[1240px] mx-auto w-full">
                 <div className="mb-16 flex items-center gap-3">
-                    <Activity className="w-5 h-5 text-blue-400" />
+                    <Activity className="w-5 h-5 text-white/40" />
                     <h2 className="text-h2">
                         Isolation & Abuse Resistance
                     </h2>
@@ -130,14 +130,14 @@ export default function SecurityPage() {
                             desc: "Platform guarantees are derived deterministically from code and database constraints, rather than aspirational trust."
                         }
                     ].map((item, i) => (
-                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-blue-500/20 transition-all duration-500 group shadow-[0_10px_40px_rgba(59,130,246,0.02)]">
-                            <div className="p-3 rounded-xl bg-blue-500/5 text-blue-400 mb-8 group-hover:bg-blue-500/10 group-hover:text-blue-300 transition-all w-fit">
+                        <div key={i} className="p-8 rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-white/10 transition-all duration-500 group">
+                            <div className="p-3 rounded-xl bg-white/[0.04] text-white/40 mb-8 group-hover:bg-white/[0.08] group-hover:text-white/60 transition-all w-fit">
                                 {item.icon}
                             </div>
                             <h3 className="text-caption text-white font-bold mb-4">{item.title}</h3>
                             <p className="text-body group-hover:text-white/50 mb-6">{item.desc}</p>
                             <div className="pt-4 border-t border-white/[0.05] flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                 <span className="text-caption !tracking-[0.15em] opacity-40">Active Protection</span>
                             </div>
                         </div>
@@ -149,11 +149,11 @@ export default function SecurityPage() {
             <section className="relative z-40 py-20 px-8 max-w-[1240px] mx-auto w-full border-y border-white/[0.03]">
                 <div className="max-w-4xl">
                     <div className="flex items-center gap-3 mb-6">
-                        <ShieldAlert className="w-5 h-5 text-emerald-400" />
-                        <span className="text-caption text-emerald-400/80">Legal Threshold</span>
+                        <ShieldAlert className="w-5 h-5 text-white/40" />
+                        <span className="text-caption text-amber-200/60">Legal Threshold</span>
                     </div>
                     <h2 className="text-h2 mb-8">Security Scope & Disclosure</h2>
-                    <div className="space-y-6 text-body italic border-l-2 border-emerald-500/20 pl-8 bg-emerald-500/[0.01] py-8 rounded-r-3xl">
+                    <div className="space-y-6 text-body italic border-l-2 border-white/10 pl-8 bg-white/[0.01] py-8 rounded-r-3xl">
                         <p>“This document outlines the operational security posture and structural guarantees implemented within the ChainVolio platform. It is not an assertion of absolute security, nor does it replace formal third-party cryptanalysis or audit reports. While the architecture is hardened against common vectors, including replay, mutation, and enumeration, software systems carry inherent risk. ChainVolio’s operational baseline relies on deterministic enforcement, transparent invariant design, and predictable degradation under failure.”</p>
                     </div>
                 </div>
@@ -165,8 +165,8 @@ export default function SecurityPage() {
                     <div className="space-y-12">
                         <div className="space-y-6">
                             <div className="flex items-center gap-3">
-                                <Cpu className="w-5 h-5 text-emerald-400" />
-                                <span className="text-caption text-emerald-400/80">System Status</span>
+                                <Cpu className="w-5 h-5 text-white/40" />
+                                <span className="text-caption text-amber-200/60">System Status</span>
                             </div>
                             <h3 className="text-h2">Operational Readiness</h3>
                             <p className="text-body text-lg">The platform asserts production readiness based on deterministic protocol constraints.</p>
@@ -179,24 +179,24 @@ export default function SecurityPage() {
                                 "Asymmetric cost enforcement throttles anomaly"
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-6 group">
-                                    <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-caption opacity-40 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:opacity-100 transition-all">
+                                    <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-caption opacity-40 group-hover:bg-white/[0.05] group-hover:text-white/60 group-hover:opacity-100 transition-all">
                                         0{i + 1}
                                     </div>
                                     <span className="text-body text-inherit font-medium group-hover:text-white transition-colors">{item}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="p-4 bg-emerald-500/[0.02] border border-emerald-500/10 rounded-xl inline-block">
-                            <p className="text-caption text-emerald-400/60 font-bold">Guarantees valid under partial system compromise</p>
+                        <div className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl inline-block">
+                            <p className="text-caption text-white/40 font-bold">Guarantees valid under partial system compromise</p>
                         </div>
                     </div>
 
                     {/* 6. SECURITY OVERVIEW PDF */}
                     <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-[40px] relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.02] blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity" />
                         <div className="relative z-10 space-y-10">
                             <div className="p-4 rounded-2xl bg-white/[0.03] w-fit">
-                                <FileText className="w-8 h-8 text-emerald-400" />
+                                <FileText className="w-8 h-8 text-white/40" />
                             </div>
                             <div className="space-y-4">
                                 <h4 className="text-h2 !text-2xl">Security Overview (PDF)</h4>
@@ -206,7 +206,7 @@ export default function SecurityPage() {
                             </div>
                             <button
                                 onClick={() => setShowPdfNotice(true)}
-                                className="w-full py-5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 transition-all text-caption font-bold rounded-2xl flex items-center justify-center gap-3"
+                                className="w-full py-5 bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.08] text-white/60 transition-all text-caption font-bold rounded-2xl flex items-center justify-center gap-3"
                             >
                                 Download Overview <ArrowUpRight className="w-4 h-4" />
                             </button>
@@ -220,15 +220,15 @@ export default function SecurityPage() {
                 <div className="flex flex-col md:flex-row gap-16 justify-between items-center">
                     <div className="space-y-8">
                         <h3 className="text-h3 flex items-center gap-3">
-                            <Activity className="w-5 h-5 text-emerald-400" />
+                            <Activity className="w-5 h-5 text-white/40" />
                             Transparency Hub
                         </h3>
                         <div className="flex gap-6">
                             <Link href="/trust" className="group flex items-center gap-2 text-caption opacity-40 hover:opacity-100 transition-all">
-                                /trust <ArrowUpRight className="w-3 h-3 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all" />
+                                /trust <ArrowUpRight className="w-3 h-3 text-white/30 opacity-0 group-hover:opacity-100 transition-all" />
                             </Link>
                             <Link href="/status" className="group flex items-center gap-2 text-caption opacity-40 hover:opacity-100 transition-all">
-                                /status <ArrowUpRight className="w-3 h-3 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all" />
+                                /status <ArrowUpRight className="w-3 h-3 text-white/30 opacity-0 group-hover:opacity-100 transition-all" />
                             </Link>
                         </div>
                     </div>
@@ -252,8 +252,8 @@ export default function SecurityPage() {
                         >
                             ×
                         </button>
-                        <div className="p-4 rounded-2xl bg-emerald-500/10 w-fit mb-8">
-                            <AlertCircle className="w-6 h-6 text-emerald-400" />
+                        <div className="p-4 rounded-2xl bg-white/[0.04] w-fit mb-8">
+                            <AlertCircle className="w-6 h-6 text-white/40" />
                         </div>
                         <h3 className="text-h2 !text-2xl mb-4">Under Finalization</h3>
                         <p className="text-body mb-10">
@@ -261,7 +261,7 @@ export default function SecurityPage() {
                         </p>
                         <button
                             onClick={() => setShowPdfNotice(false)}
-                            className="w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-caption font-bold transition-all rounded-2xl"
+                            className="w-full py-4 bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.08] text-white/60 text-caption font-bold transition-all rounded-2xl"
                         >
                             Understood
                         </button>

@@ -166,15 +166,15 @@ if (data.score > 75 && data.confidence > 0.8) {
 }`;
 
   return (
-    <main className="h-screen flex flex-col relative selection:bg-indigo-500/30 selection:text-white overflow-x-hidden bg-black">
+    <main className="h-screen flex flex-col relative selection:bg-amber-500/30 selection:text-white overflow-x-hidden bg-black">
 
       <Navbar />
 
       {/* Ambient Background Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[160px] rounded-full" />
-          <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[160px] rounded-full" />
-          <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[160px] rounded-full" />
+          <div className="absolute top-[10%] -left-[10%] w-[50%] h-[50%] bg-white/[0.01] blur-[160px] rounded-full" />
+          <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-white/[0.01] blur-[160px] rounded-full" />
+          <div className="absolute bottom-[5%] left-[20%] w-[40%] h-[40%] bg-white/[0.01] blur-[160px] rounded-full" />
       </div>
       
       <div className="flex-1 flex overflow-hidden relative z-10 pt-24">
@@ -191,7 +191,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { label: "Example Usage", href: "#example-usage" },
                   { label: "Authentication", href: "#authentication" }
               ].map((item, i) => (
-                  <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-indigo-500 font-medium tracking-tight">
+                  <a key={i} href={item.href} className="block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-white/30 font-medium tracking-tight">
                       {item.label}
                   </a>
               ))}
@@ -207,7 +207,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { label: "Get API Key", href: "#get-key" },
                   { label: "Try the API", href: "#try-api" }
               ].map((item, i) => (
-                  <a key={i} href={item.href} className={`block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-blue-500 font-medium tracking-tight ${item.mono ? 'font-mono !text-xs' : ''}`}>
+                  <a key={i} href={item.href} className={`block text-body text-sm opacity-40 hover:opacity-100 transition-all py-2.5 border-l border-white/5 pl-6 hover:border-white/30 font-medium tracking-tight ${item.mono ? 'font-mono !text-xs' : ''}`}>
                       {item.label}
                   </a>
               ))}
@@ -218,14 +218,14 @@ if (data.score > 75 && data.confidence > 0.8) {
           <div className="flex-1 overflow-y-auto h-full px-8 lg:px-12 py-12 space-y-32 scrollbar-hide scroll-smooth">
           {/* Header */}
           <header id="introduction" className="space-y-8 scroll-mt-[120px]">
-            <div className="flex items-center gap-3 px-4 py-1.5 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-full w-fit">
-              <Code2 className="w-4 h-4 text-indigo-400" />
-              <span className="text-caption text-indigo-400/80">Documentation V1</span>
+            <div className="flex items-center gap-3 px-4 py-1.5 bg-white/[0.02] border border-white/[0.08] rounded-full w-fit">
+              <Code2 className="w-4 h-4 text-white/40" />
+              <span className="text-caption text-amber-200/60">Documentation V1</span>
             </div>
             <h1 className="text-3xl md:text-h1 break-words overflow-hidden max-w-full">
                 Reputation <span className="text-white/20">API.</span>
             </h1>
-            <p className="text-body text-lg md:text-xl italic border-l-2 border-indigo-500/20 pl-6 md:pl-8 bg-indigo-500/[0.01] py-6 rounded-r-3xl break-words">
+            <p className="text-body text-lg md:text-xl italic border-l-2 border-white/10 pl-6 md:pl-8 bg-white/[0.01] py-6 rounded-r-3xl break-words">
               "Integrate the ChainVolio reputation layer into your application. Authenticate professional identities and filter users by verified skill signals."
             </p>
           </header>
@@ -235,7 +235,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* USE CASES */}
           <section id="use-cases" className="space-y-12 scroll-mt-[120px]">
             <div className="flex items-center gap-4">
-              <Layers className="w-5 h-5 text-blue-400" />
+              <Layers className="w-5 h-5 text-white/40" />
               <h2 className="text-2xl md:text-h2 break-words">Use Cases</h2>
             </div>
             
@@ -246,7 +246,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                   { icon: <Landmark className="w-5 h-5" />, title: "DeFi Lending", desc: "Adjust collateral requirements based on a borrower's verified trust score.", color: "emerald" }
               ].map((item, i) => (
                   <div key={i} className="p-6 md:p-8 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-6 hover:border-white/10 transition-all group w-full max-w-full break-words overflow-hidden">
-                    <div className={`p-4 rounded-xl bg-${item.color}-500/5 text-${item.color}-400 group-hover:bg-${item.color}-500/10 transition-colors w-fit`}>
+                    <div className="p-4 rounded-xl bg-white/[0.04] text-white/40 group-hover:bg-white/[0.08] transition-colors w-fit">
                       {item.icon}
                     </div>
                     <h3 className="text-caption text-white font-bold">{item.title}</h3>
@@ -259,7 +259,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* EXAMPLE USAGE */}
           <section id="example-usage" className="space-y-12 scroll-mt-[120px]">
             <div className="flex items-center gap-4">
-              <Cpu className="w-5 h-5 text-teal-400" />
+              <Cpu className="w-5 h-5 text-white/40" />
               <h2 className="text-2xl md:text-h2 break-words">Example Usage</h2>
             </div>
 
@@ -275,7 +275,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                       "Dynamically adjust platform permissions"
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-4 group">
-                        <div className="w-2 h-2 rounded-full bg-teal-500/20 group-hover:bg-teal-500 transition-all" />
+                        <div className="w-2 h-2 rounded-full bg-white/20 group-hover:bg-white/50 transition-all" />
                         <span className="text-body text-inherit font-medium break-words overflow-hidden max-w-full">{item}</span>
                       </div>
                     ))}
@@ -283,17 +283,17 @@ if (data.score > 75 && data.confidence > 0.8) {
               </div>
 
               <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl relative group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-teal-500/40" />
+                      <div className="w-2 h-2 rounded-full bg-white/20" />
                       <span className="text-caption opacity-20">Application Logic</span>
                   </div>
                   <button onClick={() => copyToClipboard(usageExample, 'usage')} className="text-white/20 hover:text-white transition-colors">
                     {copied === 'usage' ? 'Copied' : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="p-6 md:p-10 font-mono text-sm md:text-base leading-relaxed text-teal-400/80 overflow-x-auto whitespace-pre italic break-all">
+                <div className="p-6 md:p-10 font-mono text-sm md:text-base leading-relaxed text-white/40 overflow-x-auto whitespace-pre italic break-all">
                   {usageExample}
                 </div>
               </div>
@@ -303,7 +303,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* GET API KEY */}
           <section id="get-key" className="space-y-10 scroll-mt-[120px]">
             <div className="flex items-center gap-4">
-              <Zap className="w-5 h-5 text-indigo-400" />
+              <Zap className="w-5 h-5 text-white/40" />
               <h2 className="text-2xl md:text-h2 break-words">Identity Auth</h2>
             </div>
 
@@ -314,8 +314,8 @@ if (data.score > 75 && data.confidence > 0.8) {
                 { step: "02", title: "Sign Once", desc: "Sign a one-time message to prove ownership. No funds are moved, no transaction is sent." },
                 { step: "03", title: "Get Your Key", desc: "Your key is generated instantly. Use it in the x-api-key header on every request." },
               ].map((item) => (
-                <div key={item.step} className="p-6 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-3 hover:border-indigo-500/20 transition-all">
-                  <span className="text-[10px] font-black text-indigo-400/40 uppercase tracking-[0.25em]">Step {item.step}</span>
+                <div key={item.step} className="p-6 bg-white/[0.01] border border-white/[0.03] rounded-2xl space-y-3 hover:border-white/10 transition-all">
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.25em]">Step {item.step}</span>
                   <p className="text-caption text-white font-bold">{item.title}</p>
                   <p className="text-body text-xs">{item.desc}</p>
                 </div>
@@ -323,7 +323,7 @@ if (data.score > 75 && data.confidence > 0.8) {
             </div>
 
             <div className="p-12 bg-white/[0.01] border border-white/[0.03] rounded-2xl relative overflow-hidden group shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
-                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row gap-16 items-center">
                     <div className="md:w-1/2 space-y-6">
                         <h3 className="text-2xl md:text-h2 md:!text-3xl break-words">Get Your API Key</h3>
@@ -345,7 +345,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                                 <button
                                     onClick={generateApiKey}
                                     disabled={generatingKey}
-                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-indigo-50 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
+                                    className="px-10 py-5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-white/90 transition-all shadow-2xl shadow-white/5 text-caption !text-slate-950 disabled:opacity-50"
                                 >
                                     {generatingKey ? "Signing…" : "Generate API Key"}
                                 </button>
@@ -382,9 +382,9 @@ if (data.score > 75 && data.confidence > 0.8) {
                         {generatedKey ? (
                            <div className="space-y-6">
                               <div className="p-8 bg-black border border-white/[0.05] rounded-2xl relative group/key">
-                                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                                 <div className="flex items-center justify-between gap-4">
-                                    <code className="text-emerald-400 font-mono text-sm break-all">{generatedKey}</code>
+                                    <code className="text-white/60 font-mono text-sm break-all">{generatedKey}</code>
                                     <button
                                       onClick={() => copyToClipboard(generatedKey, "gen-key")}
                                       className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 text-white/20 hover:text-white transition-all flex-shrink-0"
@@ -412,26 +412,26 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* Authentication Header Section */}
           <section id="authentication" className="space-y-10 scroll-mt-[120px]">
              <div className="flex items-center gap-4">
-              <Lock className="w-5 h-5 text-indigo-400" />
+              <Lock className="w-5 h-5 text-white/40" />
               <h2 className="text-2xl md:text-h2 break-words">Request Auth</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-12 items-start">
                 <div className="space-y-6">
                     <p className="text-body text-lg italic opacity-40">
-                        "Pass your API key via the <code className="not-italic text-indigo-400 text-sm">x-api-key</code> header to authenticate requests and track usage."
+                        "Pass your API key via the <code className="not-italic text-white/60 text-sm">x-api-key</code> header to authenticate requests and track usage."
                     </p>
                     <div className="space-y-3">
-                        <div className="flex items-start gap-3 p-4 bg-emerald-500/[0.03] border border-emerald-500/10 rounded-xl">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                            <CheckCircle2 className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-caption text-emerald-400 font-bold text-xs mb-1">GET /v1/wallet/:address/score</p>
+                                <p className="text-caption text-white/60 font-bold text-xs mb-1">GET /v1/wallet/:address/score</p>
                                 <p className="text-body text-xs opacity-40">Publicly accessible. API key optional — include it to track your usage quota.</p>
                             </div>
                         </div>
-                        <div className="flex items-start gap-3 p-4 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-xl">
-                            <Key className="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                            <Key className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-caption text-indigo-400 font-bold text-xs mb-1">POST /v1/scores/batch</p>
+                                <p className="text-caption text-white/60 font-bold text-xs mb-1">POST /v1/scores/batch</p>
                                 <p className="text-body text-xs opacity-40">Requires API key. Use for high-volume integrations.</p>
                             </div>
                         </div>
@@ -441,13 +441,13 @@ if (data.score > 75 && data.confidence > 0.8) {
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-caption opacity-20">Header (optional for GET, required for POST batch)</span>
                     </div>
-                    <div className="p-5 md:p-6 bg-black border border-white/[0.05] rounded-2xl flex flex-col md:flex-row items-center justify-between group-hover:border-indigo-500/20 transition-all shadow-2xl gap-4">
-                        <code className="text-indigo-400 text-xs md:text-sm font-mono break-all italic">x-api-key: YOUR_API_KEY</code>
+                    <div className="p-5 md:p-6 bg-black border border-white/[0.05] rounded-2xl flex flex-col md:flex-row items-center justify-between group-hover:border-white/10 transition-all shadow-2xl gap-4">
+                        <code className="text-white/60 text-xs md:text-sm font-mono break-all italic">x-api-key: YOUR_API_KEY</code>
                         <button
                           onClick={() => copyToClipboard("x-api-key: YOUR_API_KEY", "auth")}
                           className="p-2 text-white/20 hover:text-white transition-colors"
                         >
-                          <Copy className={`w-4 h-4 ${copied === 'auth' ? 'text-indigo-400' : ''}`} />
+                          <Copy className={`w-4 h-4 ${copied === 'auth' ? 'text-white/60' : ''}`} />
                         </button>
                     </div>
                 </div>
@@ -460,15 +460,15 @@ if (data.score > 75 && data.confidence > 0.8) {
           <section id="get-score" className="space-y-12 scroll-mt-[120px]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full max-w-full">
               <div className="flex items-center gap-4">
-                <Terminal className="w-5 h-5 text-indigo-400" />
+                <Terminal className="w-5 h-5 text-white/40" />
                 <h2 className="text-2xl md:text-h2 break-words">Get Wallet Score</h2>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                   <div className="px-3 py-1 bg-white/[0.03] border border-white/[0.05] rounded-full max-w-full overflow-hidden">
                     <span className="text-body text-[9px] md:text-[10px] font-mono opacity-40 break-all">GET /v1/wallet/:address/score</span>
                   </div>
-                  <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                    <span className="text-caption text-emerald-400 font-bold text-[9px] md:text-xs">Cached (24h)</span>
+                  <div className="px-3 py-1 bg-white/[0.04] border border-white/[0.08] rounded-full">
+                    <span className="text-caption text-white/40 font-bold text-[9px] md:text-xs">Cached (24h)</span>
                   </div>
               </div>
             </div>
@@ -480,11 +480,11 @@ if (data.score > 75 && data.confidence > 0.8) {
                   <span className="text-caption opacity-20">Fetch Signature</span>
                   <div className="flex items-center gap-6">
                     <button onClick={() => copyToClipboard(curlExample, 'curl-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
-                        <Terminal className="w-3 h-3 group-hover:text-indigo-400 transition-colors" />
+                        <Terminal className="w-3 h-3 group-hover:text-white/60 transition-colors" />
                         <span className="text-caption font-bold">cURL</span>
                     </button>
                     <button onClick={() => copyToClipboard(getExample, 'js-get')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all group">
-                        <Copy className="w-3 h-3 group-hover:text-indigo-400 transition-colors" />
+                        <Copy className="w-3 h-3 group-hover:text-white/60 transition-colors" />
                         <span className="text-caption font-bold">Fetch</span>
                     </button>
                   </div>
@@ -498,11 +498,11 @@ if (data.score > 75 && data.confidence > 0.8) {
               <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl flex flex-col h-full">
                 <div className="px-8 py-5 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center text-caption opacity-20">
                   <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                      <div className="w-2 h-2 rounded-full bg-white/20" />
                       <span className="!tracking-[0.1em]">Expected Response</span>
                   </div>
                 </div>
-                <div className="p-6 md:p-10 font-mono text-[10px] md:text-xs leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre flex-1 break-all">
+                <div className="p-6 md:p-10 font-mono text-[10px] md:text-xs leading-relaxed text-white/40 overflow-x-auto whitespace-pre flex-1 break-all">
                   {jsonExample}
                 </div>
               </div>
@@ -513,15 +513,15 @@ if (data.score > 75 && data.confidence > 0.8) {
           <section id="batch-score" className="space-y-12 scroll-mt-[120px]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full max-w-full">
               <div className="flex items-center gap-4">
-                <Workflow className="w-5 h-5 text-blue-400" />
+                <Workflow className="w-5 h-5 text-white/40" />
                 <h2 className="text-2xl md:text-h2 break-words">Batch Score Fetch</h2>
               </div>
                <div className="flex flex-wrap items-center gap-3">
                   <div className="px-3 py-1 bg-white/[0.03] border border-white/[0.05] rounded-full max-w-full overflow-hidden">
                     <span className="text-body text-[9px] md:text-[10px] font-mono opacity-40 break-all">POST /v1/scores/batch</span>
                   </div>
-                  <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                    <span className="text-caption text-blue-400 font-bold text-[9px] md:text-xs">Optimized</span>
+                  <div className="px-3 py-1 bg-white/[0.04] border border-white/[0.08] rounded-full">
+                    <span className="text-caption text-white/40 font-bold text-[9px] md:text-xs">Optimized</span>
                   </div>
               </div>
             </div>
@@ -529,16 +529,16 @@ if (data.score > 75 && data.confidence > 0.8) {
             <div className="bg-black rounded-2xl overflow-hidden border border-white/[0.03] shadow-2xl group">
               <div className="px-8 py-6 bg-white/[0.02] border-b border-white/[0.05] flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <Activity className="w-4 h-4 text-blue-400/60" />
+                    <Activity className="w-4 h-4 text-white/20" />
                     <span className="text-caption opacity-20">Batch Request Object</span>
                 </div>
                 <div className="flex items-center gap-6">
                   <button onClick={() => copyToClipboard(batchCurlExample, 'curl-batch')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all">
-                    <Terminal className="w-3 h-3 group-hover:text-blue-400" />
+                    <Terminal className="w-3 h-3 group-hover:text-white/60" />
                     <span className="text-caption font-bold">cURL</span>
                   </button>
                   <button onClick={() => copyToClipboard(batchExample, 'js-batch')} className="text-white/20 hover:text-white flex items-center gap-2 transition-all">
-                    <Copy className="w-3 h-3 group-hover:text-blue-400" />
+                    <Copy className="w-3 h-3 group-hover:text-white/60" />
                     <span className="text-caption font-bold">Fetch</span>
                   </button>
                 </div>
@@ -593,11 +593,11 @@ if (data.score > 75 && data.confidence > 0.8) {
                              <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
                                 <div className="flex items-center gap-6">
                                     <div className="flex items-center gap-2 text-caption opacity-20">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
+                                        <div className="w-2 h-2 rounded-full bg-white/20" />
                                         Response Body
                                     </div>
                                     {responseTime !== null && (
-                                        <div className="flex items-center gap-2 text-caption text-emerald-500/60 font-bold">
+                                        <div className="flex items-center gap-2 text-caption text-white/40 font-bold">
                                             <Zap className="w-3 h-3" />
                                             {responseTime}ms Latency
                                         </div>
@@ -607,7 +607,7 @@ if (data.score > 75 && data.confidence > 0.8) {
                                     {copied === 'test-res' ? 'Copied' : 'Copy JSON'}
                                 </button>
                              </div>
-                             <div className="p-6 md:p-10 bg-black border border-white/[0.05] rounded-2xl font-mono text-[10px] md:text-sm leading-relaxed text-emerald-400/80 overflow-x-auto whitespace-pre shadow-2xl max-h-[500px] break-all">
+                             <div className="p-6 md:p-10 bg-black border border-white/[0.05] rounded-2xl font-mono text-[10px] md:text-sm leading-relaxed text-white/40 overflow-x-auto whitespace-pre shadow-2xl max-h-[500px] break-all">
                                 {JSON.stringify(testResult, null, 2)}
                              </div>
                         </div>
@@ -619,7 +619,7 @@ if (data.score > 75 && data.confidence > 0.8) {
           {/* Final Call to Action */}
           <section className="relative z-40 md:py-24 md:px-8 pt-16 pb-28 px-4 border-t border-white/[0.03] h-auto overflow-hidden max-w-full">
               <div className="p-8 md:p-16 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-center space-y-10 relative group flex flex-col items-center justify-start h-auto">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.01] to-white/[0.01] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="relative z-10 flex flex-col items-center w-full space-y-8 md:space-y-10">
                       <div className="p-5 rounded-2xl bg-white/[0.03] w-fit mx-auto">
                         <Users className="w-10 h-10 text-white/40" />
