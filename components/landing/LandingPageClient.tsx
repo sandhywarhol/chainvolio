@@ -53,7 +53,9 @@ import {
     Plus,
     Briefcase,
     Send,
-    Inbox
+    Inbox,
+    Zap,
+    TrendingUp
 } from 'lucide-react';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -1410,8 +1412,8 @@ export function LandingPageClient() {
                                                 <div className="space-y-1.5 relative pl-4">
                                                     <div className="absolute left-[5px] top-0 bottom-0 w-px" style={{ background: "rgba(255,255,255,0.07)" }} />
                                                     {[
-                                                        { org: "Nexus Protocol", role: "Rust Developer", period: "2022 — 2024", current: true },
-                                                        { org: "SolanaLabs", role: "Smart Contract Eng.", period: "2020 — 2022", current: false },
+                                                        { org: "Nexus Protocol", role: "Rust Developer", period: "2022 to 2024", current: true },
+                                                        { org: "SolanaLabs", role: "Smart Contract Eng.", period: "2020 to 2022", current: false },
                                                     ].map((item, i) => (
                                                         <div key={i} className="relative">
                                                             <div className="absolute left-[-10px] top-[8px] rounded-full" style={{ width: item.current ? 7 : 5, height: item.current ? 7 : 5, background: item.current ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.2)", transform: "translateX(-50%)" }} />
@@ -1447,8 +1449,8 @@ export function LandingPageClient() {
                                             </div>
                                             <div className="space-y-2">
                                                 {[
-                                                    { org: "Nexus Protocol", role: "Rust Developer", type: "Full-time", period: "Jan 2022 — Dec 2024", attested: true, desc: "Built on-chain identity modules and DeFi smart contracts." },
-                                                    { org: "SolanaLabs",    role: "Smart Contract Eng.", type: "Contract", period: "Mar 2020 — Dec 2022", attested: true, desc: "Developed Anchor programs for NFT marketplace." },
+                                                    { org: "Nexus Protocol", role: "Rust Developer", type: "Full-time", period: "Jan 2022 to Dec 2024", attested: true, desc: "Built on-chain identity modules and DeFi smart contracts." },
+                                                    { org: "SolanaLabs",    role: "Smart Contract Eng.", type: "Contract", period: "Mar 2020 to Dec 2022", attested: true, desc: "Developed Anchor programs for NFT marketplace." },
                                                     { org: "DeFi Hub",      role: "Frontend Developer",  type: "Freelance", period: "Jun 2019 — Feb 2020", attested: false, desc: "Integrated wallet adapters and swap UI flows." },
                                                 ].map((item, i) => (
                                                     <div key={i} className="rounded-xl p-3.5 cursor-default hover:bg-white/[0.03] transition-colors" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1516,7 +1518,7 @@ export function LandingPageClient() {
                                                                         <p style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{item.role}</p>
                                                                     </div>
                                                                     <div className="text-right flex-shrink-0">
-                                                                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "monospace", display: "block" }}>{item.start} — {item.end}</span>
+                                                                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontFamily: "monospace", display: "block" }}>{item.start} to {item.end}</span>
                                                                         <span style={{ fontSize: 9, color: "rgba(255,255,255,0.18)", marginTop: 1, display: "block" }}>{item.duration}</span>
                                                                     </div>
                                                                 </div>
@@ -1749,162 +1751,310 @@ export function LandingPageClient() {
                 {/* TRUST TRANSFORMATION — Noise to Signal */}
                 <section id="problems" className="theme-aware py-16 sm:py-20 md:py-24 relative z-10 theme-signal-bg overflow-hidden">
 
-                    {/* Header — split layout */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mb-10 md:mb-14">
-                        <div className="flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-16 pb-8">
-
-                            {/* Left: subtext — bottom aligned */}
-                            <div className="lg:flex-1">
-                                <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-md">
-                                    Work history is scattered and impossible to verify. ChainVolio anchors every contribution on-chain, cryptographically signed, portable, impossible to fake.
-                                </p>
-                            </div>
-
-                            {/* Right: pill + heading — right aligned */}
-                            <div className="flex flex-col items-end text-right space-y-6 lg:flex-1">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                                    <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Verified Work History</span>
-                                </div>
-                                <h2 className="text-[22px] sm:text-3xl md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.45] whitespace-normal md:whitespace-nowrap">
-                                    From noise to <span className="text-amber-200/60">verifiable signal.</span>
-                                </h2>
-                            </div>
-                        </div>
-                        {/* Full-width divider line — spans from left description to right heading */}
-                        <div className="h-px w-full bg-white/15" />
+                    {/* Atmospheric depth layers */}
+                    <div className="absolute inset-0 pointer-events-none" style={{ zIndex:0 }}>
+                        <div className="absolute inset-0" style={{ background:"linear-gradient(160deg, #060608 0%, #050507 50%, #060609 100%)" }} />
+                        <div className="absolute inset-0" style={{ background:"radial-gradient(ellipse 65% 55% at 55% 65%, rgba(255,255,255,0.013) 0%, transparent 60%)" }} />
                     </div>
 
+                    <div className="relative max-w-[1240px] mx-auto px-4 sm:px-6" style={{ zIndex:1 }}>
 
-                    {/* Split Visuals */}
-                    <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+                        {/* Label pill */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mb-8">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
+                            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.18em]">Verifiable Work History</span>
+                        </div>
 
-                            {/* Left: Noise Animation */}
-                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
-                                <div className="absolute top-4 left-4 z-20">
-                                    <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Problem</span>
-                                </div>
-
-                                <div className="absolute inset-0">
-                                    <SignalNoiseVisual />
-                                </div>
-
-                                <div className="absolute inset-0 pointer-events-none z-10 theme-signal-vignette" />
-                                <div className="absolute top-0 left-0 right-0 h-16 pointer-events-none z-10 theme-signal-fade-to" />
-                                <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-10 theme-signal-fade-from" />
-
-                                {/* Central Logo Node */}
-                                <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                                    <div className="relative flex items-center justify-center">
-                                        <motion.div
-                                            animate={{ scale: [1, 3.2], opacity: [0.12, 0] }}
-                                            transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 0 }}
-                                            className="absolute w-12 h-12 rounded-full border border-white/20"
-                                        />
-                                        <motion.div
-                                            animate={{ scale: [1, 2.2], opacity: [0.18, 0] }}
-                                            transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                                            className="absolute w-12 h-12 rounded-full border border-white/25"
-                                        />
-                                        <motion.div
-                                            animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 1.4 }}
-                                            className="absolute w-12 h-12 rounded-full border border-white/30"
-                                        />
-                                        <motion.div
-                                            animate={{ opacity: [0.75, 1, 0.75] }}
-                                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                            className="relative w-12 h-12 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center"
-                                        >
-                                            <Image src="/logo.png" alt="ChainVolio" width={24} height={24} className="opacity-80" />
-                                        </motion.div>
-                                    </div>
-                                </div>
-
-                                <div className="absolute bottom-4 left-4 z-20">
-                                    <p className="text-[10px] text-white/20 font-medium">Fragmented. Unverifiable. Invisible.</p>
-                                </div>
-                            </div>
-
-                            {/* Right: Globe — Trust Network */}
-                            <div className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#060608]">
-                                <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
-                                    <span className="text-[9px] font-bold text-white/25 uppercase tracking-[0.3em]">The Solution</span>
-                                </div>
-
-                                <GlobeCanvas className="absolute inset-0 w-full h-full scale-[0.95] sm:scale-[1.05] md:scale-[1.15] theme-globe-canvas" />
-
-                                <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#060608] via-[#060608]/40 to-transparent z-10 pointer-events-none theme-fade-to-black" />
-                                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#060608] via-[#060608]/80 to-transparent z-10 pointer-events-none theme-fade-from-black" />
-
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl z-20 whitespace-nowrap">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Cost</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-[#14F195] theme-cyan-accent tracking-tight">~$0.001 per attestation</span>
-                                    </div>
-                                    <div className="w-px h-5 bg-white/10" />
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[6px] sm:text-[7px] font-bold text-white/20 uppercase tracking-[0.2em]">Speed</span>
-                                        <span className="text-[9px] sm:text-[11px] font-bold text-white/80 tracking-tight">Near-instant finality</span>
+                        {/* Top row: heading LEFT + description RIGHT */}
+                        <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-20 mb-8">
+                            <h2 className="lg:w-[44%] text-[22px] sm:text-[32px] md:text-[38px] lg:text-[44px] font-bold tracking-tight text-white leading-[1.06] flex-shrink-0">
+                                From noise<br/>
+                                <span className="text-amber-200/70">to verifiable signal.</span>
+                            </h2>
+                            <div className="lg:flex-1 flex flex-col gap-5 lg:pt-2">
+                                <p className="text-white/40 text-[13px] sm:text-[14px] font-normal leading-relaxed max-w-md">
+                                    Your verified history becomes portable trust across platforms and opportunities. ChainVolio anchors every contribution on-chain, cryptographically signed, portable, impossible to fake.
+                                </p>
+                                <div className="flex flex-wrap items-center gap-4">
+                                    <Link href="/guides/how-it-works" className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/35 hover:text-white/70 transition-colors group">
+                                        Explore the architecture
+                                        <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                    </Link>
+                                    <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-white/[0.06] bg-white/[0.02]">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#0d9488]" />
+                                        <span className="text-[9px] font-bold text-white/35 tracking-widest">BUILT ON SOLANA</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* 3-column feature cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 border border-white/[0.06] rounded-2xl overflow-hidden">
-                            {[
-                                { id: "01", icon: User, title: "One Unified Profile", desc: "Every contribution, such as grants, project roles, or DAO work, lives in a single portable identity you fully own." },
-                                { id: "02", icon: ShieldCheck, title: "On-Chain Attestation", desc: "Each entry is cryptographically signed by the issuing org. No more unverifiable claims." },
-                                { id: "03", icon: Globe, title: "Portable Trust", desc: "Your verified history is shareable across platforms like LinkedIn, Twitter, or anywhere you share your work." },
-                            ].map((item, i) => (
-                                <div key={i} className={`p-6 md:p-8 space-y-3 ${i < 2 ? 'border-b md:border-b-0 md:border-r border-white/[0.06]' : ''}`}>
-                                    <span className="text-[10px] font-black text-white/20 tracking-widest">{item.id}</span>
-                                    <div className="flex items-center gap-2.5">
-                                        <item.icon size={15} className="text-white/40" />
-                                        <h3 className="text-[14px] font-bold text-white/70">{item.title}</h3>
+                        {/* Layered UI mockup area */}
+                        <div className="relative overflow-hidden" style={{ height: 440 }}>
+                            {/* Section-level right vignette — wide and subtle, looks intentional */}
+                            <div className="absolute inset-y-0 right-0 pointer-events-none" style={{ zIndex: 10, width: "18%", background: "linear-gradient(to right, transparent, rgba(6,6,8,0.55) 55%, #060608 100%)" }} />
+
+                            {/* Spotlight beam from above */}
+                            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+                                <div className="absolute inset-x-0 top-0 h-full"
+                                    style={{ background: "conic-gradient(from 180deg at 58% -8%, transparent 68deg, rgba(255,255,255,0.055) 80deg, rgba(255,255,255,0.03) 90deg, rgba(255,255,255,0.055) 100deg, transparent 112deg)" }} />
+                                <div className="absolute inset-x-0 top-0 h-36"
+                                    style={{ background: "radial-gradient(ellipse 45% 100% at 58% 0%, rgba(255,255,255,0.04) 0%, transparent 80%)" }} />
+                            </div>
+
+                            {/* ── BACK panel: extends past container right so clip is natural ── */}
+                            <div className="absolute rounded-xl overflow-hidden flex"
+                                style={{
+                                    left: "30%", right: -80,
+                                    top: 33, height: 360,
+                                    zIndex: 1,
+                                    borderTop: "1px solid rgba(255,255,255,0.06)",
+                                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                    borderLeft: "1px solid rgba(255,255,255,0.06)",
+                                    boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+                                }}>
+
+                                {/* Back LEFT: On-Chain Attestation */}
+                                <div className="flex-1 flex flex-col min-w-0 p-5" style={{ background:"linear-gradient(to bottom, #060609 0%, #0d0d11 30%)", borderRight:"1px solid rgba(255,255,255,0.06)" }}>
+                                    {/* Header */}
+                                    <div className="flex items-center gap-3 mb-3 flex-shrink-0">
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(94,106,210,0.12)", border:"1px solid rgba(94,106,210,0.22)" }}>
+                                            <ShieldCheck className="w-4 h-4" style={{ color:"rgba(94,106,210,0.8)" }} />
+                                        </div>
+                                        <span className="text-[15px] font-bold text-white/85">On-Chain Attestation</span>
                                     </div>
-                                    <p className="text-[12px] text-white/30 leading-relaxed">{item.desc}</p>
+                                    {/* Description */}
+                                    <p className="text-[12px] text-white/40 leading-relaxed mb-5 flex-shrink-0">
+                                        Every entry is cryptographically signed by the issuing organization.<br/>No more unverifiable claims.
+                                    </p>
+                                    {/* Attestation card */}
+                                    <div className="flex-1 rounded-xl overflow-hidden flex flex-col" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)" }}>
+                                        {/* Card header row */}
+                                        <div className="px-4 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                                            <span className="text-[11px] font-bold text-white/65">Attestation</span>
+                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold" style={{ color:"#34d399" }}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] inline-block" />
+                                                Verified
+                                            </span>
+                                        </div>
+                                        {/* Rows */}
+                                        <div className="flex-1 overflow-hidden">
+                                            {[
+                                                { label:"Project",   value:"ChainVolio Website", check:true,  link:false },
+                                                { label:"Role",      value:"Frontend Developer",  check:false, link:false },
+                                                { label:"Signed by", value:"ChainVolio DAO",      check:false, link:false },
+                                                { label:"Network",   value:"Solana",              check:false, link:false },
+                                                { label:"Tx Hash",   value:"5xYk...7e9p",         check:false, link:true  },
+                                            ].map(({ label, value, check, link }, i, arr) => (
+                                                <div key={i} className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: i < arr.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                                                    <span className="text-[10px] text-white/35 font-medium">{label}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-semibold text-white/65">{value}</span>
+                                                        {check && <Check className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />}
+                                                        {link  && <ExternalLink className="w-3 h-3 text-white/30 flex-shrink-0" />}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Back MIDDLE: Portable Trust */}
+                                <div className="w-[27%] flex-shrink-0 flex flex-col p-5" style={{ background:"linear-gradient(to bottom, #060609 0%, #0c0c10 30%)", borderRight:"1px solid rgba(255,255,255,0.06)" }}>
+                                    {/* Header */}
+                                    <div className="flex items-center gap-2.5 mb-3 flex-shrink-0">
+                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)" }}>
+                                            <Globe className="w-3.5 h-3.5 text-white/35" />
+                                        </div>
+                                        <span className="text-[13px] font-bold text-white/80">Portable Trust</span>
+                                    </div>
+                                    {/* Description */}
+                                    <p className="text-[10px] text-white/35 leading-relaxed mb-4 flex-shrink-0">
+                                        Your verified history is shareable across platforms like LinkedIn, Twitter, or anywhere you share your work.
+                                    </p>
+                                    {/* Share profile card */}
+                                    <div className="flex-1 rounded-xl flex flex-col p-3.5" style={{ background:"rgba(255,255,255,0.025)", border:"1px solid rgba(255,255,255,0.07)" }}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className="text-[9px] font-bold text-white/55">Share your profile</span>
+                                            <Check className="w-3 h-3 text-white/25" />
+                                        </div>
+                                        {/* URL copy row */}
+                                        <div className="flex items-center justify-between px-2.5 py-2 rounded-lg mb-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+                                            <span className="text-[8px] text-white/45 font-mono truncate">chainvolio.xyz/u/0x8F3A...7C21</span>
+                                            <svg className="flex-shrink-0 ml-2" width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="rgba(255,255,255,0.3)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                        </div>
+                                        {/* Share on */}
+                                        <p className="text-[8.5px] text-white/30 mb-2">Share on</p>
+                                        <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                                            {[
+                                                { bg:"#0077B5", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="white"/></svg> },
+                                                { bg:"#171515", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
+                                                { bg:"#5865F2", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.04.032.05a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.05c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> },
+                                                { bg:"#229ED9", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> },
+                                                { bg:"#25D366", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> },
+                                                { bg:"#EA4335", svg:<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg> },
+                                            ].map(({ bg, svg }, i) => (
+                                                <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background:bg }}>
+                                                    {svg}
+                                                </div>
+                                            ))}
+                                            <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.09)" }}>
+                                                <span className="text-[9px] text-white/40 font-bold leading-none">···</span>
+                                            </div>
+                                        </div>
+                                        {/* Footer */}
+                                        <div className="flex items-center gap-1.5 mt-auto">
+                                            <ShieldCheck className="w-3 h-3 text-white/20 flex-shrink-0" />
+                                            <span className="text-[8px] text-white/30">Anyone can verify this data on-chain.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Back RIGHT: Career Timeline */}
+                                <div className="w-[27%] flex-shrink-0 flex flex-col p-5" style={{ background:"linear-gradient(to bottom, #060609 0%, #0c0c10 30%)" }}>
+                                    {/* Header */}
+                                    <div className="flex items-center gap-2.5 mb-3 flex-shrink-0">
+                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(251,191,36,0.10)", border:"1px solid rgba(251,191,36,0.20)" }}>
+                                            <Briefcase className="w-3.5 h-3.5" style={{ color:"rgba(251,191,36,0.85)" }} />
+                                        </div>
+                                        <span className="text-[13px] font-bold text-white/80">Career Timeline</span>
+                                    </div>
+                                    {/* Description */}
+                                    <p className="text-[10px] text-white/35 leading-relaxed mb-4 flex-shrink-0">
+                                        Every verified role compounds your reputation. Recruiters see growth, not just a snapshot.
+                                    </p>
+                                    {/* Timeline card */}
+                                    <div className="flex-1 rounded-xl overflow-hidden p-3.5" style={{ background:"rgba(255,255,255,0.025)", border:"1px solid rgba(255,255,255,0.07)" }}>
+                                        <div className="relative pl-4">
+                                            <div className="absolute left-[5px] top-1 bottom-1 w-px" style={{ background:"rgba(255,255,255,0.07)" }} />
+                                            {[
+                                                { year:"2022", org:"DeFi Protocol",  role:"Developer",     current:false },
+                                                { year:"2024", org:"ChainVolio DAO", role:"Lead Builder",  current:true  },
+                                            ].map(({ year, org, role, current }, i) => (
+                                                <div key={i} className="relative pb-4 last:pb-0">
+                                                    <div className="absolute rounded-full"
+                                                        style={{
+                                                            left: -11, top: 5,
+                                                            width: current ? 10 : 7,
+                                                            height: current ? 10 : 7,
+                                                            background: current ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.18)",
+                                                            border: current ? "1px solid rgba(255,255,255,0.5)" : "1px solid rgba(255,255,255,0.1)",
+                                                            transform: "translateX(-50%)",
+                                                            boxShadow: current ? "0 0 8px rgba(255,255,255,0.3)" : "none",
+                                                        }} />
+                                                    <span className="text-[9px] font-mono text-white/25 block mb-0.5">{year}</span>
+                                                    <p className="text-[11px] font-bold leading-tight" style={{ color:"rgba(255,255,255,0.75)" }}>{org}</p>
+                                                    <p className="text-[10px] leading-tight mt-0.5" style={{ color:"rgba(255,255,255,0.38)" }}>{role}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3 pt-2.5 flex items-center gap-1.5" style={{ borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+                                            <TrendingUp className="w-3 h-3 flex-shrink-0" style={{ color:"rgba(251,191,36,0.5)" }} />
+                                            <span className="text-[9px] text-white/30">2 years of verified growth</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Gradient fade — right/back panel only */}
+                                <div className="absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10"
+                                    style={{ background:"linear-gradient(to top, #070709 25%, rgba(7,7,9,0.6) 60%, transparent)" }} />
+                            </div>
+
+                            {/* ── FRONT panel: One Unified Profile + Globe (single card) ── */}
+                            <div className="absolute left-0 flex flex-col rounded-xl overflow-hidden"
+                                style={{
+                                    top: 0, width: 340, height: 425,
+                                    zIndex: 2,
+                                    background: "linear-gradient(160deg, #040408 0%, #060609 60%, #050508 100%)",
+                                    border: "1px solid rgba(255,255,255,0.07)",
+                                    boxShadow: "0 0 0 0.5px rgba(255,255,255,0.05) inset, 0 1px 0 rgba(255,255,255,0.07) inset, 12px 0 80px rgba(0,0,0,0.98), 28px 0 100px rgba(0,0,0,0.75), 0 24px 64px rgba(0,0,0,0.9), 0 4px 16px rgba(0,0,0,0.6)"
+                                }}>
+                                {/* Gloss sheen — diagonal highlight from top-left */}
+                                <div className="absolute inset-0 pointer-events-none rounded-xl" style={{ zIndex: 20, background: "linear-gradient(135deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 30%, transparent 55%)" }} />
+                                {/* Top-edge specular line */}
+                                <div className="absolute inset-x-0 top-0 h-px pointer-events-none rounded-t-xl" style={{ zIndex: 21, background: "linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.18) 35%, rgba(255,255,255,0.1) 65%, transparent 95%)" }} />
+                                {/* Header */}
+                                <div className="px-5 py-4 flex items-center gap-3 flex-shrink-0" style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)" }}>
+                                        <User className="w-4 h-4 text-white/40" />
+                                    </div>
+                                    <span className="text-[15px] font-bold text-white/85">One Unified Profile</span>
+                                </div>
+
+                                {/* Top content: description */}
+                                <div className="px-5 py-4 flex-shrink-0">
+                                    <p className="text-[12px] text-white/40 leading-relaxed">
+                                        All your contributions, roles, and achievements in one portable identity you fully own.
+                                    </p>
+                                </div>
+
+                                {/* Globe section — fills rest of card, no inner box */}
+                                <div className="flex-1 relative overflow-hidden">
+                                    <div className="absolute inset-x-0 top-0 px-4 pt-3 pb-0 z-10 flex items-center gap-2 pointer-events-none">
+                                        <Globe className="w-3 h-3 text-white/20" />
+                                        <span className="text-[9px] font-black text-white/20 tracking-[0.15em] uppercase">Blockchain Network</span>
+                                    </div>
+                                    <GlobeCanvas className="absolute inset-0 w-full h-full theme-globe-canvas" />
+                                    {/* Sphere depth vignette — darkens edges to make globe pop */}
+                                    <div className="absolute inset-0 pointer-events-none z-[6]" style={{ background: "radial-gradient(circle at 50% 52%, transparent 32%, rgba(4,4,8,0.45) 62%, rgba(4,4,8,0.88) 80%)" }} />
+                                    {/* Directional highlight — top-left light source */}
+                                    <div className="absolute inset-0 pointer-events-none z-[7]" style={{ background: "radial-gradient(ellipse 55% 45% at 30% 22%, rgba(255,255,255,0.065) 0%, transparent 65%)" }} />
+                                    <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#050508] to-transparent z-[5] pointer-events-none" />
+                                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#050508] to-transparent z-[5] pointer-events-none" />
+                                    {/* Cost / Speed chip */}
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-10 whitespace-nowrap">
+                                        <div className="flex flex-col">
+                                            <span className="text-[6px] font-bold text-white/20 uppercase tracking-[0.18em]">Cost</span>
+                                            <span className="text-[9px] font-bold text-[#14F195] tracking-tight">~$0.001 / attest</span>
+                                        </div>
+                                        <div className="w-px h-4 bg-white/10" />
+                                        <div className="flex flex-col">
+                                            <span className="text-[6px] font-bold text-white/20 uppercase tracking-[0.18em]">Speed</span>
+                                            <span className="text-[9px] font-bold text-white/60 tracking-tight">Near-instant</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Feature text blocks: 01 / 02 / 03 */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 mt-10 pt-8 border-t border-white/[0.06]">
+                            {[
+                                {
+                                    num: "01",
+                                    title: "One Unified Profile",
+                                    body: "No more scattered contributions. You own a single source of truth that follows you across every protocol, DAO, and organization.",
+                                },
+                                {
+                                    num: "02",
+                                    title: "On-Chain Attestation",
+                                    body: "Trust is mathematical, not reputational. Issuers sign your record once, so anyone can verify it forever without asking you to prove it again.",
+                                },
+                                {
+                                    num: "03",
+                                    title: "Portable Trust",
+                                    body: "Doors that used to require warm introductions open automatically. Your verified record speaks before you do.",
+                                },
+                            ].map(({ num, title, body }) => (
+                                <div key={num} className="flex flex-col gap-2.5">
+                                    <span className="text-[10px] font-black text-white/20 tracking-[0.18em]">{num}</span>
+                                    <h4 className="text-[13px] font-bold text-white/70 leading-snug">{title}</h4>
+                                    <p className="text-[12px] text-white/35 leading-relaxed font-normal">{body}</p>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Context footer row */}
+
+
+                        {/* Bottom bar */}
                         <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-1">
-                            <div className="flex flex-wrap items-center gap-4">
-                                <Link href="/guides/how-it-works" className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/35 hover:text-white/70 transition-colors group">
-                                    Explore the architecture
-                                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                                </Link>
-                                <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-white/[0.06] bg-white/[0.02]">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#0d9488]" />
-                                    <span className="text-[9px] font-bold text-white/35 tracking-widest">BUILT ON SOLANA</span>
-                                </div>
-                            </div>
+                            <p className="text-[11px] text-white/25 italic max-w-xs leading-relaxed">
+                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
+                            </p>
                             <p className="text-[11px] text-white/25 italic">
                                 Recruiters see proof, not promises. Real contributors rise above the noise.
                             </p>
                         </div>
 
-                        {/* Founder Quote */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="max-w-2xl mx-auto mt-10 md:mt-14 text-center px-6"
-                        >
-                            <div className="h-px w-12 bg-white/10 mx-auto mb-6" />
-                            <p className="text-[12px] md:text-[13px] text-white/50 italic leading-relaxed mb-6 font-normal">
-                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
-                            </p>
-                            <div className="flex flex-col items-center gap-1">
-                                <span className="text-[9px] md:text-[10px] font-black tracking-widest text-white/80 uppercase">Sandhy Warhol</span>
-                                <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Founder Chainvolio</span>
-                            </div>
-                        </motion.div>
                     </div>
 
                 </section>

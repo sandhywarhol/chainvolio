@@ -130,7 +130,8 @@ export default function GlobeCanvas({ className }: { className?: string }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dotsRef = useRef<any>(new Float32Array(0));
   const timeRef = useRef(0);
-  const [dims, setDims] = useState({ w: 0, h: 0 });
+  const dimsRef = useRef({ w: 0, h: 0 });
+  const [dimsReady, setDimsReady] = useState(false); // fires once when dims first become non-zero
   const [ready, setReady] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [network, setNetwork] = useState<{ hubs: { idx: number; targets: number[]; color: string }[] } | null>(null);
@@ -226,29 +227,30 @@ export default function GlobeCanvas({ className }: { className?: string }) {
     return () => observer.disconnect();
   }, []);
 
-  // Observe container size
+  // Observe container size — store in ref to avoid restarting the animation loop on every resize
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    const update = (w: number, h: number) => {
+      dimsRef.current = { w: Math.round(w), h: Math.round(h) };
+      if (!dimsReady && w > 0) setDimsReady(true); // one-time trigger to start the render loop
+    };
     const ro = new ResizeObserver(([e]) => {
       const { width, height } = e.contentRect;
-      setDims({ w: Math.round(width), h: Math.round(height) });
+      update(width, height);
     });
     ro.observe(el);
     const r = el.getBoundingClientRect();
-    setDims({ w: Math.round(r.width), h: Math.round(r.height) });
+    update(r.width, r.height);
     return () => ro.disconnect();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Render loop
+  // Render loop — depends only on ready/visible/dimsReady to avoid restarting on every resize
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || dims.w === 0 || !ready || !isVisible) return;
+    if (!canvas || !dimsReady || !ready || !isVisible) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const size = Math.max(dims.w, dims.h);
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
     const ctx = canvas.getContext("2d")!;
 
     cancelAnimationFrame(rafRef.current);
@@ -263,13 +265,21 @@ export default function GlobeCanvas({ className }: { className?: string }) {
       }
 
       if (!pauseRef.current) {
-        phiRef.current += 0.0022;
+        phiRef.current += 0.0038;
       }
-      timeRef.current += 1; // always advance — comets keep running even when globe is paused
+      timeRef.current += 1;
+
+      const { w, h } = dimsRef.current;
+      const size = Math.max(w, h);
+      const targetPx = Math.round(size * dpr);
+      if (canvas!.width !== targetPx || canvas!.height !== targetPx) {
+        canvas!.width = targetPx;
+        canvas!.height = targetPx;
+      }
 
       const dots = dotsRef.current;
       const n = dots.length / 4;
-      const R = (Math.min(dims.w, dims.h) / 2) * dpr;
+      const R = (Math.min(w, h) / 2) * dpr;
       const cx = (size / 2) * dpr, cy = (size / 2) * dpr;
 
       ctx.clearRect(0, 0, canvas!.width, canvas!.height);
@@ -283,10 +293,10 @@ export default function GlobeCanvas({ className }: { className?: string }) {
       let curCY: number | null = null;
       const cur = cursorRef.current;
       if (cur) {
-        const offX = (size - dims.w) / 2;
-        const offY = (size - dims.h) / 2;
-        curCX = (cur.x * dims.w + offX) * dpr;
-        curCY = (cur.y * dims.h + offY) * dpr;
+        const offX = (size - w) / 2;
+        const offY = (size - h) / 2;
+        curCX = (cur.x * w + offX) * dpr;
+        curCY = (cur.y * h + offY) * dpr;
       }
 
       const influR = R * 0.15; 
@@ -347,17 +357,23 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         const depth = (erz + 1) * 0.5;
 
 
-        // Stronger organic pulse
-        const pulse = (
-          Math.sin(time * (0.012 + rand * 0.008) + rand * 20) * 0.7 + 
-          Math.sin(time * (0.03 + rand * 0.015) + rand * 10) * 0.3
-        ) * 0.5 + 0.5;
-        
-        // Twinkle (kelap-kelip) effect
-        const twinkle = Math.sin(time * (0.06 + rand * 0.04) + rand * 100) * 0.5 + 0.5;
+        const isHub = networkRef.current?.hubs.some(h => h.idx === i);
 
-        const alpha = Math.min(0.98, (0.15 + depth * 0.35 + elev * 0.45) * (0.6 + rand * 0.4) * (0.5 + pulse * 0.5) * (0.7 + twinkle * 0.3));
-        const radius = (0.35 + depth * 0.5 + elev * 2.5 + rand * 0.8 + pulse * 0.4) * dpr;
+        let alpha: number, radius: number;
+
+        if (isHub || elev > 0.01) {
+          // Hub / elevated dots: subtle pulse so they feel alive
+          const pulse = (
+            Math.sin(time * (0.012 + rand * 0.008) + rand * 20) * 0.7 +
+            Math.sin(time * (0.03 + rand * 0.015) + rand * 10) * 0.3
+          ) * 0.5 + 0.5;
+          alpha = Math.min(0.95, (0.35 + depth * 0.45 + elev * 0.5) * (0.75 + rand * 0.25) * (0.85 + pulse * 0.15));
+          radius = (0.8 + depth * 0.8 + elev * 2.2 + pulse * 0.3) * dpr;
+        } else {
+          // Background dots: deeper contrast so backside fades out and frontside pops
+          alpha = (0.04 + depth * 0.62) * (0.5 + rand * 0.5);
+          radius = (0.1 + Math.pow(rand, 2) * 1.4 + depth * 0.7) * dpr;
+        }
 
         ctx.fillStyle = "#ffffff";
         ctx.globalAlpha = alpha;
@@ -365,13 +381,12 @@ export default function GlobeCanvas({ className }: { className?: string }) {
         ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Subtler glow for prominent dots
-        if (rand > 0.94) {
-          const isHub = networkRef.current?.hubs.some(h => h.idx === i);
-          ctx.globalAlpha = alpha * (isHub ? 0.6 : 0.25);
-          ctx.beginPath();
-          ctx.arc(sx, sy, radius * (isHub ? 3.5 : 2.2), 0, Math.PI * 2);
+        // Glow only for actual hub dots — no glow on random background dots
+        if (isHub) {
           const hubColor = networkRef.current?.hubs.find(h => h.idx === i)?.color;
+          ctx.globalAlpha = alpha * 0.35;
+          ctx.beginPath();
+          ctx.arc(sx, sy, radius * 3.2, 0, Math.PI * 2);
           ctx.fillStyle = hubColor || "#ffffff";
           ctx.fill();
         }
@@ -585,17 +600,17 @@ export default function GlobeCanvas({ className }: { className?: string }) {
 
     rafRef.current = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [dims, ready, isVisible]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dimsReady, ready, isVisible]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── mouse handling ────────────────────────────────────────────────────────
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const nx = (e.clientX - rect.left) / rect.width;
     const ny = (e.clientY - rect.top) / rect.height;
-    const sz = Math.max(dims.w, dims.h) || 1;
-    // Map container position → canvas-relative position
-    const cx = nx * (dims.w / sz) + (sz - dims.w) / 2 / sz;
-    const cy = ny * (dims.h / sz) + (sz - dims.h) / 2 / sz;
+    const { w, h } = dimsRef.current;
+    const sz = Math.max(w, h) || 1;
+    const cx = nx * (w / sz) + (sz - w) / 2 / sz;
+    const cy = ny * (h / sz) + (sz - h) / 2 / sz;
     const onGlobe = Math.hypot(cx - 0.5, cy - 0.5) < 0.47;
     pauseRef.current = onGlobe;
     cursorRef.current = onGlobe ? { x: nx, y: ny } : null;
@@ -606,9 +621,10 @@ export default function GlobeCanvas({ className }: { className?: string }) {
     cursorRef.current = null;
   }
 
-  const size = Math.max(dims.w, dims.h) || 0;
-  const offL = -(size - dims.w) / 2;
-  const offT = -(size - dims.h) / 2;
+  const { w: dw, h: dh } = dimsRef.current;
+  const size = Math.max(dw, dh) || 0;
+  const offL = -(size - dw) / 2;
+  const offT = -(size - dh) / 2;
 
   return (
     <div
@@ -617,7 +633,7 @@ export default function GlobeCanvas({ className }: { className?: string }) {
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
     >
-      {dims.w > 0 && (
+      {dimsReady && (
         <canvas
           ref={canvasRef}
           style={{
