@@ -244,11 +244,58 @@ export default function ProblemDiagram() {
                         <feGaussianBlur stdDeviation="6" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
-
                     <filter id="tracerGlow">
                         <feGaussianBlur stdDeviation="1.2" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
+
+                    {/* Icon card: multi-layer drop shadow */}
+                    <filter id="iconDrop" x="-80%" y="-80%" width="260%" height="260%">
+                        <feFlood floodColor="rgba(0,0,0,0.75)" result="f1" />
+                        <feComposite in="f1" in2="SourceAlpha" operator="in" result="s1" />
+                        <feOffset dx="0" dy="6" in="s1" result="o1" />
+                        <feGaussianBlur stdDeviation="5" in="o1" result="b1" />
+                        <feFlood floodColor="rgba(0,0,0,0.45)" result="f2" />
+                        <feComposite in="f2" in2="SourceAlpha" operator="in" result="s2" />
+                        <feOffset dx="0" dy="2" in="s2" result="o2" />
+                        <feGaussianBlur stdDeviation="2" in="o2" result="b2" />
+                        <feMerge>
+                            <feMergeNode in="b1" />
+                            <feMergeNode in="b2" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    {/* Soft ambient glow blur */}
+                    <filter id="softBlur" x="-100%" y="-100%" width="300%" height="300%">
+                        <feGaussianBlur stdDeviation="5" />
+                    </filter>
+                    {/* Icon face: radial gradient — top-left light source */}
+                    <radialGradient id="iconFace" cx="35%" cy="22%" r="75%">
+                        <stop offset="0%" stopColor="#ffffff" />
+                        <stop offset="55%" stopColor="#f0f0f8" />
+                        <stop offset="100%" stopColor="#d4d4e4" />
+                    </radialGradient>
+                    {/* Question bubble: subtle warm tint */}
+                    <radialGradient id="bubbleFace" cx="50%" cy="10%" r="80%">
+                        <stop offset="0%" stopColor="#ffffff" />
+                        <stop offset="100%" stopColor="#ebebf5" />
+                    </radialGradient>
+                    {/* Bubble drop shadow */}
+                    <filter id="bubbleDrop" x="-60%" y="-60%" width="220%" height="220%">
+                        <feFlood floodColor="rgba(0,0,0,0.55)" result="f1" />
+                        <feComposite in="f1" in2="SourceAlpha" operator="in" result="s1" />
+                        <feOffset dx="0" dy="4" in="s1" result="o1" />
+                        <feGaussianBlur stdDeviation="4" in="o1" result="b1" />
+                        <feMerge>
+                            <feMergeNode in="b1" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    {/* Icon area spotlight */}
+                    <radialGradient id="iconAreaLight" cx="50%" cy="40%" r="55%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.055)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                    </radialGradient>
 
                     <linearGradient id="cloudAbsorption" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stopColor="white" />
@@ -266,8 +313,6 @@ export default function ProblemDiagram() {
                     </radialGradient>
                 </defs>
 
-                {/* --- Center Ambient Glow --- */}
-                <ellipse cx="550" cy="240" rx="460" ry="190" fill="url(#centerGlow)" pointerEvents="none" />
 
                 {/* --- Narrative Stage Labels --- */}
                 <g style={{ opacity: 0.8 }}>
@@ -420,14 +465,25 @@ export default function ProblemDiagram() {
                                 x1={q.x} y1={q.y + 12} x2={q.x} y2={q.anchorY}
                                 stroke="white" strokeWidth="0.5" strokeDasharray="1 3" opacity="0.1"
                             />
+                            {/* Bubble shadow layer */}
+                            <rect
+                                x={q.x - 55} y={q.y - 9} width="110" height="22" rx="6"
+                                fill="rgba(0,0,0,0.5)" filter="url(#softBlur)" opacity="0.6"
+                            />
+                            {/* Bubble body */}
                             <rect
                                 x={q.x - 55} y={q.y - 11} width="110" height="22" rx="6"
-                                fill="white" stroke="rgba(0,0,0,0.1)" strokeWidth="1"
-                                className="shadow-sm"
+                                fill="url(#bubbleFace)"
+                                stroke="rgba(255,255,255,0.35)" strokeWidth="0.6"
+                            />
+                            {/* Top specular highlight */}
+                            <rect
+                                x={q.x - 48} y={q.y - 10} width="96" height="7" rx="5"
+                                fill="rgba(255,255,255,0.55)"
                             />
                             <text
                                 x={q.x} y={q.y + 4} textAnchor="middle"
-                                fill="black" fontSize="8.5" fontWeight="500" opacity="1"
+                                fill="rgba(10,10,18,0.9)" fontSize="8.5" fontWeight="600"
                                 letterSpacing="0.02em"
                             >
                                 {q.text}
@@ -441,23 +497,34 @@ export default function ProblemDiagram() {
                         <motion.g
                             initial={{ opacity: 0.9, scale: 1 }}
                             animate={{
-                                scale: [1, 1.03, 1],
-                                opacity: [0.7, 1, 0.7]
+                                scale: [1, 1.04, 1],
+                                opacity: [0.75, 1, 0.75]
                             }}
-                            whileHover={{ scale: 1.15 }}
+                            whileHover={{ scale: 1.18 }}
                             transition={{
                                 repeat: Infinity,
-                                duration: 4.5,
-                                delay: i * 0.5,
+                                duration: 4 + i * 0.3,
+                                delay: i * 0.45,
                                 ease: "easeInOut"
                             }}
-                            className="cursor-pointer group/icon"
+                            className="cursor-pointer"
                         >
-                            <rect
-                                width="30" height="30" rx="9"
-                                fill="white"
-                                stroke="rgba(0,0,0,0.1)"
-                                strokeWidth="1"
+                            {/* Soft ambient glow behind card */}
+                            <ellipse cx="15" cy="26" rx="13" ry="5"
+                                fill="rgba(255,255,255,0.22)" filter="url(#softBlur)" />
+                            {/* Card body — gradient face */}
+                            <rect width="30" height="30" rx="9"
+                                fill="url(#iconFace)"
+                                filter="url(#iconDrop)"
+                            />
+                            {/* Top specular highlight — simulates directional light from above */}
+                            <rect x="2" y="2" width="26" height="9" rx="7"
+                                fill="rgba(255,255,255,0.5)" />
+                            {/* Subtle border */}
+                            <rect width="30" height="30" rx="9"
+                                fill="none"
+                                stroke="rgba(255,255,255,0.2)"
+                                strokeWidth="0.7"
                             />
                             <foreignObject x="3" y="3" width="24" height="24">
                                 <div className="flex items-center justify-center h-full text-black pointer-events-none">

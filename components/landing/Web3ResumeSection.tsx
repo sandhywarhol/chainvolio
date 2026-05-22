@@ -723,8 +723,13 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         ].map((item, idx) => (
                             <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
                                 <div className="flex items-start gap-6">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 group-hover:bg-white border border-white/10 flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl shadow-black/5">
-                                        <item.icon size={20} className="text-white/60 group-hover:text-black transition-colors duration-500" />
+                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 relative overflow-hidden transition-all duration-500 border border-white/10 group-hover:border-white/20"
+                                        style={{
+                                            background: "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.04) 100%)",
+                                            boxShadow: "0 8px 24px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)"
+                                        }}>
+                                        <div className="absolute inset-x-2 top-1.5 h-2 rounded-full pointer-events-none" style={{ background: "rgba(255,255,255,0.18)" }} />
+                                        <item.icon size={20} className="relative z-10 text-white/55 group-hover:text-white/90 transition-colors duration-500" />
                                     </div>
 
                                     <div className="space-y-4">

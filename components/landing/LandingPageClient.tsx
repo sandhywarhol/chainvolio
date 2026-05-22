@@ -565,7 +565,7 @@ function AttestationBlock() {
             {/* Left — copy */}
             <div className="space-y-10">
                 <div className="space-y-5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.12]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
                         <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Verifiable Work History with On-Chain Attestations</span>
                     </div>
@@ -1019,7 +1019,7 @@ function HiringBlock() {
             {/* Right — copy & hover-controlled feature rows */}
             <div className="space-y-10 order-1 lg:order-2">
                 <div className="space-y-5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.07] bg-white/[0.02]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.12]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
                         <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">How to Hire Verified Web3 Talent</span>
                     </div>
@@ -1242,7 +1242,7 @@ export function LandingPageClient() {
                 <section className="relative pt-20 sm:pt-28 md:pt-36 pb-0 px-4 sm:px-6 z-20 max-w-[1100px] mx-auto flex flex-col w-full">
 
                     {/* Badge — above headline */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.09] bg-white/[0.025] backdrop-blur-md mb-5 self-start">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.14] backdrop-blur-md mb-5 self-start" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }}>
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-400/70 animate-pulse flex-shrink-0" />
                         <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em] whitespace-nowrap">
                             Trust layer for Web3
@@ -1263,7 +1263,7 @@ export function LandingPageClient() {
                         </p>
                         <Link
                             href="/create-profile"
-                            className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.09] bg-white/[0.025] backdrop-blur-md flex-shrink-0 mt-0.5 transition-all hover:bg-white/[0.06] hover:border-white/[0.18] active:scale-[0.97]"
+                            className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.14] backdrop-blur-md flex-shrink-0 mt-0.5 transition-all hover:border-white/[0.22] active:scale-[0.97]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }}
                         >
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/70 flex-shrink-0" />
                             <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em] whitespace-nowrap">
@@ -1627,7 +1627,7 @@ export function LandingPageClient() {
                     <div className="max-w-[1240px] mx-auto">
                         <div className="text-center mb-8 space-y-6">
                             {/* Pill Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mx-auto">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.12] mx-auto" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
                                 <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Why Web3 Hiring Is Broken</span>
                             </div>
@@ -1700,13 +1700,21 @@ export function LandingPageClient() {
                                 ].map((item, idx) => (
                                     <div key={idx} className={`p-6 transition-colors group relative w-[80vw] md:w-auto flex-shrink-0 px-5 mx-2 md:mx-0 ${(idx === 0 || idx === 4) ? 'md:hidden' : ''}`}>
                                         <div className="flex items-start gap-6">
-                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-xl ${
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 flex-shrink-0 transition-all duration-500 relative overflow-hidden ${
                                                 theme === 'light'
                                                 ? 'bg-brand-cyan border border-brand-cyan shadow-cyan-900/10 theme-preserve'
-                                                : 'bg-white/10 group-hover:bg-white border border-white/10 shadow-black/5'
-                                            }`}>
-                                                <item.icon size={20} className={`transition-colors duration-500 ${
-                                                    theme === 'light' ? 'text-white' : 'text-white/60 group-hover:text-black'
+                                                : 'border border-white/10 group-hover:border-white/20'
+                                            }`}
+                                            style={theme !== 'light' ? {
+                                                background: "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.04) 100%)",
+                                                boxShadow: "0 8px 24px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)"
+                                            } : undefined}>
+                                                {/* Top highlight streak */}
+                                                {theme !== 'light' && (
+                                                    <div className="absolute inset-x-2 top-1.5 h-2 rounded-full pointer-events-none" style={{ background: "rgba(255,255,255,0.18)" }} />
+                                                )}
+                                                <item.icon size={20} className={`relative z-10 transition-colors duration-500 ${
+                                                    theme === 'light' ? 'text-white' : 'text-white/55 group-hover:text-white/90'
                                                 }`} />
                                             </div>
 
@@ -1760,7 +1768,7 @@ export function LandingPageClient() {
                     <div className="relative max-w-[1240px] mx-auto px-4 sm:px-6" style={{ zIndex:1 }}>
 
                         {/* Label pill */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mb-8">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.12] mb-8" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                             <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
                             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.18em]">Verifiable Work History</span>
                         </div>
@@ -2066,7 +2074,7 @@ export function LandingPageClient() {
 
                         {/* ── Header: left-aligned ── */}
                         <div className="text-left space-y-6 mb-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02]">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.12]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
                                 <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Build a Verifiable Web3 Resume with On-Chain Proof</span>
                             </div>
@@ -2112,10 +2120,16 @@ export function LandingPageClient() {
                             <div className="relative scale-[0.65] min-[440px]:scale-[0.75] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[350px] h-[650px] md:w-[1200px] md:h-[650px]">
                                 <div className="relative w-full h-full group">
                                     {/* Main Dashboard Mockup */}
-                                    <div className="theme-preserve w-full h-full bg-[#060608] rounded-[32px] border border-white/10 overflow-hidden text-left relative"
-                                        style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
+                                    <div className="theme-preserve w-full h-full bg-[#060608] rounded-[32px] border border-white/[0.13] overflow-hidden text-left relative"
+                                        style={{ boxShadow: "0 0 0 1px rgba(255,255,255,0.06) inset, 0 1px 0 rgba(255,255,255,0.1) inset, 0 32px 80px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.5)" }}
                                     >
                                         <MockProfileUI />
+                                        {/* Diagonal sheen — top-left catch light */}
+                                        <div className="absolute inset-0 pointer-events-none rounded-[32px]" style={{ zIndex: 20, background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 25%, transparent 50%)" }} />
+                                        {/* Top-edge specular line */}
+                                        <div className="absolute inset-x-0 top-0 h-px pointer-events-none rounded-t-[32px]" style={{ zIndex: 21, background: "linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.2) 35%, rgba(255,255,255,0.12) 65%, transparent 92%)" }} />
+                                        {/* Spotlight cone from top-left */}
+                                        <div className="absolute inset-0 pointer-events-none rounded-[32px]" style={{ zIndex: 19, background: "conic-gradient(from 150deg at 12% -6%, transparent 55deg, rgba(255,255,255,0.05) 67deg, rgba(255,255,255,0.025) 78deg, transparent 92deg)" }} />
                                     </div>
 
                                     {/* Floating Proof Card - Now visible on all screens, part of the scaled assembly */}
@@ -2152,15 +2166,7 @@ export function LandingPageClient() {
                 <Web3ResumeSection onCtaClick={() => setIsWalletModalOpen(true)} />
 
                 {/* 5. FINAL CTA */}
-                <section className="py-16 sm:py-20 md:py-24 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
-
-                    {/* Radial glow center */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] rounded-full pointer-events-none"
-                        style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, transparent 70%)" }}
-                    />
-                    {/* Top + bottom fade */}
-                    <div className="theme-cta-fade absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#060608] to-transparent pointer-events-none" />
-                    <div className="theme-cta-fade absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#060608] to-transparent pointer-events-none" />
+                <section className="pt-16 sm:pt-20 md:pt-24 pb-40 sm:pb-52 md:pb-64 relative z-10 bg-[#060608] theme-bg-section">
 
                     <div className="relative max-w-[760px] mx-auto text-center z-10">
                         <motion.div
