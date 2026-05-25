@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { title, description, ownerWallet, filters, signature, nonce, timestamp, ...metadata } = body;
+        const { title, description, ownerWallet, filters, signature, nonce, timestamp, auth_uid, ...metadata } = body;
 
         if (!title?.trim() || !ownerWallet) {
             return errorResponse("ERR_INVALID_REQUEST", "Title and ownerWallet are required", 400);
@@ -57,52 +57,80 @@ export async function POST(request: Request) {
         }
 
         // --- Signature Verification ---
-        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!signature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to create a collection.", 401);
+        // Google-auth users (ownerWallet = "gauth:<auth_uid>") skip signature — no wallet to sign with.
+        const isGoogleAuthUser = ownerWallet.startsWith("gauth:");
+        if (!isGoogleAuthUser) {
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!signature || !nonce || !timestamp)) {
+                return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to create a collection.", 401);
+            }
+
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                ownerWallet,
+                "create_collection",
+                nonce || "",
+                timestamp || 0,
+                signature || ""
+            );
+
+            if (!isValid) {
+                return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+            }
         }
-
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            ownerWallet,
-            "create_collection",
-            nonce || "",
-            timestamp || 0,
-            signature || ""
-        );
-
-        if (!isValid) {
-            return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
-        }
-
-        // --- Tier Resolution ---
-        const { data: orgData } = await supabase
-            .from("organization_verifications")
-            .select("status, type, expires_at")
-            .eq("wallet_address", ownerWallet)
-            .maybeSingle();
 
         const now = new Date();
-        const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
-        const isExpired = expiresAtDate ? now > expiresAtDate : false;
-        const isVerified = orgData?.status === "verified" && !isExpired;
-        const verificationTier = isVerified ? (orgData?.type || "unverified") : "unverified";
+        let isGoogleOrgActive = false;
+        let verificationTier = "unverified";
 
-        // --- Google org subscription check (wallet linked to a paid org_account) ---
-        const { data: googleOrgData } = await supabase
-            .from("org_accounts")
-            .select("plan_name, subscription_status, current_period_end")
-            .eq("wallet_address", ownerWallet)
-            .maybeSingle();
+        if (isGoogleAuthUser) {
+            // --- Google-user tier: check org_accounts by auth_uid ---
+            const uid = auth_uid || ownerWallet.replace("gauth:", "");
+            const { data: gaOrgData } = await supabase
+                .from("org_accounts")
+                .select("plan_name, subscription_status, current_period_end")
+                .eq("auth_uid", uid)
+                .maybeSingle();
 
-        const googlePeriodExpired = googleOrgData?.current_period_end
-            ? new Date(googleOrgData.current_period_end) < now : false;
-        const isGoogleOrgActive = !!(
-            googleOrgData?.subscription_status === "active" &&
-            !googlePeriodExpired &&
-            googleOrgData?.plan_name &&
-            googleOrgData.plan_name !== "free"
-        );
+            const gaPeriodExpired = gaOrgData?.current_period_end
+                ? new Date(gaOrgData.current_period_end) < now : false;
+            isGoogleOrgActive = !!(
+                gaOrgData?.subscription_status === "active" &&
+                !gaPeriodExpired &&
+                gaOrgData?.plan_name &&
+                gaOrgData.plan_name !== "free"
+            );
+            // Google-only users are capped at unverified tier unless they have an active subscription
+            verificationTier = "unverified";
+        } else {
+            // --- Wallet-user tier: check organization_verifications ---
+            const { data: orgData } = await supabase
+                .from("organization_verifications")
+                .select("status, type, expires_at")
+                .eq("wallet_address", ownerWallet)
+                .maybeSingle();
+
+            const expiresAtDate = orgData?.expires_at ? new Date(orgData.expires_at) : null;
+            const isExpired = expiresAtDate ? now > expiresAtDate : false;
+            const isVerified = orgData?.status === "verified" && !isExpired;
+            verificationTier = isVerified ? (orgData?.type || "unverified") : "unverified";
+
+            // --- Google org subscription check (wallet linked to a paid org_account) ---
+            const { data: googleOrgData } = await supabase
+                .from("org_accounts")
+                .select("plan_name, subscription_status, current_period_end")
+                .eq("wallet_address", ownerWallet)
+                .maybeSingle();
+
+            const googlePeriodExpired = googleOrgData?.current_period_end
+                ? new Date(googleOrgData.current_period_end) < now : false;
+            isGoogleOrgActive = !!(
+                googleOrgData?.subscription_status === "active" &&
+                !googlePeriodExpired &&
+                googleOrgData?.plan_name &&
+                googleOrgData.plan_name !== "free"
+            );
+        }
 
         // Active Google subscription unlocks unlimited hiring (same as verified wallet orgs)
         const effectiveHiringLimit = isGoogleOrgActive ? null : getHiringLimit(verificationTier);
@@ -155,10 +183,10 @@ export async function POST(request: Request) {
         const updatedMetadata = { ...metadata };
         if (isGoogleOrgActive) {
             updatedMetadata.isTrusted = true;
-            updatedMetadata.verificationTier = googleOrgData!.plan_name;
-        } else if (isVerified && isRecruiterTier(orgData?.type)) {
+            updatedMetadata.verificationTier = "google_paid";
+        } else if (!isGoogleAuthUser && isRecruiterTier(verificationTier)) {
             updatedMetadata.isTrusted = true;
-            updatedMetadata.verificationTier = orgData.type;
+            updatedMetadata.verificationTier = verificationTier;
         } else {
             updatedMetadata.isTrusted = false;
         }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase } from "@/lib/supabase/client";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import Link from "next/link";
 import { getHiringLimit } from "@/lib/paymentConfig";
 import {
@@ -41,6 +42,8 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateCollection() {
     const { publicKey, signMessage } = useWallet();
+    const { session, orgAccount: googleOrgAccount, loading: googleLoading } = useGoogleAuth();
+    const isGoogleUser = !publicKey && !!session;
     const [loading, setLoading] = useState(false);
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -83,64 +86,100 @@ export default function CreateCollection() {
         }
     });
 
-    // Fetch user tier + collection count on wallet connect
+    // Fetch user tier + collection count on wallet connect or Google session
     useEffect(() => {
-        if (!publicKey) { setUserTier("unverified"); setCollectionCount(0); return; }
-        setTierLoading(true);
-        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
-            .then(r => r.ok ? r.json() : null)
-            .then(data => {
-                if (data) setUserTier(data.verificationTier || "unverified");
-            })
-            .catch(() => {})
-            .finally(async () => {
-                // Count existing collections
-                if (supabase && publicKey) {
-                    const { count } = await supabase
-                        .from("hiring_collections")
-                        .select("*", { count: "exact", head: true })
-                        .eq("owner_wallet", publicKey.toBase58());
-                    setCollectionCount(count ?? 0);
-                }
-                setTierLoading(false);
-            });
-    }, [publicKey]);
+        if (!publicKey && !session) { setUserTier("unverified"); setCollectionCount(0); return; }
 
-    // Auto-populate profile data
+        setTierLoading(true);
+
+        if (publicKey) {
+            const walletStr = publicKey.toBase58();
+            fetch(`/api/user/me?wallet=${walletStr}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (data) setUserTier(data.verificationTier || "unverified");
+                })
+                .catch(() => {})
+                .finally(async () => {
+                    if (supabase) {
+                        const { count } = await supabase
+                            .from("hiring_collections")
+                            .select("*", { count: "exact", head: true })
+                            .eq("owner_wallet", walletStr);
+                        setCollectionCount(count ?? 0);
+                    }
+                    setTierLoading(false);
+                });
+        } else if (session) {
+            // Google user — derive tier from org subscription
+            const authUid = session.user.id;
+            const planName = googleOrgAccount?.plan_name || "free";
+            const subStatus = googleOrgAccount?.subscription_status || "free";
+            const periodEnd = googleOrgAccount?.current_period_end;
+            const isActive = subStatus === "active" && planName !== "free" &&
+                (!periodEnd || new Date(periodEnd) > new Date());
+            setUserTier(isActive ? "Company / Organization" : "unverified");
+
+            if (supabase) {
+                void supabase.from("hiring_collections")
+                    .select("*", { count: "exact", head: true })
+                    .eq("owner_wallet", `gauth:${authUid}`)
+                    .then(({ count }) => {
+                        setCollectionCount(count ?? 0);
+                        setTierLoading(false);
+                    });
+            } else {
+                setTierLoading(false);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [publicKey, session, googleOrgAccount]);
+
+    // Auto-populate profile data from wallet profile or Google org account
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!publicKey || !supabase) return;
+            if (publicKey && supabase) {
+                try {
+                    const { data, error } = await supabase
+                        .from("profiles")
+                        .select("display_name, headline, professional_role, organization, website, twitter")
+                        .eq("wallet_address", publicKey.toBase58())
+                        .single();
 
-            try {
-                const { data, error } = await supabase
-                    .from("profiles")
-                    .select("display_name, headline, professional_role, organization, website, twitter")
-                    .eq("wallet_address", publicKey.toBase58())
-                    .single();
+                    if (data && !error) {
+                        const baseRole = data.professional_role || data.headline || "";
+                        const fullRole = (baseRole && data.organization)
+                            ? `${baseRole} @ ${data.organization}`
+                            : baseRole;
 
-                if (data && !error) {
-                    const baseRole = data.professional_role || data.headline || "";
-                    const fullRole = (baseRole && data.organization) 
-                        ? `${baseRole} @ ${data.organization}` 
-                        : baseRole;
-
-                    setFormData(prev => ({
-                        ...prev,
-                        recruiterName: prev.recruiterName || data.display_name || "",
-                        recruiterRole: prev.recruiterRole || fullRole,
-                        companyName: prev.companyName || data.organization || "",
-                        websiteUrl: prev.websiteUrl || data.website || "",
-                        twitterUrl: prev.twitterUrl || data.twitter || ""
-                    }));
-                    setIsAutoFilled(true);
+                        setFormData(prev => ({
+                            ...prev,
+                            recruiterName: prev.recruiterName || data.display_name || "",
+                            recruiterRole: prev.recruiterRole || fullRole,
+                            companyName: prev.companyName || data.organization || "",
+                            websiteUrl: prev.websiteUrl || data.website || "",
+                            twitterUrl: prev.twitterUrl || data.twitter || ""
+                        }));
+                        setIsAutoFilled(true);
+                    }
+                } catch (err) {
+                    console.error("Error fetching recruiter profile:", err);
                 }
-            } catch (err) {
-                console.error("Error fetching recruiter profile:", err);
+            } else if (isGoogleUser && googleOrgAccount) {
+                setFormData(prev => ({
+                    ...prev,
+                    recruiterName: prev.recruiterName || googleOrgAccount.org_name || "",
+                    companyName: prev.companyName || googleOrgAccount.org_name || "",
+                    websiteUrl: prev.websiteUrl || googleOrgAccount.website || "",
+                    twitterUrl: prev.twitterUrl || googleOrgAccount.twitter || "",
+                }));
+                setIsAutoFilled(true);
             }
         };
 
         fetchProfile();
-    }, [publicKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [publicKey, isGoogleUser, googleOrgAccount]);
 
     const toggleFocus = (area: string) => {
         setFormData(prev => ({
@@ -161,8 +200,8 @@ export default function CreateCollection() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!publicKey || !signMessage) {
-            setToast({ message: "Please connect your wallet to sign this action.", type: "warning" });
+        if (!publicKey && !session) {
+            setToast({ message: "Please connect your wallet or sign in with Google.", type: "warning" });
             return;
         }
 
@@ -197,10 +236,27 @@ export default function CreateCollection() {
         setLoading(true);
 
         try {
-            const { signChainVolioAction } = await import("@/lib/wallet-utils");
-            const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "create_collection");
+            let requestBody: Record<string, any> = {
+                ...formData,
+            };
 
-            if (!signedAction) {
+            if (isGoogleUser && session) {
+                // Google user — no wallet signing, use gauth: identifier
+                requestBody.ownerWallet = `gauth:${session.user.id}`;
+                requestBody.auth_uid = session.user.id;
+            } else if (publicKey && signMessage) {
+                // Wallet user — sign the action on-chain
+                const { signChainVolioAction } = await import("@/lib/wallet-utils");
+                const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "create_collection");
+
+                if (!signedAction) {
+                    setLoading(false);
+                    return;
+                }
+                requestBody.ownerWallet = publicKey.toBase58();
+                Object.assign(requestBody, signedAction);
+            } else {
+                setToast({ message: "Please connect your wallet to sign this action.", type: "warning" });
                 setLoading(false);
                 return;
             }
@@ -208,11 +264,7 @@ export default function CreateCollection() {
             const res = await fetch("/api/hiring/collections", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    ownerWallet: publicKey?.toBase58(),
-                    ...signedAction
-                }),
+                body: JSON.stringify(requestBody),
             });
 
             const responseData = await res.json();
@@ -222,7 +274,7 @@ export default function CreateCollection() {
                 const errorMsg = responseData?.error?.message || "An error occurred while creating the collection.";
                 if (errorCode === "ERR_HIRING_LIMIT_REACHED") {
                     setToast({ message: "You've reached your hiring limit. Upgrade for unlimited access.", type: "error" });
-                    setCollectionCount(hiringLimit ?? 0); // reflect in UI immediately
+                    setCollectionCount(hiringLimit ?? 0);
                 } else {
                     setToast({ message: errorMsg, type: "error" });
                 }
@@ -268,19 +320,19 @@ export default function CreateCollection() {
     };
     const hiringAccess = getHiringAccess();
 
-    if (tierLoading) {
+    if (tierLoading || googleLoading) {
         return <LoadingScreen />;
     }
 
-    if (!publicKey) {
+    if (!publicKey && !session) {
         return (
             <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black">
                 <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                     <Lock className="w-6 h-6 text-emerald-400" />
                 </div>
                 <div className="text-center space-y-2">
-                    <h1 className="text-xl font-bold text-white">Connect your wallet to continue</h1>
-                    <p className="text-slate-400 text-sm max-w-sm">You need a connected wallet to create a hiring collection.</p>
+                    <h1 className="text-xl font-bold text-white">Sign in to continue</h1>
+                    <p className="text-slate-400 text-sm max-w-sm">Connect your wallet or sign in with Google to create a hiring collection.</p>
                 </div>
                 <WalletMultiButton />
                 <Link href="/" className="text-slate-400 hover:text-white text-sm">← Back</Link>
@@ -307,6 +359,20 @@ export default function CreateCollection() {
                         </header>
 
                         <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* Google-user notice — no on-chain record, no hiring dashboard */}
+                        {isGoogleUser && (
+                            <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <Mail className="w-4 h-4 text-blue-400" />
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="text-[11px] font-bold text-blue-300 uppercase tracking-wider">Signed in with Google</p>
+                                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                                        Your collection will be saved to Supabase. Note: the hiring dashboard won&apos;t be available for Google-only accounts — connect a wallet later to unlock it.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         {/* Tier-based hiring gate */}
                         {hiringAccess === "limit_reached" ? (
                             // Limit reached: any capped tier exhausted
@@ -906,12 +972,19 @@ export default function CreateCollection() {
                         )}
 
                         <div className="flex flex-col md:flex-row gap-4 justify-center">
-                            <Link
-                                href={`/hiring/${createdSlug}/dashboard`}
-                                className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-xl"
-                            >
-                                Open Dashboard <ArrowRight className="w-5 h-5" />
-                            </Link>
+                            {!isGoogleUser && (
+                                <Link
+                                    href={`/hiring/${createdSlug}/dashboard`}
+                                    className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-xl"
+                                >
+                                    Open Dashboard <ArrowRight className="w-5 h-5" />
+                                </Link>
+                            )}
+                            {isGoogleUser && (
+                                <div className="px-6 py-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-center">
+                                    <p className="text-[11px] text-slate-400">Connect a wallet to unlock the hiring dashboard.</p>
+                                </div>
+                            )}
                             {hiringAccess !== "limit_reached" && (
                                 <button
                                     onClick={() => setCreatedSlug(null)}
