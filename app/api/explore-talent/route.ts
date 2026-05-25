@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
     const minScore      = parseInt(searchParams.get("minScore") || "0");
     const maxScore      = parseInt(searchParams.get("maxScore") || "100");
     const sort          = searchParams.get("sort") || "score_desc";
+    const skillTag      = (searchParams.get("skillTag") || "").trim();
     const location      = (searchParams.get("location") || "").trim();
     const availableOnly = searchParams.get("availableOnly") === "true";
     const verifiedOnly  = searchParams.get("verifiedOnly")  === "true";
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
         if (search)   profileQuery = profileQuery.or(`display_name.ilike.%${search}%,skills.ilike.%${search}%,professional_role.ilike.%${search}%`);
         if (workType) profileQuery = profileQuery.contains("work_preference", [workType]);
         if (location) profileQuery = profileQuery.ilike("country", `%${location}%`);
+        if (skillTag) profileQuery = profileQuery.ilike("skills", `%${skillTag}%`);
 
         const { data: rawProfiles, error: profileError } = await profileQuery;
         if (profileError) throw profileError;

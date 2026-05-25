@@ -5,6 +5,7 @@ import { TalentCard } from "@/components/explore/TalentCard";
 import { useExploreTalent } from "@/hooks/useExploreTalent";
 import { CATEGORIES, WORK_TYPES, SORT_OPTIONS } from "@/types/explore";
 import { SiteStats } from "@/lib/siteStats";
+import { SKILL_TAGS } from "@/types/explore";
 import {
     Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight,
     Loader2, Users, X, Briefcase, ShieldCheck, Globe, BadgeCheck
@@ -243,7 +244,7 @@ function ExploreTalentInnerBody({ initialStats }: { initialStats: SiteStats }) {
             </div>
 
             {/* ── Category tabs ─────────────────────────────────────────── */}
-            <div className="flex items-center gap-1 mb-5 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex items-center gap-1 mb-3 overflow-x-auto no-scrollbar pb-1">
                 {CATEGORIES.map((cat) => (
                     <button
                         key={cat.id}
@@ -255,6 +256,24 @@ function ExploreTalentInnerBody({ initialStats }: { initialStats: SiteStats }) {
                         }`}
                     >
                         {cat.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* ── Blockchain skill quick-filters ────────────────────────── */}
+            <div className="flex items-center gap-1.5 mb-5 overflow-x-auto no-scrollbar pb-1">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 flex-shrink-0 pr-1">Skills</span>
+                {SKILL_TAGS.map((tag) => (
+                    <button
+                        key={tag.id}
+                        onClick={() => setFilter("skillTag", filters.skillTag === tag.id ? "" : tag.id)}
+                        className={`flex-shrink-0 h-7 px-3 rounded-lg text-[11px] font-bold transition-all ${
+                            filters.skillTag === tag.id
+                                ? "bg-amber-200/15 border border-amber-200/30 text-amber-200/80"
+                                : "bg-white/[0.03] border border-white/[0.06] text-white/35 hover:bg-white/[0.07] hover:text-white/55"
+                        }`}
+                    >
+                        {tag.label}
                     </button>
                 ))}
             </div>

@@ -7,6 +7,7 @@ export interface ExploreFilters {
     workType:     string;
     minScore:     number;
     sort:         string;
+    skillTag:     string;   // quick blockchain skill chip filter
     // Future filters — API-ready, UI not yet wired
     location:     string;   // maps to profiles.country
     ecosystem:    string;   // future: profiles.ecosystem
@@ -20,11 +21,21 @@ export const DEFAULT_FILTERS: ExploreFilters = {
     workType:      "",
     minScore:      0,
     sort:          "score_desc",
+    skillTag:      "",
     location:      "",
     ecosystem:     "",
     availableOnly: false,
     verifiedOnly:  false,
 };
+
+export const SKILL_TAGS = [
+    { id: "Solana",     label: "Solana" },
+    { id: "Rust",       label: "Rust" },
+    { id: "Anchor",     label: "Anchor" },
+    { id: "EVM",        label: "EVM" },
+    { id: "Solidity",   label: "Solidity" },
+    { id: "TypeScript", label: "TypeScript" },
+] as const;
 
 export const SORT_OPTIONS = [
     { value: "score_desc", label: "Highest Score" },

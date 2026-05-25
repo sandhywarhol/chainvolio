@@ -542,6 +542,29 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         Waiting for wallet confirmation — make sure your wallet app is open.
                     </p>
                 )}
+
+                {/* Role preview — so users know what to expect before connecting */}
+                <div className="pt-1">
+                    <p className="text-[9px] text-slate-600 font-bold uppercase tracking-[0.2em] text-center mb-2">What you can do</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="p-3 rounded-[14px] bg-indigo-500/[0.06] border border-indigo-500/[0.12]">
+                            <p className="text-[10px] font-black text-indigo-300/80 mb-1.5">🏗 Builder</p>
+                            <ul className="space-y-0.5">
+                                {["Verified resume", "On-chain proof of work", "Shareable profile link"].map(t => (
+                                    <li key={t} className="text-[9px] text-slate-500 flex items-center gap-1"><span className="text-indigo-500/60">·</span>{t}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="p-3 rounded-[14px] bg-amber-500/[0.06] border border-amber-500/[0.12]">
+                            <p className="text-[10px] font-black text-amber-300/80 mb-1.5">🔍 Recruiter</p>
+                            <ul className="space-y-0.5">
+                                {["Post hiring collections", "Attest talent work", "Browse verified talent"].map(t => (
+                                    <li key={t} className="text-[9px] text-slate-500 flex items-center gap-1"><span className="text-amber-500/60">·</span>{t}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}

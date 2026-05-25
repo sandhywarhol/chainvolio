@@ -12,6 +12,7 @@ function parseFiltersFromURL(sp: URLSearchParams): ExploreFilters {
         workType:      sp.get("workType")  || DEFAULT_FILTERS.workType,
         minScore:      parseInt(sp.get("minScore") || "0"),
         sort:          sp.get("sort")      || DEFAULT_FILTERS.sort,
+        skillTag:      sp.get("skillTag")  || DEFAULT_FILTERS.skillTag,
         location:      sp.get("location")  || DEFAULT_FILTERS.location,
         ecosystem:     sp.get("ecosystem") || DEFAULT_FILTERS.ecosystem,
         availableOnly: sp.get("availableOnly") === "true",
@@ -26,6 +27,7 @@ function buildURLParams(filters: ExploreFilters, page: number): URLSearchParams 
     if (filters.workType)              p.set("workType",     filters.workType);
     if (filters.minScore > 0)          p.set("minScore",     String(filters.minScore));
     if (filters.sort !== "score_desc") p.set("sort",         filters.sort);
+    if (filters.skillTag)              p.set("skillTag",     filters.skillTag);
     if (filters.location)              p.set("location",     filters.location);
     if (filters.ecosystem)             p.set("ecosystem",    filters.ecosystem);
     if (filters.availableOnly)         p.set("availableOnly","true");
@@ -68,6 +70,7 @@ export function useExploreTalent() {
                 maxScore:     "100",
                 sort:         f.sort,
             });
+            if (f.skillTag)      params.set("skillTag",      f.skillTag);
             if (f.location)      params.set("location",      f.location);
             if (f.ecosystem)     params.set("ecosystem",     f.ecosystem);
             if (f.availableOnly) params.set("availableOnly", "true");
@@ -103,7 +106,7 @@ export function useExploreTalent() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         filters.category, filters.workType, filters.minScore, filters.sort,
-        filters.location, filters.ecosystem, filters.availableOnly, filters.verifiedOnly,
+        filters.skillTag, filters.location, filters.ecosystem, filters.availableOnly, filters.verifiedOnly,
         page,
     ]);
 
@@ -145,6 +148,7 @@ export function useExploreTalent() {
         !!filters.workType         ||
         filters.minScore > 0       ||
         filters.sort !== "score_desc" ||
+        !!filters.skillTag         ||
         !!filters.location         ||
         !!filters.ecosystem        ||
         filters.availableOnly      ||

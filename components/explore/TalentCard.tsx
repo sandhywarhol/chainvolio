@@ -252,6 +252,14 @@ export function TalentCard({ talent, variant = "default" }: { talent: TalentProf
                         <p className="text-[11px] font-medium text-white/40">
                             {talent.role || "Web3 Builder"}
                         </p>
+                        {!isOrg && talent.status && STATUS_CONFIG[talent.status] && (
+                            <div className="flex justify-center mt-1">
+                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${STATUS_CONFIG[talent.status].className}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[talent.status].dot} ${talent.status === 'available' ? 'animate-pulse' : ''}`} />
+                                    {STATUS_CONFIG[talent.status].label}
+                                </span>
+                            </div>
+                        )}
                         <p className="mt-3 text-[11px] text-white/30 leading-relaxed line-clamp-2 max-w-[200px] mx-auto min-h-[2.2rem]">
                             {talent.bio || "Active contributor building the future of the decentralized web."}
                         </p>
