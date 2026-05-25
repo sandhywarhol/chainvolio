@@ -19,6 +19,12 @@ export default function AuthCallbackPage() {
             const code = params.get("code");
             const next = params.get("next") ?? "/dashboard";
 
+            const errorParam = params.get("error");
+            if (errorParam) {
+                setAuthError("Sign in was cancelled. Please try again.");
+                return;
+            }
+
             if (code) {
                 const { error } = await supabaseAuth.auth.exchangeCodeForSession(code);
                 if (error) {

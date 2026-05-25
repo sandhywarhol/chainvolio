@@ -196,7 +196,7 @@ export default function CreateProfilePage() {
       <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black theme-bg-page theme-aware">
         <h1 className="text-2xl font-bold">Connect your wallet</h1>
         <p className="text-slate-400 text-center max-w-sm">
-          You need to connect your Solana wallet (e.g. Phantom) to create or edit your profile.
+          Connect your Solana wallet or sign in with Google to create or edit your profile.
         </p>
         <WalletMultiButton />
         <Link href="/" className="text-slate-400 hover:text-white">
