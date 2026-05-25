@@ -1257,10 +1257,15 @@ export function LandingPageClient() {
 
                     {/* Subtitle + Start Free */}
                     <div className="flex items-start justify-between gap-6 mb-8 sm:mb-10">
-                        <p className="text-white/35 text-[12px] sm:text-[13px] font-normal leading-relaxed max-w-[380px]">
-                            Signed by real people. Anchored on Solana.
-                            <br />Cryptographically verified. Share anywhere with one link.
-                        </p>
+                        <div className="space-y-2">
+                            <p className="text-white/35 text-[12px] sm:text-[13px] font-normal leading-relaxed max-w-[380px]">
+                                Signed by real people. Anchored on Solana.
+                                <br />Cryptographically verified. Share anywhere with one link.
+                            </p>
+                            <p className="text-white/20 text-[11px] font-normal leading-relaxed max-w-[380px]">
+                                Connect your wallet or Google account → complete your profile → get a shareable verified link in under 2 minutes.
+                            </p>
+                        </div>
                         <Link
                             href="/create-profile"
                             className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.14] backdrop-blur-md flex-shrink-0 mt-0.5 transition-all hover:border-white/[0.22] active:scale-[0.97]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }}
@@ -2193,6 +2198,23 @@ export function LandingPageClient() {
                                 >
                                     Create Hiring Link <ArrowRight className="w-4 h-4" />
                                 </Link>
+                            </div>
+
+                            {/* Post-signup flow hint */}
+                            <div className="flex items-center justify-center gap-2 mb-8 flex-wrap">
+                                {[
+                                    { step: "1", label: "Connect wallet or Google" },
+                                    { step: "2", label: "Fill your profile" },
+                                    { step: "3", label: "Share your verified link" },
+                                ].map(({ step, label }, i) => (
+                                    <React.Fragment key={step}>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[10px] font-bold text-white/40 flex items-center justify-center flex-shrink-0">{step}</span>
+                                            <span className="text-[11px] text-white/30 font-medium">{label}</span>
+                                        </div>
+                                        {i < 2 && <span className="text-white/15 text-[10px]">→</span>}
+                                    </React.Fragment>
+                                ))}
                             </div>
 
                             {/* Trust pills */}
