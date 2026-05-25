@@ -28,6 +28,23 @@ export default function AuthCallbackPage() {
                 }
             }
 
+            // Detect new Google user — route to role selection before dashboard
+            try {
+                const { data: { session } } = await supabaseAuth.auth.getSession();
+                if (session?.user?.id) {
+                    const res = await fetch(`/api/org-accounts?auth_uid=${session.user.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.orgAccount) {
+                            router.replace("/auth/role");
+                            return;
+                        }
+                    }
+                }
+            } catch {
+                // Fail open — go to dashboard as normal
+            }
+
             router.replace(next);
         };
 

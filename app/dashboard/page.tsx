@@ -281,10 +281,17 @@ export default function DashboardPage() {
     return <LoadingScreen message="Loading your dashboard..." />;
   }
 
-  // Google org users always get the Google dashboard — even if a wallet is also connected.
-  // Wallet connection is irrelevant for the Google/Stripe payment path.
   if (session) {
-    return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} />;
+    if (orgAccount?.account_type === "builder") {
+      // Google builder: if wallet is connected, fall through to wallet builder dashboard.
+      // Without a wallet, show a prompt to connect one.
+      if (!connected || !publicKey) {
+        return <GoogleBuilderNoWalletView session={session} />;
+      }
+      // fall through to wallet builder dashboard below
+    } else {
+      return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} />;
+    }
   }
 
   // autoConnect is still running — show loading so the Sign-In screen never
@@ -351,7 +358,6 @@ export default function DashboardPage() {
               { Icon: User,        label: "Profile",           id: "profile",       href: undefined },
               { Icon: ShieldCheck, label: "Credential",        id: "credential",    href: undefined },
               { Icon: FileCheck2,  label: "Proof of Work",     id: "proof-work",    href: undefined },
-              { Icon: FolderOpen,  label: "Hiring Collection", id: "hiring",        href: undefined },
               { Icon: Activity,    label: "Attestation Usage", id: "attestation",   href: undefined },
               { Icon: Briefcase,   label: "Career Timeline",   id: "timeline",      href: undefined },
               { Icon: Send,        label: "My Applications",   id: "applications",  href: undefined },
@@ -430,7 +436,6 @@ export default function DashboardPage() {
               profile:     { title: "Profile",           desc: "Manage your professional identity and information." },
               credential:  { title: "Credential",        desc: "Your verified credentials and badges." },
               "proof-work":{ title: "Proof of Work",     desc: "Your work history and contributions." },
-              hiring:      { title: "Hiring Collection", desc: "Manage your talent hiring collections." },
               attestation: { title: "Attestation Usage", desc: "Track your monthly attestation usage." },
               timeline:    { title: "Career Timeline",   desc: "Your verified professional career timeline." },
               applications:{ title: "My Applications",   desc: "Track your job applications and opportunities." },
@@ -1220,108 +1225,6 @@ export default function DashboardPage() {
         </div>
             </>}{/* end attestation tab */}
 
-            {/* ── HIRING COLLECTION tab ── */}
-            {activeTab === "hiring" && <>
-        <div id="hiring" className="mb-3 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
-          <div
-            onClick={() => setIsHiringExpanded(!isHiringExpanded)}
-            className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-all hover:bg-white/[0.02]"
-            style={{ background: "rgba(255,255,255,0.02)" }}
-          >
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <FolderOpen style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3">
-                  <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Hiring Collection</p>
-                  {collections.length > 0 && !isHiringExpanded && (
-                    <span className="text-[10px] font-bold bg-white/10 text-white/60 px-2 py-0.5 rounded-full border border-white/10">
-                      {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'}
-                    </span>
-                  )}
-                </div>
-                {!isHiringExpanded && (() => {
-                  const hiringLimit = getHiringLimit(profile?.verificationTier);
-                  if (hiringLimit === null) {
-                    return <p className="text-[10px] text-slate-500 mt-0.5"><span className="text-white/60 font-bold">Unlimited hiring access enabled</span></p>;
-                  }
-                  // Capped tier: show usage
-                  const used = collections.length;
-                  const remaining = Math.max(0, hiringLimit - used);
-                  const isAtLimit = used >= hiringLimit;
-                  return (
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      Hiring Usage:{" "}
-                      <span className={`font-bold ${
-                        isAtLimit ? "text-rose-400" : remaining <= 1 ? "text-amber-400" : "text-slate-400"
-                      }`}>
-                        {used} / {hiringLimit} used
-                      </span>
-                      {!isAtLimit && remaining <= 1 && (
-                        <span className="text-amber-400/80 ml-1">- last slot</span>
-                      )}
-                    </p>
-                  );
-                })()}
-              </div>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{collections.length} Collections</span>
-            {isHiringExpanded ? <ChevronUp style={{ width: 12, height: 12, opacity: 0.3, flexShrink: 0 }} /> : <ChevronDown style={{ width: 12, height: 12, opacity: 0.25, flexShrink: 0 }} />}
-          </div>
-
-          {isHiringExpanded && (
-            <div className="px-4 py-3 animate-in slide-in-from-top-2 fade-in duration-300" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-              <div className="flex items-center justify-between mb-3">
-                <p style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Talent Collections</p>
-                <Link 
-                  href="/hiring/create"
-                  className="text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <Plus className="w-3.5 h-3.5" /> New Collection
-                </Link>
-              </div>
-
-            {collections.length > 0 ? (
-              <div className="grid gap-3">
-                {collections.map(col => (
-                  <div key={col.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
-                    <div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-white transition-colors">{col.title}</h3>
-                      <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
-                        <span>{new Date(col.created_at).toLocaleDateString()}</span>
-                        <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={(e) => e.stopPropagation()}>
-                          Public Page <ExternalLink className="w-2.5 h-2.5" />
-                        </Link>
-                      </div>
-                    </div>
-                    <Link
-                      href={`/hiring/${col.slug}/dashboard`}
-                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Dashboard
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-8 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
-                <h3 className="text-base font-bold text-white mb-2">Ready to Source Talent?</h3>
-                <p className="text-xs text-slate-500 mb-4 max-w-sm">
-                  Create your first collection to start discovering and tracking talent.
-                </p>
-                <Link
-                  href="/hiring/create"
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-bold rounded-lg transition-all border border-white/10"
-                >
-                  Create Hiring Collection
-                </Link>
-              </div>
-            )}
-            </div>
-          )}
-        </div>
-
-            </>}{/* end hiring tab */}
 
             {/* ── CREDENTIAL tab ── */}
             {activeTab === "credential" && <>
@@ -1724,6 +1627,25 @@ export default function DashboardPage() {
 // ── Wrapper for Google-only org users ───────────────────────────────────────
 import type { Session } from "@supabase/supabase-js";
 import type { OrgAccount } from "@/hooks/useGoogleAuth";
+
+function GoogleBuilderNoWalletView({ session }: { session: Session }) {
+  return (
+    <main className="min-h-screen text-white relative bg-black theme-bg-page theme-aware">
+      <Navbar />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
+        <div className="text-center space-y-3 max-w-sm">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mx-auto">🏗</div>
+          <h1 className="text-2xl font-bold">Connect your wallet</h1>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            You are signed in as a Builder via Google. Link a Solana wallet to create your on-chain profile and access all builder features.
+          </p>
+          <p className="text-[11px] text-slate-600">Signed in as {session.user.email}</p>
+        </div>
+        <WalletMultiButton />
+      </div>
+    </main>
+  );
+}
 
 function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; orgAccount: OrgAccount | null }) {
   const router = useRouter();

@@ -41,16 +41,28 @@ export async function POST(req: NextRequest) {
     if (!supabaseServer) return NextResponse.json({ error: "Server error" }, { status: 500 });
 
     const body = await req.json();
-    const { auth_uid, email, org_name, org_type } = body;
+    const { auth_uid, email, org_name, org_type, account_type, onboarding_complete } = body;
 
     if (!auth_uid || !email) {
         return NextResponse.json({ error: "auth_uid and email required" }, { status: 400 });
     }
 
+    const isBuilder = account_type === "builder";
+    const resolvedComplete = onboarding_complete !== undefined
+        ? !!onboarding_complete
+        : isBuilder ? true : !!(org_name && org_type);
+
     const { data, error } = await supabaseServer
         .from("org_accounts")
         .upsert(
-            { auth_uid, email, org_name: org_name ?? null, org_type: org_type ?? null, onboarding_complete: !!(org_name && org_type) },
+            {
+                auth_uid,
+                email,
+                org_name: org_name ?? null,
+                org_type: org_type ?? null,
+                account_type: account_type ?? "recruiter",
+                onboarding_complete: resolvedComplete,
+            },
             { onConflict: "auth_uid" }
         )
         .select()

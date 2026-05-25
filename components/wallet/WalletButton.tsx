@@ -188,13 +188,20 @@ export function WalletMultiButton() {
 
               <button
                 onClick={() => {
+                  // Sign Out: clear ChainVolio session + disconnect wallet
+                  try {
+                    localStorage.removeItem("cv_wallet_address");
+                    localStorage.removeItem("cv_wallet_name");
+                    localStorage.removeItem("cv_account_type");
+                    localStorage.removeItem("cv_session_exp");
+                  } catch {}
                   disconnect();
                   setIsMenuOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400/80 hover:bg-red-500/5 text-xs font-bold transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                Disconnect
+                Sign Out
               </button>
             </div>
           )}

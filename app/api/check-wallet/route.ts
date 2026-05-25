@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
             // Run both queries in parallel for speed
             const [profileResult, orgResult] = await Promise.all([
                 supabase.from("profiles").select("wallet_address").eq("wallet_address", wallet).maybeSingle(),
-                supabase.from("organization_verifications").select("wallet_address").eq("wallet_address", wallet).eq("status", "verified").maybeSingle(),
+                // Check all org statuses — pending wallets should not re-enter role selection
+                supabase.from("organization_verifications").select("wallet_address, status").eq("wallet_address", wallet).maybeSingle(),
             ]);
 
             // If the profiles query itself errors (e.g. RLS / permission), fail open — don't block
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
                 return NextResponse.json({ allowed: true, isNew: false });
             }
 
-            // New wallet — only block if it's a verified org
+            // Block wallet registered as org (any status: pending, verified, rejected)
             if (!orgResult.error && orgResult.data) {
                 return NextResponse.json({
                     allowed: false,
