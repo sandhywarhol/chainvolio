@@ -850,211 +850,237 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     );
 
     return (
-        <div className="min-h-screen text-slate-200 font-sans antialiased">
-            {/* Top Header */}
-            <header className="border-b border-white/5 bg-black/60 backdrop-blur-md sticky top-0 z-[100]">
-                <div className="max-w-[1600px] mx-auto px-8 h-12 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <Link href="/" className="flex items-center gap-3 group">
-                            <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-5 h-5 grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-300" />
-                            <span className="text-[11px] font-black tracking-[0.2em] text-white/50 uppercase group-hover:text-white/80 transition-colors">ChainVolio <span className="text-indigo-400">Secure</span></span>
-                        </Link>
-                        <div className="h-4 w-[1px] bg-white/[0.08]" />
-                        <div className="flex flex-col">
-                            <h1 className="text-[11px] font-bold text-white uppercase tracking-widest line-clamp-1">{data?.collection.title}</h1>
-                            <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{data?.collection.metadata?.roleType}</span>
-                                <span className="w-1 h-1 rounded-full bg-slate-800"></span>
-                                <span className="text-[9px] font-bold text-emerald-500/80 uppercase tracking-wider">{data?.collection.metadata?.salary || "Competitive"}</span>
+        <div className="flex flex-col h-screen overflow-hidden text-white" style={{ background: "#000000" }}>
+            {/* Noise texture */}
+            <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+            {/* ── 3-PANEL BODY ── */}
+            <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-12 pt-3 pb-3 flex flex-col">
+                <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1380px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+
+                    {/* ── LEFT SIDEBAR ── */}
+                    <aside className="hidden md:flex w-[240px] flex-shrink-0 flex-col overflow-y-auto" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                        {/* Logo / Brand */}
+                        <div className="flex items-center px-4 h-[46px] flex-shrink-0 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                                <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
                             </div>
+                            <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 18, width: "auto", objectFit: "contain" }} />
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginLeft: 6, letterSpacing: "-0.01em" }}>chainvolio</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(99,102,241,0.65)", marginLeft: 4 }}>secure</span>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setShowDeleteModal(true)}
-                            disabled={isDeleting}
-                            className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/5 text-red-400/50 hover:text-red-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-red-500/10 disabled:opacity-50"
-                        >
-                            {isDeleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                            Terminate
-                        </button>
-                        <button
-                            onClick={handleDownloadReport}
-                            className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/[0.03] text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-white/5"
-                        >
-                            <Download className="w-3 h-3" /> Report
-                        </button>
-                        <Link href={`/r/${slug}`} className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border border-indigo-500/20 hover:border-indigo-500/40">
-                            <ExternalLink className="w-3 h-3" /> View Public Link
-                        </Link>
-                    </div>
-                </div>
-            </header>
-
-            <main className="max-w-[1600px] mx-auto px-6 py-8 relative z-[60]">
-                {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-                    {[
-                        { label: "Pipeline Depth", value: data?.candidates?.length || 0, icon: Users, color: "text-blue-400/80", desc: "Total applications" },
-                        { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter(c => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, icon: ShieldCheck, color: "text-emerald-400/80", desc: "Attested portfolios" },
-                        { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc, c) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", icon: Briefcase, color: "text-indigo-400/80", desc: "Avg. proof volume" },
-                        { label: "Network Breadth", value: new Set(data?.candidates.flatMap(c => c.attestedOrgs)).size, icon: Building2, color: "text-amber-400/80", desc: "Verified partners" }
-                    ].map((stat, i) => (
-                        <div key={i} className="bg-white/[0.02] border border-white/[0.04] rounded-2xl p-6 relative overflow-hidden group hover:border-white/[0.08] transition-all duration-300">
-                            {/* Suble glow */}
-                            <div className={`absolute -top-12 -right-12 w-24 h-24 blur-3xl opacity-5 transition-opacity group-hover:opacity-10 ${stat.color.split('-')[1] === 'blue' ? 'bg-blue-500' : stat.color.split('-')[1] === 'emerald' ? 'bg-emerald-500' : stat.color.split('-')[1] === 'purple' ? 'bg-indigo-500' : 'bg-amber-500'}`}></div>
-
-                            <div className="flex items-center justify-between mb-4 relative z-10">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em]">{stat.label}</span>
-                                <div className={`p-2 rounded-lg bg-black/20 border border-white/[0.03] ${stat.color}`}>
-                                    <stat.icon className="w-3.5 h-3.5" />
-                                </div>
-                            </div>
-                            <div className="flex items-baseline gap-2 relative z-10">
-                                <div className="text-xl md:text-3xl font-bold text-white tracking-tight">{stat.value}</div>
-                                <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">{stat.desc}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Collection Context Bar */}
-                {(data?.collection.metadata?.focusAreas?.length > 0 || data?.collection.metadata?.deadline) && (
-                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6 px-1">
-                        {data?.collection.metadata?.focusAreas?.length > 0 && (
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1.5 text-slate-600">
-                                    <Target className="w-3 h-3" />
-                                    <span className="text-[9px] font-black uppercase tracking-[0.2em]">Focus Areas</span>
-                                </div>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {data?.collection.metadata?.focusAreas?.map((area: string) => {
-                                        const label: Record<string, string> = { on_chain: "On-Chain", github: "GitHub", dao: "DAO", hackathon: "Hackathon", nft: "NFT" };
-                                        return (
-                                            <span key={area} className="px-2 py-0.5 bg-indigo-500/5 border border-indigo-500/10 rounded text-[9px] font-black text-indigo-400/70 uppercase tracking-wider">
-                                                {label[area] || area}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                        {data?.collection.metadata?.deadline && (
-                            <div className="flex items-center gap-2 text-slate-600">
-                                <CalendarDays className="w-3 h-3" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">
-                                    Deadline: <span className="text-slate-400">{data?.collection.metadata?.deadline ? new Date(data.collection.metadata.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "No Deadline"}</span>
+                        {/* Collection info */}
+                        <div className="px-4 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.22)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>Active Collection</p>
+                            <h1 style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1.4 }}>{data?.collection.title}</h1>
+                            <div className="flex flex-wrap items-center gap-2 mt-3">
+                                {data?.collection.metadata?.roleType && (
+                                    <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(99,102,241,0.7)", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.14)", padding: "2px 8px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                                        {data.collection.metadata.roleType}
+                                    </span>
+                                )}
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(52,211,153,0.7)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                    {data?.collection.metadata?.salary || "Competitive"}
                                 </span>
                             </div>
+                        </div>
+
+                        {/* Pipeline stats */}
+                        <div className="px-3 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.22)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 10, paddingLeft: 12 }}>Pipeline Overview</p>
+                            <div className="space-y-1.5">
+                                {[
+                                    { label: "Pipeline Depth", value: String(data?.candidates?.length || 0), Icon: Users, color: "rgba(96,165,250,0.75)", desc: "Total applications" },
+                                    { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter((c: any) => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, Icon: ShieldCheck, color: "rgba(52,211,153,0.75)", desc: "Attested portfolios" },
+                                    { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc: number, c: any) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", Icon: Briefcase, color: "rgba(129,140,248,0.75)", desc: "Avg. proof volume" },
+                                    { label: "Network Breadth", value: String(new Set(data?.candidates.flatMap((c: any) => c.attestedOrgs)).size), Icon: Building2, color: "rgba(251,191,36,0.75)", desc: "Verified partners" },
+                                ].map((stat, i) => (
+                                    <div key={i} className="flex items-center justify-between px-3 py-2.5 rounded-lg" style={{ background: "rgba(255,255,255,0.02)" }}>
+                                        <div className="flex items-center gap-2.5">
+                                            <stat.Icon style={{ width: 12, height: 12, color: stat.color, flexShrink: 0 }} />
+                                            <div>
+                                                <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.38)", lineHeight: 1.2 }}>{stat.label}</p>
+                                                <p style={{ fontSize: 9, color: "rgba(255,255,255,0.18)", lineHeight: 1.3 }}>{stat.desc}</p>
+                                            </div>
+                                        </div>
+                                        <span style={{ fontSize: 17, fontWeight: 700, color: "rgba(255,255,255,0.8)", fontVariantNumeric: "tabular-nums" }}>{stat.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Focus areas + deadline */}
+                        {(data?.collection.metadata?.focusAreas?.length > 0 || data?.collection.metadata?.deadline) && (
+                            <div className="px-4 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                {data?.collection.metadata?.focusAreas?.length > 0 && (
+                                    <div className="mb-4">
+                                        <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.22)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>Focus Areas</p>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {data?.collection.metadata?.focusAreas?.map((area: string) => {
+                                                const focusLabel: Record<string, string> = { on_chain: "On-Chain", github: "GitHub", dao: "DAO", hackathon: "Hackathon", nft: "NFT" };
+                                                return (
+                                                    <span key={area} style={{ fontSize: 9, fontWeight: 800, color: "rgba(99,102,241,0.6)", background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.1)", padding: "2px 7px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                        {focusLabel[area] || area}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                                {data?.collection.metadata?.deadline && (
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays style={{ width: 11, height: 11, color: "rgba(255,255,255,0.28)", flexShrink: 0 }} />
+                                        <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                            Deadline: <span style={{ color: "rgba(255,255,255,0.5)" }}>{new Date(data.collection.metadata.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         )}
-                    </div>
-                )}
 
-                {/* Filters Bar */}
-                <div className="bg-black/80 backdrop-blur-sm border border-white/[0.04] rounded-2xl p-4 mb-10">
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                        <div className="flex-1 relative group">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Search by name, wallet address, or organization..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-black/40 border border-white/[0.05] rounded-xl pl-11 pr-4 py-2 text-[13px] focus:border-indigo-400/30 transition-all text-slate-200 placeholder:text-slate-600 outline-none"
-                            />
+                        {/* Actions */}
+                        <div className="px-3 py-4 flex-1">
+                            <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.22)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 12 }}>Actions</p>
+                            <nav className="space-y-0.5">
+                                <Link
+                                    href={`/r/${slug}`}
+                                    className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md"
+                                    style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.14)" }}
+                                >
+                                    <ExternalLink style={{ width: 12, height: 12, color: "rgba(99,102,241,0.8)", flexShrink: 0 }} />
+                                    <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(99,102,241,0.8)" }}>View Public Link</span>
+                                </Link>
+                                <button
+                                    onClick={handleDownloadReport}
+                                    className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md transition-all hover:bg-white/[0.03] text-left"
+                                >
+                                    <Download style={{ width: 12, height: 12, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.38)" }}>Download Report</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowDeleteModal(true)}
+                                    disabled={isDeleting}
+                                    className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md transition-all hover:bg-red-500/[0.04] text-left disabled:opacity-40"
+                                >
+                                    {isDeleting ? <Loader2 style={{ width: 12, height: 12, color: "rgba(239,68,68,0.5)", flexShrink: 0 }} className="animate-spin" /> : <Trash2 style={{ width: 12, height: 12, color: "rgba(239,68,68,0.5)", flexShrink: 0 }} />}
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(239,68,68,0.5)" }}>Terminate Collection</span>
+                                </button>
+                            </nav>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Role</span>
-                                <select
-                                    value={roleFilter}
-                                    onChange={(e) => setRoleFilter(e.target.value)}
-                                    className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
-                                >
-                                    <option value="all" className="bg-[#121215] text-white">ALL</option>
-                                    {uniqueRoles.map((role: string) => (
-                                        <option key={role} value={role} className="bg-[#121215] text-white">
-                                            {role.toUpperCase()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sort</span>
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
-                                >
-                                    <option value="best_fit" className="bg-[#121215] text-white">BEST FIT</option>
-                                    <option value="recent" className="bg-[#121215] text-white">RECENCY</option>
-                                    <option value="attestations" className="bg-[#121215] text-white">AUTHORITY</option>
-                                    <option value="total_proof" className="bg-[#121215] text-white">VOLUME</option>
-                                </select>
-                            </div>
-
-                            <div className="h-6 w-[1px] bg-white/[0.05] mx-1" />
-
-                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
-                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${attestedOnly ? 'bg-emerald-500 border-emerald-500' : 'border-white/[0.1] bg-black/40'}`}>
-                                    {attestedOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    checked={attestedOnly}
-                                    onChange={(e) => setAttestedOnly(e.target.checked)}
-                                    className="hidden"
-                                />
-                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Verified Only</span>
-                            </label>
-
-                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1 relative">
-                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${spamFilter ? 'bg-red-500 border-red-500' : 'border-white/[0.1] bg-black/40'}`}>
-                                    {spamFilter && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    checked={spamFilter}
-                                    onChange={(e) => setSpamFilter(e.target.checked)}
-                                    className="hidden"
-                                />
-                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">High Signal Only</span>
-                            </label>
-
-                            <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
-                                <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${focusMatchOnly ? 'bg-indigo-500 border-indigo-500' : 'border-white/[0.1] bg-black/40'}`}>
-                                    {focusMatchOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    checked={focusMatchOnly}
-                                    onChange={(e) => setFocusMatchOnly(e.target.checked)}
-                                    className="hidden"
-                                />
-                                <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Focus Match Only</span>
-                            </label>
+                        {/* Wallet button */}
+                        <div className="px-3 pb-4 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                            <WalletMultiButton />
                         </div>
-                    </div>
-                </div>
+                    </aside>
 
-                {/* Candidates Table */}
-                <div className="bg-black border border-white/[0.04] rounded-2xl overflow-hidden min-h-[400px] shadow-2xl relative">
-                    <table className="w-full text-left border-separate border-spacing-0">
-                        <thead>
-                            <tr className="bg-white/[0.01]">
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Candidate Intelligence</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Signal Confidence</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden md:table-cell border-b border-white/[0.03]">Strategic Fit</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Portfolio Authority</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden lg:table-cell border-b border-white/[0.03]">Institutional Trust</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Last Activity</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-right border-b border-white/[0.03]">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.02]">
+                    {/* ── CENTER PANEL ── */}
+                    <div className="flex-1 overflow-hidden min-h-0 flex flex-col" style={{ background: "#0a0b0e" }}>
+                        {/* Top bar */}
+                        <div className="flex items-center justify-between px-5 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+                            <div>
+                                <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>Candidate Pipeline</p>
+                                <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{filteredCandidates.length} of {data?.candidates?.length || 0} candidates shown</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="md:hidden text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.3)" }}>{data?.collection.title}</span>
+                                <div className="md:hidden"><WalletMultiButton /></div>
+                            </div>
+                        </div>
+
+                        {/* Scrollable content */}
+                        <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+
+                            {/* Filters Bar */}
+                            <div className="rounded-xl p-4 mb-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                                    <div className="flex-1 relative group">
+                                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search by name, wallet address, or organization..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full bg-black/40 border border-white/[0.05] rounded-xl pl-11 pr-4 py-2 text-[13px] focus:border-indigo-400/30 transition-all text-slate-200 placeholder:text-slate-600 outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Role</span>
+                                            <select
+                                                value={roleFilter}
+                                                onChange={(e) => setRoleFilter(e.target.value)}
+                                                className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
+                                            >
+                                                <option value="all" className="bg-[#121215] text-white">ALL</option>
+                                                {uniqueRoles.map((role: string) => (
+                                                    <option key={role} value={role} className="bg-[#121215] text-white">
+                                                        {role.toUpperCase()}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 bg-black/20 border border-white/[0.05] rounded-xl px-3 py-1.5">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sort</span>
+                                            <select
+                                                value={sortBy}
+                                                onChange={(e) => setSortBy(e.target.value)}
+                                                className="bg-[#121215] text-[11px] font-bold text-slate-300 outline-none cursor-pointer focus:text-white transition-colors"
+                                            >
+                                                <option value="best_fit" className="bg-[#121215] text-white">BEST FIT</option>
+                                                <option value="recent" className="bg-[#121215] text-white">RECENCY</option>
+                                                <option value="attestations" className="bg-[#121215] text-white">AUTHORITY</option>
+                                                <option value="total_proof" className="bg-[#121215] text-white">VOLUME</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="h-6 w-[1px] bg-white/[0.05] mx-1" />
+
+                                        <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
+                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${attestedOnly ? 'bg-emerald-500 border-emerald-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                                {attestedOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                            </div>
+                                            <input type="checkbox" checked={attestedOnly} onChange={(e) => setAttestedOnly(e.target.checked)} className="hidden" />
+                                            <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Verified Only</span>
+                                        </label>
+
+                                        <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1 relative">
+                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${spamFilter ? 'bg-red-500 border-red-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                                {spamFilter && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                            </div>
+                                            <input type="checkbox" checked={spamFilter} onChange={(e) => setSpamFilter(e.target.checked)} className="hidden" />
+                                            <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">High Signal Only</span>
+                                        </label>
+
+                                        <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
+                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${focusMatchOnly ? 'bg-indigo-500 border-indigo-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                                {focusMatchOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                            </div>
+                                            <input type="checkbox" checked={focusMatchOnly} onChange={(e) => setFocusMatchOnly(e.target.checked)} className="hidden" />
+                                            <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest transition-colors">Focus Match Only</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Candidates Table */}
+                            <div className="rounded-xl overflow-hidden mb-4" style={{ background: "#000000", border: "1px solid rgba(255,255,255,0.04)" }}>
+                                <table className="w-full text-left border-separate border-spacing-0">
+                                    <thead>
+                                        <tr className="bg-white/[0.01]">
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Candidate Intelligence</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Signal Confidence</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden md:table-cell border-b border-white/[0.03]">Strategic Fit</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Portfolio Authority</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden lg:table-cell border-b border-white/[0.03]">Institutional Trust</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Last Activity</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-right border-b border-white/[0.03]">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/[0.02]">
                             {filteredCandidates.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="px-8 py-32 text-center">
@@ -1429,10 +1455,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     </React.Fragment>
                                 ))
                             )}
-                        </tbody>
-                    </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </main>
+            </div>
 
             {/* Confirmation Modals */}
             <ConfirmationModal

@@ -189,115 +189,235 @@ function VerifiableWorkHistoryFlow() {
 }
 
 // --- Static UI Mockup for Feature Card ---
-function MockProfileUI() {
+function MockRecruiterDashboardUI() {
+    const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+
+    const candidates = [
+        { initials: "SC", avatar: "https://i.pravatar.cc/40?img=47", name: "Sarah Chen",   wallet: "9xKm...f2Yp", role: "Rust Developer",      status: "shortlisted", signal: "STRONG",     proofs: 12, attested: 4, org: "Solana Foundation", active: "2h ago", bio: "Rust systems engineer with 4 years building on-chain programs and DeFi protocols for Solana mainnet.", skills: ["Rust", "Anchor", "Web3.js"] },
+        { initials: "MW", avatar: "https://i.pravatar.cc/40?img=12", name: "Marcus Wei",   wallet: "3tBq...w8Rv", role: "Protocol Engineer",   status: "pending",     signal: "STRONG",     proofs: 8,  attested: 3, org: "Anchor Labs",       active: "5h ago", bio: "Core protocol engineer specialising in high-throughput transaction pipelines and MEV infrastructure.", skills: ["Go", "Rust", "Protocol Design"] },
+        { initials: "DO", avatar: "https://i.pravatar.cc/40?img=25", name: "Dani Okonkwo", wallet: "7pLn...k4Jx", role: "Smart Contract Dev", status: "pending",     signal: "CALIBRATED", proofs: 6,  attested: 2, org: "Drift Protocol",    active: "1d ago", bio: "Smart contract developer focused on DeFi primitives and cross-chain bridge security audits.", skills: ["Solidity", "Rust", "TypeScript"] },
+        { initials: "YT", avatar: "https://i.pravatar.cc/40?img=44", name: "Yuki Tanaka",  wallet: "2cHs...m9Qd", role: "Core Developer",     status: "hired",       signal: "STRONG",     proofs: 15, attested: 5, org: "Jito Labs",         active: "3h ago", bio: "Low-level systems developer with deep expertise in consensus mechanisms and validator operations.", skills: ["Rust", "C++", "Linux"] },
+        { initials: "AP", avatar: "https://i.pravatar.cc/40?img=60", name: "Alex Petrov",  wallet: "8gVz...r6Ns", role: "Frontend Engineer",  status: "rejected",    signal: "LOW SIGNAL", proofs: 3,  attested: 0, org: "",                  active: "2d ago", bio: "Frontend engineer building Web3 interfaces with wallet adapter integrations across DeFi apps.", skills: ["React", "TypeScript", "ethers.js"] },
+    ];
+
+    // Auto-cycle through candidates
+    useEffect(() => {
+        let idx = 0;
+        let timer: ReturnType<typeof setTimeout>;
+        const SHOW = 2800;
+        const GAP  = 350;
+
+        const next = () => {
+            setExpandedIdx(null);
+            timer = setTimeout(() => {
+                idx = (idx + 1) % candidates.length;
+                setExpandedIdx(idx);
+                timer = setTimeout(next, SHOW);
+            }, GAP);
+        };
+
+        // initial open after short delay
+        timer = setTimeout(() => {
+            setExpandedIdx(0);
+            timer = setTimeout(next, SHOW);
+        }, 700);
+
+        return () => clearTimeout(timer);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
-        <div className="w-full h-full flex flex-col md:flex-row font-sans text-sm overflow-hidden">
-            {/* 1. Sidebar (Linear Style) */}
-            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.01] p-6 md:p-6 flex flex-col gap-4 md:gap-8">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
-                        <span className="text-xs font-bold text-white/50">AR</span>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-white/90 tracking-tight">Alex Rivera</span>
-                        <span className="text-[10px] text-white/30 uppercase tracking-widest font-black">Member</span>
+        <div className="w-full h-full flex font-sans text-sm overflow-hidden" style={{ background: "#0a0b0e" }}>
+            {/* Sidebar */}
+            <div className="w-[200px] flex-shrink-0 flex flex-col overflow-hidden" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                {/* Logo */}
+                <div className="flex items-center px-4 h-[52px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 17, width: "auto", objectFit: "contain", flexShrink: 0 }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginLeft: 6, letterSpacing: "-0.01em" }}>chainvolio</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(99,102,241,0.65)", marginLeft: 4 }}>secure</span>
+                </div>
+
+                {/* Collection */}
+                <div className="px-3 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <p style={{ fontSize: 7.5, fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 5 }}>Active Collection</p>
+                    <p style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1.35 }}>Frontend Developer</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                        <span style={{ fontSize: 7.5, fontWeight: 800, color: "rgba(99,102,241,0.7)", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.14)", padding: "1.5px 6px", borderRadius: 3, textTransform: "uppercase", letterSpacing: "0.05em" }}>Full-Time</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(52,211,153,0.7)", textTransform: "uppercase" }}>Competitive</span>
                     </div>
                 </div>
 
-                <nav className="flex-1 space-y-1">
-                    {[
-                        { icon: LayoutDashboard, label: "Overview", active: true },
-                        { icon: ShieldCheck, label: "Verifications" },
-                        { icon: FolderOpen, label: "Collections" },
-                        { icon: Terminal, label: "Activity" }
-                    ].map((item, i) => (
-                        <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer ${item.active ? 'bg-white/5 text-white' : 'text-white/40 hover:bg-white/[0.02] hover:text-white/60'}`}>
-                            <item.icon className={`w-4 h-4 ${item.active ? 'text-amber-400' : ''}`} />
-                            <span className="text-[11px] font-bold uppercase tracking-widest">{item.label}</span>
+                {/* Pipeline stats */}
+                <div className="px-2.5 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <p style={{ fontSize: 7.5, fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 7, paddingLeft: 8 }}>Pipeline Overview</p>
+                    <div className="space-y-1">
+                        {[
+                            { label: "Pipeline Depth",  value: "24",  Icon: User,        color: "rgba(96,165,250,0.7)" },
+                            { label: "Authority Rate",   value: "58%", Icon: ShieldCheck, color: "rgba(52,211,153,0.7)" },
+                            { label: "Signal Density",   value: "7.2", Icon: Briefcase,   color: "rgba(129,140,248,0.7)" },
+                            { label: "Network Breadth",  value: "11",  Icon: Building2,   color: "rgba(251,191,36,0.7)" },
+                        ].map((s, i) => (
+                            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 8px", borderRadius: 6, background: "rgba(255,255,255,0.02)" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <s.Icon style={{ width: 10, height: 10, color: s.color, flexShrink: 0 }} />
+                                    <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>{s.label}</span>
+                                </div>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.8)" }}>{s.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="px-2.5 py-3 flex-1">
+                    <p style={{ fontSize: 7.5, fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 7, paddingLeft: 8 }}>Actions</p>
+                    <div className="space-y-0.5">
+                        <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6, background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.14)" }}>
+                            <ExternalLink style={{ width: 10, height: 10, color: "rgba(99,102,241,0.75)", flexShrink: 0 }} />
+                            <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(99,102,241,0.8)" }}>View Public Link</span>
                         </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}>
+                            <FileText style={{ width: 10, height: 10, color: "rgba(255,255,255,0.28)", flexShrink: 0 }} />
+                            <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.35)" }}>Download Report</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Center Panel */}
+            <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "#0a0b0e" }}>
+                {/* Top bar */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 52, flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div>
+                        <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>Candidate Pipeline</p>
+                        <p style={{ fontSize: 8, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>24 candidates · 5 shown</p>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span style={{ fontSize: 9.5, color: "rgba(255,255,255,0.2)" }}>Search candidates...</span>
+                    </div>
+                </div>
+
+                {/* Table header */}
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 0.8fr", padding: "8px 16px", background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.03)", flexShrink: 0 }}>
+                    {["Candidate", "Signal", "Strategic Fit", "Portfolio", "Last Active"].map((h) => (
+                        <span key={h} style={{ fontSize: 7.5, fontWeight: 800, color: "rgba(255,255,255,0.18)", textTransform: "uppercase", letterSpacing: "0.14em" }}>{h}</span>
                     ))}
-                </nav>
-
-                <div className="pt-6 border-t border-white/5">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Trust Signal</span>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                            <span className="text-[11px] font-bold text-white/70">Score: 98</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* 2. Main Content Area */}
-            <div className="flex-1 flex flex-col bg-[#060608] overflow-y-auto md:overflow-hidden">
-                {/* Content Header */}
-                <div className="h-14 border-b border-white/5 px-8 flex items-center justify-between bg-white/[0.01]">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Active Grants</span>
-                        <div className="w-[1px] h-4 bg-white/5"></div>
-                        <span className="text-[11px] font-bold text-white/80">NX-2703</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[9px] font-black text-amber-500 uppercase tracking-widest">In Progress</div>
-                    </div>
                 </div>
 
-                {/* Main Body - Fixed Size, No Scroll */}
-                <div className="p-8 space-y-6 flex-1 flex flex-col justify-between">
-                    <div className="space-y-4">
-                        <h4 className="text-2xl font-bold text-white tracking-tight leading-tight">Nexus Protocol Grant #882</h4>
-                        <p className="text-white/40 text-sm leading-relaxed max-w-2xl">
-                            Core systems development and parallel transaction processing optimization for the Nexus mainnet infrastructure.
-                        </p>
-                    </div>
-
-                    <div className="space-y-4">
-                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Detailed Activity</span>
-                        <div className="space-y-3">
-                            {[
-                                "Built staking contract module using Anchor framework",
-                                "Integrated Core optimization for Lumina mainnet nodes",
-                                "Reduced transaction latency by 30% through parallel processing"
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-start gap-4 p-3.5 rounded-xl bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-colors">
-                                    <div className="mt-0.5 flex-shrink-0">
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-500/40 group-hover:text-emerald-500 transition-colors" />
+                {/* Candidate rows */}
+                <div className="flex-1 overflow-hidden">
+                    {candidates.map((c, i) => {
+                        const isOpen = expandedIdx === i;
+                        const statusColor = c.status === "shortlisted" ? "#10b981" : c.status === "hired" ? "#6366f1" : c.status === "rejected" ? "#ef4444" : "transparent";
+                        return (
+                            <div key={i} style={{ opacity: c.status === "rejected" ? 0.4 : 1, borderBottom: "1px solid rgba(255,255,255,0.025)", transition: "opacity 0.3s ease" }}>
+                                {/* Row */}
+                                <div style={{
+                                    display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 0.8fr",
+                                    padding: "9px 16px", alignItems: "center",
+                                    background: isOpen ? "rgba(99,102,241,0.04)" : "transparent",
+                                    borderLeft: isOpen ? "2px solid rgba(99,102,241,0.4)" : "2px solid transparent",
+                                    transition: "background 0.25s ease, border-color 0.25s ease",
+                                }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                                        <div style={{ position: "relative", flexShrink: 0 }}>
+                                            <div style={{ width: 26, height: 26, borderRadius: 7, overflow: "hidden", border: `1px solid ${isOpen ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.08)"}`, transition: "border-color 0.25s", flexShrink: 0 }}>
+                                                <img src={c.avatar} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                                            </div>
+                                            {c.status !== "pending" && <div style={{ position: "absolute", top: -2, right: -2, width: 7, height: 7, borderRadius: "50%", background: statusColor, border: "1.5px solid #0a0b0e" }} />}
+                                        </div>
+                                        <div>
+                                            <p style={{ fontSize: 10.5, fontWeight: 700, color: isOpen ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.82)", lineHeight: 1, marginBottom: 2, transition: "color 0.2s" }}>{c.name}</p>
+                                            <p style={{ fontSize: 7.5, fontWeight: 600, color: "rgba(255,255,255,0.22)", fontFamily: "monospace" }}>{c.wallet}</p>
+                                        </div>
                                     </div>
-                                    <span className="text-[12px] text-white/60 font-medium leading-none">{item}</span>
+                                    <div>
+                                        <span style={{ fontSize: 7.5, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.08em", padding: "2px 6px", borderRadius: 3, background: c.signal === "STRONG" ? "rgba(52,211,153,0.1)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.1)" : "rgba(239,68,68,0.08)", color: c.signal === "STRONG" ? "rgba(52,211,153,0.9)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.9)" : "rgba(239,68,68,0.7)", border: `1px solid ${c.signal === "STRONG" ? "rgba(52,211,153,0.2)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.2)" : "rgba(239,68,68,0.15)"}` }}>
+                                            {c.signal}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.6)", lineHeight: 1, marginBottom: 2 }}>{c.role}</p>
+                                        {c.org && <p style={{ fontSize: 8, color: "rgba(255,255,255,0.22)" }}>{c.org}</p>}
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <div style={{ textAlign: "center" as const }}>
+                                            <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)", lineHeight: 1 }}>{c.proofs}</p>
+                                            <p style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>proofs</p>
+                                        </div>
+                                        <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.05)" }} />
+                                        <div style={{ textAlign: "center" as const }}>
+                                            <p style={{ fontSize: 13, fontWeight: 700, color: c.attested > 0 ? "rgba(52,211,153,0.85)" : "rgba(255,255,255,0.18)", lineHeight: 1 }}>{c.attested}</p>
+                                            <p style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>attest</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                        <Clock style={{ width: 9, height: 9, color: "rgba(255,255,255,0.2)" }} />
+                                        <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.35)", fontFamily: "monospace" }}>{c.active}</span>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    <div className="pt-6 border-t border-white/5 space-y-4">
-                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Verified Attestations</span>
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                { name: "Lumina", color: "bg-blue-500" },
-                                { name: "Apex Guild", color: "bg-amber-500" }
-                            ].map((org, i) => (
-                                <div key={i} className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5">
-                                    <div className={`w-2 h-2 rounded-full ${org.color}`}></div>
-                                    <span className="text-[11px] font-bold text-white/80">{org.name}</span>
+                                {/* Expanded panel — slides in below the row */}
+                                <div style={{
+                                    maxHeight: isOpen ? "160px" : "0px",
+                                    opacity: isOpen ? 1 : 0,
+                                    overflow: "hidden",
+                                    transition: "max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease",
+                                    background: "rgba(0,0,0,0.4)",
+                                    borderLeft: "2px solid rgba(99,102,241,0.35)",
+                                }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, padding: "14px 20px 14px 18px" }}>
+                                        {/* Left: Candidate intelligence */}
+                                        <div>
+                                            <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(99,102,241,0.7)", textTransform: "uppercase" as const, letterSpacing: "0.2em", marginBottom: 8 }}>Candidate Intelligence</p>
+                                            <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.55, marginBottom: 10, fontWeight: 500 }}>{c.bio}</p>
+                                            <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 4 }}>
+                                                {c.skills.map((sk) => (
+                                                    <span key={sk} style={{ fontSize: 7.5, fontWeight: 700, color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", padding: "2px 7px", borderRadius: 4, textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>{sk}</span>
+                                                ))}
+                                            </div>
+                                            {c.attested > 0 && (
+                                                <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 5 }}>
+                                                    <ShieldCheck style={{ width: 9, height: 9, color: "rgba(52,211,153,0.7)" }} />
+                                                    <span style={{ fontSize: 8, fontWeight: 700, color: "rgba(52,211,153,0.65)" }}>Protocol Verified · {c.org}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {/* Right: Pipeline calibration */}
+                                        <div>
+                                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                                                <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.22)", textTransform: "uppercase" as const, letterSpacing: "0.2em" }}>Pipeline Calibration</p>
+                                                <span style={{ fontSize: 7.5, fontWeight: 800, color: c.status === "shortlisted" ? "rgba(52,211,153,0.8)" : c.status === "hired" ? "rgba(99,102,241,0.8)" : c.status === "rejected" ? "rgba(239,68,68,0.6)" : "rgba(255,255,255,0.3)", background: c.status === "shortlisted" ? "rgba(52,211,153,0.08)" : c.status === "hired" ? "rgba(99,102,241,0.08)" : c.status === "rejected" ? "rgba(239,68,68,0.06)" : "rgba(255,255,255,0.04)", border: `1px solid ${c.status === "shortlisted" ? "rgba(52,211,153,0.2)" : c.status === "hired" ? "rgba(99,102,241,0.2)" : c.status === "rejected" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)"}`, padding: "2px 7px", borderRadius: 3, textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>
+                                                    {c.status === "pending" ? "Under Review" : c.status.toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div style={{ display: "flex", gap: 6, marginBottom: 7 }}>
+                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "shortlisted" ? "1px solid rgba(52,211,153,0.5)" : "1px solid rgba(52,211,153,0.12)", background: c.status === "shortlisted" ? "rgba(52,211,153,0.15)" : "rgba(52,211,153,0.04)", textAlign: "center" as const }}>
+                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "shortlisted" ? "rgba(52,211,153,1)" : "rgba(52,211,153,0.45)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Shortlist</span>
+                                                </div>
+                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "rejected" ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.06)", background: c.status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.02)", textAlign: "center" as const }}>
+                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "rejected" ? "rgba(239,68,68,0.85)" : "rgba(255,255,255,0.25)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Reject</span>
+                                                </div>
+                                            </div>
+                                            <div style={{ padding: "7px 0", borderRadius: 7, border: c.status === "hired" ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(99,102,241,0.14)", background: c.status === "hired" ? "rgba(99,102,241,0.18)" : "rgba(99,102,241,0.05)", textAlign: "center" as const }}>
+                                                <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "hired" ? "rgba(99,102,241,1)" : "rgba(99,102,241,0.5)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>
+                                                    {c.status === "hired" ? "Hired On-Chain ✓" : "Mark as Hired"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            </div>
+                        );
+                    })}
                 </div>
 
-                {/* Footer Meta */}
-                <div className="h-12 border-t border-white/5 px-8 flex items-center justify-between opacity-30 bg-white/[0.01]">
-                    <div className="flex gap-6">
-                        <code className="text-[10px] font-mono text-white/60 tracking-tighter">SIG: 5k2R...j8Wq</code>
-                        <span className="text-[10px] text-white/40 font-mono tracking-tighter">2025-03-24 14:02 UTC</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-white/60">
-                        View Proof <ExternalLink className="w-3 h-3" />
-                    </div>
+                {/* Footer strip */}
+                <div style={{ height: 32, flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", opacity: 0.4 }}>
+                    <span style={{ fontSize: 8.5, fontWeight: 600, color: "rgba(255,255,255,0.4)", fontFamily: "monospace", letterSpacing: "0.04em" }}>COLLECTION: cv-frontend-2025 · 24 applicants</span>
+                    <span style={{ fontSize: 8.5, fontWeight: 600, color: "rgba(255,255,255,0.35)", fontFamily: "monospace" }}>Secured · Solana Mainnet</span>
                 </div>
             </div>
-
         </div>
     );
 }
@@ -310,10 +430,25 @@ const CARD_BASE: React.CSSProperties = {
     borderRadius: "14px",
     overflow: "hidden",
     position: "relative",
-    background: "#080808",
-    border: "1px solid rgba(255,255,255,0.06)",
-    boxShadow: "0 0 0 1px rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)",
+    background: "#060608",
+    border: "1px solid rgba(255,255,255,0.13)",
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.06) inset, 0 1px 0 rgba(255,255,255,0.1) inset, 0 32px 80px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.5)",
 };
+
+function CardShimmers({ delay = "-2s" }: { delay?: string }) {
+    return (
+        <>
+            {/* Lightning shimmer sweep */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.10] to-transparent animate-lightning-shine pointer-events-none z-[48] opacity-90 rounded-[14px]" style={{ animationDelay: delay }} />
+            {/* Diagonal sheen — top-left catch light */}
+            <div className="absolute inset-0 pointer-events-none rounded-[14px]" style={{ zIndex: 40, background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 25%, transparent 50%)" }} />
+            {/* Top-edge specular line */}
+            <div className="absolute inset-x-0 top-0 h-px pointer-events-none rounded-t-[14px]" style={{ zIndex: 41, background: "linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.25) 35%, rgba(255,255,255,0.15) 65%, transparent 92%)" }} />
+            {/* Spotlight cone from top-left */}
+            <div className="absolute inset-0 pointer-events-none rounded-[14px]" style={{ zIndex: 39, background: "conic-gradient(from 150deg at 12% -6%, transparent 55deg, rgba(255,255,255,0.05) 67deg, rgba(255,255,255,0.025) 78deg, transparent 92deg)" }} />
+        </>
+    );
+}
 
 // Shared header dots (three-dot menu like Linear)
 function CardDots() {
@@ -346,6 +481,7 @@ function AttestationCard() {
     ];
     return (
         <div style={CARD_BASE} className="theme-preserve">
+            <CardShimmers delay="-1.5s" />
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -394,6 +530,7 @@ function AttestationCard() {
 function OrgIssuerCard() {
     return (
         <div style={CARD_BASE} className="theme-preserve">
+            <CardShimmers delay="-3.5s" />
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -478,6 +615,7 @@ function PublicVerifyCard() {
     ];
     return (
         <div style={CARD_BASE} className="theme-preserve">
+            <CardShimmers delay="-5.5s" />
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 <div className="flex items-center gap-2">
@@ -667,56 +805,124 @@ function AttestationBlock() {
 }
 
 // --- Mobile UI Mockup for Feature Card ---
-// --- Floating Feature Card (Overlay) ---
-function FloatingVerificationCard() {
+// --- Floating Inbox Card ---
+function FloatingInboxCard() {
     return (
-        <div className="theme-preserve w-[340px] bg-[#060608]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans"
-            style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+        <div className="theme-preserve w-[200px] rounded-xl border overflow-hidden flex flex-col font-sans relative"
+            style={{
+                background: "#0c0d11",
+                borderColor: "rgba(255,255,255,0.22)",
+                boxShadow: "1px 2px 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15)",
+            }}
         >
-            {/* Card Header */}
-            <div className="p-5 border-b border-white/5 flex items-center justify-between bg-emerald-500/5">
-                <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">Verified Proof</span>
+            {/* Lightning shimmer — offset by half cycle so it doesn't sync with hero */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-10 rounded-xl" style={{ animationDelay: "-4s" }} />
+            {/* Header */}
+            {/* Header */}
+            <div className="px-3 py-2 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.02)" }}>
+                <div className="flex items-center gap-1.5">
+                    <Inbox style={{ width: 10, height: 10, color: "rgba(255,255,255,0.35)" }} />
+                    <span style={{ fontSize: 8.5, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.14em" }}>Inbox</span>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="w-1 h-1 rounded-full animate-pulse" style={{ background: "rgba(255,255,255,0.4)" }} />
+                    <span style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>1 new</span>
+                </div>
             </div>
 
-            {/* Card Body */}
-            <div className="p-6 space-y-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-white/40">AR</span>
+            {/* Recruiter message */}
+            <div className="px-2.5 pt-2 pb-1.5">
+                <div style={{ padding: "6px 7px", borderRadius: 7, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.14)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
+                        <div style={{ width: 17, height: 17, borderRadius: 4, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Building2 style={{ width: 8, height: 8, color: "rgba(255,255,255,0.3)" }} />
+                        </div>
+                        <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.65)", lineHeight: 1, flex: 1 }}>Meridian Labs</p>
+                        <span style={{ fontSize: 6, color: "rgba(255,255,255,0.18)", fontFamily: "monospace" }}>2h</span>
                     </div>
-                    <div className="space-y-0.5">
-                        <h4 className="text-sm font-bold text-white">Alex Rivera</h4>
-                        <p className="text-[10px] text-white/30 font-medium">Nexus Protocol • Grant #882</p>
-                    </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-white/20 uppercase">On-Chain Attestation</span>
-                        <CheckCircle2 className="w-3 h-3 text-emerald-500/60" />
-                    </div>
-                    <p className="text-[11px] text-white/70 font-medium leading-relaxed">
-                        Technical contribution verified by Lumina Systems core infrastructure audit team.
+                    <p style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>
+                        Inviting you for an interview —{" "}
+                        <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.55)" }}>Core Rust Engineer</span>.
                     </p>
                 </div>
+            </div>
 
-                <div className="flex items-center justify-between pt-2">
-                    <div className="flex flex-col gap-1">
-                        <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Hash ID</span>
-                        <code className="text-[9px] text-emerald-400/60 font-mono">0x4f2d...9b1a</code>
-                    </div>
-                    <div className="w-12 h-12 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center">
-                        <div className="w-6 h-6 border-2 border-dashed border-white/10 rounded"></div>
+            {/* Reply compose */}
+            <div className="px-2.5 pb-2.5">
+                <div style={{ padding: "6px 7px", borderRadius: 7, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    <p style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Reply</p>
+                    <p style={{ fontSize: 8, color: "rgba(255,255,255,0.42)", lineHeight: 1.5, marginBottom: 6 }}>
+                        Thanks for the invite! I&apos;d be happy to schedule a call this week.
+                        <span className="animate-pulse inline-block ml-[2px]" style={{ width: "1.5px", height: "10px", background: "rgba(255,255,255,0.7)", borderRadius: "1px", verticalAlign: "middle" }} />
+                    </p>
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <div style={{ padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", lineHeight: 1 }}>
+                            <span style={{ fontSize: 7, fontWeight: 600, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em", lineHeight: 1, display: "block" }}>Send</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
 
-            {/* Bottom Glow */}
-            <div className="h-1 w-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-30"></div>
+// --- Floating CV Score Card ---
+function FloatingVerificationCard() {
+    const top3 = [
+        { initials: "SC", avatar: "https://i.pravatar.cc/40?img=47", name: "Sarah Chen",  role: "Rust Developer",    score: 94, color: "#6366f1" },
+        { initials: "YT", avatar: "https://i.pravatar.cc/40?img=44", name: "Yuki Tanaka", role: "Core Developer",    score: 91, color: "#34d399" },
+        { initials: "MW", avatar: "https://i.pravatar.cc/40?img=12", name: "Marcus Wei",  role: "Protocol Engineer", score: 87, color: "#60a5fa" },
+    ];
+    return (
+        <div className="theme-preserve w-[280px] bg-[#060608]/95 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans relative"
+            style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.04) inset" }}
+        >
+            {/* Shiny sweep with offset timing */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none z-50 rounded-2xl"
+                style={{ 
+                    animation: "lightning-shine 7s ease-in-out infinite",
+                    animationDelay: "-2.5s"
+                }} 
+            />
+
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between" style={{ background: "rgba(99,102,241,0.06)" }}>
+                <div className="flex items-center gap-2">
+                    <Star className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">CV Score</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            </div>
+
+            {/* Body */}
+            <div className="px-3 py-3 space-y-2">
+                <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 6 }}>
+                    Top Recommended
+                </p>
+                {top3.map((c, i) => (
+                    <div key={i} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "8px 10px", borderRadius: 10,
+                        background: i === 0 ? "rgba(99,102,241,0.08)" : "rgba(255,255,255,0.02)",
+                        border: `1px solid ${i === 0 ? "rgba(99,102,241,0.22)" : "rgba(255,255,255,0.05)"}`,
+                    }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 7, overflow: "hidden", border: `1px solid ${c.color}35`, flexShrink: 0 }}>
+                            <img src={c.avatar} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,0.85)", lineHeight: 1, marginBottom: 2 }}>{c.name}</p>
+                            <p style={{ fontSize: 8, color: "rgba(255,255,255,0.25)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.role}</p>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                            <p style={{ fontSize: 16, fontWeight: 800, color: c.color, lineHeight: 1 }}>{c.score}</p>
+                            <p style={{ fontSize: 7, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase", letterSpacing: "0.1em" }}>score</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Bottom glow */}
+            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-30" />
         </div>
     );
 }
@@ -741,167 +947,278 @@ function RecruiterDashboardPreviewUI_V2({
 
     const panels = [
         // Box 0: Talent Pool (Verified Signal)
-        <div key={0} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                        <ShieldCheck className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-white tracking-tight">Talent Pool</h4>
-                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Verified Signal</p>
-                    </div>
+        <div key={0} className="theme-preserve w-full h-[360px] rounded-2xl overflow-hidden flex relative" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 24px 48px -8px rgba(0,0,0,0.85)" }}>
+            {/* Spotlight */}
+            <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 50% 30% at 50% -1%, rgba(255,255,255,0.06) 0%, transparent 80%)" }} />
+            {/* Shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-[6] opacity-70" />
+
+            {/* Left Sidebar */}
+            <div className="w-[110px] sm:w-[130px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center px-3 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <img src="/chainvolio%20logo.png" alt="logo" style={{ height: 12, width: "auto" }} />
+                    <span className="hidden sm:inline" style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginLeft: 4 }}>chainvolio</span>
                 </div>
-                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 hidden sm:block">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Top Match</span>
+                <div className="px-1.5 py-2 flex-1 space-y-0.5">
+                    {[
+                        { label: "Talent Pool", id: 0 },
+                        { label: "Trust Net", id: 1 },
+                        { label: "Distribution", id: 2 }
+                    ].map(item => {
+                        const isItemActive = active === item.id;
+                        return (
+                            <div key={item.id} className="flex items-center gap-1 px-2 py-[4px] rounded-md transition-colors cursor-pointer" style={isItemActive ? { background: "rgba(255,255,255,0.07)" } : {}} onClick={() => setActive(item.id)}>
+                                <span style={{ fontSize: 9, fontWeight: isItemActive ? 600 : 500, color: isItemActive ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.35)", whiteSpace: "nowrap" }}>{item.label}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* Profile Card */}
-            <div className="flex-1 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/5 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-center shadow-inner">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-                <div className="flex items-center justify-between mb-5 relative z-10">
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-lg font-black text-white/80 shadow-lg">
-                            AR
-                        </div>
-                        <div>
-                            <h5 className="text-base font-bold text-white mb-0.5">Alex Rivera</h5>
-                            <p className="text-xs text-white/40">Sr. Rust Developer</p>
-                        </div>
-                    </div>
-                    
-                    {/* Trust Score Badge */}
-                    <div className="flex flex-col items-center justify-center relative">
-                        <span className="text-[8px] font-bold text-[#14F195]/60 uppercase tracking-widest mb-1">Score</span>
-                        <div className="w-12 h-12 rounded-full bg-[#14F195]/10 border border-[#14F195]/30 shadow-[0_0_15px_rgba(20,241,149,0.15)] flex items-center justify-center">
-                            <span className="text-lg font-black text-[#14F195]">98</span>
-                        </div>
-                    </div>
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col min-w-0" style={{ background: "#0a0b0e" }}>
+                <div className="flex items-center justify-between px-4 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>Talent Pool</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3 relative z-10">
-                    <div className="p-3 rounded-xl bg-[#0D0D0D] border border-white/5 shadow-md">
-                        <p className="text-[9px] text-white/30 uppercase tracking-wider mb-1.5 font-bold">On-Chain Signals</p>
-                        <p className="text-lg font-black text-blue-400 leading-none">142</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-[#0D0D0D] border border-white/5 shadow-md">
-                        <p className="text-[9px] text-white/30 uppercase tracking-wider mb-1.5 font-bold">Org Attestations</p>
-                        <p className="text-lg font-black text-indigo-400 leading-none">12</p>
+                <div className="flex-1 p-4 flex flex-col justify-center min-h-0 relative z-10">
+                    {/* Profile Card */}
+                    <div className="rounded-xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/5 p-3.5 relative overflow-hidden flex flex-col justify-center shadow-inner">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+                        <div className="flex items-center justify-between mb-4 relative z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-xs font-black text-white/80 shadow-lg">
+                                    AR
+                                </div>
+                                <div>
+                                    <h5 className="text-[12px] font-bold text-white mb-0.5">Alex Rivera</h5>
+                                    <p className="text-[10px] text-white/40">Sr. Rust Developer</p>
+                                </div>
+                            </div>
+                            
+                            {/* Trust Score Badge */}
+                            <div className="flex flex-col items-center justify-center relative scale-90">
+                                <span className="text-[7px] font-bold text-[#14F195]/60 uppercase tracking-widest mb-0.5">Score</span>
+                                <div className="w-9 h-9 rounded-full bg-[#14F195]/10 border border-[#14F195]/30 shadow-[0_0_15px_rgba(20,241,149,0.15)] flex items-center justify-center">
+                                    <span className="text-xs font-black text-[#14F195]">98</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 relative z-10">
+                            <div className="p-2.5 rounded-lg bg-[#0d0e11] border border-white/5 shadow-md">
+                                <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1 font-bold">On-Chain Signals</p>
+                                <p className="text-sm font-black text-blue-400 leading-none">142</p>
+                            </div>
+                            <div className="p-2.5 rounded-lg bg-[#0d0e11] border border-white/5 shadow-md">
+                                <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1 font-bold">Org Attestations</p>
+                                <p className="text-sm font-black text-indigo-400 leading-none">12</p>
+                            </div>
+                        </div>
+
+                        {/* Skills & Match score */}
+                        <div className="mt-3.5 space-y-2 relative z-10">
+                            <div className="flex items-center justify-between text-[9px]">
+                                <span className="text-white/30 font-bold uppercase tracking-wider">Role Match</span>
+                                <span className="text-[#14F195] font-black">95% (Perfect)</span>
+                            </div>
+                            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-blue-505 to-[#14F195] rounded-full" style={{ width: "95%" }} />
+                            </div>
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                                {["Rust", "Solana", "Anchor", "DeFi"].map(skill => (
+                                    <span key={skill} className="px-1.5 py-0.5 rounded text-[8px] font-bold text-white/50 bg-white/5 border border-white/5">{skill}</span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>,
 
         // Box 1: Org-Backed Trust (Endorsement Chain)
-        <div key={1} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col relative overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-500/10 border border-slate-500/20 flex items-center justify-center">
-                        <Building2 className="w-5 h-5 text-slate-400" />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-white tracking-tight">Trust Network</h4>
-                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Endorsement Chain</p>
-                    </div>
+        <div key={1} className="theme-preserve w-full h-[360px] rounded-2xl overflow-hidden flex relative" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 24px 48px -8px rgba(0,0,0,0.85)" }}>
+            {/* Spotlight */}
+            <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 50% 30% at 50% -1%, rgba(255,255,255,0.06) 0%, transparent 80%)" }} />
+            {/* Shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-[6] opacity-70" />
+
+            {/* Left Sidebar */}
+            <div className="w-[110px] sm:w-[130px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center px-3 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <img src="/chainvolio%20logo.png" alt="logo" style={{ height: 12, width: "auto" }} />
+                    <span className="hidden sm:inline" style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginLeft: 4 }}>chainvolio</span>
+                </div>
+                <div className="px-1.5 py-2 flex-1 space-y-0.5">
+                    {[
+                        { label: "Talent Pool", id: 0 },
+                        { label: "Trust Net", id: 1 },
+                        { label: "Distribution", id: 2 }
+                    ].map(item => {
+                        const isItemActive = active === item.id;
+                        return (
+                            <div key={item.id} className="flex items-center gap-1 px-2 py-[4px] rounded-md transition-colors cursor-pointer" style={isItemActive ? { background: "rgba(255,255,255,0.07)" } : {}} onClick={() => setActive(item.id)}>
+                                <span style={{ fontSize: 9, fontWeight: isItemActive ? 600 : 500, color: isItemActive ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.35)", whiteSpace: "nowrap" }}>{item.label}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* Timeline */}
-            <div className="flex-1 relative pl-5 space-y-5 border-l-2 border-white/[0.08] ml-3 flex flex-col justify-center">
-                {[
-                    { org: "Nexus Protocol", role: "Core Contributor", date: "Q3 2024", color: "#94a3b8" },
-                    { org: "Superteam", role: "Grant Winner", date: "Q1 2024", color: "#60a5fa" },
-                    { org: "Solana Foundation", role: "Hackathon 1st", date: "2023", color: "#14F195" },
-                ].map((e, i) => (
-                    <div key={i} className="relative group">
-                        <div className="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full border-[3px] border-[#0D0D0D] transition-transform duration-300 group-hover:scale-125" style={{ background: e.color }} />
-                        <div className="p-3 sm:p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors flex items-center justify-between shadow-md">
-                            <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <ShieldCheck className="w-4 h-4" style={{ color: e.color }} />
-                                    <h5 className="text-sm font-bold text-white/90">{e.org}</h5>
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col min-w-0" style={{ background: "#0a0b0e" }}>
+                <div className="flex items-center justify-between px-4 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>Trust Network</span>
+                </div>
+                <div className="flex-1 p-4 flex flex-col justify-center min-h-0 relative z-10">
+                    {/* Timeline */}
+                    <div className="relative pl-4 space-y-2.5 border-l border-white/[0.08] ml-2">
+                        {[
+                            { org: "Nexus Protocol", role: "Core Contributor", date: "Q3 24", color: "#94a3b8" },
+                            { org: "Superteam", role: "Grant Winner", date: "Q1 24", color: "#60a5fa" },
+                            { org: "Solana Foundation", role: "Hackathon 1st", date: "2023", color: "#14F195" },
+                        ].map((e, i) => (
+                            <div key={i} className="relative group">
+                                <div className="absolute -left-[21px] top-1.5 w-2 h-2 rounded-full border-2 border-[#0a0b0e] transition-transform duration-300 group-hover:scale-125" style={{ background: e.color }} />
+                                <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-colors flex items-center justify-between shadow-md">
+                                    <div>
+                                        <div className="flex items-center gap-1.5 mb-0.5">
+                                            <ShieldCheck className="w-3.5 h-3.5" style={{ color: e.color }} />
+                                            <h5 className="text-[11px] font-bold text-white/90">{e.org}</h5>
+                                        </div>
+                                        <p className="text-[9px] text-white/40">{e.role}</p>
+                                    </div>
+                                    <span className="text-[9px] font-medium text-white/30 bg-white/5 px-1.5 py-0.5 rounded">{e.date}</span>
                                 </div>
-                                <p className="text-[10px] text-white/40">{e.role}</p>
                             </div>
-                            <span className="text-[10px] font-medium text-white/30 bg-white/5 px-2 py-1 rounded-md">{e.date}</span>
+                        ))}
+                    </div>
+
+                    {/* Verification Summary Card */}
+                    <div className="mt-3.5 p-2 rounded-xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 border border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold text-white/80 leading-none">Security Attestation</p>
+                                <p className="text-[8px] text-white/30 mt-0.5 font-medium">Solana SPL-Memo Protocol</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[7.5px] font-mono text-emerald-400/70 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">Verified</span>
                         </div>
                     </div>
-                ))}
+                </div>
             </div>
         </div>,
- 
+
         // Box 2: Post Anywhere (Share Link)
-        <div key={2} className="theme-preserve w-full h-[360px] bg-[#0D0D0D] border border-white/10 rounded-3xl p-5 shadow-2xl flex flex-col relative overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                        <Share2 className="w-4 h-4 text-amber-400" />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-white tracking-tight">Distribution</h4>
-                        <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">Portable Job Link</p>
-                    </div>
+        <div key={2} className="theme-preserve w-full h-[360px] rounded-2xl overflow-hidden flex relative" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 24px 48px -8px rgba(0,0,0,0.85)" }}>
+            {/* Spotlight */}
+            <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 50% 30% at 50% -1%, rgba(255,255,255,0.06) 0%, transparent 80%)" }} />
+            {/* Shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-[6] opacity-70" />
+
+            {/* Left Sidebar */}
+            <div className="w-[110px] sm:w-[130px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center px-3 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <img src="/chainvolio%20logo.png" alt="logo" style={{ height: 12, width: "auto" }} />
+                    <span className="hidden sm:inline" style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginLeft: 4 }}>chainvolio</span>
+                </div>
+                <div className="px-1.5 py-2 flex-1 space-y-0.5">
+                    {[
+                        { label: "Talent Pool", id: 0 },
+                        { label: "Trust Net", id: 1 },
+                        { label: "Distribution", id: 2 }
+                    ].map(item => {
+                        const isItemActive = active === item.id;
+                        return (
+                            <div key={item.id} className="flex items-center gap-1 px-2 py-[4px] rounded-md transition-colors cursor-pointer" style={isItemActive ? { background: "rgba(255,255,255,0.07)" } : {}} onClick={() => setActive(item.id)}>
+                                <span style={{ fontSize: 9, fontWeight: isItemActive ? 600 : 500, color: isItemActive ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.35)", whiteSpace: "nowrap" }}>{item.label}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-            
-            {/* Share Widget - Launchpad Style */}
-            <div className="flex-1 flex flex-col gap-3 relative z-10">
-                {/* Primary Link Card */}
-                <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col gap-2 relative group/link hover:bg-white/[0.05] transition-all duration-500">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
-                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Live Link</span>
-                        </div>
-                        <div className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                            <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Encrypted</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between gap-3">
-                        <span className="text-base font-bold text-white tracking-tight truncate">chainvolio.xyz/hire/rust-dev</span>
-                        <button className="flex-shrink-0 w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center hover:bg-white/90 transition-all shadow-lg active:scale-95">
-                            <ExternalLink className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
+
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col min-w-0" style={{ background: "#0a0b0e" }}>
+                <div className="flex items-center justify-between px-4 h-[38px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>Distribution</span>
                 </div>
-
-                {/* Social Channels */}
-                <div className="grid grid-cols-2 gap-3 flex-1">
-                    {/* LinkedIn Channel */}
-                    <div className="rounded-xl border border-white/5 bg-gradient-to-br from-[#0077b5]/10 to-transparent p-3 flex flex-col justify-between group/social hover:border-[#0077b5]/30 transition-all duration-500 cursor-pointer">
-                        <div className="flex items-center justify-between">
-                            <div className="w-7 h-7 rounded-lg bg-[#0077b5]/20 flex items-center justify-center">
-                                <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />
+                <div className="flex-1 p-4 flex flex-col justify-center min-h-0 relative z-10">
+                    {/* Share Widget */}
+                    <div className="flex-1 flex flex-col gap-2.5 justify-center">
+                        {/* Primary Link Card */}
+                        <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col gap-1.5 relative group/link hover:bg-white/[0.05] transition-all duration-500">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
+                                    <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Live Link</span>
+                                </div>
+                                <div className="px-1 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                                    <span className="text-[7px] font-black text-amber-500 uppercase tracking-widest">Encrypted</span>
+                                </div>
                             </div>
-                            <ArrowRight className="w-3 h-3 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
-                        </div>
-                        <div>
-                            <h5 className="text-[11px] font-bold text-white mb-0.5">LinkedIn</h5>
-                            <p className="text-[8px] text-white/30 leading-tight">Professional network</p>
-                        </div>
-                        <div className="mt-2 py-1.5 w-full rounded-lg bg-[#0077b5] text-white text-[9px] font-black uppercase tracking-widest text-center shadow-lg shadow-[#0077b5]/20 opacity-80 group-hover/social:opacity-100 transition-opacity">
-                            Share Post
-                        </div>
-                    </div>
-
-                    {/* X Channel */}
-                    <div className="rounded-xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent p-3 flex flex-col justify-between group/social hover:border-white/20 transition-all duration-500 cursor-pointer">
-                        <div className="flex items-center justify-between">
-                            <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                                <span className="text-xs font-black text-white">X</span>
+                            
+                            <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-bold text-white tracking-tight truncate">chainvolio.xyz/hire/rust-dev</span>
+                                <button className="flex-shrink-0 w-6 h-6 rounded bg-white text-black flex items-center justify-center hover:bg-white/90 transition-all shadow-lg active:scale-95">
+                                    <ExternalLink className="w-3 h-3" />
+                                </button>
                             </div>
-                            <ArrowRight className="w-3 h-3 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
                         </div>
-                        <div>
-                            <h5 className="text-[11px] font-bold text-white mb-0.5">X / Twitter</h5>
-                            <p className="text-[8px] text-white/30 leading-tight">Instant broadcast</p>
+
+                        {/* Social Channels */}
+                        <div className="grid grid-cols-2 gap-2">
+                            {/* LinkedIn Channel */}
+                            <div className="rounded-lg border border-white/5 bg-gradient-to-br from-[#0077b5]/10 to-transparent p-2.5 flex flex-col justify-between group/social hover:border-[#0077b5]/30 transition-all duration-500 cursor-pointer">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <div className="w-5 h-5 rounded bg-[#0077b5]/20 flex items-center justify-center">
+                                        <Linkedin className="w-2.5 h-2.5 text-[#0077b5]" />
+                                    </div>
+                                    <ArrowRight className="w-2.5 h-2.5 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
+                                </div>
+                                <div>
+                                    <h5 className="text-[10px] font-bold text-white mb-0.5">LinkedIn</h5>
+                                    <p className="text-[7.5px] text-white/30 leading-tight">Professional network</p>
+                                </div>
+                                <div className="mt-2 py-1 w-full rounded bg-[#0077b5] text-white text-[8px] font-black uppercase tracking-widest text-center shadow-lg shadow-[#0077b5]/20 opacity-80 group-hover/social:opacity-100 transition-opacity">
+                                    Share Post
+                                </div>
+                            </div>
+
+                            {/* X Channel */}
+                            <div className="rounded-lg border border-white/5 bg-gradient-to-br from-white/5 to-transparent p-2.5 flex flex-col justify-between group/social hover:border-white/20 transition-all duration-500 cursor-pointer">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <div className="w-5 h-5 rounded bg-white/5 flex items-center justify-center">
+                                        <span className="text-[9px] font-black text-white">X</span>
+                                    </div>
+                                    <ArrowRight className="w-2.5 h-2.5 text-white/20 group-hover/social:text-white/60 group-hover/social:translate-x-1 transition-all" />
+                                </div>
+                                <div>
+                                    <h5 className="text-[10px] font-bold text-white mb-0.5">X / Twitter</h5>
+                                    <p className="text-[7.5px] text-white/30 leading-tight">Instant broadcast</p>
+                                </div>
+                                <div className="mt-2 py-1 w-full rounded bg-white text-black text-[8px] font-black uppercase tracking-widest text-center shadow-lg shadow-white/10 opacity-90 group-hover/social:opacity-100 transition-opacity">
+                                    Blast Link
+                                </div>
+                            </div>
                         </div>
-                        <div className="mt-2 py-1.5 w-full rounded-lg bg-white text-black text-[9px] font-black uppercase tracking-widest text-center shadow-lg shadow-white/10 opacity-90 group-hover/social:opacity-100 transition-opacity">
-                            Blast Link
+
+                        {/* Live Metrics Row */}
+                        <div className="grid grid-cols-3 gap-2 mt-2 text-center">
+                            <div className="p-1.5 rounded-lg bg-white/[0.015] border border-white/5">
+                                <p className="text-[7.5px] text-white/30 font-bold uppercase tracking-wider mb-0.5">Views</p>
+                                <p className="text-xs font-black text-white/80">1,420</p>
+                            </div>
+                            <div className="p-1.5 rounded-lg bg-white/[0.015] border border-white/5">
+                                <p className="text-[7.5px] text-white/30 font-bold uppercase tracking-wider mb-0.5">Applicants</p>
+                                <p className="text-xs font-black text-[#14F195]">48</p>
+                            </div>
+                            <div className="p-1.5 rounded-lg bg-white/[0.015] border border-white/5">
+                                <p className="text-[7.5px] text-white/30 font-bold uppercase tracking-wider mb-0.5">CTR</p>
+                                <p className="text-xs font-black text-amber-400">3.4%</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1597,6 +1914,31 @@ export function LandingPageClient() {
                                     </div>
                                 </div>
                             </div>{/* end 3-panel absolute inset flex */}
+
+                            {/* Floating Inbox Card — bottom-right of hero */}
+                            <motion.div 
+                                className="absolute bottom-0 left-1 z-20 cursor-pointer" 
+                                style={{ filter: "drop-shadow(1px 2px 3px rgba(0,0,0,0.12)) drop-shadow(2px 8px 10px rgba(0,0,0,0.25))" }}
+                                animate={{
+                                    scale: [1, 1.03, 0.98, 1.02, 1, 1],
+                                    x: [0, -3, 3, -2, 2, 0, 0, 0],
+                                }}
+                                transition={{
+                                    duration: 0.8,
+                                    repeat: Infinity,
+                                    repeatDelay: 4.5,
+                                    ease: "easeInOut"
+                                }}
+                                whileHover={{
+                                    x: -8,
+                                    y: -8,
+                                    scale: 1.02,
+                                    transition: { duration: 0.3 }
+                                }}
+                            >
+                                <FloatingInboxCard />
+                            </motion.div>
+
                         </div>{/* end scaled 960x540 container */}
                     </div>{/* end hero outer relative */}
 
@@ -1777,7 +2119,7 @@ export function LandingPageClient() {
                         {/* Label pill */}
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.12] mb-8" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
                             <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse flex-shrink-0" />
-                            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.18em]">Verifiable Work History</span>
+                            <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em]">Portable Web3 reputation</span>
                         </div>
 
                         {/* Top row: heading LEFT + description RIGHT */}
@@ -2074,6 +2416,13 @@ export function LandingPageClient() {
 
                 </section>
 
+                {/* CORE FEATURE SECTION */}
+                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
+                    <div className="max-w-[1200px] mx-auto relative z-10">
+                        <AttestationBlock />
+                    </div>
+                </section>
+
                 <section id="solution" className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 bg-[#060608] theme-bg-section">
                     <div className="theme-fade-from-black absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-[#060608] to-transparent pointer-events-none z-30"></div>
 
@@ -2097,7 +2446,7 @@ export function LandingPageClient() {
 
                         {/* ── Interactive Flow ── */}
                         <div className="relative w-full max-w-[860px] mx-auto mb-4">
-                            <div className="absolute -inset-8 bg-white/[0.03] blur-[80px] pointer-events-none" />
+                            <div className="absolute -inset-8 bg-white/[0.01] blur-[80px] pointer-events-none" />
 
                             <VerifiableWorkHistoryFlow />
                         </div>
@@ -2121,7 +2470,7 @@ export function LandingPageClient() {
 
                         {/* ── UI Mockup ── */}
                         <div className="relative h-[480px] sm:h-[350px] md:h-[550px] lg:h-[700px] w-full max-w-[1200px] mx-auto flex items-center justify-center overflow-visible">
-                            <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full opacity-40 pointer-events-none" />
+                            <div className="absolute inset-0 bg-white/[0.01] blur-[120px] rounded-full opacity-20 pointer-events-none" />
 
                             {/* Unified Scaling Container for the entire assembly */}
                             <div className="relative scale-[0.65] min-[440px]:scale-[0.75] sm:scale-[0.65] md:scale-[0.8] lg:scale-100 transition-transform duration-700 origin-center flex items-center justify-center w-[350px] h-[650px] md:w-[1200px] md:h-[650px]">
@@ -2130,7 +2479,11 @@ export function LandingPageClient() {
                                     <div className="theme-preserve w-full h-full bg-[#060608] rounded-[32px] border border-white/[0.13] overflow-hidden text-left relative"
                                         style={{ boxShadow: "0 0 0 1px rgba(255,255,255,0.06) inset, 0 1px 0 rgba(255,255,255,0.1) inset, 0 32px 80px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.5)" }}
                                     >
-                                        <MockProfileUI />
+                                        <MockRecruiterDashboardUI />
+                                        {/* Lightning shimmer sweep */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.10] to-transparent animate-lightning-shine pointer-events-none z-[22] opacity-90 rounded-[32px]" />
+                                        {/* Bottom fade — darkens bottom third of dashboard */}
+                                        <div className="absolute inset-x-0 bottom-0 h-[45%] pointer-events-none rounded-b-[32px]" style={{ zIndex: 23, background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.5) 40%, transparent 100%)" }} />
                                         {/* Diagonal sheen — top-left catch light */}
                                         <div className="absolute inset-0 pointer-events-none rounded-[32px]" style={{ zIndex: 20, background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 25%, transparent 50%)" }} />
                                         {/* Top-edge specular line */}
@@ -2139,25 +2492,81 @@ export function LandingPageClient() {
                                         <div className="absolute inset-0 pointer-events-none rounded-[32px]" style={{ zIndex: 19, background: "conic-gradient(from 150deg at 12% -6%, transparent 55deg, rgba(255,255,255,0.05) 67deg, rgba(255,255,255,0.025) 78deg, transparent 92deg)" }} />
                                     </div>
 
-                                    {/* Floating Proof Card - Now visible on all screens, part of the scaled assembly */}
-                                    <div className="absolute -right-16 top-1/4 z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
+                                    {/* Floating CV Score Card — in front */}
+                                    <div className="absolute -right-16 top-[52%] z-40 transition-all duration-1000 group-hover:translate-y-[-15px] group-hover:translate-x-6 group-hover:rotate-2">
                                         <div className="[perspective:1500px]">
                                             <div className="rounded-2xl [transform:rotateY(-8deg)rotateX(2deg)]">
                                                 <FloatingVerificationCard />
                                             </div>
                                         </div>
                                     </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Explanation / Description below the dashboard */}
+                    <div className="mt-4 sm:mt-6 md:mt-8 max-w-[1200px] mx-auto relative z-30 px-4">
+                        <div style={{
+                            padding: "16px 20px",
+                            borderRadius: "16px",
+                            border: "1px solid rgba(255,255,255,0.06)",
+                            background: "rgba(10,11,14,0.6)",
+                            backdropFilter: "blur(12px)",
+                            position: "relative" as const,
+                            overflow: "hidden"
+                        }}>
+                            <div style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "3px",
+                                height: "100%",
+                                background: "linear-gradient(to bottom, rgba(99,102,241,0.8), transparent)"
+                            }} />
+                            <div className="flex items-start gap-4">
+                                <div style={{
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: 8,
+                                    background: "rgba(99,102,241,0.08)",
+                                    border: "1px solid rgba(99,102,241,0.18)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                    marginTop: 2
+                                }}>
+                                    <Terminal style={{ width: 14, height: 14, color: "rgba(129,140,248,0.85)" }} />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <h4 className="flex items-center gap-2 mb-1.5" style={{
+                                        fontSize: "13px",
+                                        fontWeight: 700,
+                                        color: "rgba(255,255,255,0.9)",
+                                        letterSpacing: "0.02em"
+                                    }}>
+                                        Verifiable Recruitment Engine
+                                        <span style={{
+                                            width: 6,
+                                            height: 6,
+                                            borderRadius: "50%",
+                                            background: "#10b981",
+                                            boxShadow: "0 0 8px #10b981"
+                                        }} />
+                                    </h4>
+                                    <p style={{
+                                        fontSize: "12.5px",
+                                        color: "rgba(255,255,255,0.45)",
+                                        lineHeight: 1.6,
+                                        fontWeight: 400
+                                    }}>
+                                        The recruiter dashboard aggregates cryptographically signed credentials directly from the blockchain. Filter candidates based on verified on-chain signals, instantly verify work history validity, and request interviews directly without relying on unverified PDF resumes.
+                                    </p>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                </section>
 
-                {/* CORE FEATURE SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative z-10 overflow-hidden bg-[#060608] theme-bg-section">
-                    <div className="max-w-[1200px] mx-auto relative z-10">
-                        <AttestationBlock />
                     </div>
                 </section>
 
