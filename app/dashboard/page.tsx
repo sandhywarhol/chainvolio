@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ReceiptForm } from "@/components/receipt/ReceiptForm";
@@ -18,7 +19,7 @@ import { RoleBadge } from "@/components/profile/RoleBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox, Building2, PenLine } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox, Building2, PenLine, Wallet } from "lucide-react";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
 import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
@@ -1629,19 +1630,42 @@ import type { Session } from "@supabase/supabase-js";
 import type { OrgAccount } from "@/hooks/useGoogleAuth";
 
 function GoogleBuilderNoWalletView({ session }: { session: Session }) {
+  const features = [
+    { icon: "🔗", label: "On-Chain Proof of Work", desc: "Cryptographically sign every project you've shipped" },
+    { icon: "🛡️", label: "Verified CV Score",      desc: "A tamper-proof resume that recruiters trust instantly" },
+    { icon: "📜", label: "Attestations",            desc: "Get your work endorsed by organizations on-chain" },
+    { icon: "🔍", label: "Discoverable Profile",    desc: "Show up in recruiter searches as a verified builder" },
+  ];
   return (
     <main className="min-h-screen text-white relative bg-black theme-bg-page theme-aware">
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
-        <div className="text-center space-y-3 max-w-sm">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mx-auto">🏗</div>
-          <h1 className="text-2xl font-bold">Connect your wallet</h1>
+      <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8 px-4 py-12">
+        {/* Header */}
+        <div className="text-center space-y-3 max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl mx-auto">🏗</div>
+          <h1 className="text-3xl font-black tracking-tight">One step away</h1>
           <p className="text-slate-400 text-sm leading-relaxed">
-            You are signed in as a Builder via Google. Link a Solana wallet to create your on-chain profile and access all builder features.
+            Your Google account is ready. Connect a Solana wallet to activate your builder profile and unlock everything ChainVolio has to offer.
           </p>
           <p className="text-[11px] text-slate-600">Signed in as {session.user.email}</p>
         </div>
-        <WalletMultiButton />
+
+        {/* Feature grid */}
+        <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+          {features.map(f => (
+            <div key={f.label} className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] space-y-2">
+              <span className="text-xl">{f.icon}</span>
+              <p className="text-xs font-bold text-white/80">{f.label}</p>
+              <p className="text-[10px] text-slate-500 leading-snug">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="flex flex-col items-center gap-3">
+          <WalletMultiButton />
+          <p className="text-[10px] text-slate-600">Phantom and Solflare supported · Takes 30 seconds</p>
+        </div>
       </div>
     </main>
   );
@@ -1654,6 +1678,8 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
   const [isRenewalGoogle, setIsRenewalGoogle] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showWalletNudge, setShowWalletNudge] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
 
   const needsOnboarding = !orgAccount || !orgAccount.onboarding_complete;
   useEffect(() => {
@@ -1661,9 +1687,17 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
   }, [needsOnboarding, router]);
 
   useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem("cv_wallet_nudge_dismissed");
+      if (!dismissed) setShowWalletNudge(true);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     if (!orgAccount?.auth_uid || !session?.access_token) return;
     fetch(`/api/hiring/collections?auth_uid=${orgAccount.auth_uid}`, {
-      headers: { Authorization: `Bearer ${session.access_token}` },
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Cache-Control': 'no-cache' },
+      cache: 'no-store',
     })
       .then(r => r.ok ? r.json() : { data: [] })
       .then(data => { if (Array.isArray(data.data)) setGoogleCollections(data.data); })
@@ -1681,7 +1715,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
     linkedin: orgAccount?.linkedin ?? null,
     discord: orgAccount?.discord ?? null,
     telegram: orgAccount?.telegram ?? null,
-    email: orgAccount?.email ?? session.user.email ?? null,
+    email: orgAccount?.email || session.user.email || null,
     country: orgAccount?.country ?? null,
     isVerified: false as const,
     verificationStatus: null,
@@ -1792,6 +1826,36 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
                 </Link>
               )}
             </div>
+            {/* Link Wallet nudge — dismissible, shown once */}
+            {showWalletNudge && (
+              <div className="mx-4 mt-3 flex items-start gap-3 px-4 py-3 rounded-xl" style={{ background: "rgba(45,212,191,0.06)", border: "1px solid rgba(45,212,191,0.18)" }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(45,212,191,0.12)" }}>
+                  <Wallet style={{ width: 14, height: 14, color: "rgb(45,212,191)" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", lineHeight: 1.2 }}>Unlock the full platform</p>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 2, lineHeight: 1.5 }}>Link a Solana wallet to issue on-chain attestations, get verified, and appear as a trusted hiring source.</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => setWalletModalOpen(true)}
+                    className="px-3 py-1.5 rounded-lg font-bold transition-all hover:opacity-90"
+                    style={{ fontSize: 11, background: "rgba(45,212,191,0.15)", border: "1px solid rgba(45,212,191,0.3)", color: "rgb(45,212,191)" }}
+                  >
+                    Link Wallet
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowWalletNudge(false);
+                      try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
+                    }}
+                    style={{ color: "rgba(255,255,255,0.2)", fontSize: 18, lineHeight: 1, background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
               {activeTab === "inbox" ? (
@@ -1899,6 +1963,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
       )}
 
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+      <CustomWalletModal isOpen={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </main>
   );
 }

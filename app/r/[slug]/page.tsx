@@ -245,7 +245,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                             <div className="flex items-center gap-1.5">
                                                                 <AlertCircle className={`w-3.5 h-3.5 ${ownerProfile?.isExpired ? "text-amber-500" : "text-slate-500 opacity-50"}`} />
                                                                 <span className={`text-[9px] font-black uppercase tracking-widest leading-none ${ownerProfile?.isExpired ? "text-amber-500" : "text-slate-500 opacity-50"}`}>
-                                                                    {ownerProfile?.isExpired ? "Expired Verification" : "Unverified User"}
+                                                                    {ownerProfile?.isExpired ? "Expired Verification" : collection?.owner_wallet?.startsWith("gauth:") ? "Google Account" : "Unverified User"}
                                                                 </span>
                                                             </div>
                                                         )}

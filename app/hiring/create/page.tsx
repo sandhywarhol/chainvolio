@@ -981,19 +981,18 @@ export default function CreateCollection() {
                         )}
 
                         <div className="flex flex-col md:flex-row gap-4 justify-center">
-                            {!isGoogleUser && (
-                                <Link
-                                    href={`/hiring/${createdSlug}/dashboard`}
-                                    className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-xl"
-                                >
-                                    Open Dashboard <ArrowRight className="w-5 h-5" />
-                                </Link>
-                            )}
-                            {isGoogleUser && (
-                                <div className="px-6 py-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-center">
-                                    <p className="text-[11px] text-slate-400">Connect a wallet to unlock the hiring dashboard.</p>
-                                </div>
-                            )}
+                            <Link
+                                href={`/hiring/${createdSlug}/dashboard`}
+                                className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-xl"
+                            >
+                                View Dashboard <ArrowRight className="w-5 h-5" />
+                            </Link>
+                            <Link
+                                href="/dashboard"
+                                className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                            >
+                                Back to Dashboard
+                            </Link>
                             {hiringAccess !== "limit_reached" && (
                                 <button
                                     onClick={() => setCreatedSlug(null)}
