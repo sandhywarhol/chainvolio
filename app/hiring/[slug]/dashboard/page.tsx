@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { supabaseAuth } from "@/lib/supabase/auth";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
 import { generateHiringReport } from "@/lib/report-generator";
@@ -781,10 +782,16 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     </div>
                     <div className="flex flex-col items-center gap-4">
                         <WalletMultiButton />
-                        <p className="text-xs text-slate-600">or sign in with Google</p>
-                        <Link href="/dashboard" className="text-xs text-indigo-400 hover:text-indigo-300 underline">
-                            Go to Dashboard to sign in with Google
-                        </Link>
+                        <p className="text-xs text-slate-600">or</p>
+                        <button
+                            onClick={() => supabaseAuth?.auth.signInWithOAuth({
+                                provider: "google",
+                                options: { redirectTo: typeof window !== "undefined" ? window.location.href : undefined }
+                            })}
+                            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-bold text-white transition-colors"
+                        >
+                            Sign in with Google
+                        </button>
                     </div>
                 </div>
             </div>

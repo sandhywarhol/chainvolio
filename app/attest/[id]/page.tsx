@@ -354,7 +354,7 @@ export default function AttestPage() {
                 </Link>
             </nav>
             <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
-                <p className="text-red-400 text-center max-w-sm">{error}</p>
+                <p className="text-red-300 text-center max-w-sm">{error}</p>
                 {txHash && (
                     <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
                         className="text-xs text-emerald-400 hover:text-emerald-300 underline">

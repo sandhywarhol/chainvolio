@@ -326,16 +326,25 @@ export default function CreateCollection() {
 
     if (!publicKey && !session) {
         return (
-            <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                    <Lock className="w-6 h-6 text-emerald-400" />
+            <main className="min-h-screen text-white flex flex-col bg-black">
+                <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
+                        <span className="text-xl font-bold tracking-tight">ChainVolio <span className="text-emerald-500">recruit</span></span>
+                    </Link>
+                    <WalletMultiButton />
+                </nav>
+                <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+                    <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                        <Lock className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h1 className="text-xl font-bold text-white">Sign in to continue</h1>
+                        <p className="text-slate-400 text-sm max-w-sm">Connect your wallet or sign in with Google to create a hiring collection.</p>
+                    </div>
+                    <WalletMultiButton />
+                    <Link href="/" className="text-slate-400 hover:text-white text-sm">← Back</Link>
                 </div>
-                <div className="text-center space-y-2">
-                    <h1 className="text-xl font-bold text-white">Sign in to continue</h1>
-                    <p className="text-slate-400 text-sm max-w-sm">Connect your wallet or sign in with Google to create a hiring collection.</p>
-                </div>
-                <WalletMultiButton />
-                <Link href="/" className="text-slate-400 hover:text-white text-sm">← Back</Link>
             </main>
         );
     }

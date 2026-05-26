@@ -185,23 +185,29 @@ export default function CreateProfilePage() {
 
   if (loading && !form.displayName) {
     return (
-      <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+      <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+        </div>
       </div>
     );
   }
 
   if (!connected || !publicKey) {
     return (
-      <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black theme-bg-page theme-aware">
-        <h1 className="text-2xl font-bold">Connect your wallet</h1>
-        <p className="text-slate-400 text-center max-w-sm">
-          Connect your Solana wallet or sign in with Google to create or edit your profile.
-        </p>
-        <WalletMultiButton />
-        <Link href="/" className="text-slate-400 hover:text-white">
-          ← Back
-        </Link>
+      <main className="min-h-screen text-white flex flex-col bg-black theme-bg-page theme-aware">
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+          <h1 className="text-2xl font-bold">Connect your wallet</h1>
+          <p className="text-slate-400 text-center max-w-sm">
+            Connect your Solana wallet or sign in with Google to create or edit your profile.
+          </p>
+          <WalletMultiButton />
+          <Link href="/" className="text-slate-400 hover:text-white">
+            ← Back
+          </Link>
+        </div>
       </main>
     );
   }
