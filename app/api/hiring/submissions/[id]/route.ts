@@ -38,32 +38,48 @@ export async function PATCH(
 
         const ownerWallet = (submission as any).hiring_collections?.owner_wallet;
 
-        // --- Signature / Proof Verification ---
+        // --- Auth: Google session OR wallet signature ---
+        const authHeader = request.headers.get("Authorization");
+        const isGoogleAuth = authHeader?.startsWith("Bearer ");
         const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
 
         // Internal workflow actions like notes or shortlisted/rejected are off-chain and don't require signatures
         const isWorkflowAction = ["shortlisted", "rejected", "pending"].includes(status) || (typeof notes === 'string' && !status);
 
-        if (!skipVerify && !cleanTxSignature && !isWorkflowAction && (!wallet || !cleanSignature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required for this action.", 401);
-        }
+        if (isGoogleAuth) {
+            // Google session path (workflow actions only — hired requires on-chain tx which needs a wallet)
+            if (!isWorkflowAction) {
+                return errorResponse("ERR_WALLET_REQUIRED", "On-chain actions require a connected Solana wallet.", 403);
+            }
+            const token = authHeader!.replace("Bearer ", "");
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) {
+                return errorResponse("ERR_UNAUTHORIZED", "Invalid session.", 401);
+            }
+            if (ownerWallet !== `gauth:${user.id}`) {
+                return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized. You do not own the parent collection.", 403);
+            }
+            // Verified — proceed without set_app_wallet (service role bypasses RLS)
+        } else {
+            if (!skipVerify && !cleanTxSignature && !isWorkflowAction && (!wallet || !cleanSignature || !nonce || !timestamp)) {
+                return errorResponse("ERR_SIGNATURE_REQUIRED", "On-chain transaction or signature required for this action.", 401);
+            }
 
-        if (!skipVerify && cleanSignature && !cleanTxSignature) {
-            const { verifySignature } = await import("@/lib/crypto");
-            const { isValid, error: sigError } = await verifySignature(
-                wallet || "",
-                "review_submission",
-                nonce || "",
-                Number(timestamp) || 0,
-                cleanSignature || ""
-            );
+            if (!skipVerify && cleanSignature && !cleanTxSignature) {
+                const { verifySignature } = await import("@/lib/crypto");
+                const { isValid, error: sigError } = await verifySignature(
+                    wallet || "",
+                    "review_submission",
+                    nonce || "",
+                    Number(timestamp) || 0,
+                    cleanSignature || ""
+                );
+                if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+            }
 
-            if (!isValid) return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
-        }
-
-        // Verify that the signer is the collection owner
-        if (wallet !== ownerWallet) {
-            return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized. You do not own the parent collection.", 403);
+            if (wallet !== ownerWallet) {
+                return errorResponse("ERR_UNAUTHORIZED_OWNER", "Unauthorized. You do not own the parent collection.", 403);
+            }
         }
 
         // --- On-Chain Signer Verification ---
@@ -95,8 +111,10 @@ export async function PATCH(
             }
         }
 
-        // Set transaction context for RLS
-        await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
+        // Set transaction context for RLS (wallet users only)
+        if (!isGoogleAuth && wallet) {
+            await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
+        }
 
         const updates: any = {};
         if (status) updates.recruiter_status = status;

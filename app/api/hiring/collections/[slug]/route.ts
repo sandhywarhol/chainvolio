@@ -81,34 +81,46 @@ export async function DELETE(
             return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
 
-        // --- Signature Verification ---
-        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
-            return NextResponse.json({ error: "Signature required to delete collection." }, { status: 401 });
-        }
+        // --- Auth: Google session OR wallet signature ---
+        const authHeader = request.headers.get("Authorization");
+        const isGoogleAuth = authHeader?.startsWith("Bearer ");
 
+        if (isGoogleAuth) {
+            const token = authHeader!.replace("Bearer ", "");
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) {
+                return NextResponse.json({ error: "Invalid session." }, { status: 401 });
+            }
+            if (collection.owner_wallet !== `gauth:${user.id}`) {
+                return NextResponse.json({ error: "Unauthorized. You do not own this collection." }, { status: 403 });
+            }
+            // No RLS context needed — service role bypasses RLS
+        } else {
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!wallet || !signature || !nonce || !timestamp)) {
+                return NextResponse.json({ error: "Signature required to delete collection." }, { status: 401 });
+            }
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            wallet || "",
-            "update_profile",
-            nonce || "",
-            timestamp ? parseInt(timestamp) : 0,
-            signature || ""
-        );
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                wallet || "",
+                "update_profile",
+                nonce || "",
+                timestamp ? parseInt(timestamp) : 0,
+                signature || ""
+            );
 
+            if (!isValid) {
+                return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+            }
 
-        if (!isValid) {
-            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
-        }
+            if (collection.owner_wallet !== wallet) {
+                return NextResponse.json({ error: "Unauthorized. You do not own this collection." }, { status: 403 });
+            }
 
-        if (collection.owner_wallet !== wallet) {
-            return NextResponse.json({ error: "Unauthorized. You do not own this collection." }, { status: 403 });
+            await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
         }
         // ----------------------------
-
-        // Set transaction context for RLS parity
-        await supabase.rpc('set_app_wallet', { wallet_addr: wallet });
 
         // 2. Delete submissions (if any)
         const { error: subError } = await supabase

@@ -39,30 +39,44 @@ export async function GET(
             return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
 
-        // --- Signature Verification ---
-        if (!wallet || !signature || !nonce || !timestamp) {
-            return NextResponse.json({ error: "Signature required to view dashboard." }, { status: 401 });
-        }
+        // --- Auth Verification: Google session OR wallet signature ---
+        const authHeader = request.headers.get("Authorization");
+        const isGoogleAuth = authHeader?.startsWith("Bearer ");
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            wallet,
-            "view_dashboard", // Using specific view action that allows session-like reuse
-            nonce,
-            parseInt(timestamp),
-            signature,
-            slug // Pass the context parameter so the signed message matches
-        );
+        if (isGoogleAuth) {
+            const token = authHeader!.replace("Bearer ", "");
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) {
+                return NextResponse.json({ error: "Invalid session." }, { status: 401, headers });
+            }
+            const expectedOwner = `gauth:${user.id}`;
+            if (collection.owner_wallet !== expectedOwner) {
+                return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403, headers });
+            }
+        } else {
+            if (!wallet || !signature || !nonce || !timestamp) {
+                return NextResponse.json({ error: "Signature required to view dashboard." }, { status: 401, headers });
+            }
 
-        if (!isValid) {
-            console.error(`[Dashboard API] Signature verification failed for wallet ${wallet}. Error: ${sigError}`);
-            return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
-        }
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                wallet,
+                "view_dashboard",
+                nonce,
+                parseInt(timestamp),
+                signature,
+                slug
+            );
 
-        // Check ownership
-        if (collection.owner_wallet !== wallet) {
-            console.error(`[Dashboard API] Unauthorized: Wallet ${wallet} is not owner ${collection.owner_wallet} for slug ${slug}`);
-            return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403 });
+            if (!isValid) {
+                console.error(`[Dashboard API] Signature verification failed for wallet ${wallet}. Error: ${sigError}`);
+                return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401, headers });
+            }
+
+            if (collection.owner_wallet !== wallet) {
+                console.error(`[Dashboard API] Unauthorized: Wallet ${wallet} is not owner ${collection.owner_wallet} for slug ${slug}`);
+                return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403, headers });
+            }
         }
         // ----------------------------
 

@@ -30,6 +30,7 @@ import {
 import { useRouter } from "next/navigation";
 import React from "react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
 import { generateHiringReport } from "@/lib/report-generator";
@@ -59,6 +60,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [needsAuth, setNeedsAuth] = useState(false);
 
     const { publicKey, connected, signMessage, sendTransaction } = useWallet();
+    const { session: googleSession, loading: googleLoading, isGoogleSignedIn } = useGoogleAuth();
+    const isGoogleUser = isGoogleSignedIn && !publicKey;
 
     const generateReviewHash = async (data: any) => {
         const encoder = new TextEncoder();
@@ -70,6 +73,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     useEffect(() => {
+        // Google auth path: no wallet needed
+        if (isGoogleUser && googleSession?.access_token) {
+            setLoading(true);
+            fetchWithGoogleSession(googleSession.access_token);
+            return;
+        }
+
         if (!connected || !publicKey) {
             setLoading(false);
             setNeedsAuth(false);
@@ -89,7 +99,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     try {
                         const parsed = JSON.parse(cached);
                         const twoHours = 2 * 60 * 60 * 1000;
-                        // Only check the 2-hour window — no idle timeout
                         if (Date.now() - parsed.timestamp < twoHours - 30000) {
                             await fetchWithSignature(parsed);
                             return;
@@ -100,7 +109,6 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     }
                 }
 
-                // No valid session — show the authorize button
                 setNeedsAuth(true);
                 setLoading(false);
             } catch (err) {
@@ -110,7 +118,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
 
         initDashboard();
-    }, [slug, connected, publicKey]);
+    }, [slug, connected, publicKey, isGoogleUser, googleSession?.access_token]);
 
     const handleAuthorize = async () => {
         if (!publicKey || !signMessage) return;
@@ -170,7 +178,51 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     };
 
+    const fetchWithGoogleSession = async (accessToken: string) => {
+        try {
+            const res = await fetch(`/api/hiring/collections/${slug}/candidates?t=${Date.now()}`, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            const result = await res.json();
+            if (res.ok) {
+                setData(result);
+                setNeedsAuth(false);
+            } else {
+                setError(result.error || "Failed to load dashboard.");
+            }
+        } catch {
+            setError("Network error occurred.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDelete = async () => {
+        if (isGoogleUser && googleSession?.access_token) {
+            setIsDeleting(true);
+            try {
+                const res = await fetch(`/api/hiring/collections/${slug}`, {
+                    method: "DELETE",
+                    headers: { 'Authorization': `Bearer ${googleSession.access_token}` }
+                });
+                if (res.ok) {
+                    router.push("/hiring/create");
+                } else {
+                    const result = await res.json();
+                    setToast({ message: `Failed to delete: ${result.error}`, type: "error" });
+                }
+            } catch {
+                setToast({ message: "An error occurred while deleting.", type: "error" });
+            } finally {
+                setIsDeleting(false);
+                setShowDeleteModal(false);
+            }
+            return;
+        }
         if (!publicKey || !signMessage) return;
         setIsDeleting(true);
         try {
@@ -221,13 +273,57 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [expandedId, data]);
 
     const handleUpdateStatus = async (candidateId: string, newStatus: string, skipConfirm = false) => {
-        if (!publicKey || !signMessage) return; // Ensure signMessage is available for on-chain actions
         const candidate = data?.candidates.find(c => c.id === candidateId);
         const oldStatus = candidate?.recruiterStatus;
+
+        // On-chain "hired" action requires a wallet — Google users can't do this
+        if (newStatus === 'hired' && isGoogleUser) {
+            setToast({ message: "On-chain hiring proof requires a connected Solana wallet.", type: "warning" });
+            return;
+        }
+
+        if (!isGoogleUser && (!publicKey || !signMessage)) return;
 
         // If it's a 'hired' action and not yet confirmed, trigger modal
         if (newStatus === 'hired' && !skipConfirm) {
             setCandidateToHire(candidateId);
+            return;
+        }
+
+        // Google user path for workflow actions (shortlist/reject/pending)
+        if (isGoogleUser && googleSession?.access_token) {
+            const isWorkflowAction = ["shortlisted", "rejected", "pending"].includes(newStatus);
+            if (!isWorkflowAction) {
+                setToast({ message: "This action requires a connected wallet.", type: "warning" });
+                return;
+            }
+            setProcessingId(candidateId);
+            setData(prev => {
+                if (!prev) return null;
+                return { ...prev, candidates: prev.candidates.map(c => c.id === candidateId ? { ...c, recruiterStatus: newStatus } : c) };
+            });
+            try {
+                const res = await fetch(`/api/hiring/submissions/${candidateId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${googleSession.access_token}` },
+                    body: JSON.stringify({ status: newStatus }),
+                });
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.error?.message || errData.message || "Status update failed");
+                }
+                if (newStatus === 'shortlisted') setToast({ message: "Candidate Shortlisted", type: "success" });
+                else if (newStatus === 'rejected') setToast({ message: "Candidate Rejected", type: "success" });
+            } catch (err: any) {
+                setToast({ message: `Status update failed: ${err.message}`, type: "error" });
+                setData(prev => {
+                    if (!prev) return null;
+                    return { ...prev, candidates: prev.candidates.map(c => c.id === candidateId ? { ...c, recruiterStatus: oldStatus } : c) };
+                });
+            } finally {
+                setProcessingId(null);
+                setCandidateToHire(null);
+            }
             return;
         }
 
@@ -254,7 +350,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 // 1. Prepare data and generate hash
                 const reviewData = {
                     submissionId: candidateId,
-                    recruiterWallet: publicKey.toBase58(),
+                    recruiterWallet: publicKey!.toBase58(),
                     candidateWallet: candidate?.wallet,
                     organization: data?.collection.title,
                     role: candidate?.role,
@@ -321,7 +417,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     status: newStatus,
-                    wallet: publicKey.toBase58(),
+                    wallet: publicKey!.toBase58(),
                     txSignature
                 }),
             });
@@ -377,14 +473,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     const handleSaveNote = async () => {
-        if (!expandedId || !publicKey) return;
+        if (!expandedId || (!publicKey && !isGoogleUser)) return;
 
         const oldNote = data?.candidates.find(c => c.id === expandedId)?.recruiterNotes;
-        if (oldNote === noteDraft) return; // No change
+        if (oldNote === noteDraft) return;
 
         setIsSavingNote(true);
 
-        // Optimistic update
         setData(prev => {
             if (!prev) return null;
             return {
@@ -395,16 +490,20 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             };
         });
 
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        const body: Record<string, any> = { notes: noteDraft };
+
+        if (isGoogleUser && googleSession?.access_token) {
+            headers["Authorization"] = `Bearer ${googleSession.access_token}`;
+        } else {
+            body.wallet = publicKey!.toBase58();
+        }
+
         try {
-            // Internal Review Notes are now off-chain for smoother workflow
             const res = await fetch(`/api/hiring/submissions/${expandedId}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    notes: noteDraft,
-                    wallet: publicKey.toBase58(),
-                    // No txSignature for notes updates
-                }),
+                headers,
+                body: JSON.stringify(body),
             });
 
             if (!res.ok) {
@@ -522,7 +621,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     }, [activeDropdown]);
 
     const handleDeleteCandidate = async () => {
-        if (!candidateToDelete || !publicKey || !signMessage) return;
+        if (!candidateToDelete) return;
+        if (isGoogleUser) {
+            setToast({ message: "Removing candidates requires a connected Solana wallet for on-chain proof.", type: "warning" });
+            setCandidateToDelete(null);
+            return;
+        }
+        if (!publicKey || !signMessage) return;
 
         const candidateId = candidateToDelete;
         const oldCandidates = [...(data?.candidates || [])];
@@ -649,7 +754,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         </nav>
     );
 
-    if (loading) {
+    if (loading || googleLoading) {
         return (
             <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
                 <DashboardNav />
@@ -660,7 +765,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         );
     }
 
-    if (!connected || !publicKey) return (
+    if (!connected && !publicKey && !isGoogleSignedIn) return (
         <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
             <DashboardNav />
             <div className="flex-1 flex flex-col items-center justify-center p-6">
@@ -669,13 +774,17 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                         <Users className="w-10 h-10 text-indigo-500" />
                     </div>
                     <div className="space-y-3">
-                        <h1 className="text-2xl font-bold">Connect Wallet</h1>
+                        <h1 className="text-2xl font-bold">Sign In to Continue</h1>
                         <p className="text-slate-400 text-sm leading-relaxed">
-                            Connect your recruiter wallet to access the hiring dashboard.
+                            Access your hiring dashboard with a wallet or Google account.
                         </p>
                     </div>
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center gap-4">
                         <WalletMultiButton />
+                        <p className="text-xs text-slate-600">or sign in with Google</p>
+                        <Link href="/dashboard" className="text-xs text-indigo-400 hover:text-indigo-300 underline">
+                            Go to Dashboard to sign in with Google
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -708,7 +817,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                         <ShieldCheck className="w-4 h-4" /> Authorize Session
                     </button>
                     <div className="pt-2">
-                        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey.toBase58().slice(0,4)}...{publicKey.toBase58().slice(-4)}</p>
+                        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey?.toBase58().slice(0,4)}...{publicKey?.toBase58().slice(-4)}</p>
                     </div>
                 </div>
             </div>
