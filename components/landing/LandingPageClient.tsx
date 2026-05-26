@@ -808,10 +808,10 @@ function AttestationBlock() {
 // --- Floating Inbox Card ---
 function FloatingInboxCard() {
     return (
-        <div className="theme-preserve w-[200px] rounded-xl border overflow-hidden flex flex-col font-sans relative"
+        <div className="theme-preserve w-[220px] rounded-xl border overflow-hidden flex flex-col font-sans relative"
             style={{
                 background: "#0c0d11",
-                borderColor: "rgba(255,255,255,0.22)",
+                borderColor: "rgba(255,255,255,0.13)",
                 boxShadow: "1px 2px 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15)",
             }}
         >
@@ -1604,12 +1604,9 @@ export function LandingPageClient() {
                             className="w-[960px] h-[540px] absolute left-1/2 -translate-x-1/2 top-0 scale-[0.45] min-[400px]:scale-[0.52] sm:scale-[0.7] md:scale-[0.88] lg:scale-[1.1] origin-top transition-all duration-300 flex-shrink-0"
                         >
                             {/* ── LINEAR-STYLE 3-PANEL APP MOCKUP ── */}
-                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 36px 60px -8px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
+                            <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
                                 {/* Spotlight — thin cone from top-center */}
                                 <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 45% 28% at 50% -1%, rgba(255,255,255,0.07) 0%, transparent 80%)" }} />
-
-                                {/* Shimmer — diagonal shine sweep */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.12] to-transparent animate-lightning-shine pointer-events-none z-[6] opacity-80" />
 
                                 {/* ── LEFT SIDEBAR ── */}
                                 <div className="w-[195px] flex-shrink-0 flex flex-col h-full" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1913,11 +1910,19 @@ export function LandingPageClient() {
                                         </div>
                                     </div>
                                 </div>
+                                {/* Diagonal sheen — top-left catch light */}
+                                <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ zIndex: 45, background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 25%, transparent 50%)" }} />
+                                {/* Top-edge specular line */}
+                                <div className="absolute inset-x-0 top-0 h-px pointer-events-none rounded-t-2xl" style={{ zIndex: 46, background: "linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.2) 35%, rgba(255,255,255,0.12) 65%, transparent 92%)" }} />
+                                {/* Spotlight cone from top-left */}
+                                <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{ zIndex: 44, background: "conic-gradient(from 150deg at 12% -6%, transparent 55deg, rgba(255,255,255,0.05) 67deg, rgba(255,255,255,0.025) 78deg, transparent 92deg)" }} />
+                                {/* Shiny sweep overlay on top of all panels */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.12] to-transparent animate-lightning-shine pointer-events-none z-[50] opacity-80 rounded-2xl" />
                             </div>{/* end 3-panel absolute inset flex */}
 
                             {/* Floating Inbox Card — bottom-right of hero */}
                             <motion.div 
-                                className="absolute bottom-0 left-1 z-20 cursor-pointer" 
+                                className="absolute bottom-0 left-[-14px] z-20 cursor-pointer w-[220px]" 
                                 style={{ filter: "drop-shadow(1px 2px 3px rgba(0,0,0,0.12)) drop-shadow(2px 8px 10px rgba(0,0,0,0.25))" }}
                                 animate={{
                                     scale: [1, 1.03, 0.98, 1.02, 1, 1],
