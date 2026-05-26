@@ -127,6 +127,15 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Auto-prefix URLs that don't have a protocol
+    const formattedLinks = form.evidenceLinks.map((link: EvidenceLink) => {
+        let url = link.url.trim();
+        if (url && !/^https?:\/\//i.test(url)) {
+            url = `https://${url}`;
+        }
+        return { ...link, url };
+    });
+    setForm(prev => ({ ...prev, evidenceLinks: formattedLinks }));
     setShowConfirm(true);
   };
 
@@ -339,7 +348,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
         )}
       </div>
 
-      <ConfirmationModal isOpen={showConfirm} onClose={() => setShowConfirm(false)} onConfirm={processSubmission} title={isEditing ? "Update Proof of Work?" : "Finalize Proof of Work?"} message={isEditing ? "This will update your record with a new cryptographic signature. Metadata like images and links will be updated." : "Once this receipt is minted, the core details (Role, Organization, Date) cannot be edited or deleted. This ensures trust and immutability."} confirmLabel={isEditing ? "Update Receipt" : "Yes, Mint Receipt"} cancelLabel="Review Again" iconColor="green" confirmButtonColor="green" />
+      <ConfirmationModal isOpen={showConfirm} onClose={() => setShowConfirm(false)} onConfirm={processSubmission} title={isEditing ? "Update Proof of Work?" : "Finalize Proof of Work?"} message={isEditing ? "This will update your record with a new cryptographic signature. Metadata like images and links will be updated." : "Once this receipt is minted, the core details (Role, Organization, Date) cannot be edited or deleted. This ensures trust and immutability."} confirmLabel={isEditing ? "Update Receipt" : "Yes, Mint Receipt"} cancelLabel="Review Again" iconColor="green" confirmButtonColor="green" note="Your wallet signature cryptographically binds this record to your identity, ensuring it cannot be forged or tampered with. This is what makes your resume verifiable on-chain." />
 
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />

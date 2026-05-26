@@ -84,6 +84,21 @@ export async function PATCH(req: NextRequest) {
 
     if (!auth_uid) return NextResponse.json({ error: "auth_uid required" }, { status: 400 });
 
+    if (updates.wallet_address) {
+        // Validate wallet uniqueness before linking
+        const [profileResult, orgResult] = await Promise.all([
+            supabaseServer.from("profiles").select("wallet_address").eq("wallet_address", updates.wallet_address).maybeSingle(),
+            supabaseServer.from("org_accounts").select("auth_uid").eq("wallet_address", updates.wallet_address).neq("auth_uid", auth_uid).maybeSingle(),
+        ]);
+
+        if (profileResult.data) {
+            return NextResponse.json({ error: "This wallet is already registered as a Builder. You cannot link it to a Recruiter account." }, { status: 400 });
+        }
+        if (orgResult.data) {
+            return NextResponse.json({ error: "This wallet is already linked to another Recruiter account." }, { status: 400 });
+        }
+    }
+
     const { data, error } = await supabaseServer
         .from("org_accounts")
         .update(updates)

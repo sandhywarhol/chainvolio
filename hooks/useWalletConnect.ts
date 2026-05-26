@@ -100,6 +100,7 @@ export function useWalletConnect() {
                 }
                 setConnectionError("unknown");
             } finally {
+                localStorage.removeItem("cv_connecting");
                 setIsConnecting(false);
                 connectingRef.current = false;
                 setPendingWallet(null);

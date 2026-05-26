@@ -121,6 +121,12 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             const address = publicKey?.toBase58();
             if (!address) { setLoadingKey(null); return; }
 
+            if (googleSession) {
+                setLoadingKey(null);
+                onClose();
+                return;
+            }
+
             try {
                 const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
                 const check = await res.json();
@@ -335,7 +341,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             <>
                 <div className="flex justify-center gap-1.5 pt-5 pb-1">
                     <div className="w-2 h-2 rounded-full bg-white/20" />
-                    <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    <div className={`w-2 h-2 rounded-full transition-colors ${selectedRole === "builder" ? "bg-indigo-400" : selectedRole === "recruiter" ? "bg-amber-400" : "bg-white/30"}`} />
                     <div className="w-2 h-2 rounded-full bg-white/10" />
                 </div>
 

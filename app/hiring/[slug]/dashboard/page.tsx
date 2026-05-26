@@ -1499,6 +1499,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 confirmLabel="Execute Hiring Proof"
                 confirmButtonColor="green"
                 iconColor="green"
+                note="This action requires your wallet signature to anchor the hiring proof on-chain. This creates a tamper-proof, verifiable record that both you and the candidate can reference permanently."
             />
 
             {/* Hiring Success Modal */}

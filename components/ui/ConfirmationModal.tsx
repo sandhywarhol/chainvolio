@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, X, Info } from "lucide-react";
 
 type Props = {
     isOpen: boolean;
@@ -12,6 +12,7 @@ type Props = {
     cancelLabel?: string;
     iconColor?: "yellow" | "green" | "red";
     confirmButtonColor?: "yellow" | "green" | "red";
+    note?: string;
 };
 
 export function ConfirmationModal({
@@ -23,7 +24,8 @@ export function ConfirmationModal({
     confirmLabel = "Confirm",
     cancelLabel = "Cancel",
     iconColor = "yellow",
-    confirmButtonColor = "yellow"
+    confirmButtonColor = "yellow",
+    note,
 }: Props) {
     if (!isOpen) return null;
 
@@ -56,9 +58,16 @@ export function ConfirmationModal({
                     </div>
 
                     <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-                    <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                    <p className="text-sm text-slate-400 mb-4 leading-relaxed">
                         {message}
                     </p>
+
+                    {note && (
+                        <div className="w-full mb-5 px-3 py-2.5 rounded-xl flex items-start gap-2.5" style={{ background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.12)" }}>
+                            <Info className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-indigo-300/80 leading-relaxed text-left">{note}</p>
+                        </div>
+                    )}
 
                     <div className="flex w-full gap-3">
                         <button

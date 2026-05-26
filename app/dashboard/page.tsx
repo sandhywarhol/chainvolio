@@ -1680,11 +1680,23 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showWalletNudge, setShowWalletNudge] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const { connected: walletConnected, publicKey: walletPublicKey } = useWallet();
+  const [walletLinkShown, setWalletLinkShown] = useState(false);
 
   const needsOnboarding = !orgAccount || !orgAccount.onboarding_complete;
   useEffect(() => {
     if (needsOnboarding) router.replace("/onboarding/org");
   }, [needsOnboarding, router]);
+
+  // Detect wallet linked successfully — show success toast once
+  useEffect(() => {
+    if (walletConnected && walletPublicKey && !walletLinkShown) {
+      setWalletLinkShown(true);
+      setShowWalletNudge(false);
+      setToastMessage("🎉 Wallet linked successfully! On-chain features are now unlocked.");
+      try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
+    }
+  }, [walletConnected, walletPublicKey, walletLinkShown]);
 
   useEffect(() => {
     try {
@@ -1779,6 +1791,15 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
                   </button>
                 );
               })}
+              {!orgAccount?.wallet_address && (
+                <button
+                  onClick={() => setWalletModalOpen(true)}
+                  className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md relative transition-colors text-left group mt-1"
+                >
+                  <Wallet style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} className="group-hover:text-amber-400 transition-colors" />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }} className="group-hover:text-amber-400/90 transition-colors">Link Wallet</span>
+                </button>
+              )}
             </nav>
             {/* Hiring Overview */}
             <div className="px-3 pb-3 space-y-1.5">
