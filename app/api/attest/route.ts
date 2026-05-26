@@ -4,6 +4,47 @@ import { Connection } from "@solana/web3.js";
 import { calculateScore } from "@/lib/score";
 import { getAttestationQuota, getVerificationLabel } from "@/lib/paymentConfig";
 
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const receiptId = searchParams.get("receiptId");
+    const attesterWallet = searchParams.get("attesterWallet");
+
+    if (!supabase || !receiptId || !attesterWallet) {
+        return NextResponse.json({ blocked: false });
+    }
+
+    try {
+        const { data: receipt } = await supabase
+            .from("receipts")
+            .select("wallet_address")
+            .eq("id", receiptId)
+            .single();
+
+        if (!receipt) return NextResponse.json({ blocked: false });
+
+        const { data: attesterReceipts } = await supabase
+            .from("receipts")
+            .select("id")
+            .eq("wallet_address", attesterWallet);
+
+        if (!attesterReceipts || attesterReceipts.length === 0) {
+            return NextResponse.json({ blocked: false });
+        }
+
+        const ids = attesterReceipts.map((r: any) => r.id);
+        const { data: reciprocal } = await supabase
+            .from("attestations")
+            .select("id")
+            .eq("attester_wallet", receipt.wallet_address)
+            .in("receipt_id", ids)
+            .limit(1);
+
+        return NextResponse.json({ blocked: !!(reciprocal && reciprocal.length > 0) });
+    } catch {
+        return NextResponse.json({ blocked: false });
+    }
+}
+
 export async function POST(request: Request) {
     if (!supabase) {
         return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });

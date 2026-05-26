@@ -56,6 +56,7 @@ export default function AttestPage() {
     const [profileLoading, setProfileLoading] = useState(false);
     const [isExternal, setIsExternal] = useState(true);
     const [walletModalOpen, setWalletModalOpen] = useState(false);
+    const [reciprocalBlocked, setReciprocalBlocked] = useState<boolean | null>(null);
 
     // Set when user clicks "Connect Wallet & Sign" before wallet is connected.
     // Auto-triggers handleAttest once wallet connects.
@@ -149,6 +150,18 @@ export default function AttestPage() {
             })
             .finally(() => setProfileLoading(false));
     }, [publicKey, isGoogleOrgAttester, googleOrg, googleOrgIsActive, googleOrgPlan]);
+
+    // Pre-check reciprocal attestation so user doesn't waste gas on a blocked tx
+    useEffect(() => {
+        if (!publicKey || !receipt?.id) {
+            setReciprocalBlocked(null);
+            return;
+        }
+        fetch(`/api/attest?receiptId=${receipt.id}&attesterWallet=${publicKey.toBase58()}`)
+            .then(r => r.json())
+            .then(d => setReciprocalBlocked(d.blocked === true))
+            .catch(() => setReciprocalBlocked(false));
+    }, [publicKey, receipt?.id]);
 
     // Auto-trigger attestation when wallet connects after lazy-connect flow
     useEffect(() => {
@@ -813,6 +826,16 @@ export default function AttestPage() {
                           );
                         })()}
 
+                        {/* Reciprocal attestation block */}
+                        {reciprocalBlocked && (
+                            <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-1.5">
+                                <p className="text-sm font-bold text-amber-400">Mutual attestation not allowed</p>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    This candidate has previously attested your work. To maintain trust integrity, mutual attestations between the same two parties are blocked. You cannot sign this verification.
+                                </p>
+                            </div>
+                        )}
+
                         {/* Submit / Lazy wallet connect */}
                         {!publicKey ? (
                             <div className="space-y-3">
@@ -824,7 +847,7 @@ export default function AttestPage() {
                                 </div>
                                 <button
                                     onClick={handleAttest}
-                                    disabled={!attesterName.trim() || !attesterRole.trim()}
+                                    disabled={reciprocalBlocked === true || !attesterName.trim() || !attesterRole.trim()}
                                     className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2"
                                 >
                                     <Wallet className="w-4 h-4" /> Connect Wallet &amp; Sign
@@ -832,7 +855,7 @@ export default function AttestPage() {
                             </div>
                         ) : (
                             <button onClick={handleAttest}
-                                disabled={attesting || profileLoading || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
+                                disabled={reciprocalBlocked === true || attesting || profileLoading || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
                                 className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2">
                                 {attesting ? (
                                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing…</>

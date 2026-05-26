@@ -48,7 +48,10 @@ export default function AuthCallbackPage() {
                     }
                 }
             } catch {
-                // Fail open — go to dashboard as normal
+                // API check failed — route to role selection which handles
+                // both new users (need onboarding) and existing users safely
+                router.replace("/auth/role");
+                return;
             }
 
             router.replace(next);
