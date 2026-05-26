@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
 import { generateHiringReport } from "@/lib/report-generator";
@@ -636,76 +637,98 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     };
 
+    const DashboardNav = () => (
+        <nav className="border-b border-white/5 bg-black/60 backdrop-blur-md sticky top-0 z-[100]">
+            <div className="max-w-[1600px] mx-auto px-8 h-12 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-3 group">
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-6 h-6 object-contain" />
+                    <span className="text-sm font-bold text-white">ChainVolio</span>
+                </Link>
+                <WalletMultiButton />
+            </div>
+        </nav>
+    );
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
+                <DashboardNav />
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
+                </div>
             </div>
         );
     }
 
     if (!connected || !publicKey) return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
-            <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
-                <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
-                    <Users className="w-10 h-10 text-indigo-500" />
-                </div>
-                <div className="space-y-3">
-                    <h1 className="text-2xl font-bold">Connect Wallet</h1>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                        Please connect your recruiter wallet to access the hiring dashboard.
-                    </p>
-                </div>
-                {/* We'll assume WalletMultiButton is already themed or use a standard one if it was here, 
-                    but since it's not imported, I'll use a placeholder or check imports */}
-                <div className="flex justify-center">
-                   <p className="text-xs text-slate-500 italic">Please use the wallet connect button in the header or sidebar.</p>
+        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
+            <DashboardNav />
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
+                    <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
+                        <Users className="w-10 h-10 text-indigo-500" />
+                    </div>
+                    <div className="space-y-3">
+                        <h1 className="text-2xl font-bold">Connect Wallet</h1>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                            Connect your recruiter wallet to access the hiring dashboard.
+                        </p>
+                    </div>
+                    <div className="flex justify-center">
+                        <WalletMultiButton />
+                    </div>
                 </div>
             </div>
         </div>
     );
 
     if (needsAuth) return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
-            <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
-                <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
-                    <Lock className="w-10 h-10 text-indigo-500" />
-                </div>
-                <div className="space-y-3">
-                    <h1 className="text-2xl font-bold">Secure Dashboard</h1>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                        To protect sensitive candidate data, please authorize restricted access with your recruiter wallet signature.
-                    </p>
-                    {error && (
-                        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold">
-                             {error}
-                        </div>
-                    )}
-                </div>
-                <button 
-                    onClick={handleAuthorize}
-                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
-                >
-                    <ShieldCheck className="w-4 h-4" /> Authorize Session
-                </button>
-                <div className="pt-2">
-                    <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey.toBase58().slice(0,4)}...{publicKey.toBase58().slice(-4)}</p>
+        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
+            <DashboardNav />
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
+                    <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
+                        <Lock className="w-10 h-10 text-indigo-500" />
+                    </div>
+                    <div className="space-y-3">
+                        <h1 className="text-2xl font-bold">Secure Dashboard</h1>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                            To protect sensitive candidate data, please authorize restricted access with your recruiter wallet signature.
+                        </p>
+                        {error && (
+                            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold">
+                                 {error}
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleAuthorize}
+                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
+                    >
+                        <ShieldCheck className="w-4 h-4" /> Authorize Session
+                    </button>
+                    <div className="pt-2">
+                        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey.toBase58().slice(0,4)}...{publicKey.toBase58().slice(-4)}</p>
+                    </div>
                 </div>
             </div>
         </div>
     );
 
     if (error) return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0b] text-white p-6">
-            <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <XCircle className="w-8 h-8 text-red-500" />
+        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
+            <DashboardNav />
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <XCircle className="w-8 h-8 text-red-500" />
+                    </div>
+                    <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+                    <p className="text-slate-400 mb-8">{error}</p>
+                    <Link href="/hiring/create" className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all w-full block">
+                        Back to Hiring Center
+                    </Link>
                 </div>
-                <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-                <p className="text-slate-400 mb-8">{error}</p>
-                <Link href="/hiring/create" className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all w-full block">
-                    Back to Hiring Center
-                </Link>
             </div>
         </div>
     );

@@ -331,54 +331,78 @@ export default function AttestPage() {
     // ─── Loading ──────────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
+                <nav className="flex items-center px-6 py-4 max-w-2xl mx-auto w-full relative z-[100]">
+                    <Link href="/" className="flex items-center gap-1.5 group">
+                        <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain" />
+                        <span className="text-xl font-bold text-white">ChainVolio</span>
+                    </Link>
+                </nav>
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                </div>
             </div>
         );
     }
 
     if (error && !receipt) return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black theme-bg-page theme-aware px-6">
-            <p className="text-red-400 text-center max-w-sm">{error}</p>
-            {txHash && (
-                <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
-                    className="text-xs text-emerald-400 hover:text-emerald-300 underline">
-                    View transaction on Solscan ↗
-                </a>
-            )}
-            <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
+        <main className="min-h-screen flex flex-col text-white bg-black theme-bg-page theme-aware">
+            <nav className="flex items-center px-6 py-4 max-w-2xl mx-auto w-full relative z-[100]">
+                <Link href="/" className="flex items-center gap-1.5 group">
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain" />
+                    <span className="text-xl font-bold text-white">ChainVolio</span>
+                </Link>
+            </nav>
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
+                <p className="text-red-400 text-center max-w-sm">{error}</p>
+                {txHash && (
+                    <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-emerald-400 hover:text-emerald-300 underline">
+                        View transaction on Solscan ↗
+                    </a>
+                )}
+                <Link href="/" className="text-slate-400 hover:text-white text-sm">Return Home</Link>
+            </div>
         </main>
     );
 
     // ─── Success ──────────────────────────────────────────────────────────────
     if (success) return (
-        <main className="min-h-screen text-white flex flex-col items-center justify-center gap-6 px-6 bg-black theme-bg-page theme-aware">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-4xl">✓</div>
-            <div className="text-center space-y-2">
-                <h1 className="text-2xl font-bold">Attestation Recorded On-Chain</h1>
-                <p className="text-slate-400 max-w-sm text-sm">Your verification has been permanently anchored to the Solana blockchain.</p>
-            </div>
-            <div className="flex flex-col gap-3 w-full max-w-xs">
-                <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
-                    className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-medium text-center text-sm">
-                    🔗 View on Solscan
-                </a>
-                <Link href={`/memo/${memoId}`}
-                    className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-medium text-center text-sm">
-                    📄 View Verification Memo
+        <main className="min-h-screen text-white flex flex-col bg-black theme-bg-page theme-aware">
+            <nav className="flex items-center px-6 py-4 max-w-2xl mx-auto w-full relative z-[100]">
+                <Link href="/" className="flex items-center gap-1.5 group">
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-8 h-8 object-contain" />
+                    <span className="text-xl font-bold text-white">ChainVolio</span>
                 </Link>
-                {receipt && (
-                    <Link href={`/cv/${receipt.ownerWallet}`}
-                        className="px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 font-medium text-center text-sm">
-                        View Updated Profile
+            </nav>
+            <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-4xl">✓</div>
+                <div className="text-center space-y-2">
+                    <h1 className="text-2xl font-bold">Attestation Recorded On-Chain</h1>
+                    <p className="text-slate-400 max-w-sm text-sm">Your verification has been permanently anchored to the Solana blockchain.</p>
+                </div>
+                <div className="flex flex-col gap-3 w-full max-w-xs">
+                    <a href={`https://solscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                        className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-medium text-center text-sm">
+                        🔗 View on Solscan
+                    </a>
+                    <Link href={`/memo/${memoId}`}
+                        className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-medium text-center text-sm">
+                        📄 View Verification Memo
                     </Link>
-                )}
-                {googleSession && (
-                    <Link href="/dashboard"
-                        className="px-6 py-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 font-medium text-center text-sm hover:bg-teal-500/20 transition-colors">
-                        Back to Dashboard
-                    </Link>
-                )}
+                    {receipt && (
+                        <Link href={`/cv/${receipt.ownerWallet}`}
+                            className="px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 font-medium text-center text-sm">
+                            View Updated Profile
+                        </Link>
+                    )}
+                    {googleSession && (
+                        <Link href="/dashboard"
+                            className="px-6 py-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 font-medium text-center text-sm hover:bg-teal-500/20 transition-colors">
+                            Back to Dashboard
+                        </Link>
+                    )}
+                </div>
             </div>
         </main>
     );

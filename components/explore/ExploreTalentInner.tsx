@@ -326,7 +326,7 @@ function ExploreTalentInnerBody({ initialStats }: { initialStats: SiteStats }) {
 
             {/* ── Grids ─────────────────────────────────────────────────── */}
             {loading ? (
-                <div className="flex items-center justify-center py-32">
+                <div className="flex items-center justify-center py-16">
                     <Loader2 className="w-6 h-6 animate-spin text-white/30" />
                 </div>
             ) : error ? (

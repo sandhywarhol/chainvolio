@@ -126,24 +126,40 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black theme-bg-page theme-aware flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+            <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
+                <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 grayscale" />
+                        <span className="text-xl font-bold tracking-tight text-white">ChainVolio</span>
+                    </Link>
+                </nav>
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+                </div>
             </div>
         );
     }
 
     if (error && !collection) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-black theme-bg-page theme-aware text-white p-6">
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
-                    </div>
-                    <h1 className="text-2xl font-bold mb-2">Oops!</h1>
-                    <p className="text-slate-400 mb-8">{error}</p>
-                    <Link href="/" className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all w-full block">
-                        Back to Home
+            <div className="min-h-screen flex flex-col bg-black theme-bg-page theme-aware text-white">
+                <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 grayscale" />
+                        <span className="text-xl font-bold tracking-tight text-white">ChainVolio</span>
                     </Link>
+                </nav>
+                <div className="flex-1 flex flex-col items-center justify-center p-6">
+                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+                        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <AlertCircle className="w-8 h-8 text-red-500" />
+                        </div>
+                        <h1 className="text-2xl font-bold mb-2">Oops!</h1>
+                        <p className="text-slate-400 mb-8">{error}</p>
+                        <Link href="/" className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all w-full block">
+                            Back to Home
+                        </Link>
+                    </div>
                 </div>
             </div>
         );

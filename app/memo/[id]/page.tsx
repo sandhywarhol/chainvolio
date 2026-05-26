@@ -89,17 +89,37 @@ export default function MemoPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-white/10" />
+            <div className="min-h-screen bg-[#0a0a0c] flex flex-col">
+                <nav className="sticky top-0 z-50 border-b border-[#1e1e24] backdrop-blur-md bg-black/80">
+                    <div className="max-w-[1200px] mx-auto flex items-center px-8 py-4">
+                        <Link href="/" className="flex items-center gap-2.5">
+                            <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-7 h-7" />
+                            <span className="font-bold text-lg tracking-tight text-white">ChainVolio</span>
+                        </Link>
+                    </div>
+                </nav>
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-white/10" />
+                </div>
             </div>
         );
     }
 
     if (error || !data) return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-            <h1 className="text-2xl font-bold mb-2">Verification Not Found</h1>
-            <p className="text-gray-500 mb-6">The requested credential may have been revoked or the ID is invalid.</p>
-            <Link href="/" className="text-emerald-500 hover:underline">Back to ChainVolio</Link>
+        <div className="min-h-screen bg-[#0a0a0c] flex flex-col text-white">
+            <nav className="sticky top-0 z-50 border-b border-[#1e1e24] backdrop-blur-md bg-black/80">
+                <div className="max-w-[1200px] mx-auto flex items-center px-8 py-4">
+                    <Link href="/" className="flex items-center gap-2.5">
+                        <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-7 h-7" />
+                        <span className="font-bold text-lg tracking-tight text-white">ChainVolio</span>
+                    </Link>
+                </div>
+            </nav>
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                <h1 className="text-2xl font-bold mb-2">Verification Not Found</h1>
+                <p className="text-gray-500 mb-6">The requested credential may have been revoked or the ID is invalid.</p>
+                <Link href="/" className="text-emerald-500 hover:underline">Back to ChainVolio</Link>
+            </div>
         </div>
     );
 
