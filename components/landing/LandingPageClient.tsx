@@ -340,7 +340,7 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 function AttestationCard() {
     const items = [
         { initials: "DC", color: "#34d399", name: "David Chen", action: "attested your work on", subject: "Brand Identity Design", time: "2m ago" },
-        { initials: "GD", color: "#60a5fa", name: "Glassdoor", action: "verified your employment at", subject: "Stripe", time: "1h ago" },
+        { initials: "SD", color: "#60a5fa", name: "Superteam DAO", action: "attested your contribution at", subject: "Solana Hackathon", time: "1h ago" },
         { initials: "SA", color: "#a78bfa", name: "Smart Contract Auditor", action: "attested your audit on", subject: "Payment Protocol v2", time: "3h ago" },
         { initials: "GH", color: "#f59e0b", name: "GitHub", action: "verified your contribution in", subject: "chainvolio/identity-core", time: "1d ago" },
     ];
@@ -430,7 +430,7 @@ function OrgIssuerCard() {
                             <span style={{ fontSize: 10, color: "rgba(255,255,255,0.28)" }}>4:54 PM</span>
                         </div>
                         <p style={{ fontSize: 12, color: "rgba(255,255,255,0.52)", lineHeight: 1.55 }}>
-                            Transaction confirmed on Solana. This record is now public and tamper-proof forever.
+                            Transaction confirmed on Solana. This record is now public and tamper-resistant.
                         </p>
                     </div>
                 </div>
@@ -539,7 +539,7 @@ function AttestationBlock() {
     const features = [
         { icon: ShieldCheck, label: "Verifiable on-chain proof", desc: "Each attestation is stored permanently on Solana.", color: "#94a3b8" },
         { icon: Building2, label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.", color: "#60a5fa" },
-        { icon: Lock, label: "Public and tamper-resistant", desc: "Anyone can verify, no one can alter or revoke.", color: "#a78bfa" },
+        { icon: Lock, label: "Public and tamper-resistant", desc: "Anyone can verify, the on-chain record cannot be altered.", color: "#a78bfa" },
     ];
 
     const cards = [<AttestationCard />, <OrgIssuerCard />, <PublicVerifyCard />];
@@ -574,7 +574,7 @@ function AttestationBlock() {
                     </h3>
                     <div className="h-px w-full max-w-6xl bg-white/10 mb-5" />
                     <p className="text-white/40 text-[12px] md:text-[13px] leading-relaxed font-normal max-w-md">
-                        Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-proof work history.
+                        Attestations turn real contributions into verifiable records. Every endorsement is cryptographically signed, creating a tamper-resistant work history.
                     </p>
                 </div>
 
@@ -1256,26 +1256,28 @@ export function LandingPageClient() {
                     </h1>
 
                     {/* Subtitle + Start Free */}
-                    <div className="flex items-start justify-between gap-6 mb-8 sm:mb-10">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8 sm:mb-10">
                         <div className="space-y-2">
                             <p className="text-white/35 text-[12px] sm:text-[13px] font-normal leading-relaxed max-w-[380px]">
                                 Signed by real people. Anchored on Solana.
                                 <br />Cryptographically verified. Share anywhere with one link.
                             </p>
-                            <p className="text-white/20 text-[11px] font-normal leading-relaxed max-w-[380px]">
+                        </div>
+                        <div className="flex flex-col items-start sm:items-end gap-2 max-w-[320px] w-full sm:w-auto sm:-mt-1.5">
+                            <Link
+                                href="/create-profile"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.14] backdrop-blur-md flex-shrink-0 transition-all hover:border-white/[0.22] active:scale-[0.97]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }}
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/70 flex-shrink-0" />
+                                <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em] whitespace-nowrap">
+                                    Start Free
+                                </span>
+                                <ArrowRight className="w-3 h-3 text-white/25 flex-shrink-0" />
+                            </Link>
+                            <p className="text-white/20 text-[10px] font-normal leading-relaxed text-left sm:text-right">
                                 Connect your wallet or Google account → complete your profile → get a shareable verified link in under 2 minutes.
                             </p>
                         </div>
-                        <Link
-                            href="/create-profile"
-                            className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.14] backdrop-blur-md flex-shrink-0 mt-0.5 transition-all hover:border-white/[0.22] active:scale-[0.97]" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }}
-                        >
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/70 flex-shrink-0" />
-                            <span className="text-[11px] text-white/50 font-medium tracking-[-0.01em] whitespace-nowrap">
-                                Start Free
-                            </span>
-                            <ArrowRight className="w-3 h-3 text-white/25 flex-shrink-0" />
-                        </Link>
                     </div>
 
                     {/* HERO VISUAL - App UI Card Mockup */}
@@ -1786,7 +1788,7 @@ export function LandingPageClient() {
                             </h2>
                             <div className="lg:flex-1 flex flex-col gap-5 lg:pt-2">
                                 <p className="text-white/40 text-[13px] sm:text-[14px] font-normal leading-relaxed max-w-md">
-                                    Your verified history becomes portable trust across platforms and opportunities. ChainVolio anchors every contribution on-chain, cryptographically signed, portable, impossible to fake.
+                                    Your verified history becomes portable trust across platforms and opportunities. ChainVolio anchors every contribution on-chain, cryptographically signed, portable, and tamper-resistant.
                                 </p>
                                 <div className="flex flex-wrap items-center gap-4">
                                     <Link href="/guides/how-it-works" className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/35 hover:text-white/70 transition-colors group">
@@ -1837,7 +1839,7 @@ export function LandingPageClient() {
                                     </div>
                                     {/* Description */}
                                     <p className="text-[12px] text-white/40 leading-relaxed mb-5 flex-shrink-0">
-                                        Every entry is cryptographically signed by the issuing organization.<br/>No more unverifiable claims.
+                                        Every entry is cryptographically signed by the issuing organization. Every claim is backed by a verifiable signature.
                                     </p>
                                     {/* Attestation card */}
                                     <div className="flex-1 rounded-xl overflow-hidden flex flex-col" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)" }}>
@@ -2040,12 +2042,12 @@ export function LandingPageClient() {
                                 {
                                     num: "02",
                                     title: "On-Chain Attestation",
-                                    body: "Trust is mathematical, not reputational. Issuers sign your record once, so anyone can verify it forever without asking you to prove it again.",
+                                    body: "Trust is verifiable, not just claimed. Issuers sign your record once, so anyone can verify it without asking you to prove it again.",
                                 },
                                 {
                                     num: "03",
                                     title: "Portable Trust",
-                                    body: "Doors that used to require warm introductions open automatically. Your verified record speaks before you do.",
+                                    body: "Doors that once required warm introductions become more accessible. Your verified record speaks before you do.",
                                 },
                             ].map(({ num, title, body }) => (
                                 <div key={num} className="flex flex-col gap-2.5">
@@ -2088,7 +2090,7 @@ export function LandingPageClient() {
                             </h3>
                             <div className="h-px w-full max-w-6xl bg-white/10" />
                             <p className="text-white/40 text-[12px] md:text-[13px] font-normal leading-relaxed max-w-2xl">
-                                Turn your work into verifiable proof that anyone can trust. Transparent, portable, impossible to fake.
+                                Turn your work into verifiable proof that anyone can trust. Transparent, portable, and tamper-resistant.
                             </p>
                         </div>
 
@@ -2105,7 +2107,7 @@ export function LandingPageClient() {
                             {[
                                 { icon: ShieldCheck, label: "On-Chain Proof", color: "#14F195" },
                                 { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
-                                { icon: Lock, label: "Impossible to Fake", color: "#a78bfa" },
+                                { icon: Lock, label: "Tamper-Resistant", color: "#a78bfa" },
                             ].map(({ icon: Icon, label, color }, i) => (
                                 <div key={i} className="flex items-center gap-2 md:gap-2.5 flex-shrink-0">
                                     <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color }} />
@@ -2675,7 +2677,7 @@ export function LandingPageClient() {
                                             <div className="space-y-4">
                                                 <div className="flex gap-4">
                                                     <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
-                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">Eliminates fake portfolios by anchoring outputs to a cryptographic professional audit trail.</p>
+                                                    <p className="text-[10px] text-white/50 leading-relaxed font-light">Reduces portfolio fraud risk by anchoring outputs to a cryptographic professional audit trail.</p>
                                                 </div>
                                                 <div className="flex gap-4">
                                                     <span className="text-emerald-400/40 font-bold text-[10px]">/</span>
