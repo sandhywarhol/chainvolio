@@ -11,10 +11,12 @@ import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
 import { Instagram, Github, Globe, Send, Phone, Mail, Loader2 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 export default function CreateProfilePage() {
   const router = useRouter();
   const { publicKey, connected, signMessage } = useWallet();
+  const { session } = useGoogleAuth();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
@@ -53,7 +55,18 @@ export default function CreateProfilePage() {
     fetch(`/api/profile?wallet=${publicKey.toBase58()}`)
       .then((res) => res.json())
       .then((data) => {
-        if (!data || data.error) return; // null = no profile yet, error = API failure
+        if (!data || data.error) {
+          // If no profile yet, but we have a Google session, pre-fill some data
+          if (session?.user) {
+            setForm((prev) => ({
+              ...prev,
+              displayName: prev.displayName || session.user.user_metadata?.full_name || "",
+              email: prev.email || session.user.email || "",
+              avatarUrl: prev.avatarUrl || session.user.user_metadata?.avatar_url || "",
+            }));
+          }
+          return;
+        }
         setProfileExists(true);
         setForm({
           displayName: data.displayName || "",
@@ -82,7 +95,7 @@ export default function CreateProfilePage() {
         setToast({ message: "Failed to load profile data. Please refresh.", type: "error" });
       })
       .finally(() => setLoading(false));
-  }, [publicKey]);
+  }, [publicKey, session]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
