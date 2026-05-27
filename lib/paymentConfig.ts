@@ -67,11 +67,11 @@ export function getRetailAttestationLamports(): number {
 // Used when a non-subscribed user exceeds their 2 free job posts.
 // Payment is processed via the x402 HTTP 402 protocol using Dexter facilitator.
 
-/** USDC price for one additional job post in base units (6 decimals = 0.50 USDC) */
-export const RETAIL_JOB_POST_USDC = "500000";
+/** USDC price for one additional job post in base units (6 decimals = 0.10 USDC) */
+export const RETAIL_JOB_POST_USDC = "100000";
 
 /** Human-readable USDC display price for the UI */
-export const RETAIL_JOB_POST_USDC_DISPLAY = 0.50;
+export const RETAIL_JOB_POST_USDC_DISPLAY = 0.10;
 
 // ─── USDC prod amounts (in base units, 6 decimals) ─────────────────────────
 export const USDC_MINT_MAINNET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
