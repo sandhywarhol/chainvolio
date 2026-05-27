@@ -894,10 +894,11 @@ export default function DashboardPage() {
                   <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Edit Profile</p>
                   <button onClick={() => setShowInlineEdit(false)} style={{ fontSize: 18, color: "rgba(255,255,255,0.3)", lineHeight: 1 }}>×</button>
                 </div>
-                <form onSubmit={handleEditSubmit} className="px-4 py-4 space-y-4">
-                  {/* Avatar */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.1)" }}>
+                <form onSubmit={handleEditSubmit} className="px-4 py-4 space-y-5">
+
+                  {/* ── Avatar row ── */}
+                  <div className="flex items-center gap-4 pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.12)" }}>
                       {editForm.avatarUrl
                         ? <img src={editForm.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                         : <div className="w-full h-full flex items-center justify-center text-lg font-bold" style={{ background: "#1e1e22", color: "rgba(255,255,255,0.3)" }}>{editForm.displayName?.[0] || "?"}</div>
@@ -910,100 +911,103 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Display name */}
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Display name *</label>
-                    <input required value={editForm.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} maxLength={60}
-                      className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors"
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
-                      placeholder="Name or pseudonym" />
-                  </div>
+                  {/* ── Identity ── */}
+                  <div className="space-y-3">
+                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Identity</p>
 
-                  {/* Role + Org */}
-                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Current Role</label>
-                      <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
-                        placeholder="CEO, Developer..." />
+                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Display name *</label>
+                      <input required value={editForm.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} maxLength={60}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
+                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                        placeholder="Name or pseudonym" />
                     </div>
-                    <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Organization</label>
-                      <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
-                        placeholder="Company / DAO" />
-                    </div>
-                  </div>
 
-                  {/* Bio */}
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Bio</label>
-                    <textarea value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} rows={3}
-                      className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none resize-none"
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
-                      placeholder="Brief intro about you" />
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Primary Skills</label>
-                    <SkillSelector value={editForm.skills} onChange={val => setEditForm(p => ({ ...p, skills: val }))} maxSkills={8} />
-                  </div>
-
-                  {/* Country */}
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Country</label>
-                    <CountrySelector value={editForm.country} onChange={val => setEditForm(p => ({ ...p, country: val }))} />
-                  </div>
-
-                  {/* Timezone + Looking For */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Timezone</label>
-                      <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}>
-                        <option value="">Select</option>
-                        {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
-                          <option key={tz} value={tz}>{tz}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Looking For</label>
-                      <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13 }}
-                        placeholder="Open to remote roles..." />
-                    </div>
-                  </div>
-
-                  {/* Work Preference */}
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 6 }}>Availability</label>
-                    <div className="flex flex-wrap gap-2">
-                      {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
-                        <button key={type} type="button"
-                          onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
-                          className="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
-                          style={editForm.workPreference.includes(type)
-                            ? { background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.4)", color: "#4ade80" }
-                            : { background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }
-                          }>{type}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Social links */}
-                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12 }}>
-                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Social Links</p>
                     <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Current Role</label>
+                        <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
+                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          placeholder="CEO, Developer..." />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Organization</label>
+                        <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
+                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          placeholder="Company / DAO" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Bio</label>
+                      <textarea value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} rows={3}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none resize-none transition-colors focus:border-white/25"
+                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                        placeholder="Brief intro about you" />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Primary Skills</label>
+                      <SkillSelector value={editForm.skills} onChange={val => setEditForm(p => ({ ...p, skills: val }))} maxSkills={8} />
+                    </div>
+                  </div>
+
+                  {/* ── Location & Work ── */}
+                  <div className="space-y-3 pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase", paddingTop: 4 }}>Location & Work</p>
+
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Country</label>
+                      <CountrySelector value={editForm.country} onChange={val => setEditForm(p => ({ ...p, country: val }))} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Timezone</label>
+                        <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
+                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}>
+                          <option value="">Select</option>
+                          {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
+                            <option key={tz} value={tz}>{tz}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Looking For</label>
+                        <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
+                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          placeholder="Open to remote roles..." />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 6, fontWeight: 600 }}>Availability</label>
+                      <div className="flex flex-wrap gap-2">
+                        {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
+                          <button key={type} type="button"
+                            onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
+                            className="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
+                            style={editForm.workPreference.includes(type)
+                              ? { background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.4)", color: "#4ade80" }
+                              : { background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }
+                            }>{type}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Social Links ── */}
+                  <div className="space-y-3 pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase", paddingTop: 4 }}>Social Links</p>
+                    <div className="grid grid-cols-2 gap-2.5">
                       {[
                         { key: "twitter", label: "Twitter / X", placeholder: "@username" },
                         { key: "github", label: "GitHub", placeholder: "username" },
-                        { key: "linkedin", label: "LinkedIn", placeholder: "username" },
+                        { key: "linkedin", label: "LinkedIn", placeholder: "username or URL" },
                         { key: "telegram", label: "Telegram", placeholder: "@username" },
                         { key: "discord", label: "Discord", placeholder: "user#1234" },
                         { key: "instagram", label: "Instagram", placeholder: "@username" },
@@ -1012,13 +1016,13 @@ export default function DashboardPage() {
                         { key: "whatsapp", label: "WhatsApp", placeholder: "+628..." },
                       ].map(({ key, label, placeholder }) => (
                         <div key={key}>
-                          <label style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", display: "block", marginBottom: 3 }}>{label}</label>
+                          <label style={{ fontSize: 10, color: "rgba(255,255,255,0.38)", display: "block", marginBottom: 3, fontWeight: 600 }}>{label}</label>
                           <input
                             type={key === "email" ? "email" : "text"}
                             value={(editForm as any)[key]}
                             onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))}
-                            className="w-full px-3 py-1.5 rounded-lg text-white outline-none"
-                            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", fontSize: 12 }}
+                            className="w-full px-3 py-1.5 rounded-lg text-white outline-none transition-colors focus:border-white/20"
+                            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.11)", fontSize: 12 }}
                             placeholder={placeholder}
                           />
                         </div>
@@ -1026,8 +1030,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Submit */}
-                  <div className="flex items-center gap-3 pt-2">
+                  {/* ── Submit ── */}
+                  <div className="flex items-center gap-3 pt-1">
                     <button type="submit" disabled={editLoading}
                       className="flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
                       style={{ background: "rgba(255,255,255,0.9)", color: "#0d0e11" }}>
@@ -1035,7 +1039,7 @@ export default function DashboardPage() {
                     </button>
                     <button type="button" onClick={() => setShowInlineEdit(false)}
                       className="px-4 py-2.5 rounded-lg text-sm transition-all"
-                      style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>
+                      style={{ border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }}>
                       Cancel
                     </button>
                   </div>
