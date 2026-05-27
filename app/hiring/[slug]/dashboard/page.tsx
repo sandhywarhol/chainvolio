@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, Transaction, TransactionInstruction, PublicKey } from "@solana/web3.js";
@@ -63,6 +63,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
     const [focusMatchOnly, setFocusMatchOnly] = useState(false);
     const [needsAuth, setNeedsAuth] = useState(false);
+    // Tracks that wallet restore was already attempted; prevents premature sign-in flash
+    // on initial load but correctly clears the spinner after a failed reconnect
+    const hasAttemptedRestoreRef = useRef(false);
 
     const { publicKey, connected, signMessage, sendTransaction, connecting, wallets } = useWallet();
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -128,19 +131,28 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 }
 
                 if (connecting) {
-                    return; // Wait for auto-connect
+                    // Mark that a restore attempt is in progress; clear loading so
+                    // the UI spinner is driven by `connecting` rather than `loading`.
+                    hasAttemptedRestoreRef.current = true;
+                    setLoading(false);
+                    return;
                 }
 
                 if (!connected || !publicKey) {
-                    // Prevent showing "Sign In" prematurely if SessionRestoreHandler is about to auto-connect
-                    try {
-                        const walletName = localStorage.getItem("cv_wallet_name");
-                        const exp = localStorage.getItem("cv_session_exp");
-                        if (walletName && exp && Date.now() < parseInt(exp)) {
-                            // Wait for WalletProvider's SessionRestoreHandler to kick in
-                            return;
-                        }
-                    } catch (e) {}
+                    // If the restore hasn't been attempted yet, wait briefly for
+                    // SessionRestoreHandler to call select() → connect(). Once it
+                    // does, `connecting` becomes true and this effect re-runs.
+                    // After the restore attempt (successful or failed), skip this
+                    // guard so we don't loop endlessly on a failed reconnect.
+                    if (!hasAttemptedRestoreRef.current) {
+                        try {
+                            const walletName = localStorage.getItem("cv_wallet_name");
+                            const exp = localStorage.getItem("cv_session_exp");
+                            if (walletName && exp && Date.now() < parseInt(exp)) {
+                                return; // loading stays true; SessionRestoreHandler will fire shortly
+                            }
+                        } catch (e) {}
+                    }
 
                     setLoading(false);
                     setNeedsAuth(false);
@@ -158,7 +170,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
 
         initDashboard();
-    }, [slug, connected, publicKey, isGoogleUser, googleSession?.access_token]);
+    // `connecting` must be in deps: when the wallet restore times out and connecting
+    // goes false, we need the effect to re-run and show the sign-in screen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [slug, connected, publicKey, isGoogleUser, googleSession?.access_token, connecting]);
 
     const handleAuthorize = async () => {
         if (!publicKey || !signMessage) return;
