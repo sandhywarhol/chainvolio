@@ -8,7 +8,6 @@ import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle, ArrowL
 import { formatDistanceToNow } from "date-fns";
 import type { Session } from "@supabase/supabase-js";
 import type { OrgAccount } from "@/hooks/useGoogleAuth";
-import { signChainVolioAction } from "@/lib/wallet-utils";
 
 type CandidateConversation = {
     id: string; status: string; role_position: string; initial_message: string;
@@ -51,61 +50,33 @@ export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<InboxTab>("requests");
     const [activeThread, setActiveThread] = useState<ActiveThread>(null);
-    const [sigData, setSigData] = useState<{ signature: string; nonce: string; timestamp: number } | null>(null);
-    const [signatureFailed, setSignatureFailed] = useState(false);
 
     const isGoogleRecruiter = !!googleSession && googleOrgAccount?.account_type === "recruiter";
 
-    const requestSignature = useCallback(async () => {
-        setSignatureFailed(false);
-        const sig = await signChainVolioAction(walletState, "view_conversations");
-        if (sig) {
-            setSigData(sig);
-            return sig;
-        } else {
-            setSignatureFailed(true);
-            return null;
-        }
-    }, [walletState]);
-
-    useEffect(() => {
-        setSigData(null);
-        setSignatureFailed(false);
-    }, [wallet]);
-
-    useEffect(() => {
-        if (wallet && !sigData && !signatureFailed) {
-            requestSignature();
-        }
-    }, [wallet, sigData, signatureFailed, requestSignature]);
-
     const fetchAll = useCallback(async () => {
         if (!wallet && !isGoogleRecruiter) return;
-        if (wallet && !sigData) return;
         try {
             const promises: Promise<any>[] = [];
 
-            // 1. Fetch candidate conversations if wallet connected
-            if (wallet && sigData) {
-                const { signature, nonce, timestamp } = sigData;
+            // Candidate conversations — wallet address only, no signature needed
+            if (wallet) {
                 promises.push(
-                    fetch(`/api/messaging/conversations?role=candidate&wallet=${wallet}&signature=${signature}&nonce=${nonce}&timestamp=${timestamp}`).then((r) => r.json())
+                    fetch(`/api/messaging/conversations?role=candidate&wallet=${wallet}`).then(r => r.json())
                 );
             } else {
                 promises.push(Promise.resolve({ ok: true, data: [] }));
             }
 
-            // 2. Fetch recruiter conversations
+            // Recruiter conversations
             if (isGoogleRecruiter) {
                 promises.push(
                     fetch(`/api/messaging/conversations?role=recruiter`, {
-                        headers: { Authorization: `Bearer ${googleSession.access_token}` },
-                    }).then((r) => r.json())
+                        headers: { Authorization: `Bearer ${googleSession!.access_token}` },
+                    }).then(r => r.json())
                 );
-            } else if (wallet && sigData) {
-                const { signature, nonce, timestamp } = sigData;
+            } else if (wallet) {
                 promises.push(
-                    fetch(`/api/messaging/conversations?role=recruiter&wallet=${wallet}&signature=${signature}&nonce=${nonce}&timestamp=${timestamp}`).then((r) => r.json())
+                    fetch(`/api/messaging/conversations?role=recruiter&wallet=${wallet}`).then(r => r.json())
                 );
             } else {
                 promises.push(Promise.resolve({ ok: true, data: [] }));
@@ -116,55 +87,24 @@ export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
             if (rData.ok) setRecruiterConvs(rData.data);
         } catch { /* silent */ }
         finally { setLoading(false); }
-    }, [wallet, isGoogleRecruiter, googleSession, sigData]);
+    }, [wallet, isGoogleRecruiter, googleSession]);
 
     useEffect(() => {
-        if (isGoogleRecruiter || sigData) {
-            fetchAll();
-        }
-    }, [fetchAll, isGoogleRecruiter, sigData]);
+        setLoading(true);
+        fetchAll();
+    }, [fetchAll]);
 
     useEffect(() => {
-        if (isGoogleRecruiter || sigData) {
-            const interval = setInterval(fetchAll, 15_000);
-            return () => clearInterval(interval);
-        }
-    }, [fetchAll, isGoogleRecruiter, sigData]);
+        if (!wallet && !isGoogleRecruiter) return;
+        const interval = setInterval(fetchAll, 15_000);
+        return () => clearInterval(interval);
+    }, [fetchAll, wallet, isGoogleRecruiter]);
 
     if (!wallet && !isGoogleRecruiter) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Inbox style={{ width: 32, height: 32, color: "rgba(255,255,255,0.1)", marginBottom: 12 }} />
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>Connect your wallet to view inbox</p>
-            </div>
-        );
-    }
-
-    if (wallet && !sigData) {
-        if (signatureFailed) {
-            return (
-                <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-                    <Inbox style={{ width: 32, height: 32, color: "rgba(255,255,255,0.1)", marginBottom: 12 }} />
-                    <div>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>Signature Required</p>
-                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 4, maxWidth: 280 }}>
-                            Please sign the wallet message to securely view your inbox and messages.
-                        </p>
-                    </div>
-                    <button
-                        onClick={requestSignature}
-                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-xs uppercase tracking-widest rounded-xl transition-colors"
-                    >
-                        Unlock Inbox
-                    </button>
-                </div>
-            );
-        }
-
-        return (
-            <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-                <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Please sign message in your wallet...</p>
             </div>
         );
     }

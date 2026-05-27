@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
     title: "Verify Proof of Work: ChainVolio Attestation",
@@ -6,5 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function AttestLayout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+    return (
+        <>
+            <Navbar />
+            {children}
+        </>
+    );
 }

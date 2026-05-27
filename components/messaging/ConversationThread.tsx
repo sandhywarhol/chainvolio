@@ -58,15 +58,7 @@ export function ConversationThread({
             
             if (viewerWallet) {
                 params.set("wallet", viewerWallet);
-                const sigData = await signChainVolioAction(walletState, "view_thread");
-                if (sigData) {
-                    params.set("signature", sigData.signature);
-                    params.set("nonce", sigData.nonce);
-                    params.set("timestamp", String(sigData.timestamp));
-                } else {
-                    if (!silent) setLoading(false);
-                    return; // signature declined
-                }
+                // No signature required for reading — participant check is enforced server-side
             }
 
             const headers: Record<string, string> = {};

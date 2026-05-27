@@ -79,11 +79,11 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
         prevPublicKeyRef.current = currentKey;
     }, [publicKey]);
 
-    // If autoConnect is still "connecting" after 6s with no wallet, stop hiding Sign In.
+    // If autoConnect is still "connecting" after 3s with no wallet, stop hiding Sign In.
     // This prevents the UI from being permanently blocked when Phantom is locked or unresponsive.
     useEffect(() => {
         if (connecting && !publicKey && !skipSpinner) {
-            const timer = setTimeout(() => setConnectingTimedOut(true), 6000);
+            const timer = setTimeout(() => setConnectingTimedOut(true), 3000);
             return () => clearTimeout(timer);
         } else {
             setConnectingTimedOut(false);

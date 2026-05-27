@@ -54,6 +54,28 @@ export function useWalletConnect() {
                         setTimeout(() => reject(new Error("WalletConnectTimeout")), 15000)
                     ),
                 ]);
+
+                // Because we initiated the connection synchronously in connectWallet(), 
+                // connectRef.current() might return immediately if the adapter is already connecting or connected.
+                if (!wallet.adapter.connected) {
+                    // The popup is still open. Wait for the actual connect event.
+                    await new Promise<void>((resolve, reject) => {
+                        const handleConnect = () => { cleanup(); resolve(); };
+                        const handleError = (err: any) => { cleanup(); reject(err); };
+                        const cleanup = () => {
+                            wallet.adapter.off('connect', handleConnect);
+                            wallet.adapter.off('error', handleError);
+                        };
+                        wallet.adapter.on('connect', handleConnect);
+                        wallet.adapter.on('error', handleError);
+                        setTimeout(() => { cleanup(); reject(new Error("WalletConnectTimeout")); }, 30000);
+                    });
+                } else {
+                    // The wallet connected instantly before React context could attach its listeners.
+                    // Force the context to sync by manually re-emitting the event.
+                    wallet.adapter.emit('connect', wallet.adapter.publicKey!);
+                }
+
                 localStorage.removeItem("cv_connecting");
             } catch (err: any) {
                 const msg: string = err?.message ?? "";
@@ -137,6 +159,16 @@ export function useWalletConnect() {
                     return;
                 }
                 // Inside wallet browser: fall through to normal connect below
+            }
+
+            // To preserve the browser's transient user activation (required for Phantom MV3 popups),
+            // we MUST call the adapter's connect() method directly within this synchronous click handler chain.
+            const targetWallet = wallets.find(w => w.adapter.name === walletName);
+            if (targetWallet && targetWallet.readyState !== WalletReadyState.Unsupported) {
+                try {
+                    // Start the connection immediately to consume the user gesture
+                    targetWallet.adapter.connect().catch(() => {});
+                } catch (e) {}
             }
 
             // Step 1: tell the context which wallet we want.

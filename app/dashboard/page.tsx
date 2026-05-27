@@ -113,6 +113,18 @@ export default function DashboardPage() {
   const [editUploading, setEditUploading] = useState(false);
   const [editCropModal, setEditCropModal] = useState<{ isOpen: boolean; image: string | null }>({ isOpen: false, image: null });
   const [selectedReceiptForDetail, setSelectedReceiptForDetail] = useState<any>(null);
+  
+  // Timeout for wallet adapter hanging on connecting=true
+  const [connectingTimedOut, setConnectingTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (connecting && !publicKey) {
+        const timer = setTimeout(() => setConnectingTimedOut(true), 3000);
+        return () => clearTimeout(timer);
+    } else {
+        setConnectingTimedOut(false);
+    }
+  }, [connecting, publicKey]);
 
   const getProfileUrl = () => {
     if (!profile || !publicKey) return `${window.location.origin}/cv/${publicKey?.toBase58()}`;
@@ -128,7 +140,7 @@ export default function DashboardPage() {
       // Don't flip loading=false while autoConnect is still in flight — that
       // would expose an empty Sign-In screen for a frame before the wallet
       // connects and triggers this effect again with connected=true.
-      if (!connecting) setLoading(false);
+      if (!connecting || connectingTimedOut) setLoading(false);
       return;
     }
 
@@ -311,7 +323,7 @@ export default function DashboardPage() {
 
   // autoConnect is still running — show loading so the Sign-In screen never
   // flashes for returning users whose wallet connects silently in the background.
-  if (!publicKey && connecting) {
+  if (!publicKey && connecting && !connectingTimedOut) {
     return <LoadingScreen message="Connecting wallet..." />;
   }
 

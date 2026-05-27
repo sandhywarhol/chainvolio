@@ -49,18 +49,67 @@ function SessionRestoreHandler() {
     }, []);
 
     // Step 2: after the adapter is set, call connect()
-    // 10s timeout guards against Phantom MV3 service-worker hangs where
-    // connect() stays pending indefinitely, leaving `connecting=true` and
-    // the dashboard spinner stuck for the user.
     useEffect(() => {
         if (!wallet || connected || !attemptedRef.current) return;
-        const timer = setTimeout(() => {
-            // Force the adapter to abort by selecting null — clears `connecting`
-            // so the dashboard falls through to the "Sign in" screen.
-            select(null as any);
-        }, 10000);
-        connect().catch(() => {}).finally(() => clearTimeout(timer));
+        
+        let isCancelled = false;
+        const doConnect = async () => {
+            try {
+                await Promise.race([
+                    connect(),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error("Timeout")), 3000)
+                    )
+                ]);
+            } catch (err) {
+                if (!isCancelled) {
+                    // Timeout or error (e.g., wallet locked, dropped silently)
+                    select(null as any);
+                }
+            }
+        };
+
+        doConnect();
+        
+        return () => {
+            isCancelled = true;
+        };
     }, [wallet, connected, connect, select]);
+
+    return null;
+}
+
+/**
+ * Mid-session recovery: if the wallet disconnects (e.g. Phantom MV3 service-worker drop)
+ * but the localStorage session is still valid, attempt a silent reconnect once.
+ * A separate ref prevents infinite retry loops.
+ */
+function SessionRecoveryHandler() {
+    const { connect, connected, wallet } = useWallet();
+    const recoveryAttemptRef = useRef(false);
+
+    useEffect(() => {
+        if (connected) {
+            recoveryAttemptRef.current = false;
+            return;
+        }
+        
+        // If we reach here, connected became false.
+        // If wallet is completely deselected (null), it means a hard disconnect or rejection.
+        if (!wallet) {
+            localStorage.removeItem("cv_session_exp");
+            localStorage.removeItem("cv_wallet_name");
+            return;
+        }
+
+        if (recoveryAttemptRef.current) return;
+        try {
+            const exp = localStorage.getItem("cv_session_exp");
+            if (!exp || Date.now() >= parseInt(exp)) return;
+            recoveryAttemptRef.current = true;
+            connect().catch(() => {});
+        } catch {}
+    }, [connected, wallet, connect]);
 
     return null;
 }
@@ -97,6 +146,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
                 <ModalProv>
                     <MobileReturnHandler />
                     <SessionRestoreHandler />
+                    <SessionRecoveryHandler />
                     {children}
                 </ModalProv>
             </SolWallProv>
