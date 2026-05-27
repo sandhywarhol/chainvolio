@@ -221,10 +221,33 @@ export async function GET(
             fitScore += Math.min(Math.round(attestedReceipts.reduce((s, r) => s + attestationWeight(receiptTierMap.get(r.id)) / 4, 0)), 25);
             if (userVerifications.some(v => v.status === 'verified')) fitScore += 15;
 
+            // Build work history from snapshot captured at submission time,
+            // augmented with current attestation status from live attestationMap.
+            const rawExperience: any[] = snapshot.experience || [];
+            const workHistory = rawExperience.map((e: any) => ({
+                role: e.role || "Unknown Role",
+                org: e.org || "Unknown Org",
+                start_date: e.start_date || null,
+                end_date: e.end_date || null,
+                description: e.description || null,
+                work_type: e.work_type || null,
+                isAttested: e.status === "Attested",
+            }));
+
+            // Years of experience: span from earliest role start to today
+            let yearsOfExperience = 0;
+            const startTimes = workHistory
+                .map((w) => w.start_date ? new Date(w.start_date).getTime() : null)
+                .filter((t): t is number => t !== null && !isNaN(t));
+            if (startTimes.length > 0) {
+                const earliest = Math.min(...startTimes);
+                yearsOfExperience = parseFloat(((Date.now() - earliest) / (1000 * 60 * 60 * 24 * 365)).toFixed(1));
+            }
+
             return {
                 id: sub.id,
                 wallet: sub.candidate_wallet,
-                displayName: profile?.display_name || null,
+                displayName: profile?.display_name || snapshot.profile?.name || null,
                 avatarUrl: profile?.avatar_url || null,
                 role: sub.role_strength || profile?.bio || "Web3 Professional",
                 primarySignal: sub.primary_signal,
@@ -245,8 +268,10 @@ export async function GET(
                 fitScore,
                 signalMatch,
                 cardNumber: profile?.card_number || null,
-                snapshotBio: snapshot.profile?.bio || null,
+                snapshotBio: snapshot.profile?.bio || profile?.bio || null,
                 snapshotSkills: snapshot.profile?.skills || null,
+                workHistory,
+                yearsOfExperience,
             };
         });
 
