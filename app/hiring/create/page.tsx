@@ -576,7 +576,7 @@ export default function CreateCollection() {
 
                             {/* Main Info Card */}
                             {/* ── 1. Job Overview ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Job Overview</span>
@@ -590,7 +590,7 @@ export default function CreateCollection() {
                                             placeholder="e.g. Content Creator, Frontend Engineer"
                                             value={formData.title}
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
                                         />
                                     </div>
                                     <div>
@@ -599,14 +599,14 @@ export default function CreateCollection() {
                                             placeholder="Briefly describe the role, key responsibilities, or specific requirements..."
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed"
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* ── 2. Recruiter Identity ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <Building2 style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Recruiter Identity</span>
@@ -624,7 +624,7 @@ export default function CreateCollection() {
                                                     placeholder="e.g. Satoshi (Founder)"
                                                     value={formData.recruiterName}
                                                     onChange={(e) => setFormData({ ...formData, recruiterName: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 pr-9 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 pr-9 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
                                                 />
                                                 <User className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
                                             </div>
@@ -636,7 +636,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. CTO, Head of Talent"
                                                 value={formData.recruiterRole}
                                                 onChange={(e) => setFormData({ ...formData, recruiterRole: e.target.value })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
                                             />
                                         </div>
                                     </div>
@@ -649,7 +649,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. ChainVolio"
                                                 value={formData.companyName}
                                                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
                                             />
                                         </div>
                                         <div>
@@ -657,7 +657,7 @@ export default function CreateCollection() {
                                             <select
                                                 value={formData.projectStage}
                                                 onChange={(e) => setFormData({ ...formData, projectStage: e.target.value })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all text-sm cursor-pointer appearance-none"
+                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all text-sm cursor-pointer appearance-none"
                                             >
                                                 <option value="Stealth">Stealth</option>
                                                 <option value="Early">Early Stage</option>
@@ -674,7 +674,7 @@ export default function CreateCollection() {
                                             placeholder="Subtle, high-signal recruitment infrastructure for Web3."
                                             value={formData.companyDescription}
                                             onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
                                         />
                                     </div>
 
@@ -693,7 +693,7 @@ export default function CreateCollection() {
                                                     placeholder="Website URL"
                                                     value={formData.websiteUrl}
                                                     onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -703,7 +703,7 @@ export default function CreateCollection() {
                                                     placeholder="X / Twitter handle"
                                                     value={formData.twitterUrl}
                                                     onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -713,7 +713,7 @@ export default function CreateCollection() {
                                                     placeholder="Discord Link"
                                                     value={formData.discordUrl}
                                                     onChange={(e) => setFormData({ ...formData, discordUrl: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -723,7 +723,7 @@ export default function CreateCollection() {
                                                     placeholder="Company Email"
                                                     value={formData.companyEmail}
                                                     onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -733,7 +733,7 @@ export default function CreateCollection() {
                                                     placeholder="Telegram Group / Channel"
                                                     value={formData.telegramUrl}
                                                     onChange={(e) => setFormData({ ...formData, telegramUrl: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -743,7 +743,7 @@ export default function CreateCollection() {
                                                     placeholder="Company LinkedIn"
                                                     value={formData.linkedinUrl}
                                                     onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                                 />
                                             </div>
                                         </div>
@@ -754,7 +754,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. DM on X, Discord Ticket, or Email"
                                                 value={formData.contactChannel}
                                                 onChange={(e) => setFormData({ ...formData, contactChannel: e.target.value })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
                                             />
                                         </div>
                                     </div>
@@ -762,13 +762,13 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 3. Role Details ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Role Details</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Role Type</label>
                                         <select
                                             value={formData.roleType}
@@ -783,7 +783,7 @@ export default function CreateCollection() {
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Work Mode</label>
                                         <select
                                             value={formData.workMode}
@@ -796,7 +796,7 @@ export default function CreateCollection() {
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Timezone</label>
                                         <select
                                             value={formData.timezone}
@@ -810,7 +810,7 @@ export default function CreateCollection() {
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Experience</label>
                                         <select
                                             value={formData.experienceLevel}
@@ -824,7 +824,7 @@ export default function CreateCollection() {
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Comp. Model</label>
                                         <select
                                             value={formData.compensationType}
@@ -839,7 +839,7 @@ export default function CreateCollection() {
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Salary</label>
                                         <input
                                             type="text"
@@ -853,7 +853,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 4. Evaluation Focus ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
@@ -866,7 +866,7 @@ export default function CreateCollection() {
                                         <div
                                             key={opt.id}
                                             onClick={() => toggleFocus(opt.id)}
-                                            className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-800/60 border-slate-700 hover:border-slate-600 hover:bg-slate-800'}`}
+                                            className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
                                         >
                                             <div className="flex items-start gap-2.5 relative z-10">
                                                 <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500 group-hover:text-slate-300'}`}>
@@ -884,7 +884,7 @@ export default function CreateCollection() {
                                     ))}
 
                                     {/* Custom Focus Box */}
-                                    <div className={`p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.customFocus ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-800/60 border-slate-700 hover:border-slate-600 hover:bg-slate-800'}`}>
+                                    <div className={`p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.customFocus ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}>
                                         <div className="flex items-start gap-2.5 relative z-10">
                                             <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.customFocus ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500 group-hover:text-slate-300'}`}>
                                                 <Target className="w-4 h-4" />
@@ -909,7 +909,7 @@ export default function CreateCollection() {
 
 
                             {/* ── 5. Eligibility Filters ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="flex items-center gap-2">
                                         <Filter style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
@@ -923,7 +923,7 @@ export default function CreateCollection() {
                                             ...prev,
                                             filters: { ...prev.filters, minReceiptsThreshold: prev.filters.minReceiptsThreshold === 5 ? 0 : 5 }
                                         }))}
-                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/10 border-indigo-500/40' : 'bg-slate-800/60 border-slate-700 hover:border-slate-600 hover:bg-slate-800'}`}
+                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/10 border-indigo-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
                                     >
                                         <div className="flex items-center gap-2.5">
                                             <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-slate-500'}`}>
@@ -942,7 +942,7 @@ export default function CreateCollection() {
                                             ...prev,
                                             filters: { ...prev.filters, verifiedOnly: !prev.filters.verifiedOnly }
                                         }))}
-                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.verifiedOnly ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-800/60 border-slate-700 hover:border-slate-600 hover:bg-slate-800'}`}
+                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.verifiedOnly ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
                                     >
                                         <div className="flex items-center gap-2.5">
                                             <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.verifiedOnly ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500'}`}>
@@ -959,7 +959,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 6. Final Configuration ── */}
-                            <div className="rounded-xl p-4 bg-slate-900 border border-slate-800">
+                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
                                 <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <CalendarDays style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Final Configuration</span>
@@ -969,21 +969,21 @@ export default function CreateCollection() {
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Submission Deadline <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "rgba(255,255,255,0.15)" }}>optional</span></label>
                                         <div className="relative">
                                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <CalendarDays className="h-3.5 w-3.5 text-slate-700" />
+                                                <CalendarDays className="h-3.5 w-3.5 text-zinc-500" />
                                             </div>
                                             <input
                                                 type="date"
                                                 value={formData.deadline}
                                                 min={new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:border-emerald-500/60 outline-none transition-colors text-slate-300"
+                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:border-emerald-500/60 outline-none transition-colors text-slate-300"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Collection Visibility</label>
-                                        <div className="flex p-1 rounded-lg" style={{ background: "#1e293b", border: "1px solid #334155" }}>
+                                        <div className="flex p-1 rounded-lg" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
                                             {['public', 'unlisted', 'private'].map((vis) => (
                                                 <button
                                                     key={vis}
