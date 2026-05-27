@@ -217,34 +217,51 @@ export default function CreateCollection() {
             return;
         }
 
-        const urlFields: { key: keyof typeof formData; label: string }[] = [
-            { key: "websiteUrl", label: "Website URL" },
-            { key: "twitterUrl", label: "Twitter/X URL" },
+        // Normalize + validate URL fields before sending
+        const normalizedForm = { ...formData };
+        const urlFields: { key: keyof typeof formData; label: string; isTwitter?: boolean }[] = [
+            { key: "websiteUrl",  label: "Website URL" },
+            { key: "twitterUrl",  label: "Twitter/X",   isTwitter: true },
             { key: "linkedinUrl", label: "LinkedIn URL" },
-            { key: "discordUrl", label: "Discord URL" },
+            { key: "discordUrl",  label: "Discord URL" },
             { key: "telegramUrl", label: "Telegram URL" },
         ];
-        for (const { key, label } of urlFields) {
-            const val = (formData[key] as string)?.trim();
-            if (val) {
-                try {
-                    const parsed = new URL(val);
-                    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-                        setToast({ message: `${label} must start with http:// or https://.`, type: "error" });
-                        return;
-                    }
-                } catch {
-                    setToast({ message: `${label} is not a valid URL.`, type: "error" });
+        for (const { key, label, isTwitter } of urlFields) {
+            const raw = (normalizedForm[key] as string)?.trim();
+            if (!raw) continue;
+
+            let normalized = raw;
+
+            if (isTwitter) {
+                // Accept: @username  username  twitter.com/x  https://x.com/x
+                const handle = raw.replace(/^@/, "").replace(/^(https?:\/\/)?(www\.)?(twitter\.com|x\.com)\//, "").split("?")[0].split("/")[0].trim();
+                if (!handle) continue;
+                normalized = `https://x.com/${handle}`;
+            } else if (!/^https?:\/\//i.test(raw)) {
+                // No protocol — prepend https://
+                normalized = `https://${raw}`;
+            }
+
+            // Final sanity check on the normalized value
+            try {
+                const parsed = new URL(normalized);
+                if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+                    setToast({ message: `${label} — invalid URL format.`, type: "error" });
                     return;
                 }
+            } catch {
+                setToast({ message: `${label} — could not parse as a valid URL.`, type: "error" });
+                return;
             }
+
+            (normalizedForm as any)[key] = normalized;
         }
 
         setLoading(true);
 
         try {
             let requestBody: Record<string, any> = {
-                ...formData,
+                ...normalizedForm,
             };
 
             if (isGoogleUser && session) {

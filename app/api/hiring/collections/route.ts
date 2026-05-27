@@ -284,20 +284,37 @@ export async function POST(request: Request) {
             }
         }
 
-        // Validate URL fields in metadata
-        const urlFieldNames = ["websiteUrl", "twitterUrl", "linkedinUrl", "discordUrl", "telegramUrl"];
-        for (const field of urlFieldNames) {
-            const val = metadata[field]?.trim();
-            if (val) {
-                try {
-                    const parsed = new URL(val);
-                    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-                        return errorResponse("ERR_INVALID_REQUEST", `${field} must use http or https.`, 400);
-                    }
-                } catch {
-                    return errorResponse("ERR_INVALID_REQUEST", `${field} is not a valid URL.`, 400);
-                }
+        // Normalize + validate URL fields in metadata.
+        // Client already normalizes, but we re-normalize server-side as a safety net.
+        const urlFieldNames: { key: string; isTwitter?: boolean }[] = [
+            { key: "websiteUrl" },
+            { key: "twitterUrl", isTwitter: true },
+            { key: "linkedinUrl" },
+            { key: "discordUrl" },
+            { key: "telegramUrl" },
+        ];
+        for (const { key, isTwitter } of urlFieldNames) {
+            const raw: string = (metadata[key] ?? "").trim();
+            if (!raw) continue;
+
+            let normalized = raw;
+            if (isTwitter) {
+                const handle = raw.replace(/^@/, "").replace(/^(https?:\/\/)?(www\.)?(twitter\.com|x\.com)\//, "").split("?")[0].split("/")[0].trim();
+                normalized = handle ? `https://x.com/${handle}` : raw;
+            } else if (!/^https?:\/\//i.test(raw)) {
+                normalized = `https://${raw}`;
             }
+
+            try {
+                const parsed = new URL(normalized);
+                if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+                    return errorResponse("ERR_INVALID_REQUEST", `${key} must use http or https.`, 400);
+                }
+            } catch {
+                return errorResponse("ERR_INVALID_REQUEST", `${key} is not a valid URL.`, 400);
+            }
+
+            metadata[key] = normalized; // store the normalized version
         }
 
         // Set transaction context for RLS
