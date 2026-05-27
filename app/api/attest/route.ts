@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { Connection } from "@solana/web3.js";
 import { calculateScore } from "@/lib/score";
-import { getAttestationQuota, getVerificationLabel } from "@/lib/paymentConfig";
+import {
+    getAttestationQuota, getVerificationLabel,
+    SERVER_PAYMENT_MODE, TREASURY_WALLET,
+    USDC_MINT_MAINNET,
+    RETAIL_ATTESTATION_USDC, getRetailAttestationLamports,
+} from "@/lib/paymentConfig";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -73,7 +78,16 @@ export async function POST(request: Request) {
             contentHash,
             classification,
             isExternal,
+            isPaidAttestation,   // true when user is paying per-attestation beyond quota
         } = body;
+
+        // Paid attestation requires an on-chain tx to verify the payment
+        if (isPaidAttestation && !txSignature?.trim()) {
+            return NextResponse.json(
+                { error: "Paid attestation requires an on-chain transaction signature." },
+                { status: 400 }
+            );
+        }
 
         // Server-side ISO 8601 timestamp - use client-provided value if valid,
         // otherwise fall back to server time (safety net)
@@ -107,6 +121,10 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
             }
         }
+
+        // paymentVerified is set to true inside the tx block below when a valid
+        // retail payment instruction is found inside the on-chain transaction.
+        let paymentVerified = false;
 
         // Verify the txSignature on-chain if provided
         if (!skipVerify && cleanTxSignature) {
@@ -158,6 +176,77 @@ export async function POST(request: Request) {
                             error: "Transaction signer does not match attester wallet."
                         }, { status: 403 });
                     }
+
+                    // ── Payment verification (paid attestation only) ────────────
+                    if (isPaidAttestation && txDetails) {
+                        const instructions: any[] = txDetails.transaction?.message?.instructions ?? [];
+
+                        if (SERVER_PAYMENT_MODE === "SOL_TEST") {
+                            // Expect a SystemProgram.transfer to TREASURY_WALLET ≥ RETAIL_ATTESTATION_SOL
+                            const requiredLamports = getRetailAttestationLamports();
+                            for (const ix of instructions) {
+                                if (
+                                    ix.parsed?.type === "transfer" &&
+                                    ix.programId?.toString() === "11111111111111111111111111111111" &&
+                                    ix.parsed?.info?.destination === TREASURY_WALLET &&
+                                    Number(ix.parsed?.info?.lamports) >= requiredLamports
+                                ) {
+                                    paymentVerified = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // USDC_PROD: expect SPL transferChecked to treasury's ATA, correct mint & amount
+                            for (const ix of instructions) {
+                                const p = ix.parsed;
+                                if (
+                                    (p?.type === "transferChecked" || p?.type === "transfer") &&
+                                    p?.info?.mint === USDC_MINT_MAINNET
+                                ) {
+                                    // Authority / owner must be the attester
+                                    if (
+                                        p?.info?.authority !== attesterWallet &&
+                                        p?.info?.multisigAuthority !== attesterWallet
+                                    ) continue;
+
+                                    const rawAmount = BigInt(
+                                        p?.info?.tokenAmount?.amount ??
+                                        p?.info?.amount ??
+                                        "0"
+                                    );
+                                    if (rawAmount >= RETAIL_ATTESTATION_USDC) {
+                                        paymentVerified = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!paymentVerified) {
+                            return NextResponse.json({
+                                error: "Payment not found in this transaction. " +
+                                    `Expected a transfer of ` +
+                                    (SERVER_PAYMENT_MODE === "SOL_TEST"
+                                        ? `${getRetailAttestationLamports() / 1_000_000_000} SOL`
+                                        : "0.50 USDC") +
+                                    " to the ChainVolio treasury."
+                            }, { status: 402 });
+                        }
+
+                        // Idempotency: reject if this tx signature was already used for another attestation
+                        const { data: existingByTx } = await supabase
+                            .from("attestations")
+                            .select("id")
+                            .eq("tx_signature", cleanTxSignature)
+                            .maybeSingle();
+
+                        if (existingByTx) {
+                            return NextResponse.json({
+                                error: "This transaction has already been used for an attestation."
+                            }, { status: 409 });
+                        }
+                    }
+                    // ───────────────────────────────────────────────────────────
                 } catch (parseErr) {
                     // Non-fatal: if we can't fetch TX details, skip signer check rather than blocking valid attestations
                     console.warn("[attestation-api] Could not verify TX signer:", parseErr);
@@ -266,11 +355,14 @@ export async function POST(request: Request) {
         }
 
         // 2. Attestation Quota Check
+        // Skip all quota enforcement when the user has paid for this individual attestation.
+        const skipQuota = isPaidAttestation && paymentVerified;
+
         const quota = getAttestationQuota(verificationTier);
-        console.log(`[attest-api] wallet=${attesterWallet} tier=${verificationTier} quota=${quota} used=${profile?.attestation_used ?? 0}`);
+        console.log(`[attest-api] wallet=${attesterWallet} tier=${verificationTier} quota=${quota} used=${profile?.attestation_used ?? 0} paid=${skipQuota}`);
 
         // a. Per-Target Monthly Limit Check for Unverified Users
-        if (verificationTier === "unverified") {
+        if (!skipQuota && verificationTier === "unverified") {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -315,20 +407,20 @@ export async function POST(request: Request) {
 
             trackedUsed = used;
 
-            // enforcement
-            if (used >= quota) {
+            // Enforce quota only when the user hasn't paid for this individual attestation
+            if (!skipQuota && used >= quota) {
                 return NextResponse.json({
                     error: `Monthly attestation limit reached for ${verificationTier} tier (${used}/${quota}). Please upgrade your verification tier to increase your quota.`
                 }, { status: 403 });
             }
-        } else {
+        } else if (!skipQuota) {
             // Check quota for users without a profile
             if (quota <= 0) {
-                return NextResponse.json({ 
-                    error: `Verification is required to give attestations. Your current tier is detected as: ${verificationTier}` 
+                return NextResponse.json({
+                    error: `Verification is required to give attestations. Your current tier is detected as: ${verificationTier}`
                 }, { status: 403 });
             }
-            
+
             // For users without a profile, we also check their global history to enforce the quota of 1
             const { count } = await supabase
                 .from("attestations")
@@ -337,8 +429,8 @@ export async function POST(request: Request) {
                 .gte("memo_issued_at", new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
             if ((count || 0) >= quota) {
-                 return NextResponse.json({ 
-                    error: `Unverified wallets are limited to ${quota} total attestation per 30 days. Register a profile to increase your quota.` 
+                 return NextResponse.json({
+                    error: `Unverified wallets are limited to ${quota} total attestation per 30 days. Register a profile to increase your quota.`
                 }, { status: 403 });
             }
         }
@@ -388,6 +480,7 @@ export async function POST(request: Request) {
             content_hash: contentHash || null,
             classification: classification || null,
             is_external: isExternal !== undefined ? isExternal : true,
+            is_paid_attestation: skipQuota, // true when user paid beyond their quota
         });
 
         if (error) {

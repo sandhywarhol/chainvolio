@@ -45,6 +45,24 @@ export function getSolTestLamports(tier: string, billingCycle?: "monthly" | "yea
     return Math.round(getSolTestPrice(tier, billingCycle) * LAMPORTS_PER_SOL);
 }
 
+// ─── Retail pay-per-attestation pricing ──────────────────────────────────────
+// Used when an attester has exceeded their monthly quota and wants to pay
+// for individual extra attestations instead of upgrading their plan.
+
+/** SOL price for one retail (paid) attestation in SOL_TEST mode */
+export const RETAIL_ATTESTATION_SOL = 0.005;
+
+/** USDC price for one retail (paid) attestation in base units (6 decimals = 0.50 USDC) */
+export const RETAIL_ATTESTATION_USDC = BigInt("500000");
+
+/** Human-readable USDC display price for the UI */
+export const RETAIL_ATTESTATION_USDC_DISPLAY = 0.50;
+
+/** Returns the lamport amount for one retail attestation in SOL_TEST mode */
+export function getRetailAttestationLamports(): number {
+    return Math.round(RETAIL_ATTESTATION_SOL * LAMPORTS_PER_SOL);
+}
+
 // ─── USDC prod amounts (in base units, 6 decimals) ─────────────────────────
 export const USDC_MINT_MAINNET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 export const USDC_MINT_DEVNET  = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";

@@ -5,15 +5,26 @@ import { useParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
     Connection, Transaction, TransactionInstruction,
-    PublicKey, ComputeBudgetProgram,
+    PublicKey, ComputeBudgetProgram, SystemProgram,
 } from "@solana/web3.js";
+import {
+    getAssociatedTokenAddress,
+    createTransferCheckedInstruction,
+    createAssociatedTokenAccountInstruction,
+} from "@solana/spl-token";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import Link from "next/link";
 import { Loader2, ShieldCheck, Building2, Wallet } from "lucide-react";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-import { getVerificationLabel } from "@/lib/paymentConfig";
+import {
+    getVerificationLabel,
+    TREASURY_WALLET, IS_SOL_TEST,
+    USDC_MINT_MAINNET, USDC_DECIMALS,
+    RETAIL_ATTESTATION_SOL, RETAIL_ATTESTATION_USDC, RETAIL_ATTESTATION_USDC_DISPLAY,
+    getRetailAttestationLamports,
+} from "@/lib/paymentConfig";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ReceiptDetails = {
@@ -58,6 +69,8 @@ export default function AttestPage() {
     const [isExternal, setIsExternal] = useState(true);
     const [walletModalOpen, setWalletModalOpen] = useState(false);
     const [reciprocalBlocked, setReciprocalBlocked] = useState<boolean | null>(null);
+    // true when user has chosen to pay per-attestation after exceeding their quota
+    const [isPaidAttest, setIsPaidAttest] = useState(false);
 
     // Set when user clicks "Connect Wallet & Sign" before wallet is connected.
     // Auto-triggers handleAttest once wallet connects.
@@ -265,6 +278,41 @@ export default function AttestPage() {
             tx.feePayer = publicKey;
             tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 5000 }));
             tx.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }));
+
+            // ── Paid attestation: prepend payment instruction ──────────────
+            if (isPaidAttest) {
+                const treasury = new PublicKey(TREASURY_WALLET);
+                if (IS_SOL_TEST) {
+                    // SOL_TEST mode: small SOL transfer to treasury
+                    tx.add(SystemProgram.transfer({
+                        fromPubkey: publicKey,
+                        toPubkey: treasury,
+                        lamports: getRetailAttestationLamports(),
+                    }));
+                } else {
+                    // USDC_PROD mode: USDC SPL transfer to treasury's ATA
+                    const usdcMint = new PublicKey(USDC_MINT_MAINNET);
+                    const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
+                    const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
+                    // Create treasury ATA if it doesn't exist yet (idempotent on-chain)
+                    const toATAInfo = await conn.getAccountInfo(toATA);
+                    if (!toATAInfo) {
+                        tx.add(createAssociatedTokenAccountInstruction(
+                            publicKey, toATA, treasury, usdcMint
+                        ));
+                    }
+                    tx.add(createTransferCheckedInstruction(
+                        fromATA,
+                        usdcMint,
+                        toATA,
+                        publicKey,
+                        RETAIL_ATTESTATION_USDC,
+                        USDC_DECIMALS,
+                    ));
+                }
+            }
+            // ──────────────────────────────────────────────────────────────
+
             tx.add(new TransactionInstruction({
                 keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
                 programId: MEMO_PID,
@@ -325,6 +373,7 @@ export default function AttestPage() {
                     contentHash,
                     classification: attestationType,
                     isExternal,
+                    isPaidAttestation: isPaidAttest,
                 }),
             });
 
@@ -775,7 +824,7 @@ export default function AttestPage() {
                           const isLimitReached = used >= quota;
                           const isNearLimit = !isLimitReached && pct >= 80;
 
-                          if (isLimitReached) return (
+                          if (isLimitReached && !isPaidAttest) return (
                             <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-3">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -787,10 +836,52 @@ export default function AttestPage() {
                                 <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-rose-500 rounded-full w-full" />
                                 </div>
-                                <p className="text-xs text-slate-400 leading-relaxed">Upgrade for unlimited access and keep endorsing talent.</p>
-                                <Link href="/dashboard" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all">
-                                    Upgrade Now
-                                </Link>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    Upgrade for unlimited monthly access, or pay per attestation to continue now.
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                    {/* Pay-per-attestation option */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPaidAttest(true)}
+                                        className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 transition-all group"
+                                    >
+                                        <div className="text-left">
+                                            <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">Pay per attestation</p>
+                                            <p className="text-[11px] text-slate-400 mt-0.5">
+                                                {IS_SOL_TEST
+                                                    ? `${RETAIL_ATTESTATION_SOL} SOL per attestation`
+                                                    : `$${RETAIL_ATTESTATION_USDC_DISPLAY} USDC per attestation`}
+                                            </p>
+                                        </div>
+                                        <span className="text-emerald-400 text-sm group-hover:translate-x-0.5 transition-transform">→</span>
+                                    </button>
+                                    <Link href="/dashboard" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700 text-slate-400 text-xs font-black uppercase tracking-widest transition-all">
+                                        Upgrade Plan
+                                    </Link>
+                                </div>
+                            </div>
+                          );
+
+                          // Paid attestation active: show payment banner instead of blocking UI
+                          if (isLimitReached && isPaidAttest) return (
+                            <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">Pay-per-attestation active</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPaidAttest(false)}
+                                        className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    {IS_SOL_TEST
+                                        ? `${RETAIL_ATTESTATION_SOL} SOL will be bundled with this attestation transaction.`
+                                        : `$${RETAIL_ATTESTATION_USDC_DISPLAY} USDC will be bundled with this attestation transaction.`}
+                                    {" "}Payment is verified on-chain — no charge if the transaction fails.
+                                </p>
                             </div>
                           );
 
@@ -856,7 +947,7 @@ export default function AttestPage() {
                             </div>
                         ) : (
                             <button onClick={handleAttest}
-                                disabled={reciprocalBlocked === true || attesting || profileLoading || !attesterName.trim() || !attesterRole.trim() || (attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
+                                disabled={reciprocalBlocked === true || attesting || profileLoading || !attesterName.trim() || !attesterRole.trim() || (!isPaidAttest && attesterProfile && attesterProfile.attestationUsed >= attesterProfile.attestationQuota)}
                                 className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all flex items-center justify-center gap-2">
                                 {attesting ? (
                                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing…</>
