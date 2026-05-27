@@ -20,6 +20,29 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (!wallet && !token) return err("ERR_AUTH", "Auth required", 401);
 
     try {
+        if (wallet) {
+            const signature = searchParams.get("signature");
+            const nonce = searchParams.get("nonce");
+            const timestampStr = searchParams.get("timestamp");
+            const timestamp = timestampStr ? parseInt(timestampStr, 10) : 0;
+
+            if (!signature || !nonce || !timestampStr) {
+                return err("ERR_SIGNATURE_REQUIRED", "Cryptographic signature is required for wallet verification", 401);
+            }
+
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                wallet,
+                "view_thread",
+                nonce,
+                timestamp,
+                signature
+            );
+
+            if (!isValid) {
+                return err("ERR_SIGNATURE_INVALID", sigError || "Signature verification failed", 401);
+            }
+        }
         const { data: conv, error: convErr } = await supabase
             .from("conversations")
             .select("*")

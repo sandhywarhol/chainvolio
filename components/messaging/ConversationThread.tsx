@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Send, Loader2, Building2, Briefcase, Calendar, Link as LinkIcon } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { signChainVolioAction } from "@/lib/wallet-utils";
 
 interface Message {
     id: string;
@@ -39,6 +41,7 @@ interface ConversationThreadProps {
 export function ConversationThread({
     conversationId, viewerWallet, viewerAuthToken, viewerRole, onBack,
 }: ConversationThreadProps) {
+    const walletState = useWallet();
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +55,19 @@ export function ConversationThread({
         if (!silent) setLoading(true);
         try {
             const params = new URLSearchParams({ role: viewerRole });
-            if (viewerWallet) params.set("wallet", viewerWallet);
+            
+            if (viewerWallet) {
+                params.set("wallet", viewerWallet);
+                const sigData = await signChainVolioAction(walletState, "view_thread");
+                if (sigData) {
+                    params.set("signature", sigData.signature);
+                    params.set("nonce", sigData.nonce);
+                    params.set("timestamp", String(sigData.timestamp));
+                } else {
+                    if (!silent) setLoading(false);
+                    return; // signature declined
+                }
+            }
 
             const headers: Record<string, string> = {};
             if (viewerAuthToken) headers["Authorization"] = `Bearer ${viewerAuthToken}`;
@@ -65,7 +80,7 @@ export function ConversationThread({
             }
         } catch { /* silent */ }
         finally { if (!silent) setLoading(false); }
-    }, [conversationId, viewerWallet, viewerAuthToken, viewerRole]);
+    }, [conversationId, viewerWallet, viewerAuthToken, viewerRole, walletState]);
 
     useEffect(() => { fetchThread(); }, [fetchThread]);
 
@@ -88,7 +103,19 @@ export function ConversationThread({
                 conversationId,
                 content: newMessage.trim(),
             };
-            if (viewerWallet) body.senderWallet = viewerWallet;
+            if (viewerWallet) {
+                body.senderWallet = viewerWallet;
+                const sigData = await signChainVolioAction(walletState, "send_message");
+                if (sigData) {
+                    body.signature = sigData.signature;
+                    body.nonce = sigData.nonce;
+                    body.timestamp = sigData.timestamp;
+                } else {
+                    setSendError("Signing declined. Cannot send message.");
+                    setSending(false);
+                    return;
+                }
+            }
             if (viewerAuthToken) body.authToken = viewerAuthToken;
 
             const res = await fetch("/api/messaging/messages", {

@@ -34,7 +34,10 @@ export default function AuthRolePage() {
         // Builder — create org_accounts row immediately with onboarding_complete=true
         const res = await fetch("/api/org-accounts", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session.access_token}`
+            },
             body: JSON.stringify({
                 auth_uid: session.user.id,
                 email: session.user.email ?? "",

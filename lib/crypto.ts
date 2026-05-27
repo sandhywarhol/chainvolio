@@ -2,7 +2,7 @@ import { supabaseServer as supabase } from "./supabase/server";
 import nacl from "tweetnacl"; // We might need to install this if web3.js doesn't export it clearly
 import bs58 from "bs58";
 
-export type AuthAction = "submit_cv"| "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "admin_revoke" | "admin_reset" | "admin_expire" | "admin_delete" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "view_dashboard" | "generate_api_key" | "send_outreach";
+export type AuthAction = "submit_cv"| "submit_work" | "update_work" | "apply_job" | "attest" | "review_submission" | "admin_access" | "approve_org" | "reject_org" | "admin_revoke" | "admin_reset" | "admin_expire" | "admin_delete" | "update_profile" | "update_profile_identity" | "delete_profile" | "update_submission" | "create_collection" | "update_collection" | "view_dashboard" | "generate_api_key" | "send_outreach" | "view_conversations" | "view_thread" | "send_message";
 
 export async function verifySignature(
     walletAddress: string,
@@ -26,7 +26,7 @@ export async function verifySignature(
         const twoHours = 2 * 60 * 60 * 1000;
         
         // Session-based actions get a longer window
-        const expiryWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org" || action === "generate_api_key")
+        const expiryWindow = (action === "view_dashboard" || action === "update_profile" || action === "update_profile_identity" || action === "update_work" || action === "submit_work" || action === "create_collection" || action === "update_collection" || action === "apply_job" || action === "admin_access" || action === "approve_org" || action === "reject_org" || action === "generate_api_key" || action === "view_conversations" || action === "view_thread" || action === "send_message")
             ? twoHours
             : tenMinutes;
 
@@ -41,7 +41,7 @@ export async function verifySignature(
 
         // 3. Check for replay attack (nonce check)
         // We allow some actions to reuse nonces for smoother UX (session-like behavior)
-        const isSessionAction = ["view_dashboard", "update_profile", "update_profile_identity", "update_work", "submit_work", "create_collection", "update_collection", "apply_job", "admin_access", "approve_org", "reject_org", "generate_api_key"].includes(action);
+        const isSessionAction = ["view_dashboard", "update_profile", "update_profile_identity", "update_work", "submit_work", "create_collection", "update_collection", "apply_job", "admin_access", "approve_org", "reject_org", "generate_api_key", "view_conversations", "view_thread", "send_message"].includes(action);
 
         if (supabase && !isSessionAction) {
             const { data } = await supabase

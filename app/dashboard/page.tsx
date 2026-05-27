@@ -84,7 +84,7 @@ type HiringCollection = {
 
 export default function DashboardPage() {
   const { publicKey, connected, connecting, signMessage } = useWallet();
-  const { session, orgAccount, loading: googleLoading } = useGoogleAuth();
+  const { session, orgAccount, loading: googleLoading, refetchOrgAccount } = useGoogleAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,9 +165,23 @@ export default function DashboardPage() {
   }, [publicKey, connected, connecting]);
 
   const handleDeleteCertificate = async (id: string) => {
-    if (!publicKey) return;
+    if (!publicKey || !signMessage) return;
     try {
-      const res = await fetch(`/api/certificates?id=${id}&wallet=${publicKey.toBase58()}`, { method: "DELETE" });
+      const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+      if (!signedAction) {
+        setToastMessage("Signing canceled. Please try again.");
+        return;
+      }
+
+      const query = new URLSearchParams({
+        id,
+        wallet: publicKey.toBase58(),
+        signature: signedAction.signature,
+        nonce: signedAction.nonce,
+        timestamp: signedAction.timestamp.toString()
+      });
+
+      const res = await fetch(`/api/certificates?${query.toString()}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
       setCertificates(prev => prev.filter(c => c.id !== id));
     } catch {
@@ -291,7 +305,7 @@ export default function DashboardPage() {
       }
       // fall through to wallet builder dashboard below
     } else {
-      return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} />;
+      return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} refetchOrgAccount={refetchOrgAccount} />;
     }
   }
 
@@ -1671,7 +1685,7 @@ function GoogleBuilderNoWalletView({ session }: { session: Session }) {
   );
 }
 
-function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; orgAccount: OrgAccount | null }) {
+function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: { session: Session; orgAccount: OrgAccount | null; refetchOrgAccount?: () => Promise<void> }) {
   const router = useRouter();
   const [googleCollections, setGoogleCollections] = useState<{ id: string; title: string; slug: string; created_at: string }[]>([]);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
@@ -1688,22 +1702,55 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
     if (needsOnboarding) router.replace("/onboarding/org");
   }, [needsOnboarding, router]);
 
-  // Detect wallet linked successfully — show success toast once
+  // Detect wallet linked successfully — show success toast once and save to DB
   useEffect(() => {
     if (walletConnected && walletPublicKey && !walletLinkShown) {
+      if (orgAccount?.wallet_address === walletPublicKey.toBase58()) {
+        setWalletLinkShown(true);
+        setShowWalletNudge(false);
+        return;
+      }
+
       setWalletLinkShown(true);
       setShowWalletNudge(false);
-      setToastMessage("🎉 Wallet linked successfully! On-chain features are now unlocked.");
-      try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
+
+      fetch("/api/org-accounts", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          auth_uid: orgAccount?.auth_uid,
+          wallet_address: walletPublicKey.toBase58(),
+        }),
+      })
+      .then(async (res) => {
+        if (res.ok) {
+          setToastMessage("🎉 Wallet linked successfully! On-chain features are now unlocked.");
+          try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
+          if (refetchOrgAccount) {
+            await refetchOrgAccount();
+          }
+        } else {
+          const errData = await res.json();
+          setToastMessage(`Failed to save linked wallet: ${errData.error || "Unknown error"}`);
+          setWalletLinkShown(false);
+        }
+      })
+      .catch(() => {
+        setToastMessage("Failed to save linked wallet due to a network error.");
+        setWalletLinkShown(false);
+      });
     }
-  }, [walletConnected, walletPublicKey, walletLinkShown]);
+  }, [walletConnected, walletPublicKey, walletLinkShown, orgAccount, session, refetchOrgAccount]);
 
   useEffect(() => {
     try {
       const dismissed = localStorage.getItem("cv_wallet_nudge_dismissed");
-      if (!dismissed) setShowWalletNudge(true);
+      if (!dismissed && !orgAccount?.wallet_address) setShowWalletNudge(true);
     } catch {}
-  }, []);
+  }, [orgAccount?.wallet_address]);
 
   useEffect(() => {
     if (!orgAccount?.auth_uid || !session?.access_token) return;
@@ -1880,7 +1927,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount }: { session: Session; 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
               {activeTab === "inbox" ? (
-                <InboxPanel />
+                <InboxPanel googleSession={session} googleOrgAccount={orgAccount} />
               ) : (
                 <OrgDashboard
                   profile={googleProfile}

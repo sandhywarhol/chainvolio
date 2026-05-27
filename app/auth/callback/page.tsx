@@ -38,7 +38,11 @@ export default function AuthCallbackPage() {
             try {
                 const { data: { session } } = await supabaseAuth.auth.getSession();
                 if (session?.user?.id) {
-                    const res = await fetch(`/api/org-accounts?auth_uid=${session.user.id}`);
+                    const res = await fetch(`/api/org-accounts?auth_uid=${session.user.id}`, {
+                        headers: {
+                            "Authorization": `Bearer ${session.access_token}`
+                        }
+                    });
                     if (res.ok) {
                         const data = await res.json();
                         if (!data.orgAccount) {

@@ -2,6 +2,8 @@
 
 import { useState, useRef } from "react";
 import { X, Upload, FileText, Image as ImageIcon, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { signChainVolioAction } from "@/lib/wallet-utils";
 
 interface CertificateUploadModalProps {
   walletAddress: string;
@@ -55,6 +57,7 @@ async function processImage(file: File): Promise<Blob> {
 }
 
 export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: CertificateUploadModalProps) {
+  const { publicKey, signMessage } = useWallet();
   const [title, setTitle]       = useState("");
   const [issuer, setIssuer]     = useState("");
   const [dateIssued, setDate]   = useState("");
@@ -111,6 +114,21 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
 
       setProgress(60);
 
+      if (!publicKey || !signMessage) {
+        throw new Error("Wallet not connected");
+      }
+
+      const signedAction = await signChainVolioAction(
+        { publicKey, signMessage } as any,
+        "update_profile"
+      );
+
+      if (!signedAction) {
+        setStatus("idle");
+        setProgress(0);
+        return; // User canceled signature
+      }
+
       // Step 2: Upload via API
       setStatus("uploading");
       const form = new FormData();
@@ -119,6 +137,9 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
       form.append("issuer", issuer.trim());
       form.append("dateIssued", dateIssued);
       form.append("file", new File([processedBlob], processedName, { type: processedBlob.type }));
+      form.append("signature", signedAction.signature);
+      form.append("nonce", signedAction.nonce);
+      form.append("timestamp", signedAction.timestamp.toString());
 
       setProgress(80);
       const res = await fetch("/api/certificates", { method: "POST", body: form });

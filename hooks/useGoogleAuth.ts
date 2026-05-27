@@ -36,8 +36,12 @@ export function useGoogleAuth() {
     const [orgAccount, setOrgAccount] = useState<OrgAccount | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchOrgAccount = useCallback(async (authUid: string) => {
-        const res = await fetch(`/api/org-accounts?auth_uid=${authUid}`);
+    const fetchOrgAccount = useCallback(async (authUid: string, accessToken?: string) => {
+        const headers: HeadersInit = {};
+        if (accessToken) {
+            headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+        const res = await fetch(`/api/org-accounts?auth_uid=${authUid}`, { headers });
         if (res.ok) {
             const data = await res.json();
             setOrgAccount(data.orgAccount ?? null);
@@ -56,7 +60,7 @@ export function useGoogleAuth() {
             const s = data.session ?? null;
             setSession(s);
             if (s?.user?.id) {
-                fetchOrgAccount(s.user.id).finally(() => setLoading(false));
+                fetchOrgAccount(s.user.id, s.access_token).finally(() => setLoading(false));
             } else {
                 setLoading(false);
             }
@@ -65,7 +69,7 @@ export function useGoogleAuth() {
         const { data: listener } = supabaseAuth.auth.onAuthStateChange((_event, s) => {
             setSession(s);
             if (s?.user?.id) {
-                fetchOrgAccount(s.user.id);
+                fetchOrgAccount(s.user.id, s?.access_token);
             } else {
                 setOrgAccount(null);
             }
@@ -100,6 +104,6 @@ export function useGoogleAuth() {
         isGoogleSignedIn: !!session,
         signInWithGoogle,
         signOut,
-        refetchOrgAccount: () => session?.user?.id ? fetchOrgAccount(session.user.id) : Promise.resolve(),
+        refetchOrgAccount: () => session?.user?.id ? fetchOrgAccount(session.user.id, session.access_token) : Promise.resolve(),
     };
 }

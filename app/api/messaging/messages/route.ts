@@ -11,12 +11,31 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { conversationId, content, senderWallet, authToken } = body;
+        const { conversationId, content, senderWallet, authToken, signature, nonce, timestamp } = body;
 
         if (!conversationId) return err("ERR_VALIDATION", "conversationId is required");
         if (!content?.trim()) return err("ERR_VALIDATION", "content is required");
         if (content.length > 2000) return err("ERR_VALIDATION", "Message too long (max 2000 chars)");
         if (!senderWallet && !authToken) return err("ERR_AUTH", "Auth required", 401);
+
+        if (senderWallet) {
+            if (!signature || !nonce || !timestamp) {
+                return err("ERR_SIGNATURE_REQUIRED", "Cryptographic signature is required for wallet verification", 401);
+            }
+
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                senderWallet,
+                "send_message",
+                nonce,
+                timestamp,
+                signature
+            );
+
+            if (!isValid) {
+                return err("ERR_SIGNATURE_INVALID", sigError || "Signature verification failed", 401);
+            }
+        }
 
         // Resolve sender identity
         let senderAuthUid: string | undefined;

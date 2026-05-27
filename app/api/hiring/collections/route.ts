@@ -17,15 +17,58 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const wallet = searchParams.get("wallet");
+        const authUid = searchParams.get("auth_uid");
 
-        if (!wallet) {
-            return errorResponse("ERR_INVALID_REQUEST", "Wallet is required", 400);
+        if (!wallet && !authUid) {
+            return errorResponse("ERR_INVALID_REQUEST", "Wallet or auth_uid is required", 400);
+        }
+
+        const isGoogleAuthUser = !!authUid || (wallet?.startsWith("gauth:") ?? false);
+        const effectiveWallet = authUid ? `gauth:${authUid}` : wallet!;
+
+        if (isGoogleAuthUser) {
+            const authHeader = request.headers.get("authorization");
+            if (!authHeader || !authHeader.startsWith("Bearer ")) {
+                return errorResponse("ERR_UNAUTHORIZED", "Missing authorization header", 401);
+            }
+            const token = authHeader.split(" ")[1];
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) {
+                return errorResponse("ERR_UNAUTHORIZED", "Invalid token", 401);
+            }
+            if (effectiveWallet !== `gauth:${user.id}`) {
+                 return errorResponse("ERR_FORBIDDEN", "Forbidden access", 403);
+            }
+        } else {
+            const signature = searchParams.get("signature");
+            const nonce = searchParams.get("nonce");
+            const timestamp = searchParams.get("timestamp");
+
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!signature || !nonce || !timestamp)) {
+                return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to view collections.", 401);
+            }
+
+            if (!skipVerify) {
+                const { verifySignature } = await import("@/lib/crypto");
+                const { isValid, error: sigError } = await verifySignature(
+                    effectiveWallet,
+                    "view_dashboard",
+                    nonce || "",
+                    parseInt(timestamp || "0", 10),
+                    signature || ""
+                );
+
+                if (!isValid) {
+                    return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+                }
+            }
         }
 
         const { data, error } = await supabase
             .from("hiring_collections")
             .select("*")
-            .eq("owner_wallet", wallet)
+            .eq("owner_wallet", effectiveWallet)
             .order("created_at", { ascending: false });
 
         if (error) {

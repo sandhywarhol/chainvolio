@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 
+async function verifyUser(req: NextRequest, uid: string) {
+    if (!supabaseServer) return false;
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "").trim();
+    if (!token) return false;
+    const { data: { user }, error } = await supabaseServer.auth.getUser(token);
+    if (error || !user) return false;
+    return user.id === uid;
+}
+
 // GET /api/org-accounts?auth_uid=<uid>
 // Returns the org_account row for the given Supabase Auth UID.
 export async function GET(req: NextRequest) {
@@ -8,6 +17,9 @@ export async function GET(req: NextRequest) {
 
     const authUid = req.nextUrl.searchParams.get("auth_uid");
     if (!authUid) return NextResponse.json({ error: "auth_uid required" }, { status: 400 });
+
+    const isAuthorized = await verifyUser(req, authUid);
+    if (!isAuthorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { data, error } = await supabaseServer
         .from("org_accounts")
@@ -47,6 +59,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "auth_uid and email required" }, { status: 400 });
     }
 
+    const isAuthorized = await verifyUser(req, auth_uid);
+    if (!isAuthorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const isBuilder = account_type === "builder";
     const resolvedComplete = onboarding_complete !== undefined
         ? !!onboarding_complete
@@ -83,6 +98,9 @@ export async function PATCH(req: NextRequest) {
     const { auth_uid, ...updates } = body;
 
     if (!auth_uid) return NextResponse.json({ error: "auth_uid required" }, { status: 400 });
+
+    const isAuthorized = await verifyUser(req, auth_uid);
+    if (!isAuthorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     if (updates.wallet_address) {
         // Validate wallet uniqueness before linking

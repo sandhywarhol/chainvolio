@@ -117,7 +117,10 @@ export default function OrgEditProfilePage() {
 
         const res = await fetch("/api/org-accounts", {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session.access_token}`
+            },
             body: JSON.stringify({
                 auth_uid: orgAccount.auth_uid,
                 org_name: form.org_name.trim() || null,

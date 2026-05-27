@@ -6,6 +6,9 @@ import { InterviewRequestCard } from "@/components/messaging/InterviewRequestCar
 import { ConversationThread } from "@/components/messaging/ConversationThread";
 import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import type { Session } from "@supabase/supabase-js";
+import type { OrgAccount } from "@/hooks/useGoogleAuth";
+import { signChainVolioAction } from "@/lib/wallet-utils";
 
 type CandidateConversation = {
     id: string; status: string; role_position: string; initial_message: string;
@@ -34,41 +37,134 @@ const OUTREACH_STATUS = {
     closed:   { label: "Closed",   Icon: MessageSquare, color: "text-white/30",    bg: "bg-white/5",        border: "border-white/10"      },
 } as const;
 
-export function InboxPanel() {
-    const { publicKey } = useWallet();
-    const wallet = publicKey?.toBase58();
+type Props = {
+    googleSession?: Session | null;
+    googleOrgAccount?: OrgAccount | null;
+};
+
+export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
+    const walletState = useWallet();
+    const wallet = walletState.publicKey?.toBase58();
 
     const [candidateConvs, setCandidateConvs] = useState<CandidateConversation[]>([]);
     const [recruiterConvs, setRecruiterConvs] = useState<RecruiterConversation[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<InboxTab>("requests");
     const [activeThread, setActiveThread] = useState<ActiveThread>(null);
+    const [sigData, setSigData] = useState<{ signature: string; nonce: string; timestamp: number } | null>(null);
+    const [signatureFailed, setSignatureFailed] = useState(false);
+
+    const isGoogleRecruiter = !!googleSession && googleOrgAccount?.account_type === "recruiter";
+
+    const requestSignature = useCallback(async () => {
+        setSignatureFailed(false);
+        const sig = await signChainVolioAction(walletState, "view_conversations");
+        if (sig) {
+            setSigData(sig);
+            return sig;
+        } else {
+            setSignatureFailed(true);
+            return null;
+        }
+    }, [walletState]);
+
+    useEffect(() => {
+        setSigData(null);
+        setSignatureFailed(false);
+    }, [wallet]);
+
+    useEffect(() => {
+        if (wallet && !sigData && !signatureFailed) {
+            requestSignature();
+        }
+    }, [wallet, sigData, signatureFailed, requestSignature]);
 
     const fetchAll = useCallback(async () => {
-        if (!wallet) return;
+        if (!wallet && !isGoogleRecruiter) return;
+        if (wallet && !sigData) return;
         try {
-            const [cRes, rRes] = await Promise.all([
-                fetch(`/api/messaging/conversations?role=candidate&wallet=${wallet}`),
-                fetch(`/api/messaging/conversations?role=recruiter&wallet=${wallet}`),
-            ]);
-            const [cData, rData] = await Promise.all([cRes.json(), rRes.json()]);
+            const promises: Promise<any>[] = [];
+
+            // 1. Fetch candidate conversations if wallet connected
+            if (wallet && sigData) {
+                const { signature, nonce, timestamp } = sigData;
+                promises.push(
+                    fetch(`/api/messaging/conversations?role=candidate&wallet=${wallet}&signature=${signature}&nonce=${nonce}&timestamp=${timestamp}`).then((r) => r.json())
+                );
+            } else {
+                promises.push(Promise.resolve({ ok: true, data: [] }));
+            }
+
+            // 2. Fetch recruiter conversations
+            if (isGoogleRecruiter) {
+                promises.push(
+                    fetch(`/api/messaging/conversations?role=recruiter`, {
+                        headers: { Authorization: `Bearer ${googleSession.access_token}` },
+                    }).then((r) => r.json())
+                );
+            } else if (wallet && sigData) {
+                const { signature, nonce, timestamp } = sigData;
+                promises.push(
+                    fetch(`/api/messaging/conversations?role=recruiter&wallet=${wallet}&signature=${signature}&nonce=${nonce}&timestamp=${timestamp}`).then((r) => r.json())
+                );
+            } else {
+                promises.push(Promise.resolve({ ok: true, data: [] }));
+            }
+
+            const [cData, rData] = await Promise.all(promises);
             if (cData.ok) setCandidateConvs(cData.data);
             if (rData.ok) setRecruiterConvs(rData.data);
         } catch { /* silent */ }
         finally { setLoading(false); }
-    }, [wallet]);
+    }, [wallet, isGoogleRecruiter, googleSession, sigData]);
 
-    useEffect(() => { fetchAll(); }, [fetchAll]);
     useEffect(() => {
-        const interval = setInterval(fetchAll, 15_000);
-        return () => clearInterval(interval);
-    }, [fetchAll]);
+        if (isGoogleRecruiter || sigData) {
+            fetchAll();
+        }
+    }, [fetchAll, isGoogleRecruiter, sigData]);
 
-    if (!wallet) {
+    useEffect(() => {
+        if (isGoogleRecruiter || sigData) {
+            const interval = setInterval(fetchAll, 15_000);
+            return () => clearInterval(interval);
+        }
+    }, [fetchAll, isGoogleRecruiter, sigData]);
+
+    if (!wallet && !isGoogleRecruiter) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Inbox style={{ width: 32, height: 32, color: "rgba(255,255,255,0.1)", marginBottom: 12 }} />
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>Connect your wallet to view inbox</p>
+            </div>
+        );
+    }
+
+    if (wallet && !sigData) {
+        if (signatureFailed) {
+            return (
+                <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+                    <Inbox style={{ width: 32, height: 32, color: "rgba(255,255,255,0.1)", marginBottom: 12 }} />
+                    <div>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>Signature Required</p>
+                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 4, maxWidth: 280 }}>
+                            Please sign the wallet message to securely view your inbox and messages.
+                        </p>
+                    </div>
+                    <button
+                        onClick={requestSignature}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-xs uppercase tracking-widest rounded-xl transition-colors"
+                    >
+                        Unlock Inbox
+                    </button>
+                </div>
+            );
+        }
+
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+                <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Please sign message in your wallet...</p>
             </div>
         );
     }
@@ -107,7 +203,8 @@ export function InboxPanel() {
                 </button>
                 <ConversationThread
                     conversationId={activeThread.conversationId}
-                    viewerWallet={wallet}
+                    viewerWallet={activeThread.role === "candidate" ? wallet : !googleSession ? wallet : undefined}
+                    viewerAuthToken={activeThread.role === "recruiter" && googleSession ? googleSession.access_token : undefined}
                     viewerRole={activeThread.role}
                     onBack={() => setActiveThread(null)}
                 />
@@ -177,7 +274,7 @@ export function InboxPanel() {
                             <p style={{ fontSize: 11, color: "rgba(255,255,255,0.15)", marginTop: 4, maxWidth: 260 }}>When recruiters contact you, their requests will appear here.</p>
                         </div>
                     ) : pendingRequests.map(c => (
-                        <InterviewRequestCard key={c.id} conversation={c} candidateWallet={wallet} onAccept={handleAccept} onDecline={handleDecline} />
+                        <InterviewRequestCard key={c.id} conversation={c} candidateWallet={wallet || ""} onAccept={handleAccept} onDecline={handleDecline} />
                     ))}
                 </div>
             )}
