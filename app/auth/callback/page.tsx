@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAuth } from "@/lib/supabase/auth";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function AuthCallbackPage() {
     const router = useRouter();
@@ -84,10 +85,5 @@ export default function AuthCallbackPage() {
         );
     }
 
-    return (
-        <main className="min-h-screen flex flex-col items-center justify-center gap-4 text-white bg-black">
-            <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-slate-400 text-sm">Completing sign in...</p>
-        </main>
-    );
+    return <LoadingScreen />;
 }

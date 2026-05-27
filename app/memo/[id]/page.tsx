@@ -7,6 +7,7 @@ import QRCode from "react-qr-code";
 import { format } from "date-fns";
 import { ShieldCheck, Globe, FileText, ExternalLink, Copy, Check, Share2, Printer, Award, User, Building, Loader2 } from "lucide-react";
 import { getVerificationLabel, getBadgeStyles } from "@/lib/paymentConfig";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -99,7 +100,7 @@ export default function MemoPage() {
                     </div>
                 </nav>
                 <div className="flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-white/10" />
+                    <LoadingScreen fullScreen={false} />
                 </div>
             </div>
         );

@@ -9,6 +9,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Toast } from "@/components/ui/Toast";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 const ORG_TYPES = [
     { value: "community", label: "Community / DAO", description: "Open communities, DAOs, or non-profit orgs" },
@@ -187,11 +188,7 @@ function OrgEditProfileWalletContent() {
     };
 
     if (!walletReady) {
-        return (
-            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
-                <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
-            </main>
-        );
+        return <LoadingScreen />;
     }
 
     if (!connected || !publicKey) {
@@ -423,11 +420,7 @@ function OrgEditProfileWalletContent() {
 
 export default function OrgEditProfileWalletPage() {
     return (
-        <Suspense fallback={
-            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
-                <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
-            </main>
-        }>
+        <Suspense fallback={<LoadingScreen />}>
             <OrgEditProfileWalletContent />
         </Suspense>
     );

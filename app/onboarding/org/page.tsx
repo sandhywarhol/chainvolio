@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 const ORG_TYPES = [
     { value: "community", label: "Community / DAO", description: "Open communities, DAOs, or non-profit organizations" },
@@ -66,11 +67,7 @@ function OrgOnboardingContent() {
     };
 
     if (loading) {
-        return (
-            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
-                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            </main>
-        );
+        return <LoadingScreen />;
     }
 
     return (
@@ -140,11 +137,7 @@ function OrgOnboardingContent() {
 
 export default function OrgOnboardingPage() {
     return (
-        <Suspense fallback={
-            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
-                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            </main>
-        }>
+        <Suspense fallback={<LoadingScreen />}>
             <OrgOnboardingContent />
         </Suspense>
     );

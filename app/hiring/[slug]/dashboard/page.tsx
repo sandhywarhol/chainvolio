@@ -39,6 +39,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
 import { generateHiringReport } from "@/lib/report-generator";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -874,7 +875,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         return (
             <GatingShell>
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: "rgba(99,102,241,0.35)" }} />
+                    <LoadingScreen fullScreen={false} />
                     {connecting && (
                         <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 700 }}>
                             Reconnecting wallet…

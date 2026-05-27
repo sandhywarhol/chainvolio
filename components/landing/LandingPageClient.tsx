@@ -1625,7 +1625,6 @@ export function LandingPageClient() {
                                             { icon: Activity,    label: "Attestation Usage", id: "attestation" },
                                             { icon: Briefcase,   label: "Career Timeline",   id: "timeline"    },
                                             { icon: Send,        label: "My Applications",   id: "applications"},
-                                            { icon: Inbox,       label: "Inbox",             id: "inbox"       },
                                         ] as Array<{ icon: React.ElementType; label: string; id: string }>).map(({ icon: Icon, label, id }) => {
                                             const active = heroTab === id;
                                             return (
@@ -1636,6 +1635,90 @@ export function LandingPageClient() {
                                                 </div>
                                             );
                                         })}
+                                        
+                                        {/* Floating/Wobbling Inbox Card inside sidebar */}
+                                        <div className="pt-2">
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1, 1.03, 0.98, 1.02, 1, 1],
+                                                    x: [0, -2, 2, -1.5, 1.5, 0, 0, 0],
+                                                }}
+                                                transition={{
+                                                    duration: 0.8,
+                                                    repeat: Infinity,
+                                                    repeatDelay: 4.5,
+                                                    ease: "easeInOut"
+                                                }}
+                                                whileHover={{
+                                                    scale: 1.02,
+                                                    transition: { duration: 0.3 }
+                                                }}
+                                                className="cursor-pointer w-full"
+                                            >
+                                                <div className="theme-preserve w-full rounded-xl border overflow-hidden flex flex-col font-sans relative"
+                                                    style={{
+                                                        background: "rgba(255,255,255,0.015)",
+                                                        borderColor: "rgba(255,255,255,0.06)",
+                                                        boxShadow: "none",
+                                                    }}
+                                                >
+                                                    {/* Lightning shimmer */}
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-10 rounded-xl" style={{ animationDelay: "-4s" }} />
+                                                    {/* Header */}
+                                                    <div className="px-3 py-1.5 border-b flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.01)" }}>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Inbox style={{ width: 10, height: 10, color: "rgba(255,255,255,0.35)" }} />
+                                                            <span style={{ fontSize: 8.5, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.14em" }}>Inbox</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                                            <div className="w-1 h-1 rounded-full animate-pulse" style={{ background: "rgba(255,255,255,0.4)" }} />
+                                                            <span style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>1 new</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Recruiter message */}
+                                                    <div className="px-2 pt-2 pb-1.5">
+                                                        <div style={{ padding: "5px 6px", borderRadius: 7, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                                            <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
+                                                                <div style={{ width: 15, height: 15, borderRadius: 4, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                                    <Building2 style={{ width: 8, height: 8, color: "rgba(255,255,255,0.3)" }} />
+                                                                </div>
+                                                                <p style={{ fontSize: 8.5, fontWeight: 700, color: "rgba(255,255,255,0.65)", lineHeight: 1, flex: 1 }}>Meridian Labs</p>
+                                                                <span style={{ fontSize: 6, color: "rgba(255,255,255,0.18)", fontFamily: "monospace" }}>2h</span>
+                                                            </div>
+                                                            <p style={{ fontSize: 7.5, color: "rgba(255,255,255,0.35)", lineHeight: 1.4 }}>
+                                                                Inviting you for an interview —{" "}
+                                                                <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.55)" }}>Core Rust Engineer</span>.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Reply compose */}
+                                                    <div className="px-2 pb-2">
+                                                        <div style={{ padding: "5px 6px", borderRadius: 7, background: "rgba(255,255,255,0.005)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                            <p style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 3 }}>Reply</p>
+                                                            <p style={{ fontSize: 7.5, color: "rgba(255,255,255,0.42)", lineHeight: 1.4, marginBottom: 5 }}>
+                                                                Thanks for the invite! I&apos;d be happy to schedule a call.
+                                                                <>
+                                                                    <style>{`
+                                                                        @keyframes fast-blink {
+                                                                            0%, 100% { opacity: 1; }
+                                                                            50% { opacity: 0; }
+                                                                        }
+                                                                    `}</style>
+                                                                    <span className="inline-block ml-[1px]" style={{ width: "1px", height: "8.5px", background: "rgba(255,255,255,0.75)", verticalAlign: "middle", animation: "fast-blink 0.75s infinite step-end" }} />
+                                                                </>
+                                                            </p>
+                                                            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                                                                <div style={{ padding: "2px 6px", borderRadius: 4, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", lineHeight: 1 }}>
+                                                                    <span style={{ fontSize: 6.5, fontWeight: 600, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em", lineHeight: 1, display: "block" }}>Send</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        </div>
                                     </div>
                                     {/* User at bottom */}
                                     <div className="px-3 py-3 flex items-center gap-2 hover:bg-white/[0.03] transition-colors cursor-default" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
@@ -1854,17 +1937,100 @@ export function LandingPageClient() {
 
                                 {/* ── RIGHT PANEL ── */}
                                 <div className="w-[215px] flex-shrink-0 flex flex-col" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
-                                    <div className="h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }} />
-                                    <div className="px-4 py-4 space-y-2.5 overflow-hidden flex-1">
+                                    <div className="px-4 pt-3 pb-4 space-y-2.5 overflow-hidden flex-1">
                                         {/* Share Your Profile */}
-                                        <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                                            <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 2 }}>Share Your Profile</p>
-                                            <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 7 }}>Share your profile with employers.</p>
-                                            <div className="flex items-center justify-center gap-2 py-1.5 rounded-lg hover:bg-white/[0.06] transition-colors cursor-default" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}>
-                                                <Share2 style={{ width: 10, height: 10, color: "rgba(255,255,255,0.5)" }} />
-                                                <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>Share Profile</span>
+                                        <motion.div
+                                            animate={{
+                                                scale: [1, 0.98, 1.03, 1.02, 1, 1],
+                                                x: [0, 2, -2, 1.5, -1.5, 0, 0, 0],
+                                            }}
+                                            transition={{
+                                                duration: 0.8,
+                                                repeat: Infinity,
+                                                repeatDelay: 4.5,
+                                                ease: "easeInOut",
+                                                delay: 0.4
+                                            }}
+                                            whileHover={{
+                                                scale: 1.02,
+                                                transition: { duration: 0.3 }
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="rounded-xl p-3 hover:bg-white/[0.03] transition-colors relative overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                {/* Lightning shimmer */}
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-lightning-shine pointer-events-none z-10 rounded-xl" style={{ animationDelay: "-2s" }} />
+                                                
+                                                <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 2 }}>Share Your Profile</p>
+                                                <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 7 }}>Share your profile with employers.</p>
+                                                <div className="flex items-center justify-center gap-2 py-1.5 rounded-lg hover:bg-white/[0.06] transition-colors cursor-default" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", marginBottom: 8 }}>
+                                                    <Share2 style={{ width: 10, height: 10, color: "rgba(255,255,255,0.5)" }} />
+                                                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>Share Profile</span>
+                                                </div>
+                                                {/* Social icons row */}
+                                                <div className="flex items-center justify-between px-0.5 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                                                    {[
+                                                        {
+                                                            name: "LinkedIn",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                                                                    <rect x="2" y="9" width="4" height="12" />
+                                                                    <circle cx="4" cy="4" r="2" />
+                                                                </svg>
+                                                            )
+                                                        },
+                                                        {
+                                                            name: "Telegram",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <path d="m22 2-7 20-4-9-9-4Z" />
+                                                                    <path d="M22 2 11 13" />
+                                                                </svg>
+                                                            )
+                                                        },
+                                                        {
+                                                            name: "X",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+                                                                    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+                                                                </svg>
+                                                            )
+                                                        },
+                                                        {
+                                                            name: "Discord",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.197.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z" />
+                                                                </svg>
+                                                            )
+                                                        },
+                                                        {
+                                                            name: "WhatsApp",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                                    <path d="M19.005 3.125A11.206 11.206 0 0 0 11.002 0c-6.19 0-11.22 5.03-11.22 11.22 0 1.98.518 3.91 1.502 5.625L0 24l7.33-1.923a11.164 11.164 0 0 0 5.666 1.52h.005c6.19 0 11.223-5.03 11.223-11.22a11.2 11.2 0 0 0-3.22-7.925zM12.002 20.528h-.005a9.29 9.29 0 0 1-4.743-1.3l-.34-.2-.2-.12-4.4 1.156 1.176-4.293-.22-.35a9.28 9.28 0 0 1-1.423-4.992c0-5.114 4.16-9.274 9.278-9.274a9.208 9.208 0 0 1 6.56 2.717 9.208 9.208 0 0 1 2.712 6.565c-.003 5.117-4.168 9.28-9.278 9.28zm5.088-6.945c-.279-.14-1.648-.813-1.902-.906-.255-.093-.44-.14-.627.14-.186.279-.72.906-.883 1.093-.163.186-.326.21-.605.07a8.55 8.55 0 0 1-2.247-1.385 9.43 9.43 0 0 1-1.554-1.936c-.163-.28-.017-.43.122-.57.126-.124.279-.325.419-.487.14-.162.186-.279.28-.464.093-.186.046-.35-.023-.49-.07-.14-.627-1.512-.86-2.07-.226-.547-.453-.473-.627-.482-.162-.008-.348-.01-.533-.01-.186 0-.488.07-.743.348-.256.279-.977.954-.977 2.327 0 1.373 1.002 2.7 1.14 2.885.138.186 1.97 3.01 4.774 4.22.666.288 1.187.46 1.593.59.67.213 1.28.183 1.761.11.536-.08 1.648-.673 1.88-1.323.232-.65.232-1.207.162-1.323-.07-.116-.255-.186-.533-.326z" />
+                                                                </svg>
+                                                            )
+                                                        },
+                                                        {
+                                                            name: "Gmail",
+                                                            svg: (
+                                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <rect width="20" height="16" x="2" y="4" rx="2" />
+                                                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                                                </svg>
+                                                            )
+                                                        }
+                                                    ].map(social => (
+                                                        <div key={social.name} className="p-1 rounded text-white/30 hover:text-white/60 hover:bg-white/5 transition-all cursor-default" title={social.name}>
+                                                            {social.svg}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                         {/* View Your CV */}
                                         <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
                                             <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 2 }}>View Your CV</p>
@@ -1919,30 +2085,6 @@ export function LandingPageClient() {
                                 {/* Shiny sweep overlay on top of all panels */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.12] to-transparent animate-lightning-shine pointer-events-none z-[50] opacity-80 rounded-2xl" />
                             </div>{/* end 3-panel absolute inset flex */}
-
-                            {/* Floating Inbox Card — bottom-right of hero */}
-                            <motion.div 
-                                className="absolute bottom-0 left-[-14px] z-20 cursor-pointer w-[220px]" 
-                                style={{ filter: "drop-shadow(1px 2px 3px rgba(0,0,0,0.12)) drop-shadow(2px 8px 10px rgba(0,0,0,0.25))" }}
-                                animate={{
-                                    scale: [1, 1.03, 0.98, 1.02, 1, 1],
-                                    x: [0, -3, 3, -2, 2, 0, 0, 0],
-                                }}
-                                transition={{
-                                    duration: 0.8,
-                                    repeat: Infinity,
-                                    repeatDelay: 4.5,
-                                    ease: "easeInOut"
-                                }}
-                                whileHover={{
-                                    x: -8,
-                                    y: -8,
-                                    scale: 1.02,
-                                    transition: { duration: 0.3 }
-                                }}
-                            >
-                                <FloatingInboxCard />
-                            </motion.div>
 
                         </div>{/* end scaled 960x540 container */}
                     </div>{/* end hero outer relative */}

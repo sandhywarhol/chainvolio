@@ -8,6 +8,7 @@ import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { Toast } from "@/components/ui/Toast";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 const ORG_TYPES = [
     { value: "community", label: "Community / DAO", description: "Open communities, DAOs, or non-profit orgs" },
@@ -151,11 +152,7 @@ export default function OrgEditProfilePage() {
     };
 
     if (loading) {
-        return (
-            <main className="min-h-screen flex items-center justify-center bg-black theme-bg-page theme-aware">
-                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            </main>
-        );
+        return <LoadingScreen />;
     }
 
     return (

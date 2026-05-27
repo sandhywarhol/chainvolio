@@ -9,9 +9,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
-import { Instagram, Github, Globe, Send, Phone, Mail, Loader2 } from "lucide-react";
+import { Instagram, Github, Globe, Send, Phone, Mail } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateProfilePage() {
   const router = useRouter();
@@ -201,7 +202,7 @@ export default function CreateProfilePage() {
       <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+          <LoadingScreen fullScreen={false} />
         </div>
       </div>
     );

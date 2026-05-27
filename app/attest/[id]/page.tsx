@@ -11,6 +11,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import Link from "next/link";
 import { Loader2, ShieldCheck, Building2, Wallet } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
@@ -352,7 +353,7 @@ export default function AttestPage() {
                     </Link>
                 </nav>
                 <div className="flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <LoadingScreen fullScreen={false} />
                 </div>
             </div>
         );

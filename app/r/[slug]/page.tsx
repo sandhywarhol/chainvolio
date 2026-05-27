@@ -6,6 +6,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import Link from "next/link";
 import { Loader2, Send, CheckCircle, ExternalLink, AlertCircle, ShieldCheck, CalendarDays, Github, Building2, User, BadgeCheck, Clock, DollarSign, Briefcase, Globe, Eye, Filter, Mail } from "lucide-react";
 import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { getVerificationLabel } from "@/lib/paymentConfig";
 
 
@@ -134,7 +135,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                     </Link>
                 </nav>
                 <div className="flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+                    <LoadingScreen fullScreen={false} />
                 </div>
             </div>
         );
@@ -178,7 +179,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             <section className="max-w-3xl mx-auto px-6 py-12 relative z-10">
                 {checkingExisting ? (
                     <div className="flex items-center justify-center min-h-[40vh]">
-                        <div className="w-6 h-6 border-2 border-emerald-500/40 border-t-emerald-500 rounded-full animate-spin" />
+                        <LoadingScreen fullScreen={false} />
                     </div>
                 ) : !submitted ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
