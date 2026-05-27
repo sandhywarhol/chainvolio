@@ -2,19 +2,21 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 // ── Palette ────────────────────────────────────────────────────────────────────
+// Base: black / charcoal / dark grey / grey — monochromatic structural colors
+// Accents: green (verified / high score) | amber (medium) | purple (low / monitor)
 const C = {
-    indigo:   [79,  70,  229] as [number,number,number],
-    emerald:  [16,  185, 129] as [number,number,number],
-    amber:    [217, 119, 6]   as [number,number,number],
-    red:      [220, 38,  38]  as [number,number,number],
-    slate:    [51,  65,  85]  as [number,number,number],
-    dark:     [15,  23,  42]  as [number,number,number],
-    muted:    [71,  85,  105] as [number,number,number],
-    light:    [226, 232, 240] as [number,number,number],
-    white:    [255, 255, 255] as [number,number,number],
-    black:    [8,   8,   12]  as [number,number,number],
-    surface:  [245, 247, 250] as [number,number,number],
-    coverBg:  [10,  10,  16]  as [number,number,number],
+    green:     [34,  197, 94]  as [number,number,number],
+    purple:    [124, 58,  237] as [number,number,number],
+    amber:     [245, 158, 11]  as [number,number,number],
+    white:     [255, 255, 255] as [number,number,number],
+    black:     [8,   8,   10]  as [number,number,number],
+    charcoal:  [32,  32,  38]  as [number,number,number],
+    darkGrey:  [58,  58,  65]  as [number,number,number],
+    grey:      [108, 108, 118] as [number,number,number],
+    lightGrey: [172, 172, 182] as [number,number,number],
+    rule:      [214, 215, 219] as [number,number,number],
+    surface:   [244, 244, 247] as [number,number,number],
+    coverBg:   [10,  10,  14]  as [number,number,number],
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -30,25 +32,25 @@ function needsPage(doc: jsPDF, y: number, needed = 50): number {
 }
 
 function sectionHeader(doc: jsPDF, title: string, y: number): number {
-    // Left accent bar
-    rgb(doc, C.indigo, "fill");
+    // Left accent bar — charcoal on white page
+    rgb(doc, C.charcoal, "fill");
     doc.rect(15, y - 3.5, 3, 10, "F");
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    rgb(doc, C.dark, "text");
+    rgb(doc, C.charcoal, "text");
     doc.text(title, 21, y + 3.5);
 
-    rgb(doc, C.light, "draw");
+    rgb(doc, C.rule, "draw");
     doc.setLineWidth(0.3);
     doc.line(15, y + 8, 195, y + 8);
     return y + 16;
 }
 
 function scoreColor(score: number): [number,number,number] {
-    if (score >= 70) return C.emerald;
+    if (score >= 70) return C.green;
     if (score >= 30) return C.amber;
-    return C.red;
+    return C.purple;
 }
 
 // ── Logo loader ────────────────────────────────────────────────────────────────
@@ -84,8 +86,8 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     rgb(doc, C.coverBg, "fill");
     doc.rect(0, 0, 210, COVER_H, "F");
 
-    // Top rule: thin indigo stripe
-    rgb(doc, C.indigo, "fill");
+    // Top rule: thin charcoal stripe
+    rgb(doc, C.charcoal, "fill");
     doc.rect(0, 0, 210, 1.5, "F");
 
     // Logo + brand (top-left)
@@ -100,7 +102,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     doc.text("CHAINVOLIO", brandX, 18.5);
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "normal");
-    rgb(doc, C.indigo, "text");
+    rgb(doc, C.green, "text");
     doc.text("SECURE", brandX + 37, 18.5);
 
     // Main title
@@ -114,7 +116,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     doc.text("REPORT", 105, 49, { align: "center" });
 
     // Thin divider
-    rgb(doc, C.indigo, "draw");
+    rgb(doc, C.grey, "draw");
     doc.setLineWidth(0.8);
     doc.line(82, 54, 128, 54);
 
@@ -139,40 +141,38 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     let y = COVER_H + 14;
     y = sectionHeader(doc, "1. EXECUTIVE SUMMARY", y);
 
-    // Stats
-    const verifiedCount   = candidates.filter(c => c.isVerified).length;
-    const avgScoreValue   = candidates.reduce((a,c) => a + (c.signalScore||0), 0) / (candidates.length||1);
-    const avgYoe          = (candidates.reduce((a,c) => a + (c.yearsOfExperience||0), 0) / (candidates.length||1)).toFixed(1);
-    const signalDensity   = (candidates.reduce((a,c) => a + (c.powCount||0), 0) / (candidates.length||1)).toFixed(1);
-    const networkBreadth  = new Set(candidates.flatMap(c => c.attestedOrgs)).size;
+    const verifiedCount    = candidates.filter(c => c.isVerified).length;
+    const avgScoreValue    = candidates.reduce((a,c) => a + (c.signalScore||0), 0) / (candidates.length||1);
+    const avgYoe           = (candidates.reduce((a,c) => a + (c.yearsOfExperience||0), 0) / (candidates.length||1)).toFixed(1);
+    const signalDensity    = (candidates.reduce((a,c) => a + (c.powCount||0), 0) / (candidates.length||1)).toFixed(1);
+    const networkBreadth   = new Set(candidates.flatMap(c => c.attestedOrgs)).size;
     const authorityRatePct = candidates.length ? ((candidates.filter(c => c.attestedCount > 0).length / candidates.length) * 100) : 0;
-    const totalAttested   = candidates.reduce((a,c) => a + (c.attestedCount||0), 0);
-    const totalProofs     = candidates.reduce((a,c) => a + (c.powCount||0), 0);
-    const shortlistReady  = candidates.filter(c => (c.signalScore||0) >= 70 && c.isVerified).length;
+    const totalAttested    = candidates.reduce((a,c) => a + (c.attestedCount||0), 0);
+    const totalProofs      = candidates.reduce((a,c) => a + (c.powCount||0), 0);
+    const shortlistReady   = candidates.filter(c => (c.signalScore||0) >= 70 && c.isVerified).length;
 
     autoTable(doc, {
         startY: y,
         body: [
-            ["Total Applicants",   String(candidates.length),      "Avg. Signal Score",    `${avgScoreValue.toFixed(1)} / 100`],
-            ["Verified Candidates",`${verifiedCount}`,             "Avg. Years Experience",`${avgYoe} yrs`],
-            ["Authority Rate",     `${authorityRatePct.toFixed(0)}%`, "Total Proof Records",`${totalProofs}`],
-            ["Total Attestations", String(totalAttested),          "Network Breadth",      `${networkBreadth} partner orgs`],
-            ["Signal Density",     `${signalDensity} avg. proofs`, "Shortlist Ready",      `${shortlistReady} candidates`],
+            ["Total Applicants",    String(candidates.length),         "Avg. Signal Score",     `${avgScoreValue.toFixed(1)} / 100`],
+            ["Verified Candidates", `${verifiedCount}`,                "Avg. Years Experience", `${avgYoe} yrs`],
+            ["Authority Rate",      `${authorityRatePct.toFixed(0)}%`, "Total Proof Records",   `${totalProofs}`],
+            ["Total Attestations",  String(totalAttested),             "Network Breadth",       `${networkBreadth} partner orgs`],
+            ["Signal Density",      `${signalDensity} avg. proofs`,    "Shortlist Ready",       `${shortlistReady} candidates`],
         ],
         theme: "grid",
         styles: { fontSize: 8.5, cellPadding: 3 },
         columnStyles: {
-            0: { fontStyle: "bold", cellWidth: 52, fillColor: C.surface, textColor: C.slate },
-            1: { cellWidth: 32, textColor: C.dark },
-            2: { fontStyle: "bold", cellWidth: 52, fillColor: C.surface, textColor: C.slate },
-            3: { cellWidth: 32, textColor: C.dark },
+            0: { fontStyle: "bold", cellWidth: 52, fillColor: C.surface, textColor: C.darkGrey },
+            1: { cellWidth: 32, textColor: C.charcoal },
+            2: { fontStyle: "bold", cellWidth: 52, fillColor: C.surface, textColor: C.darkGrey },
+            3: { cellWidth: 32, textColor: C.charcoal },
         },
         margin: { left: 15, right: 15 },
     });
 
     y = (doc as any).lastAutoTable.finalY + 8;
 
-    // Insights
     const insights: string[] = [];
     if (verifiedCount === candidates.length && candidates.length > 0)
         insights.push("All candidates are verified — this is an exceptionally strong applicant pool.");
@@ -188,7 +188,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     if (insights.length > 0) {
         doc.setFontSize(8.5);
         doc.setFont("helvetica", "italic");
-        rgb(doc, C.muted, "text");
+        rgb(doc, C.grey, "text");
         insights.forEach(ins => {
             y = needsPage(doc, y, 8);
             doc.text(`•  ${ins}`, 18, y);
@@ -224,7 +224,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             ];
         }),
         theme: "striped",
-        headStyles: { fillColor: C.emerald, fontSize: 8, textColor: C.white, fontStyle: "bold" },
+        headStyles: { fillColor: C.charcoal, fontSize: 8, textColor: C.white, fontStyle: "bold" },
         styles: { fontSize: 8, cellPadding: 3 },
         columnStyles: {
             0: { cellWidth: 9 },
@@ -243,8 +243,8 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             if (data.section === "body" && data.column.index === 6) {
                 const v = data.cell.raw as string;
                 data.cell.styles.textColor =
-                    v === "Interview" ? C.emerald :
-                    v === "Monitor"   ? C.muted   : C.amber;
+                    v === "Interview" ? C.green :
+                    v === "Monitor"   ? C.purple : C.amber;
             }
         },
         margin: { left: 15, right: 15 },
@@ -274,7 +274,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             ];
         }),
         theme: "grid",
-        headStyles: { fillColor: C.slate, fontSize: 8, textColor: C.white },
+        headStyles: { fillColor: C.charcoal, fontSize: 8, textColor: C.white },
         styles: { fontSize: 8, cellPadding: 2.5 },
         columnStyles: {
             0: { cellWidth: 44, fontStyle: "bold" },
@@ -303,13 +303,13 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     y = needsPage(doc, y, 55);
     y = sectionHeader(doc, "4. SIGNAL ANALYSIS", y);
 
-    const highConfCount = candidates.filter(c => (c.signalScore||0) >= 70).length;
-    const avgAttRatio   = candidates.length
+    const highConfCount   = candidates.filter(c => (c.signalScore||0) >= 70).length;
+    const avgAttRatio     = candidates.length
         ? (candidates.reduce((a,c) => a + (c.powCount > 0 ? c.attestedCount/c.powCount : 0), 0) / candidates.length * 100).toFixed(1)
         : "0.0";
-    const topPerformer     = sorted[0];
-    const mostExperienced  = [...candidates].sort((a,b) => (b.yearsOfExperience||0) - (a.yearsOfExperience||0))[0];
-    const mostAttested     = [...candidates].sort((a,b) => (b.attestedCount||0) - (a.attestedCount||0))[0];
+    const topPerformer    = sorted[0];
+    const mostExperienced = [...candidates].sort((a,b) => (b.yearsOfExperience||0) - (a.yearsOfExperience||0))[0];
+    const mostAttested    = [...candidates].sort((a,b) => (b.attestedCount||0) - (a.attestedCount||0))[0];
 
     autoTable(doc, {
         startY: y,
@@ -328,8 +328,8 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
         theme: "plain",
         styles: { fontSize: 9, cellPadding: 3 },
         columnStyles: {
-            0: { fontStyle: "bold", cellWidth: 95, textColor: C.slate },
-            1: { textColor: C.dark },
+            0: { fontStyle: "bold", cellWidth: 95, textColor: C.darkGrey },
+            1: { textColor: C.charcoal },
         },
         margin: { left: 18, right: 15 },
     });
@@ -351,7 +351,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             new Date(c.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
         ]),
         theme: "striped",
-        headStyles: { fillColor: C.dark, fontSize: 8, textColor: C.white },
+        headStyles: { fillColor: C.charcoal, fontSize: 8, textColor: C.white },
         styles: { fontSize: 8, cellPadding: 2.5 },
         columnStyles: {
             0: { cellWidth: 28 },
@@ -371,12 +371,11 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
 
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "italic");
-    rgb(doc, C.muted, "text");
+    rgb(doc, C.grey, "text");
     doc.text("Proof-of-work records captured at application time, with live attestation status and years of experience.", 15, y);
     y += 12;
 
     sorted.forEach((c, idx) => {
-        // Estimate space needed for this candidate's profile
         const expList: any[] = c.workHistory || [];
         const hasBio    = !!c.snapshotBio;
         const hasSkills = !!c.snapshotSkills;
@@ -388,21 +387,20 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
         rgb(doc, C.surface, "fill");
         doc.roundedRect(15, cardTop, 180, 13, 2, 2, "F");
 
-        // Left accent bar inside card
-        rgb(doc, C.indigo, "fill");
+        // Left accent bar
+        rgb(doc, C.charcoal, "fill");
         doc.roundedRect(15, cardTop, 3, 13, 1, 1, "F");
 
-        // Candidate number + name
+        // Number + name
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
-        rgb(doc, C.dark, "text");
+        rgb(doc, C.charcoal, "text");
         const nameStr = `${idx + 1}.  ${c.displayName || c.wallet.slice(0, 14) + "..."}`;
         doc.text(nameStr, 22, cardTop + 9);
 
-        // Score badge (right side of card)
+        // Score badge
         const sc: number = c.signalScore || 0;
-        const scColor = scoreColor(sc);
-        rgb(doc, scColor, "fill");
+        rgb(doc, scoreColor(sc), "fill");
         doc.roundedRect(167, cardTop + 2, 26, 9, 2, 2, "F");
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
@@ -421,28 +419,28 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             startY: y,
             body: [[yoeStr, tierStr, verStr, prfStr]],
             theme: "plain",
-            styles: { fontSize: 8.5, cellPadding: [1, 4, 1, 0], textColor: C.muted },
+            styles: { fontSize: 8.5, cellPadding: [1, 4, 1, 0], textColor: C.grey },
             columnStyles: {
-                0: { cellWidth: 48, fontStyle: "bold", textColor: C.slate },
+                0: { cellWidth: 48, fontStyle: "bold", textColor: C.darkGrey },
                 1: { cellWidth: 46 },
-                2: { cellWidth: 36, textColor: c.isVerified ? C.emerald : C.muted, fontStyle: c.isVerified ? "bold" : "normal" },
+                2: { cellWidth: 36, textColor: c.isVerified ? C.green : C.grey, fontStyle: c.isVerified ? "bold" : "normal" },
                 3: { cellWidth: 50 },
             },
             margin: { left: 18, right: 15 },
         });
         y = (doc as any).lastAutoTable.finalY + 2;
 
-        // Wallet address (small, muted)
+        // Wallet address
         doc.setFontSize(7);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(160, 165, 180);
+        doc.setTextColor(158, 160, 170);
         doc.text(`Wallet: ${c.wallet}`, 18, y);
         y += 5;
 
         // Primary signal / role
         if (c.primarySignal || c.role) {
             doc.setFontSize(8);
-            rgb(doc, C.muted, "text");
+            rgb(doc, C.grey, "text");
             const sig = [c.role, c.primarySignal].filter(Boolean).join("  ·  ");
             doc.text(sig.length > 100 ? sig.slice(0, 97) + "..." : sig, 18, y);
             y += 5;
@@ -453,11 +451,11 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             y = needsPage(doc, y, 20);
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
-            rgb(doc, C.slate, "text");
+            rgb(doc, C.darkGrey, "text");
             doc.text("Bio", 18, y);
             y += 4;
             doc.setFont("helvetica", "normal");
-            rgb(doc, C.muted, "text");
+            rgb(doc, C.grey, "text");
             const lines = doc.splitTextToSize(c.snapshotBio, 172);
             const shown = lines.slice(0, 4);
             doc.text(shown, 18, y);
@@ -469,11 +467,11 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             y = needsPage(doc, y, 14);
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
-            rgb(doc, C.slate, "text");
+            rgb(doc, C.darkGrey, "text");
             doc.text("Skills", 18, y);
             y += 4;
             doc.setFont("helvetica", "normal");
-            rgb(doc, C.muted, "text");
+            rgb(doc, C.grey, "text");
             const sk = c.snapshotSkills.length > 190 ? c.snapshotSkills.slice(0, 187) + "..." : c.snapshotSkills;
             doc.text(doc.splitTextToSize(sk, 172).slice(0, 2), 18, y);
             y += 10;
@@ -482,7 +480,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
         // ── Work History ──
         doc.setFontSize(8.5);
         doc.setFont("helvetica", "bold");
-        rgb(doc, C.slate, "text");
+        rgb(doc, C.darkGrey, "text");
         doc.text(`Work History  (${expList.length} record${expList.length !== 1 ? "s" : ""})`, 18, y);
         y += 3;
 
@@ -495,11 +493,10 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
                 const end = e.end_date
                     ? new Date(e.end_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })
                     : "Present";
-                const durMs  = (e.end_date ? new Date(e.end_date).getTime() : Date.now())
-                             - (e.start_date ? new Date(e.start_date).getTime() : Date.now());
-                const durYr  = durMs > 0 ? `${(durMs / (1000 * 60 * 60 * 24 * 365)).toFixed(1)} yr` : "—";
-                const status = e.isAttested ? "Attested" : "Self-declared";
-                return [e.role || "—", e.org || "—", `${start} - ${end}`, durYr, status];
+                const durMs = (e.end_date ? new Date(e.end_date).getTime() : Date.now())
+                            - (e.start_date ? new Date(e.start_date).getTime() : Date.now());
+                const durYr = durMs > 0 ? `${(durMs / (1000 * 60 * 60 * 24 * 365)).toFixed(1)} yr` : "—";
+                return [e.role || "—", e.org || "—", `${start} - ${end}`, durYr, e.isAttested ? "Attested" : "Self-declared"];
             });
 
             autoTable(doc, {
@@ -507,7 +504,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
                 head: [["Role", "Organization", "Period", "Duration", "Status"]],
                 body: expRows,
                 theme: "striped",
-                headStyles: { fillColor: C.slate, fontSize: 7.5, textColor: C.white },
+                headStyles: { fillColor: C.charcoal, fontSize: 7.5, textColor: C.white },
                 styles: { fontSize: 7.5, cellPadding: 2.5 },
                 columnStyles: {
                     0: { cellWidth: 52 },
@@ -519,8 +516,8 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
                 didParseCell: (data) => {
                     if (data.section === "body" && data.column.index === 4) {
                         const v = data.cell.raw as string;
-                        data.cell.styles.textColor  = v === "Attested" ? C.emerald : C.muted;
-                        data.cell.styles.fontStyle  = v === "Attested" ? "bold" : "normal";
+                        data.cell.styles.textColor = v === "Attested" ? C.green : C.grey;
+                        data.cell.styles.fontStyle = v === "Attested" ? "bold" : "normal";
                     }
                 },
                 margin: { left: 18, right: 15 },
@@ -529,7 +526,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
         } else {
             doc.setFontSize(8);
             doc.setFont("helvetica", "italic");
-            rgb(doc, C.muted, "text");
+            rgb(doc, C.grey, "text");
             doc.text("No work history recorded at application time.", 18, y + 4);
             y += 12;
         }
@@ -539,10 +536,10 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             y = needsPage(doc, y, 12);
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
-            rgb(doc, C.slate, "text");
+            rgb(doc, C.darkGrey, "text");
             doc.text("Attested by:", 18, y);
             doc.setFont("helvetica", "normal");
-            rgb(doc, C.emerald, "text");
+            rgb(doc, C.green, "text");
             const orgStr = c.attestedOrgs.join("  ·  ");
             doc.text(orgStr.length > 165 ? orgStr.slice(0, 162) + "..." : orgStr, 18, y + 5);
             y += 13;
@@ -553,11 +550,11 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             y = needsPage(doc, y, 14);
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
-            rgb(doc, C.slate, "text");
+            rgb(doc, C.darkGrey, "text");
             doc.text("Recruiter notes:", 18, y);
             y += 4;
             doc.setFont("helvetica", "italic");
-            rgb(doc, C.muted, "text");
+            rgb(doc, C.grey, "text");
             const nl = doc.splitTextToSize(c.recruiterNotes, 172);
             doc.text(nl.slice(0, 3), 18, y);
             y += Math.min(nl.length, 3) * 4.5 + 4;
@@ -565,7 +562,7 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
 
         // Divider
         y = needsPage(doc, y, 10);
-        rgb(doc, C.light, "draw");
+        rgb(doc, C.rule, "draw");
         doc.setLineWidth(0.25);
         doc.line(15, y, 195, y);
         y += 10;
@@ -578,32 +575,28 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
 
-        // Rule
-        rgb(doc, C.light, "draw");
+        rgb(doc, C.rule, "draw");
         doc.setLineWidth(0.25);
         doc.line(15, 281, 195, 281);
 
-        // Left — logo mark + brand
         if (logo) doc.addImage(logo, "PNG", 15, 284, 5, 5);
         doc.setFontSize(7.5);
         doc.setFont("helvetica", "bold");
-        rgb(doc, C.muted, "text");
+        rgb(doc, C.grey, "text");
         doc.text("ChainVolio", logo ? 22 : 15, 288);
 
-        // Center — short disclaimer
         doc.setFontSize(6.5);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(175, 178, 190);
+        doc.setTextColor(158, 160, 170);
         doc.text(
             "Cryptographically verified on-chain data · All proof records are independently attestable",
             105, 288,
             { align: "center" }
         );
 
-        // Right — page number
         doc.setFontSize(7.5);
         doc.setFont("helvetica", "normal");
-        rgb(doc, C.muted, "text");
+        rgb(doc, C.grey, "text");
         doc.text(`${i} / ${pageCount}`, 195, 288, { align: "right" });
     }
 
