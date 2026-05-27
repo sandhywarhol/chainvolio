@@ -402,9 +402,9 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               </div>
               <Link
                 href="/hiring/create"
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors ${isAtEffectiveLimit ? "text-slate-500 cursor-not-allowed pointer-events-none" : "text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"}`}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors ${isAtEffectiveLimit ? "text-violet-400/80 hover:text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20" : "text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"}`}
               >
-                <Plus className="w-3 h-3" /> New Collection
+                <Plus className="w-3 h-3" /> {isAtEffectiveLimit ? "Pay & Post" : "New Collection"}
               </Link>
             </div>
             <div className="px-4 pb-4 pt-4">
@@ -969,11 +969,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               onClick={e => e.stopPropagation()}
               className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-colors ${
                 isAtEffectiveLimit
-                  ? "text-slate-500 cursor-not-allowed pointer-events-none"
+                  ? "text-violet-400/80 hover:text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20"
                   : "text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10"
               }`}
             >
-              <Plus className="w-3 h-3" /> New Collection
+              <Plus className="w-3 h-3" /> {isAtEffectiveLimit ? "Pay & Post" : "New Collection"}
             </Link>
             {hiringExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
           </div>

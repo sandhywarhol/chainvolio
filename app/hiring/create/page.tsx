@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import Link from "next/link";
+import { Navbar } from "@/components/layout/Navbar";
 import { getHiringLimit, RETAIL_JOB_POST_USDC_DISPLAY } from "@/lib/paymentConfig";
 import {
     Loader2,
@@ -460,13 +461,7 @@ export default function CreateCollection() {
     if (!publicKey && !session) {
         return (
             <main className="min-h-screen text-white flex flex-col bg-black">
-                <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
-                        <span className="text-xl font-bold tracking-tight">ChainVolio <span className="text-emerald-500">recruit</span></span>
-                    </Link>
-                    <WalletMultiButton />
-                </nav>
+                <Navbar />
                 <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
                     <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                         <Lock className="w-6 h-6 text-emerald-400" />
@@ -484,13 +479,8 @@ export default function CreateCollection() {
 
     return (
         <main className="min-h-screen text-white selection:bg-emerald-500/30 bg-black theme-bg-page theme-aware">
-            <nav className="flex items-center justify-between px-4 md:px-6 py-4 max-w-5xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <img src="/chainvolio%20logo.png" alt="ChainVolio Logo" className="w-8 h-8 group-hover:scale-110 transition-transform grayscale hover:grayscale-0" />
-                    <span className="text-xl font-bold tracking-tight">ChainVolio <span className="text-emerald-500">recruit</span></span>
-                </Link>
-                <WalletMultiButton />
-            </nav>
+            <Navbar />
+            <div className="h-20" />{/* spacer for sticky navbar */}
 
             <section className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
                 {!createdSlug ? (
