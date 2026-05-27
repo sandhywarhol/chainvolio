@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import Link from "next/link";
-import { getHiringLimit } from "@/lib/paymentConfig";
+import { getHiringLimit, RETAIL_JOB_POST_USDC_DISPLAY } from "@/lib/paymentConfig";
 import {
     Loader2,
     Plus,
@@ -41,7 +41,7 @@ import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateCollection() {
-    const { publicKey, signMessage } = useWallet();
+    const { publicKey, signMessage, signTransaction } = useWallet();
     const { session, orgAccount: googleOrgAccount, loading: googleLoading } = useGoogleAuth();
     const isGoogleUser = !publicKey && !!session;
     const [loading, setLoading] = useState(false);
@@ -54,6 +54,13 @@ export default function CreateCollection() {
     const [userTier, setUserTier] = useState<string>("unverified");
     const [collectionCount, setCollectionCount] = useState<number>(0);
     const [tierLoading, setTierLoading] = useState(false);
+
+    // x402 payment state — set when server returns 402 + X-PAYMENT-RESPONSE
+    const [x402Pending, setX402Pending] = useState<{
+        paymentRequired: any;       // decoded PaymentRequired from X-PAYMENT-RESPONSE header
+        requestBody: Record<string, any>; // original POST body to retry
+    } | null>(null);
+    const [x402PayLoading, setX402PayLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -267,17 +274,31 @@ export default function CreateCollection() {
                 body: JSON.stringify(requestBody),
             });
 
+            // ── Handle x402 payment required ────────────────────────────────
+            if (res.status === 402) {
+                const xPaymentResponse = res.headers.get("X-PAYMENT-RESPONSE");
+                if (xPaymentResponse && !isGoogleUser) {
+                    try {
+                        const { decodePaymentRequiredHeader } = await import("@x402/core/http");
+                        const paymentRequired = decodePaymentRequiredHeader(xPaymentResponse);
+                        setX402Pending({ paymentRequired, requestBody });
+                        setCollectionCount(hiringLimit ?? 0);
+                    } catch {
+                        setToast({ message: "Payment required but could not decode payment details.", type: "error" });
+                    }
+                } else {
+                    // Google user or no header — show upgrade prompt
+                    setToast({ message: "Free job post limit reached. Upgrade for unlimited access.", type: "warning" });
+                    setCollectionCount(hiringLimit ?? 0);
+                }
+                return;
+            }
+
             const responseData = await res.json();
 
             if (!res.ok) {
-                const errorCode = responseData?.error?.code;
                 const errorMsg = responseData?.error?.message || "An error occurred while creating the collection.";
-                if (errorCode === "ERR_HIRING_LIMIT_REACHED") {
-                    setToast({ message: "You've reached your hiring limit. Upgrade for unlimited access.", type: "error" });
-                    setCollectionCount(hiringLimit ?? 0);
-                } else {
-                    setToast({ message: errorMsg, type: "error" });
-                }
+                setToast({ message: errorMsg, type: "error" });
                 return;
             }
 
@@ -306,6 +327,101 @@ export default function CreateCollection() {
         }
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    /**
+     * x402 payment handler.
+     * Called when the user confirms the $2 USDC payment in the overlay.
+     * Builds a VersionedTransaction (USDC transfer to treasury), signs it WITHOUT
+     * submitting, encodes it as ExactSvmPayloadV1, then retries the original POST
+     * with the X-PAYMENT header so the server can verify + settle via Dexter.
+     */
+    const handleX402Pay = async () => {
+        if (!x402Pending || !publicKey || !signTransaction) return;
+        setX402PayLoading(true);
+        try {
+            const { Connection, PublicKey, TransactionMessage, VersionedTransaction } = await import("@solana/web3.js");
+            const { getAssociatedTokenAddress, createTransferCheckedInstruction } = await import("@solana/spl-token");
+            const { encodePaymentSignatureHeader } = await import("@x402/core/http");
+
+            const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+            const conn = new Connection(rpcUrl, "confirmed");
+
+            // Resolve token accounts
+            const requirements = x402Pending.paymentRequired.accepts[0];
+            const usdcMint = new PublicKey(requirements.asset);
+            const treasury = new PublicKey(requirements.payTo);
+            const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
+            const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
+
+            // USDC transfer instruction (6 decimals, 2 USDC = 2_000_000 base units)
+            const transferIx = createTransferCheckedInstruction(
+                fromATA,
+                usdcMint,
+                toATA,
+                publicKey,
+                BigInt(requirements.amount), // "2000000"
+                6 // USDC decimals
+            );
+
+            // Build versioned transaction (required by x402 SVM scheme)
+            const { blockhash } = await conn.getLatestBlockhash("confirmed");
+            const message = new TransactionMessage({
+                payerKey: publicKey,
+                recentBlockhash: blockhash,
+                instructions: [transferIx],
+            }).compileToV0Message();
+            const versionedTx = new VersionedTransaction(message);
+
+            // Sign WITHOUT submitting
+            const signedTx = await signTransaction(versionedTx as any);
+            const base64Tx = Buffer.from((signedTx as any).serialize()).toString("base64");
+
+            // Build PaymentPayload (x402 v2 format)
+            const paymentPayload = {
+                x402Version: 2,
+                resource: x402Pending.paymentRequired.resource,
+                accepted: requirements,
+                payload: { transaction: base64Tx },
+            };
+
+            // Encode as X-PAYMENT header
+            const xPaymentHeader = encodePaymentSignatureHeader(paymentPayload as any);
+
+            // Retry the original POST with X-PAYMENT header
+            const res = await fetch("/api/hiring/collections", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-PAYMENT": xPaymentHeader,
+                },
+                body: JSON.stringify(x402Pending.requestBody),
+            });
+
+            const responseData = await res.json();
+
+            if (!res.ok) {
+                const errorMsg = responseData?.error?.message || "Payment failed. Please try again.";
+                setToast({ message: errorMsg, type: "error" });
+                setX402Pending(null);
+                return;
+            }
+
+            // Success — clear payment state and show the created slug
+            setX402Pending(null);
+            const slug = responseData?.data?.slug || responseData?.slug;
+            if (slug) {
+                setCreatedSlug(slug);
+                setCollectionCount(prev => prev + 1);
+            } else {
+                setToast({ message: "Job post created but no slug returned.", type: "error" });
+            }
+        } catch (err: any) {
+            console.error("[x402pay]", err);
+            setToast({ message: err?.message || "Payment failed. Please try again.", type: "error" });
+        } finally {
+            setX402PayLoading(false);
+        }
     };
 
     // Derive hiring access state - delegates all tier logic to getHiringLimit() (single source of truth)
@@ -390,21 +506,28 @@ export default function CreateCollection() {
                                     <Lock className="w-6 h-6 text-rose-400" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-base font-bold text-white">You've reached your hiring limit.</h3>
+                                    <h3 className="text-base font-bold text-white">You've used your free job post.</h3>
                                     <p className="text-sm text-slate-400 max-w-sm mx-auto">
-                                        Upgrade for unlimited access and keep building your talent pipeline.
+                                        Fill the form and submit to pay <span className="text-violet-300 font-bold">${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC</span> per additional post, or upgrade for unlimited access.
                                     </p>
                                 </div>
                                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold">
                                     <span className="text-slate-400">Hiring Usage:</span>
                                     <span className="text-rose-400">{collectionCount} / {hiringLimit} used</span>
                                 </div>
-                                <Link
-                                    href="/dashboard"
-                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
-                                >
-                                    <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
-                                </Link>
+                                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                    {!isGoogleUser && publicKey && (
+                                        <p className="self-center text-[10px] text-violet-400 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 font-medium">
+                                            ↓ Fill form below · pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC via x402
+                                        </p>
+                                    )}
+                                    <Link
+                                        href="/dashboard"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
+                                    >
+                                        <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                                    </Link>
+                                </div>
                             </div>
                         ) : (
                             // Available: capped with slots remaining, or unlimited
@@ -927,7 +1050,7 @@ export default function CreateCollection() {
                             <div className="pt-6">
                                 <button
                                     type="submit"
-                                    disabled={loading || !formData.title || hiringAccess === "limit_reached"}
+                                    disabled={loading || !formData.title || !!x402Pending}
                                     className="w-full py-4 bg-white text-black hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl text-lg transform hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5" /> Generate Hiring Link</>}
@@ -1012,6 +1135,73 @@ export default function CreateCollection() {
                     type={toast.type}
                     onClose={() => setToast(null)}
                 />
+            )}
+
+            {/* ── x402 Payment Confirmation Modal ─────────────────────────────── */}
+            {x402Pending && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300 px-4">
+                    <div className="w-full max-w-sm bg-[#0d0d0f] border border-white/10 rounded-3xl p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-300">
+                        {/* Icon */}
+                        <div className="flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+                                <DollarSign className="w-8 h-8 text-violet-400" />
+                            </div>
+                        </div>
+
+                        {/* Title + amount */}
+                        <div className="text-center space-y-2">
+                            <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">x402 Payment</p>
+                            <h3 className="text-xl font-bold text-white">Post Additional Job</h3>
+                            <p className="text-sm text-slate-400 leading-relaxed">
+                                You&apos;ve used your 2 free job posts. Pay once to publish this additional position.
+                            </p>
+                        </div>
+
+                        {/* Price badge */}
+                        <div className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white/[0.03] border border-white/8">
+                            <span className="text-3xl font-black text-white">${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)}</span>
+                            <div className="text-left">
+                                <p className="text-xs font-bold text-slate-300">USDC</p>
+                                <p className="text-[10px] text-slate-500">one-time · Solana mainnet</p>
+                            </div>
+                        </div>
+
+                        {/* x402 badge */}
+                        <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500">
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400/60" />
+                            Processed via x402 protocol · Dexter facilitator
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={handleX402Pay}
+                                disabled={x402PayLoading}
+                                className="w-full py-3.5 bg-violet-500 hover:bg-violet-400 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-white text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/20"
+                            >
+                                {x402PayLoading
+                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing &amp; Verifying…</>
+                                    : <><DollarSign className="w-4 h-4" /> Pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} &amp; Post Job</>
+                                }
+                            </button>
+                            <button
+                                onClick={() => setX402Pending(null)}
+                                disabled={x402PayLoading}
+                                className="w-full py-3 text-slate-500 hover:text-slate-300 text-sm font-medium transition-colors disabled:opacity-40"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                        {/* Upgrade hint */}
+                        <p className="text-center text-[10px] text-slate-600">
+                            Want unlimited posts?{" "}
+                            <Link href="/dashboard" className="text-violet-400 hover:text-violet-300 underline underline-offset-2">
+                                Upgrade your plan
+                            </Link>
+                        </p>
+                    </div>
+                </div>
             )}
         </main>
     );

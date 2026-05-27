@@ -401,6 +401,7 @@ export default function DashboardPage() {
               { Icon: Activity,    label: "Attestation Usage", id: "attestation",   href: undefined },
               { Icon: Briefcase,   label: "Career Timeline",   id: "timeline",      href: undefined },
               { Icon: Send,        label: "My Applications",   id: "applications",  href: undefined },
+              { Icon: FolderOpen,  label: "Hiring Center",     id: "hiring",        href: undefined },
               { Icon: Inbox,       label: "Inbox",             id: "inbox",         href: undefined },
             ] as Array<{ Icon: React.ElementType; label: string; id: string; href?: string }>).map(({ Icon, label, id, href }) => {
               const active = activeTab === id;
@@ -489,6 +490,7 @@ export default function DashboardPage() {
               attestation: { title: "Attestation Usage", desc: "Track your monthly attestation usage." },
               timeline:    { title: "Career Timeline",   desc: "Your verified professional career timeline." },
               applications:{ title: "My Applications",   desc: "Track your job applications and opportunities." },
+              hiring:      { title: "Hiring Center",     desc: "Post job openings and find on-chain verified talent." },
               inbox:       { title: "Inbox",             desc: "Recruiter outreach & your conversations." },
             };
             const meta = tabMeta[activeTab] ?? tabMeta.profile;
@@ -1370,6 +1372,66 @@ export default function DashboardPage() {
                 </span>
               </div>
             )}
+            {/* ── HIRING CENTER tab (non-recruiter / builder) ── */}
+            {activeTab === "hiring" && (
+              <div className="space-y-4 py-2">
+                {/* Header card */}
+                <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="flex items-start gap-4">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                      <FolderOpen style={{ width: 18, height: 18, color: "#a78bfa" }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginBottom: 4 }}>Post Job Openings</p>
+                      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", lineHeight: 1.6 }}>
+                        Create a hiring collection to gather verifiable on-chain CVs from candidates.
+                        Each post generates a shareable link you can post anywhere.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Limit notice */}
+                <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                  <div className="flex-shrink-0 mt-0.5">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(139,92,246,0.2)" }}>
+                      <span style={{ fontSize: 10, fontWeight: 900, color: "#a78bfa" }}>i</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+                    Your plan includes <span style={{ color: "#a78bfa", fontWeight: 700 }}>1 free job post</span>.
+                    Additional posts cost <span style={{ color: "#a78bfa", fontWeight: 700 }}>$0.50 USDC each</span> (via x402 — no subscription needed).
+                    Upgrade to Community/DAO or Company/Org for <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>unlimited posts</span>.
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <Link
+                  href="/hiring/create"
+                  className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold transition-all"
+                  style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: 13 }}
+                >
+                  <FolderOpen style={{ width: 15, height: 15 }} />
+                  Create a Hiring Collection
+                </Link>
+
+                {/* Upgrade nudge */}
+                <div className="rounded-xl p-4 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Want unlimited job posts?</p>
+                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>Upgrade to Community/DAO or Company/Org for unlimited hiring collections and a Trusted Hiring badge.</p>
+                  </div>
+                  <button
+                    onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all"
+                    style={{ border: "1px solid rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.06)", fontSize: 10, color: "#4ade80", fontWeight: 700, whiteSpace: "nowrap" }}
+                  >
+                    <ShieldCheck style={{ width: 10, height: 10 }} /> Upgrade
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* ── INBOX tab ── */}
             {activeTab === "inbox" && <InboxPanel />}
           </>

@@ -63,6 +63,16 @@ export function getRetailAttestationLamports(): number {
     return Math.round(RETAIL_ATTESTATION_SOL * LAMPORTS_PER_SOL);
 }
 
+// ─── Retail pay-per-job-post pricing (x402 protocol) ─────────────────────────
+// Used when a non-subscribed user exceeds their 2 free job posts.
+// Payment is processed via the x402 HTTP 402 protocol using Dexter facilitator.
+
+/** USDC price for one additional job post in base units (6 decimals = 0.50 USDC) */
+export const RETAIL_JOB_POST_USDC = "500000";
+
+/** Human-readable USDC display price for the UI */
+export const RETAIL_JOB_POST_USDC_DISPLAY = 0.50;
+
 // ─── USDC prod amounts (in base units, 6 decimals) ─────────────────────────
 export const USDC_MINT_MAINNET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 export const USDC_MINT_DEVNET  = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
@@ -205,17 +215,23 @@ export function isRecruiterTier(tier?: string): boolean {
  * Returns the maximum number of hiring collections a tier can create.
  * This is the SINGLE SOURCE OF TRUTH for all hiring limit decisions.
  * Growth-mode limits:
- *   null  = unlimited (Community/DAO, Company/Org)
- *   10    = Public Figure
- *   5     = Builder
- *   2     = Unverified
+ *   null  = unlimited (Community/DAO, Company/Org — subscribed)
+ *   2     = all other tiers (builder, public figure, unverified)
+ *
+ * Non-subscribed users exceeding their free limit can pay per post
+ * via the x402 HTTP 402 payment protocol ($0.50 USDC each).
+ *
+ * Limits by tier:
+ *   null = unlimited → verified/active Company/Org or Community/DAO wallet users
+ *   2    = 2 free    → Google org-type accounts without active subscription (API-level override)
+ *   1    = 1 free    → Builder, Public Figure, Unverified
  */
 export function getHiringLimit(tier?: string): number | null {
     const t = normalizeTier(tier);
+    // Verified & active wallet subscriptions → unlimited
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return null;
     if (t.includes("community") || t.includes("dao")) return null;
-    if (t.includes("figure") || t.includes("public")) return 10;
-    if (t.includes("builder")) return 5;
-    return 2; // unverified - safest fallback
+    // Builder, Public Figure, Unverified → 1 free post
+    return 1;
 }
 
