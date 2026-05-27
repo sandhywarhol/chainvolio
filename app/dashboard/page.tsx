@@ -348,6 +348,9 @@ export default function DashboardPage() {
   }
   const walletAddress = publicKey.toBase58();
 
+  // Special flag for Admin
+  const isAdmin = publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" || profile?.cardNumber === 1;
+
   // True when the wallet holder registered as a Community/DAO or Company/Org
   const isWalletRecruiter = !!profile && (
     isRecruiterTier(profile?.verificationType) ||
@@ -376,7 +379,17 @@ export default function DashboardPage() {
           </div>
           {/* Nav */}
           <nav className="flex-1 px-2 py-3 space-y-0.5">
-            {(isWalletRecruiter ? [
+            {(isAdmin ? [
+              { Icon: User,        label: "Profile",           id: "profile",       href: undefined },
+              { Icon: ShieldCheck, label: "Credential",        id: "credential",    href: undefined },
+              { Icon: FileCheck2,  label: "Proof of Work",     id: "proof-work",    href: undefined },
+              { Icon: Activity,    label: "Attestation Usage", id: "attestation",   href: undefined },
+              { Icon: Briefcase,   label: "Career Timeline",   id: "timeline",      href: undefined },
+              { Icon: Send,        label: "My Applications",   id: "applications",  href: undefined },
+              { Icon: FolderOpen,  label: "Hiring Center",     id: "hiring",        href: undefined },
+              { Icon: LayoutDashboard, label: "Projects & Programs", id: "projects", href: undefined },
+              { Icon: Inbox,       label: "Inbox",             id: "inbox",         href: undefined },
+            ] : isWalletRecruiter ? [
               { Icon: Building2,     label: "Profile",             id: "profile",      href: undefined },
               { Icon: FolderOpen,    label: "Hiring Center",       id: "hiring",       href: undefined },
               { Icon: LayoutDashboard, label: "Projects & Programs", id: "projects",   href: undefined },
@@ -406,7 +419,7 @@ export default function DashboardPage() {
             })}
           </nav>
           {/* Hiring Overview (recruiter only) */}
-          {isWalletRecruiter && (
+          {(isWalletRecruiter || isAdmin) && (
             <div className="px-3 pb-3 space-y-1.5">
               <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 6 }}>Hiring Overview</p>
               <div className="flex items-center justify-between">
@@ -454,7 +467,17 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-y-auto min-w-0 flex flex-col" style={{ background: "#0a0b0e" }}>
           {/* Top bar */}
           {(() => {
-            const tabMeta: Record<string, { title: string; desc: string }> = isWalletRecruiter ? {
+            const tabMeta: Record<string, { title: string; desc: string }> = isAdmin ? {
+              profile:     { title: "Profile",           desc: "Manage your professional identity and information." },
+              credential:  { title: "Credential",        desc: "Your verified credentials and badges." },
+              "proof-work":{ title: "Proof of Work",     desc: "Your work history and contributions." },
+              attestation: { title: "Attestation Usage", desc: "Track your monthly attestation usage." },
+              timeline:    { title: "Career Timeline",   desc: "Your verified professional career timeline." },
+              applications:{ title: "My Applications",   desc: "Track your job applications and opportunities." },
+              hiring:      { title: "Hiring Center",     desc: "Manage your admin hiring collections." },
+              projects:    { title: "Projects & Programs", desc: "Showcase admin initiatives and programs." },
+              inbox:       { title: "Inbox",             desc: "Direct messages and candidate conversations." },
+            } : isWalletRecruiter ? {
               profile:  { title: "Profile",              desc: "Manage your organization profile and activity." },
               hiring:   { title: "Hiring Center",        desc: "Manage your hiring collections and sourcing." },
               projects: { title: "Projects & Programs",  desc: "Showcase your initiatives, hackathons, and programs." },
@@ -548,7 +571,7 @@ export default function DashboardPage() {
               Create Profile
             </Link>
           </div>
-        ) : isWalletRecruiter ? (
+        ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox"].includes(activeTab))) ? (
           // ── Org Dashboard (Community / Company wallet accounts) ───────────────
           activeTab === "inbox" ? (
             <InboxPanel />
