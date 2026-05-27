@@ -251,6 +251,91 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
         margin: { left: 15, right: 15 }
     });
 
+    // --- Section 6: Detailed Candidate Profiles ---
+    doc.addPage();
+    y = 20;
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("6. DETAILED CANDIDATE PROFILES", 15, y);
+    doc.line(15, y + 2, 195, y + 2);
+    y += 10;
+
+    sortedCandidates.forEach((c, idx) => {
+        // Add new page if we are close to the bottom
+        if (y > 220) {
+            doc.addPage();
+            y = 20;
+        }
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(`${idx + 1}. ${c.displayName || c.wallet.slice(0, 8)}`, 15, y);
+        y += 6;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text(`Wallet: ${c.wallet}`, 15, y);
+        y += 5;
+        doc.text(`Score: ${c.signalScore}/100 | Tier: ${c.verificationTier || "None"} | Verified: ${c.isVerified ? "Yes" : "No"}`, 15, y);
+        y += 5;
+
+        // Calculate YOE
+        const expList = c.snapshotData?.experience || [];
+        let yoe = "0";
+        if (expList.length > 0) {
+            const startDates = expList.map((e: any) => new Date(e.start_date).getTime()).filter((t: number) => !isNaN(t));
+            if (startDates.length > 0) {
+                const earliest = Math.min(...startDates);
+                const endDates = expList.map((e: any) => e.end_date ? new Date(e.end_date).getTime() : Date.now()).filter((t: number) => !isNaN(t));
+                const latest = Math.max(...endDates);
+                const years = (latest - earliest) / (1000 * 60 * 60 * 24 * 365);
+                yoe = years > 0 ? years.toFixed(1) : "0";
+            }
+        }
+        
+        doc.text(`Experience: ~${yoe} years across ${expList.length} roles`, 15, y);
+        y += 8;
+
+        if (expList.length > 0) {
+            const expData = expList.map((e: any) => {
+                const start = e.start_date ? new Date(e.start_date).toLocaleDateString(undefined, {month: 'short', year: 'numeric'}) : "N/A";
+                const end = e.end_date ? new Date(e.end_date).toLocaleDateString(undefined, {month: 'short', year: 'numeric'}) : "Present";
+                return [
+                    e.role || "Unknown Role",
+                    e.org || "Unknown Org",
+                    `${start} - ${end}`,
+                    e.status || "Unverified"
+                ];
+            });
+
+            autoTable(doc, {
+                startY: y,
+                head: [['Role', 'Organization', 'Duration', 'Verification Status']],
+                body: expData,
+                theme: 'striped',
+                headStyles: { fillColor: [71, 85, 105] }, // slate-600
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: 15, right: 15 }
+            });
+
+            y = (doc as any).lastAutoTable.finalY + 10;
+        } else {
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "italic");
+            doc.text("No work history provided.", 15, y);
+            y += 10;
+        }
+
+        // Draw a separator line
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(15, y, 195, y);
+        y += 10;
+    });
+
     // --- Footer ---
     const pageCount = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
