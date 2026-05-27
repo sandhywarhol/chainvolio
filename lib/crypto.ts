@@ -35,7 +35,7 @@ export async function verifySignature(
         }
 
         // 2. Prevent future-dated signatures
-        if (timestamp > now + 60000) { // 1 min buffer for clock skew
+        if (timestamp > now + 300000) { // 5 min buffer for clock skew
             return { isValid: false, error: "Invalid timestamp" };
         }
 
