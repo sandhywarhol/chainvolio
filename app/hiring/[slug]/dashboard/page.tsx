@@ -41,7 +41,7 @@ import { generateHiringReport } from "@/lib/report-generator";
 
 export default function RecruiterDashboard({ params }: { params: { slug: string } }) {
     const { slug } = params;
-    const [data, setData] = useState<{ collection: any; candidates: any[] } | null>(null);
+    const [data, setData] = useState<{ collection: any; candidates: any[]; profile?: any } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
