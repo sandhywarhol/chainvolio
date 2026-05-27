@@ -787,110 +787,160 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     };
 
-    const DashboardNav = () => (
-        <nav className="border-b border-white/5 bg-black/60 backdrop-blur-md sticky top-0 z-[100]">
-            <div className="max-w-[1600px] mx-auto px-8 h-12 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-3 group">
-                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-6 h-6 object-contain" />
-                    <span className="text-sm font-bold text-white">ChainVolio</span>
+    // Shared nav bar used on all gating screens
+    const GatingNav = () => (
+        <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(5,5,8,0.95)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 100 }}>
+            <div className="max-w-[1600px] mx-auto px-6 h-11 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2">
+                    <img src="/chainvolio%20logo.png" alt="ChainVolio" className="w-5 h-5 object-contain opacity-80" />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.75)", letterSpacing: "-0.01em" }}>chainvolio</span>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(99,102,241,0.55)", letterSpacing: "0.05em", textTransform: "uppercase", marginLeft: 2 }}>secure</span>
                 </Link>
                 <WalletMultiButton />
             </div>
         </nav>
     );
 
-    if (loading || googleLoading) {
-        return (
-            <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
-                <DashboardNav />
-                <div className="flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-indigo-500/20" />
-                </div>
+    // Shared page shell for all gating screens
+    const GatingShell = ({ children }: { children: React.ReactNode }) => (
+        <div className="min-h-screen flex flex-col text-white" style={{ background: "#050508" }}>
+            <GatingNav />
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                {children}
             </div>
+            {/* Subtle vignette */}
+            <div className="pointer-events-none fixed inset-0 z-0" style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.04) 0%, transparent 70%)" }} />
+        </div>
+    );
+
+    // Show spinner while loading OR while wallet is actively connecting (prevents
+    // flash of sign-in screen during the wallet restore sequence on refresh)
+    if (loading || googleLoading || connecting) {
+        return (
+            <GatingShell>
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: "rgba(99,102,241,0.35)" }} />
+                    {connecting && (
+                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 700 }}>
+                            Reconnecting wallet…
+                        </p>
+                    )}
+                </div>
+            </GatingShell>
         );
     }
 
     if (!connected && !publicKey && !isGoogleSignedIn) return (
-        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
-            <DashboardNav />
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
-                    <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
-                        <Users className="w-10 h-10 text-indigo-500" />
-                    </div>
-                    <div className="space-y-3">
-                        <h1 className="text-2xl font-bold">Sign In to Continue</h1>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                            Access your hiring dashboard with a wallet or Google account.
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-center gap-4">
-                        <WalletMultiButton />
-                        <p className="text-xs text-slate-600">or</p>
-                        <button
-                            onClick={() => supabaseAuth?.auth.signInWithOAuth({
-                                provider: "google",
-                                options: { redirectTo: typeof window !== "undefined" ? window.location.href : undefined }
-                            })}
-                            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-bold text-white transition-colors"
-                        >
-                            Sign in with Google
-                        </button>
-                    </div>
+        <GatingShell>
+            <div style={{ width: "100%", maxWidth: 420, background: "#0d0d10", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "40px 36px", boxShadow: "0 32px 80px rgba(0,0,0,0.6)" }}>
+                {/* Brand mark */}
+                <div className="flex items-center gap-2 mb-8">
+                    <img src="/chainvolio%20logo.png" alt="" className="w-6 h-6 object-contain opacity-60" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Recruiter Access</span>
                 </div>
+
+                <h1 style={{ fontSize: 22, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1.3, marginBottom: 10 }}>
+                    Access your<br />hiring dashboard
+                </h1>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.32)", lineHeight: 1.6, marginBottom: 32 }}>
+                    Sign in with your recruiter wallet or Google account to view candidate pipelines and intelligence reports.
+                </p>
+
+                {/* Divider */}
+                <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginBottom: 24 }} />
+
+                <div className="flex flex-col gap-3">
+                    <WalletMultiButton />
+                    <div className="flex items-center gap-3 my-1">
+                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
+                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.18)", fontWeight: 600 }}>or</span>
+                        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
+                    </div>
+                    <button
+                        onClick={() => supabaseAuth?.auth.signInWithOAuth({
+                            provider: "google",
+                            options: { redirectTo: typeof window !== "undefined" ? window.location.href : undefined }
+                        })}
+                        style={{ width: "100%", padding: "11px 20px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.75)", cursor: "pointer", transition: "all 0.15s" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}
+                    >
+                        Continue with Google
+                    </button>
+                </div>
+
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.15)", marginTop: 24, lineHeight: 1.6 }}>
+                    Only the owner of this hiring collection can access this dashboard.
+                </p>
             </div>
-        </div>
+        </GatingShell>
     );
 
     if (needsAuth) return (
-        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
-            <DashboardNav />
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="bg-[#121214] border border-white/5 rounded-2xl p-10 max-w-md w-full text-center shadow-2xl space-y-8">
-                    <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto border border-indigo-500/20">
-                        <Lock className="w-10 h-10 text-indigo-500" />
-                    </div>
-                    <div className="space-y-3">
-                        <h1 className="text-2xl font-bold">Secure Dashboard</h1>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                            To protect sensitive candidate data, please authorize restricted access with your recruiter wallet signature.
-                        </p>
-                        {error && (
-                            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold">
-                                 {error}
-                            </div>
-                        )}
-                    </div>
-                    <button
-                        onClick={handleAuthorize}
-                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
-                    >
-                        <ShieldCheck className="w-4 h-4" /> Authorize Session
-                    </button>
-                    <div className="pt-2">
-                        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Connected: {publicKey?.toBase58().slice(0,4)}...{publicKey?.toBase58().slice(-4)}</p>
-                    </div>
+        <GatingShell>
+            <div style={{ width: "100%", maxWidth: 420, background: "#0d0d10", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "40px 36px", boxShadow: "0 32px 80px rgba(0,0,0,0.6)" }}>
+                {/* Brand mark */}
+                <div className="flex items-center gap-2 mb-8">
+                    <img src="/chainvolio%20logo.png" alt="" className="w-6 h-6 object-contain opacity-60" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Secure Access</span>
                 </div>
+
+                <h1 style={{ fontSize: 22, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1.3, marginBottom: 10 }}>
+                    Authorize this<br />session
+                </h1>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.32)", lineHeight: 1.6, marginBottom: 8 }}>
+                    Candidate data is protected by wallet signature. Sign once to unlock your dashboard for this session.
+                </p>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 28, padding: "8px 12px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.12)", borderRadius: 10 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(99,102,241,0.6)", flexShrink: 0 }} />
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>
+                        {publicKey?.toBase58().slice(0, 6)}…{publicKey?.toBase58().slice(-4)}
+                    </span>
+                </div>
+
+                {error && (
+                    <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: 10, fontSize: 11, color: "rgba(239,68,68,0.9)", fontWeight: 600 }}>
+                        {error}
+                    </div>
+                )}
+
+                <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginBottom: 24 }} />
+
+                <button
+                    onClick={handleAuthorize}
+                    style={{ width: "100%", padding: "13px 20px", borderRadius: 12, background: "rgba(99,102,241,0.85)", border: "1px solid rgba(99,102,241,0.4)", fontSize: 12, fontWeight: 800, color: "#fff", cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase", transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,1)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "rgba(99,102,241,0.85)")}
+                >
+                    <ShieldCheck className="w-4 h-4" /> Authorize Session
+                </button>
+
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.15)", marginTop: 20, lineHeight: 1.6 }}>
+                    Signing does not cost SOL and is used only for identity verification.
+                </p>
             </div>
-        </div>
+        </GatingShell>
     );
 
     if (error) return (
-        <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-white">
-            <DashboardNav />
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="bg-[#121214] border border-white/5 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <XCircle className="w-8 h-8 text-red-500" />
-                    </div>
-                    <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-                    <p className="text-slate-400 mb-8">{error}</p>
-                    <Link href="/hiring/create" className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all w-full block">
-                        Back to Hiring Center
-                    </Link>
+        <GatingShell>
+            <div style={{ width: "100%", maxWidth: 420, background: "#0d0d10", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 20, padding: "40px 36px", boxShadow: "0 32px 80px rgba(0,0,0,0.6)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 28 }}>
+                    <img src="/chainvolio%20logo.png" alt="" className="w-6 h-6 object-contain opacity-60" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(239,68,68,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginLeft: 6 }}>Access Denied</span>
                 </div>
+                <h1 style={{ fontSize: 22, fontWeight: 700, color: "rgba(255,255,255,0.85)", marginBottom: 10 }}>Unable to access<br />this dashboard</h1>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", lineHeight: 1.6, marginBottom: 28 }}>{error}</p>
+                <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginBottom: 24 }} />
+                <Link
+                    href="/hiring/create"
+                    style={{ display: "block", width: "100%", padding: "12px 20px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.5)", textAlign: "center", textDecoration: "none", transition: "all 0.15s" }}
+                >
+                    ← Back to Hiring Center
+                </Link>
             </div>
-        </div>
+        </GatingShell>
     );
 
     return (
