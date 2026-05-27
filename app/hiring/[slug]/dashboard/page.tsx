@@ -1067,8 +1067,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             </div>
 
                             {/* Candidates Table */}
-                            <div className="rounded-xl overflow-hidden mb-4" style={{ background: "#000000", border: "1px solid rgba(255,255,255,0.04)" }}>
-                                <table className="w-full text-left border-separate border-spacing-0">
+                            <div className="rounded-xl overflow-x-auto mb-4 custom-scrollbar" style={{ background: "#000000", border: "1px solid rgba(255,255,255,0.04)" }}>
+                                <table className="w-full text-left border-separate border-spacing-0 min-w-[900px]">
                                     <thead>
                                         <tr className="bg-white/[0.01]">
                                             <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Candidate Intelligence</th>
@@ -1240,13 +1240,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
                                         {expandedId === candidate.id && (
                                             <tr className="bg-black/50 backdrop-blur-sm">
-                                                <td colSpan={7} className="px-12 py-12 border-l-[3px] border-indigo-500/50 relative overflow-hidden">
+                                                <td colSpan={7} className="px-6 md:px-10 py-10 border-l-[3px] border-indigo-500/50 relative overflow-hidden">
                                                     {/* Background Pattern */}
                                                     <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-20 relative z-10">
+                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 relative z-10">
                                                         {/* Separator Line with soft glow */}
-                                                        <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[1px] bg-white/[0.04] -translate-x-1/2 shadow-[0_0_15px_rgba(255,255,255,0.02)]"></div>
+                                                        <div className="hidden lg:block absolute left-1/2 top-4 bottom-4 w-[1px] bg-white/[0.04] -translate-x-1/2 shadow-[0_0_15px_rgba(255,255,255,0.02)]"></div>
 
                                                         {/* Credentials Side */}
                                                         <div>
