@@ -25,15 +25,24 @@ function MobileReturnHandler() {
 
 /**
  * On mount, checks if there is a valid saved session (cv_wallet_name + cv_session_exp).
- * If yes, triggers a two-step reconnect via select() → connect() — this silently reconnects
- * for trusted sites (returning users) and shows a popup for untrusted sites (permission revoked).
- * autoConnect={false} is intentional: calling connect() without silent:true always works for
- * both trusted and untrusted sites, unlike autoConnect which uses onlyIfTrusted and silently
- * fails for sites the wallet hasn't trusted yet (new browser / first visit).
+ * If yes, triggers a two-step reconnect via select() → connect().
+ *
+ * autoConnect={false} is intentional: connect() without onlyIfTrusted works for both
+ * trusted and untrusted sites, unlike autoConnect which silently fails when the wallet
+ * hasn't granted trust to this origin yet.
+ *
+ * connectingRef prevents double-connect when the readyState dependency causes re-runs
+ * as the Phantom extension transitions through its injection states.
+ *
+ * On connect() failure we call select(null) to clear the connecting state so the UI
+ * falls through to the sign-in screen, but we intentionally do NOT touch localStorage —
+ * a transient rejection (MV3 service worker race, wallet temporarily locked) should not
+ * permanently log the user out.
  */
 function SessionRestoreHandler() {
     const { select, connect, connected, wallet } = useWallet();
     const attemptedRef = useRef(false);
+    const connectingRef = useRef(false);
 
     // Step 1: select the saved wallet adapter
     useEffect(() => {
@@ -48,44 +57,49 @@ function SessionRestoreHandler() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Step 2: after the adapter is set, call connect()
+    // Step 2: once the adapter is selected, call connect() once.
+    // readyState is in deps so we can abort immediately if the extension isn't installed
+    // and so we re-evaluate after Phantom finishes injecting. connectingRef ensures we
+    // only ever call connect() once regardless of how many times this effect re-runs.
     useEffect(() => {
-        if (!wallet || connected || !attemptedRef.current) return;
-        
-        // Wait for the browser extension to inject before trying to connect
-        if (wallet.adapter.readyState === WalletReadyState.NotDetected) return;
+        if (!wallet || connected || !attemptedRef.current || connectingRef.current) return;
 
-        let isCancelled = false;
-        const doConnect = async () => {
-            try {
-                await Promise.race([
-                    connect(),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error("Timeout")), 15000)
-                    )
-                ]);
-            } catch (err) {
-                if (!isCancelled) {
-                    // Timeout or error (e.g., wallet locked, dropped silently)
-                    select(null as any);
-                }
-            }
-        };
+        if (wallet.adapter.readyState === WalletReadyState.NotDetected) {
+            // Extension not installed in this browser — abort, show sign-in screen
+            select(null as any);
+            return;
+        }
 
-        doConnect();
-        
-        return () => {
-            isCancelled = true;
-        };
+        connectingRef.current = true;
+
+        // 15-second safety net: if Phantom hangs (MV3 service worker never wakes),
+        // deselect the adapter so the UI falls through to the sign-in screen.
+        const timeoutId = setTimeout(() => select(null as any), 15_000);
+
+        connect()
+            .catch(() => {
+                // Failure (e.g., wallet locked, extension rejected) — clear adapter so
+                // the connecting spinner is not shown indefinitely. Do NOT clear
+                // localStorage; a transient error must not permanently log the user out.
+                select(null as any);
+            })
+            .finally(() => clearTimeout(timeoutId));
+
     }, [wallet, connected, connect, select, wallet?.adapter?.readyState]);
 
     return null;
 }
 
 /**
- * Mid-session recovery: if the wallet disconnects (e.g. Phantom MV3 service-worker drop)
- * but the localStorage session is still valid, attempt a silent reconnect once.
- * A separate ref prevents infinite retry loops.
+ * Mid-session recovery: if the wallet disconnects after having been connected
+ * (e.g. Phantom MV3 service-worker drop during an active session), attempt one
+ * silent reconnect while the localStorage session is still valid.
+ *
+ * This handler intentionally does NOT delete localStorage on failure —
+ * localStorage cleanup belongs only to the explicit logout flow or session expiry.
+ *
+ * wasConnectedRef ensures this handler is dormant during the initial page-load
+ * restore sequence (which is owned by SessionRestoreHandler).
  */
 function SessionRecoveryHandler() {
     const { connect, connected, wallet } = useWallet();
@@ -98,20 +112,17 @@ function SessionRecoveryHandler() {
             recoveryAttemptRef.current = false;
             return;
         }
-        
-        // If it was NEVER connected in this tab, this is an initial load.
-        // Let SessionRestoreHandler handle initial loads.
-        if (!wasConnectedRef.current) return;
-        
-        // If we reach here, connected became false AFTER being true.
-        // If wallet is completely deselected (null), it means a hard disconnect or rejection.
-        if (!wallet) {
-            localStorage.removeItem("cv_session_exp");
-            localStorage.removeItem("cv_wallet_name");
-            return;
-        }
 
+        // Not yet connected in this tab — let SessionRestoreHandler handle it
+        if (!wasConnectedRef.current) return;
+
+        // wallet deselected (null) after being connected — could be an explicit
+        // disconnect or a hard reset. Don't clear localStorage; just stop here.
+        if (!wallet) return;
+
+        // One recovery attempt per disconnect event
         if (recoveryAttemptRef.current) return;
+
         try {
             const exp = localStorage.getItem("cv_session_exp");
             if (!exp || Date.now() >= parseInt(exp)) return;
@@ -131,9 +142,6 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         [network]
     );
 
-    // Include adapters explicitly so select() + connect() always uses the
-    // battle-tested legacy flow — Standard Wallet auto-registration is unreliable
-    // with Phantom MV3 service workers in Chromium browsers.
     const wallets = useMemo(() => [
         new PhantomWalletAdapter(),
         new SolflareWalletAdapter(),
