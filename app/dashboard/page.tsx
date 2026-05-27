@@ -897,112 +897,106 @@ export default function DashboardPage() {
                 <form onSubmit={handleEditSubmit} className="px-4 py-4 space-y-5">
 
                   {/* ── Avatar row ── */}
-                  <div className="flex items-center gap-4 pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0" style={{ border: "2px solid rgba(255,255,255,0.12)" }}>
+                  <div className="flex items-center gap-4 pb-4 border-b border-slate-800">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-slate-700">
                       {editForm.avatarUrl
                         ? <img src={editForm.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-lg font-bold" style={{ background: "#1e1e22", color: "rgba(255,255,255,0.3)" }}>{editForm.displayName?.[0] || "?"}</div>
+                        : <div className="w-full h-full flex items-center justify-center text-lg font-bold bg-slate-800 text-slate-500">{editForm.displayName?.[0] || "?"}</div>
                       }
                     </div>
                     <div>
                       <input type="file" accept="image/*" onChange={handleEditImageUpload} disabled={editUploading}
-                        className="block text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white/5 file:text-white/50 hover:file:bg-white/10 file:transition-colors" />
+                        className="block text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-400 hover:file:bg-slate-700 file:border file:border-slate-700 file:transition-colors" />
                       {editUploading && <p className="text-[10px] text-emerald-400 mt-1">Uploading...</p>}
                     </div>
                   </div>
 
                   {/* ── Identity ── */}
                   <div className="space-y-3">
-                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Identity</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Identity</p>
 
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Display name *</label>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Display name *</label>
                       <input required value={editForm.displayName} onChange={e => setEditForm(p => ({ ...p, displayName: e.target.value }))} maxLength={60}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
-                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                         placeholder="Name or pseudonym" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Current Role</label>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Current Role</label>
                         <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
-                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                           placeholder="CEO, Developer..." />
                       </div>
                       <div>
-                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Organization</label>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Organization</label>
                         <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
-                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                           placeholder="Company / DAO" />
                       </div>
                     </div>
 
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Bio</label>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Bio</label>
                       <textarea value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} rows={3}
-                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none resize-none transition-colors focus:border-white/25"
-                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none resize-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                         placeholder="Brief intro about you" />
                     </div>
 
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Primary Skills</label>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Primary Skills</label>
                       <SkillSelector value={editForm.skills} onChange={val => setEditForm(p => ({ ...p, skills: val }))} maxSkills={8} />
                     </div>
                   </div>
 
                   {/* ── Location & Work ── */}
-                  <div className="space-y-3 pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase", paddingTop: 4 }}>Location & Work</p>
+                  <div className="space-y-3 pt-1 border-t border-slate-800">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pt-1">Location & Work</p>
 
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Country</label>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Country</label>
                       <CountrySelector value={editForm.country} onChange={val => setEditForm(p => ({ ...p, country: val }))} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Timezone</label>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Timezone</label>
                         <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
-                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}>
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60">
                           <option value="">Select</option>
                           {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
-                            <option key={tz} value={tz}>{tz}</option>
+                            <option key={tz} value={tz} className="bg-slate-900">{tz}</option>
                           ))}
                         </select>
                       </div>
                       <div>
-                        <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 4, fontWeight: 600 }}>Looking For</label>
+                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Looking For</label>
                         <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors focus:border-white/25"
-                          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)", fontSize: 13 }}
+                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                           placeholder="Open to remote roles..." />
                       </div>
                     </div>
 
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", display: "block", marginBottom: 6, fontWeight: 600 }}>Availability</label>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-2">Availability</label>
                       <div className="flex flex-wrap gap-2">
                         {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
                           <button key={type} type="button"
                             onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
-                            className="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors"
-                            style={editForm.workPreference.includes(type)
-                              ? { background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.4)", color: "#4ade80" }
-                              : { background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }
-                            }>{type}</button>
+                            className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
+                              editForm.workPreference.includes(type)
+                                ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
+                                : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600"
+                            }`}>{type}</button>
                         ))}
                       </div>
                     </div>
                   </div>
 
                   {/* ── Social Links ── */}
-                  <div className="space-y-3 pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase", paddingTop: 4 }}>Social Links</p>
+                  <div className="space-y-3 pt-1 border-t border-slate-800">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pt-1">Social Links</p>
                     <div className="grid grid-cols-2 gap-2.5">
                       {[
                         { key: "twitter", label: "Twitter / X", placeholder: "@username" },
@@ -1016,13 +1010,12 @@ export default function DashboardPage() {
                         { key: "whatsapp", label: "WhatsApp", placeholder: "+628..." },
                       ].map(({ key, label, placeholder }) => (
                         <div key={key}>
-                          <label style={{ fontSize: 10, color: "rgba(255,255,255,0.38)", display: "block", marginBottom: 3, fontWeight: 600 }}>{label}</label>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">{label}</label>
                           <input
                             type={key === "email" ? "email" : "text"}
                             value={(editForm as any)[key]}
                             onChange={e => setEditForm(p => ({ ...p, [key]: e.target.value }))}
-                            className="w-full px-3 py-1.5 rounded-lg text-white outline-none transition-colors focus:border-white/20"
-                            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.11)", fontSize: 12 }}
+                            className="w-full px-3 py-1.5 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
                             placeholder={placeholder}
                           />
                         </div>
@@ -1033,13 +1026,11 @@ export default function DashboardPage() {
                   {/* ── Submit ── */}
                   <div className="flex items-center gap-3 pt-1">
                     <button type="submit" disabled={editLoading}
-                      className="flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
-                      style={{ background: "rgba(255,255,255,0.9)", color: "#0d0e11" }}>
+                      className="flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 bg-white/90 text-[#0d0e11] hover:bg-white">
                       {editLoading ? "Saving…" : "Save Changes"}
                     </button>
                     <button type="button" onClick={() => setShowInlineEdit(false)}
-                      className="px-4 py-2.5 rounded-lg text-sm transition-all"
-                      style={{ border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }}>
+                      className="px-4 py-2.5 rounded-lg text-sm transition-all bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-300 hover:border-slate-600">
                       Cancel
                     </button>
                   </div>
