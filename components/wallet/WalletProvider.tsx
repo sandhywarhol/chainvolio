@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useRef } from "react";
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider, useWallet } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork, WalletError, WalletAdapter, WalletName } from "@solana/wallet-adapter-base";
+import { WalletAdapterNetwork, WalletError, WalletAdapter, WalletName, WalletReadyState } from "@solana/wallet-adapter-base";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { clusterApiUrl } from "@solana/web3.js";
@@ -52,13 +52,16 @@ function SessionRestoreHandler() {
     useEffect(() => {
         if (!wallet || connected || !attemptedRef.current) return;
         
+        // Wait for the browser extension to inject before trying to connect
+        if (wallet.adapter.readyState === WalletReadyState.NotDetected) return;
+
         let isCancelled = false;
         const doConnect = async () => {
             try {
                 await Promise.race([
                     connect(),
                     new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error("Timeout")), 3000)
+                        setTimeout(() => reject(new Error("Timeout")), 15000)
                     )
                 ]);
             } catch (err) {
@@ -74,7 +77,7 @@ function SessionRestoreHandler() {
         return () => {
             isCancelled = true;
         };
-    }, [wallet, connected, connect, select]);
+    }, [wallet, connected, connect, select, wallet?.adapter?.readyState]);
 
     return null;
 }
@@ -87,14 +90,20 @@ function SessionRestoreHandler() {
 function SessionRecoveryHandler() {
     const { connect, connected, wallet } = useWallet();
     const recoveryAttemptRef = useRef(false);
+    const wasConnectedRef = useRef(false);
 
     useEffect(() => {
         if (connected) {
+            wasConnectedRef.current = true;
             recoveryAttemptRef.current = false;
             return;
         }
         
-        // If we reach here, connected became false.
+        // If it was NEVER connected in this tab, this is an initial load.
+        // Let SessionRestoreHandler handle initial loads.
+        if (!wasConnectedRef.current) return;
+        
+        // If we reach here, connected became false AFTER being true.
         // If wallet is completely deselected (null), it means a hard disconnect or rejection.
         if (!wallet) {
             localStorage.removeItem("cv_session_exp");

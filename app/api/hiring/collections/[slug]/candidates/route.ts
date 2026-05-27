@@ -78,6 +78,13 @@ export async function GET(
                 return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403, headers });
             }
         }
+        // Get owner profile
+        const { data: ownerProfile } = await supabase
+            .from("profiles")
+            .select("wallet_address, display_name, avatar_url, bio, card_number")
+            .eq("wallet_address", collection.owner_wallet)
+            .maybeSingle();
+
         // ----------------------------
 
         // 2. Get submissions (Ordered in code to avoid RLS/Index issues)
@@ -243,7 +250,7 @@ export async function GET(
             };
         });
 
-        return NextResponse.json({ collection, candidates }, { headers });
+        return NextResponse.json({ collection, candidates, profile: ownerProfile }, { headers });
     } catch (err: any) {
         console.error("Dashboard API Error:", err);
         return NextResponse.json({ error: err.message }, { status: 500, headers });

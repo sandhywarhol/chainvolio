@@ -101,7 +101,7 @@ export function useGoogleAuth() {
         session,
         orgAccount,
         loading,
-        isGoogleSignedIn: !!session,
+        isGoogleSignedIn: session?.user?.app_metadata?.provider === 'google',
         signInWithGoogle,
         signOut,
         refetchOrgAccount: () => session?.user?.id ? fetchOrgAccount(session.user.id, session.access_token) : Promise.resolve(),

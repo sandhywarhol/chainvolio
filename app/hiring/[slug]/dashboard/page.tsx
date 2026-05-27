@@ -25,13 +25,16 @@ import {
     Lock,
     CalendarDays,
     Target,
-    FileText
+    FileText,
+    User
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { WalletMultiButton } from "@/components/wallet/WalletButton";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { supabaseAuth } from "@/lib/supabase/auth";
+import { Navbar } from "@/components/layout/Navbar";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { Toast } from "@/components/ui/Toast";
 import { generateHiringReport } from "@/lib/report-generator";
@@ -60,7 +63,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [focusMatchOnly, setFocusMatchOnly] = useState(false);
     const [needsAuth, setNeedsAuth] = useState(false);
 
-    const { publicKey, connected, signMessage, sendTransaction } = useWallet();
+    const { publicKey, connected, signMessage, sendTransaction, connecting } = useWallet();
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
     const { session: googleSession, loading: googleLoading, isGoogleSignedIn } = useGoogleAuth();
     const isGoogleUser = isGoogleSignedIn && !publicKey;
 
@@ -81,33 +85,62 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             return;
         }
 
-        if (!connected || !publicKey) {
-            setLoading(false);
-            setNeedsAuth(false);
-            setData(null);
-            setError(null);
-            return;
-        }
-
         async function initDashboard() {
             setLoading(true);
             try {
-                const walletStr = publicKey!.toBase58();
-                const canonicalKey = `cv_sig_view_dashboard_${walletStr}_${slug}`;
-                const cached = sessionStorage.getItem(canonicalKey);
+                let cachedWallet = publicKey?.toBase58();
+                let cached = null;
+                const prefix = "cv_sig_view_dashboard_";
+                const suffix = `_${slug}`;
 
-                if (cached) {
+                if (cachedWallet) {
+                    cached = sessionStorage.getItem(`${prefix}${cachedWallet}${suffix}`);
+                } else {
+                    // Find any existing signature for this slug
+                    for (let i = 0; i < sessionStorage.length; i++) {
+                        const key = sessionStorage.key(i);
+                        if (key?.startsWith(prefix) && key?.endsWith(suffix)) {
+                            cachedWallet = key.substring(prefix.length, key.length - suffix.length);
+                            cached = sessionStorage.getItem(key);
+                            break;
+                        }
+                    }
+                }
+
+                if (cached && cachedWallet) {
                     try {
                         const parsed = JSON.parse(cached);
                         const twoHours = 2 * 60 * 60 * 1000;
                         if (Date.now() - parsed.timestamp < twoHours - 30000) {
-                            await fetchWithSignature(parsed);
+                            await fetchWithSignature(parsed, cachedWallet);
                             return;
                         }
-                        sessionStorage.removeItem(canonicalKey);
+                        sessionStorage.removeItem(`${prefix}${cachedWallet}${suffix}`);
                     } catch {
-                        sessionStorage.removeItem(canonicalKey);
+                        sessionStorage.removeItem(`${prefix}${cachedWallet}${suffix}`);
                     }
+                }
+
+                if (connecting) {
+                    return; // Wait for auto-connect
+                }
+
+                if (!connected || !publicKey) {
+                    // Prevent showing "Sign In" prematurely if SessionRestoreHandler is about to auto-connect
+                    try {
+                        const walletName = localStorage.getItem("cv_wallet_name");
+                        const exp = localStorage.getItem("cv_session_exp");
+                        if (walletName && exp && Date.now() < parseInt(exp)) {
+                            // Wait for WalletProvider's SessionRestoreHandler to kick in
+                            return;
+                        }
+                    } catch (e) {}
+
+                    setLoading(false);
+                    setNeedsAuth(false);
+                    setData(null);
+                    setError(null);
+                    return;
                 }
 
                 setNeedsAuth(true);
@@ -142,12 +175,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         }
     };
 
-    const fetchWithSignature = async (signedAction: any) => {
-        if (!publicKey) return;
+    const fetchWithSignature = async (signedAction: any, fallbackWallet?: string) => {
+        const walletToUse = publicKey?.toBase58() || fallbackWallet;
+        if (!walletToUse) return;
         try {
             const searchParams = new URLSearchParams({
                 t: Date.now().toString(),
-                wallet: publicKey.toBase58(),
+                wallet: walletToUse,
                 signature: signedAction.signature,
                 nonce: signedAction.nonce,
                 timestamp: signedAction.timestamp.toString()
@@ -164,7 +198,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 setNeedsAuth(false);
             } else {
                 if (res.status === 401) {
-                    const canonicalKey = `cv_sig_view_dashboard_${publicKey?.toBase58()}_${slug}`;
+                    const canonicalKey = `cv_sig_view_dashboard_${walletToUse}_${slug}`;
                     sessionStorage.removeItem(canonicalKey);
                     setError(result.error || "Signature verification failed.");
                     setNeedsAuth(true);
@@ -280,6 +314,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         // On-chain "hired" action requires a wallet — Google users can't do this
         if (newStatus === 'hired' && isGoogleUser) {
             setToast({ message: "On-chain hiring proof requires a connected Solana wallet.", type: "warning" });
+            return;
+        }
+
+        if (!isGoogleUser && !connected) {
+            setIsWalletModalOpen(true);
             return;
         }
 
@@ -474,7 +513,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     };
 
     const handleSaveNote = async () => {
-        if (!expandedId || (!publicKey && !isGoogleUser)) return;
+        if (!expandedId) return;
+        if (!isGoogleUser && !connected) {
+            setIsWalletModalOpen(true);
+            return;
+        }
+        if (!isGoogleUser && !publicKey) return;
 
         const oldNote = data?.candidates.find(c => c.id === expandedId)?.recruiterNotes;
         if (oldNote === noteDraft) return;
@@ -819,7 +863,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     </div>
                     <button
                         onClick={handleAuthorize}
-                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
+                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-3"
                     >
                         <ShieldCheck className="w-4 h-4" /> Authorize Session
                     </button>
@@ -850,7 +894,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     );
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden text-white" style={{ background: "#000000" }}>
+        <div className="flex flex-col h-screen overflow-hidden text-white pt-[96px]" style={{ background: "#000000" }}>
+            <Navbar />
             {/* Noise texture */}
             <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
@@ -969,10 +1014,26 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             </nav>
                         </div>
 
-                        {/* Wallet button */}
-                        <div className="px-3 pb-4 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                            <WalletMultiButton />
-                        </div>
+                        {/* Profile Area */}
+                        {isGoogleUser ? (
+                            <div className="px-3 pb-4 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                                <WalletMultiButton />
+                            </div>
+                        ) : (
+                            <div className="px-5 pb-5 pt-4 flex items-center gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div className="w-8 h-8 rounded-full bg-indigo-500/20 overflow-hidden flex items-center justify-center border border-indigo-500/30">
+                                    {data?.profile?.avatar_url ? (
+                                        <img src={data.profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-4 h-4 text-indigo-400" />
+                                    )}
+                                </div>
+                                <div className="flex flex-col flex-1 min-w-0">
+                                    <span className="text-[11px] font-bold text-white truncate">{data?.profile?.display_name || "Recruiter"}</span>
+                                    <span className="text-[9px] text-slate-500 truncate">{data?.profile?.wallet_address ? `${data.profile.wallet_address.slice(0,6)}...${data.profile.wallet_address.slice(-4)}` : "Wallet Connected"}</span>
+                                </div>
+                            </div>
+                        )}
                     </aside>
 
                     {/* ── CENTER PANEL ── */}
@@ -985,7 +1046,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="md:hidden text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.3)" }}>{data?.collection.title}</span>
-                                <div className="md:hidden"><WalletMultiButton /></div>
+                                <div className="md:hidden">
+                                    {isGoogleUser && <WalletMultiButton />}
+                                </div>
                             </div>
                         </div>
 
@@ -1067,17 +1130,17 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             </div>
 
                             {/* Candidates Table */}
-                            <div className="rounded-xl overflow-x-auto mb-4 custom-scrollbar" style={{ background: "#000000", border: "1px solid rgba(255,255,255,0.04)" }}>
-                                <table className="w-full text-left border-separate border-spacing-0 min-w-[900px]">
+                            <div className="rounded-xl overflow-hidden mb-4" style={{ background: "#000000", border: "1px solid rgba(255,255,255,0.04)" }}>
+                                <table className="w-full text-left border-separate border-spacing-0">
                                     <thead>
                                         <tr className="bg-white/[0.01]">
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Candidate Intelligence</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Signal Confidence</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden md:table-cell border-b border-white/[0.03]">Strategic Fit</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-center border-b border-white/[0.03]">Portfolio Authority</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hidden lg:table-cell border-b border-white/[0.03]">Institutional Trust</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] border-b border-white/[0.03]">Last Activity</th>
-                                            <th className="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] text-right border-b border-white/[0.03]">Actions</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest border-b border-white/[0.03]">Candidate</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest text-center border-b border-white/[0.03]">Confidence</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest hidden md:table-cell border-b border-white/[0.03]">Strategic Fit</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest text-center border-b border-white/[0.03]">Authority</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest hidden lg:table-cell border-b border-white/[0.03]">Trust</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest border-b border-white/[0.03]">Activity</th>
+                                            <th className="px-4 py-4 text-[10px] font-black text-slate-600 uppercase tracking-widest text-right border-b border-white/[0.03]">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/[0.02]">
@@ -1104,7 +1167,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                             onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
                                             className={`group hover:bg-white/[0.01] transition-all cursor-pointer border-b border-white/[0.02] relative ${expandedId === candidate.id ? 'bg-[#121214] border-indigo-500/30' : ''} ${candidate.recruiterStatus === 'rejected' ? 'opacity-40 grayscale-[0.8]' : ''}`}
                                         >
-                                            <td className="px-8 py-6">
+                                            <td className="px-4 py-5">
                                                 <div className="flex items-center gap-4">
                                                     <div className="relative flex-shrink-0">
                                                         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm shadow-indigo-500/5 group-hover:border-indigo-500/20 transition-all duration-300">
@@ -1153,7 +1216,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-center">
+                                            <td className="px-4 py-5 text-center">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20 shadow-sm shadow-amber-400/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
                                                         {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
@@ -1165,7 +1228,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 hidden md:table-cell">
+                                            <td className="px-4 py-5 hidden md:table-cell">
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-xs font-bold text-slate-200 capitalize truncate max-w-[180px]">{candidate.role}</span>
                                                     <div className="flex items-center gap-1.5">
@@ -1176,7 +1239,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="px-4 py-5">
                                                 <div className="flex items-center justify-center gap-6">
                                                     <div className="flex flex-col items-center gap-0.5">
                                                         <span className="text-sm font-black text-white font-mono">{candidate.powCount}</span>
@@ -1189,7 +1252,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 hidden lg:table-cell">
+                                            <td className="px-4 py-5 hidden lg:table-cell">
                                                 <div className="flex flex-wrap gap-2 max-w-[280px]">
                                                     {candidate.attestedOrgs.slice(0, 2).map((org: string) => (
                                                         <div key={org} className="px-2.5 py-1 bg-white/[0.03] border border-white/[0.04] rounded-md flex items-center gap-1.5 shadow-sm">
@@ -1203,17 +1266,17 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                         </div>
                                                     )}
                                                     {candidate.attestedOrgs.length === 0 && (
-                                                        <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em] italic select-none">No Verified Anchors</span>
+                                                        <span className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic select-none">No Verified Anchors</span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="px-4 py-5">
                                                 <div className="flex items-center gap-2 text-slate-500">
                                                     <Clock className="w-3 h-3 opacity-50" />
                                                     <span className="text-[11px] font-bold font-mono tracking-tight">{new Date(candidate.lastActive).toLocaleDateString()}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-right">
+                                            <td className="px-4 py-5 text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <Link
                                                         href={`/cv/${candidate.wallet}`}
@@ -1244,7 +1307,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     {/* Background Pattern */}
                                                     <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
 
-                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 relative z-10">
+                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10">
                                                         {/* Separator Line with soft glow */}
                                                         <div className="hidden lg:block absolute left-1/2 top-4 bottom-4 w-[1px] bg-white/[0.04] -translate-x-1/2 shadow-[0_0_15px_rgba(255,255,255,0.02)]"></div>
 
@@ -1287,38 +1350,40 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                     </div>
                                                                 )}
                                                                 {candidate.attestedCount > 0 ? (
-                                                                    <div className="p-8 bg-white/[0.01] border border-white/[0.04] rounded-2xl relative group/card overflow-hidden">
-                                                                        <div className="absolute -top-6 -right-6 p-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-700 group-hover/card:scale-110">
-                                                                            <ShieldCheck className="w-32 h-32 text-indigo-500" />
+                                                                    <div className="p-5 bg-indigo-500/5 border border-indigo-500/10 rounded-xl relative overflow-hidden group/card">
+                                                                        <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-700 group-hover/card:scale-110">
+                                                                            <ShieldCheck className="w-24 h-24 text-indigo-500" />
                                                                         </div>
                                                                         <div className="relative z-10">
-                                                                            <div className="flex items-center gap-2 mb-3">
-                                                                                <div className="h-[1px] w-4 bg-indigo-500/50"></div>
-                                                                                <p className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">Protocol Verified</p>
+                                                                            <div className="flex items-center justify-between mb-2">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <div className="h-[1px] w-3 bg-indigo-500/50"></div>
+                                                                                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Protocol Verified</p>
+                                                                                </div>
+                                                                                <Link href={`/cv/${candidate.wallet}`} target="_blank" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-[8px] font-black text-indigo-400 uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all shadow-xl shadow-indigo-500/5 group/btn">
+                                                                                    Dossier <ExternalLink className="w-2 h-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                                                                </Link>
                                                                             </div>
-                                                                            <p className="text-sm font-bold text-white mb-3 pr-12 leading-snug font-serif italic opacity-90">"Consolidated professional authority anchored by immutable on-chain evidence."</p>
-                                                                            <p className="text-[12px] text-slate-500 leading-relaxed max-w-sm mb-8 font-medium">This professional has successfully correlated multiple high-authority signals, providing a verified foundation for strategic evaluation.</p>
-                                                                            <Link href={`/cv/${candidate.wallet}`} target="_blank" className="inline-flex items-center gap-3 px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-all shadow-xl shadow-indigo-500/5 group/btn">
-                                                                                Review Full Dossier <ExternalLink className="w-3 h-3 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                                                                            </Link>
+                                                                            <p className="text-[11px] font-bold text-white mb-1.5 leading-snug font-serif italic opacity-90 pr-10">"Consolidated professional authority anchored by immutable on-chain evidence."</p>
+                                                                            <p className="text-[10px] text-slate-500 leading-relaxed max-w-sm font-medium pr-10">This professional has successfully correlated multiple high-authority signals.</p>
                                                                         </div>
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="p-12 border border-dashed border-white/[0.05] rounded-3xl flex flex-col items-center text-center bg-black/10">
-                                                                        <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mb-5 text-slate-700 shadow-inner">
-                                                                            <AlertCircle className="w-6 h-6" />
+                                                                    <div className="p-6 border border-dashed border-white/[0.05] rounded-xl flex flex-col items-center text-center bg-black/10">
+                                                                        <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mb-3 text-slate-700 shadow-inner">
+                                                                            <AlertCircle className="w-4 h-4" />
                                                                         </div>
-                                                                        <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Signal Attenuation</h5>
-                                                                        <p className="text-[11px] text-slate-600 leading-relaxed max-w-[280px] font-medium italic">No verified on-chain anchors detected for this quadrant. Manual verification of external professional history is recommended.</p>
+                                                                        <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Signal Attenuation</h5>
+                                                                        <p className="text-[10px] text-slate-600 leading-relaxed max-w-[280px] font-medium italic">No verified on-chain anchors detected. Manual verification is recommended.</p>
                                                                     </div>
                                                                 )}
 
-                                                                <div className="flex items-center gap-4 px-6 py-4 bg-white/[0.01] border border-white/[0.03] rounded-xl">
-                                                                    <Users className="w-4 h-4 text-slate-700" />
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Network Consensus</span>
-                                                                        <span className="text-[11px] font-bold text-slate-400">{candidate.attestedOrgs.length > 0 ? `${candidate.attestedOrgs.length} Verified Institutional Relays` : "Organic Network Growth"}</span>
+                                                                <div className="flex items-center justify-between px-5 py-3 bg-white/[0.01] border border-white/[0.03] rounded-xl">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <Users className="w-3.5 h-3.5 text-slate-600" />
+                                                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Network Consensus</span>
                                                                     </div>
+                                                                    <span className="text-[10px] font-bold text-slate-300">{candidate.attestedOrgs.length > 0 ? `${candidate.attestedOrgs.length} Verified Relays` : "Organic Growth"}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1339,81 +1404,84 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                 </div>
                                                             </div>
 
-                                                            <div className="space-y-8 flex-1 flex flex-col">
-                                                                <div className="flex gap-4">
-                                                                    <button
-                                                                        disabled={processingId === candidate.id}
-                                                                        onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'shortlisted' ? 'pending' : 'shortlisted')}
-                                                                        className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'shortlisted'
-                                                                            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.3)]"
-                                                                            : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
-                                                                            } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
-                                                                    >
-                                                                        {processingId === candidate.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST')}
-                                                                    </button>
-                                                                    <button
-                                                                        disabled={processingId === candidate.id}
-                                                                        onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'rejected' ? 'pending' : 'rejected')}
-                                                                        className={`flex-1 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border ${candidate.recruiterStatus === 'rejected'
-                                                                            ? "bg-slate-700 text-white border-slate-600 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
-                                                                            : "bg-slate-800/5 border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10 hover:bg-white/5"
-                                                                            } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
-                                                                    >
-                                                                        {processingId === candidate.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'REJECT')}
-                                                                    </button>
-                                                                </div>
-
-                                                                <div className="relative group/hired">
-                                                                    {candidate.recruiterStatus === 'hired' && candidate.recruiterTxSignature ? (
-                                                                        <div className="flex flex-col gap-3">
-                                                                            <div className="w-full py-4 bg-indigo-600/10 border border-indigo-500/30 rounded-xl text-center">
-                                                                                <span className="text-[11px] font-black text-indigo-400 uppercase tracking-[0.25em]">HIRED ON-CHAIN</span>
-                                                                            </div>
-                                                                            <div className="flex gap-2">
-                                                                                <a
-                                                                                    href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
-                                                                                    target="_blank"
-                                                                                    rel="noopener noreferrer"
-                                                                                    className="flex-1 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-black text-slate-300 uppercase tracking-widest text-center transition-all flex items-center justify-center gap-2"
-                                                                                >
-                                                                                    <ExternalLink className="w-3 h-3 text-indigo-400" /> Solscan Proof
-                                                                                </a>
-                                                                                <button
-                                                                                    onClick={() => {
-                                                                                        setToast({ message: "Memo content anchored with SHA-256 fingerprint in the transaction instructions.", type: "warning" });
-                                                                                    }}
-                                                                                    className="flex-1 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-black text-slate-300 uppercase tracking-widest text-center transition-all"
-                                                                                >
-                                                                                    MEMO DETAILS
-                                                                                </button>
-                                                                            </div>
+                                                            <div className="space-y-4 flex-1 flex flex-col">
+                                                                {candidate.recruiterStatus === 'hired' && candidate.recruiterTxSignature ? (
+                                                                    <div className="flex flex-col gap-3">
+                                                                        <div className="flex gap-3">
+                                                                            <button
+                                                                                disabled={processingId === candidate.id}
+                                                                                onClick={() => handleUpdateStatus(candidate.id, 'pending')}
+                                                                                className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border bg-slate-800/5 border-white/5 text-slate-500 hover:text-slate-300 ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
+                                                                            >
+                                                                                {processingId === candidate.id ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : 'UNDO HIRING'}
+                                                                            </button>
                                                                         </div>
-                                                                    ) : (
+                                                                        <div className="flex gap-2">
+                                                                            <div className="w-1/3 py-2 bg-indigo-600/10 border border-indigo-500/30 rounded-lg text-center flex items-center justify-center">
+                                                                                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">HIRED ON-CHAIN</span>
+                                                                            </div>
+                                                                            <a
+                                                                                href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="flex-1 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[8px] font-black text-slate-300 uppercase tracking-widest text-center transition-all flex items-center justify-center gap-1.5"
+                                                                            >
+                                                                                <ExternalLink className="w-2.5 h-2.5 text-indigo-400" /> Solscan Proof
+                                                                            </a>
+                                                                            <button
+                                                                                onClick={() => setToast({ message: "Memo content anchored with SHA-256 fingerprint in the transaction instructions.", type: "warning" })}
+                                                                                className="flex-1 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[8px] font-black text-slate-300 uppercase tracking-widest text-center transition-all"
+                                                                            >
+                                                                                MEMO DETAILS
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="grid grid-cols-3 gap-3">
                                                                         <button
                                                                             disabled={processingId === candidate.id}
-                                                                            onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'hired' ? 'pending' : 'hired')}
-                                                                            className={`w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all border relative overflow-hidden ${candidate.recruiterStatus === 'hired'
-                                                                                ? "bg-indigo-600 text-white border-indigo-500 shadow-[0_10px_40px_rgba(79,70,229,0.4)]"
-                                                                                : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-xl shadow-indigo-500/5"
-                                                                                } ${processingId === candidate.id ? "opacity-90 pointer-events-none" : ""}`}
+                                                                            onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'shortlisted' ? 'pending' : 'shortlisted')}
+                                                                            className={`py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border ${candidate.recruiterStatus === 'shortlisted'
+                                                                                ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_5px_15px_rgba(16,185,129,0.3)]"
+                                                                                : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
+                                                                                } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
                                                                         >
-                                                                            {processingId === candidate.id ? (
-                                                                                <div className="flex items-center justify-center gap-3">
-                                                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                                                    <span>PROCESSING HIRING...</span>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <span>{candidate.recruiterStatus === 'hired' ? 'HIRED ON-CHAIN' : 'MARK AS HIRED'}</span>
-                                                                            )}
+                                                                            {processingId === candidate.id ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST')}
                                                                         </button>
-                                                                    )}
-                                                                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 px-3 py-2 bg-black border border-white/10 rounded-lg text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/hired:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-                                                                        Marking a candidate as Hired will create a verifiable on-chain recruiter proof.
+                                                                        <button
+                                                                            disabled={processingId === candidate.id}
+                                                                            onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'rejected' ? 'pending' : 'rejected')}
+                                                                            className={`py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border ${candidate.recruiterStatus === 'rejected'
+                                                                                ? "bg-slate-700 text-white border-slate-600 shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
+                                                                                : "bg-slate-800/5 border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10 hover:bg-white/5"
+                                                                                } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
+                                                                        >
+                                                                            {processingId === candidate.id ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'rejected' ? 'REJECTED' : 'REJECT')}
+                                                                        </button>
+                                                                        <div className="relative group/hired">
+                                                                            <button
+                                                                                disabled={processingId === candidate.id}
+                                                                                onClick={() => handleUpdateStatus(candidate.id, 'hired')}
+                                                                                className={`w-full py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border relative overflow-hidden bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-lg shadow-indigo-500/5 ${processingId === candidate.id ? "opacity-90 pointer-events-none" : ""}`}
+                                                                            >
+                                                                                {processingId === candidate.id ? (
+                                                                                    <div className="flex items-center justify-center gap-1.5">
+                                                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                                                        <span>PROCESSING...</span>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span>MARK AS HIRED</span>
+                                                                                )}
+                                                                            </button>
+                                                                            <div className="absolute right-0 bottom-full mb-2 px-2 py-1.5 bg-black border border-white/10 rounded-lg text-[8px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/hired:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                                                                                Creates an on-chain proof.
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
+                                                                )}
 
                                                                 <div className="relative flex-1 group/notes">
-                                                                    <div className="absolute top-4 left-5 text-[9px] font-black text-slate-700 uppercase tracking-[0.2em] pointer-events-none group-focus-within/notes:text-indigo-400/70 transition-colors flex items-center gap-2">
+                                                                    <div className="absolute top-4 left-5 text-[9px] font-black text-slate-700 uppercase tracking-widest pointer-events-none group-focus-within/notes:text-indigo-400/70 transition-colors flex items-center gap-2">
                                                                         <div className="w-2 h-[1px] bg-current opacity-30"></div>
                                                                         Evaluation Synthesis
                                                                     </div>
@@ -1422,28 +1490,20 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                         onChange={(e) => setNoteDraft(e.target.value)}
                                                                         onBlur={handleSaveNote}
                                                                         placeholder="Record strategic observations, verdict rationale, or next steps..."
-                                                                        className="w-full h-full min-h-[180px] bg-black/40 border border-white/[0.04] rounded-2xl p-6 pt-12 text-[14px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
+                                                                        className="w-full h-full min-h-[100px] bg-black/40 border border-white/[0.04] rounded-xl p-4 pt-8 pb-12 text-[12px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
                                                                     />
-                                                                    {candidate.recruiterTxSignature && (
-                                                                        <div className="absolute bottom-4 left-6 flex items-center gap-4">
-                                                                            <a
-                                                                                href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="flex items-center gap-2 text-[10px] font-black text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-[0.15em] bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/10"
-                                                                            >
-                                                                                <ShieldCheck className="w-3.5 h-3.5" />
-                                                                                Verify Recruiter Proof
-                                                                                <ExternalLink className="w-2.5 h-2.5 opacity-50" />
-                                                                            </a>
-                                                                            <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest hidden sm:inline">Proof Anchored to Solana Mainnet</span>
-                                                                        </div>
-                                                                    )}
-                                                                    {isSavingNote && (
-                                                                        <div className="absolute bottom-6 right-6 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
+                                                                    {isSavingNote ? (
+                                                                        <div className="absolute bottom-4 right-4 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
                                                                             <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />
                                                                             <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Archiving</span>
                                                                         </div>
+                                                                    ) : (
+                                                                        <button 
+                                                                            onClick={handleSaveNote} 
+                                                                            className="absolute bottom-4 right-4 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-lg text-[9px] font-black text-indigo-400 uppercase tracking-widest transition-all"
+                                                                        >
+                                                                            SAVE NOTES
+                                                                        </button>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -1474,6 +1534,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                 confirmButtonColor="red"
                 iconColor="red"
             />
+            <CustomWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
 
             <ConfirmationModal
                 isOpen={!!candidateToDelete}
@@ -1522,13 +1583,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     href={`https://solscan.io/tx/${hiringSuccess.txSignature}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
                                 >
                                     <ExternalLink className="w-4 h-4" /> View Hiring Proof
                                 </a>
                                 <button
                                     onClick={() => setHiringSuccess(null)}
-                                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-slate-400 font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all border border-white/5"
+                                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-slate-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all border border-white/5"
                                 >
                                     Close
                                 </button>
