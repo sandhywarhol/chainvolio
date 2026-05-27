@@ -184,7 +184,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 ) : !submitted ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="text-center mb-16">
-                            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight text-white">
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-emerald-300">
                                 {collection.title}
                             </h1>
                             <div className="flex flex-col items-center gap-6">
@@ -220,14 +220,14 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         <div className="space-y-6">
                             {/* Group 1: Recruiter Identity (About Recruiter) */}
                             {(collection.metadata?.recruiterName || collection.metadata?.companyName) && (
-                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden group/recruiter transition-all">
+                                <div className="rounded-3xl p-6 md:p-8 relative overflow-hidden group/recruiter transition-all" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #10b981" }}>
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-30"></div>
                                     <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
                                         <div className="w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center border border-emerald-500/20 shadow-lg overflow-hidden">
                                             {ownerProfile?.avatar_url ? (
                                                 <img src={ownerProfile.avatar_url} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <Building2 className="w-10 h-10 text-emerald-400" />
+                                                <Building2 className="w-10 h-10 text-teal-400" />
                                             )}
                                         </div>
                                         <div className="flex-1 text-center md:text-left space-y-4 w-full">
@@ -336,39 +336,39 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                             )}
 
                             {/* Group 2: Job Details (Role Overview) */}
-                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                            <div className="rounded-3xl p-8 md:p-10" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                                 <div className="space-y-10">
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                                                <Briefcase className="w-5 h-5" />
+                                            <div className="p-2 rounded-lg bg-emerald-500/10">
+                                                <Briefcase className="w-5 h-5 text-sky-400" />
                                             </div>
                                             <h2 className="text-xl font-bold">Job Details</h2>
                                         </div>
                                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Role Type</p>
-                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.roleType || "Full-time"}</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Role Type</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.roleType || "Full-time"}</p>
                                             </div>
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Work Mode</p>
-                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.workMode || "Remote"}</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Work Mode</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.workMode || "Remote"}</p>
                                             </div>
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Timezone</p>
-                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.timezone || "Any"}</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Timezone</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.timezone || "Any"}</p>
                                             </div>
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Comp. Model</p>
-                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.compensationType || "Crypto + Equity"}</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Comp. Model</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.compensationType || "Crypto + Equity"}</p>
                                             </div>
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4 border-emerald-500/10">
-                                                <p className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest mb-1">Salary</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Salary</p>
                                                 <p className="text-sm font-bold text-emerald-400">{collection.metadata?.salary || "Competitive"}</p>
                                             </div>
-                                            <div className="bg-black/20 border border-white/[0.03] rounded-2xl p-4">
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1">Experience</p>
-                                                <p className="text-sm font-bold text-slate-300">{collection.metadata?.experienceLevel || "Senior"}</p>
+                                            <div className="bg-emerald-500/[0.02] border border-emerald-500/30 rounded-2xl p-4">
+                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Experience</p>
+                                                <p className="text-sm font-bold text-emerald-400">{collection.metadata?.experienceLevel || "Senior"}</p>
                                             </div>
                                         </div>
 
@@ -389,11 +389,11 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
                             {/* Group 3: Evaluation Criteria (Focus Areas) */}
                             {collection.metadata?.focusAreas && collection.metadata.focusAreas.length > 0 && (
-                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                                <div className="rounded-3xl p-8 md:p-10" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
-                                                <Eye className="w-5 h-5" />
+                                            <div className="p-2 rounded-lg bg-blue-500/10">
+                                                <Eye className="w-5 h-5 text-violet-400" />
                                             </div>
                                             <h2 className="text-xl font-bold">Evaluation Focus</h2>
                                         </div>
@@ -420,34 +420,34 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                             )}
 
                             {/* Group 4: Requirements / Eligibility */}
-                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10">
+                            <div className="rounded-3xl p-8 md:p-10" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-                                                <Filter className="w-5 h-5" />
+                                            <div className="p-2 rounded-lg bg-indigo-500/10">
+                                                <Filter className="w-5 h-5 text-amber-400" />
                                             </div>
                                             <h2 className="text-xl font-bold">Eligibility Filters</h2>
                                         </div>
                                         <div className="space-y-3">
                                             {collection.eligibility_filters?.minReceiptsThreshold > 0 ? (
-                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
                                                     <CheckCircle className="w-4 h-4 text-indigo-400" />
-                                                    <span className="text-xs font-bold text-slate-300">Active Wallet Only</span>
+                                                    <span className="text-xs font-bold text-indigo-100">Active Wallet Only</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 opacity-50">
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.1] opacity-50">
                                                     <Globe className="w-4 h-4 text-slate-500" />
                                                     <span className="text-xs font-bold text-slate-500">Open to All Wallets</span>
                                                 </div>
                                             )}
                                             {collection.eligibility_filters?.verifiedOnly ? (
-                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
                                                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                                                    <span className="text-xs font-bold text-slate-300">Verified Profiles Only</span>
+                                                    <span className="text-xs font-bold text-emerald-100">Verified Profiles Only</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 opacity-50">
+                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.1] opacity-50">
                                                     <User className="w-4 h-4 text-slate-500" />
                                                     <span className="text-xs font-bold text-slate-500">Unverified Profiles Accepted</span>
                                                 </div>
@@ -457,12 +457,12 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-                                                <CalendarDays className="w-5 h-5" />
+                                            <div className="p-2 rounded-lg bg-amber-500/10">
+                                                <CalendarDays className="w-5 h-5 text-rose-400" />
                                             </div>
                                             <h2 className="text-xl font-bold">Submission Deadline</h2>
                                         </div>
-                                        <div className="p-5 rounded-2xl bg-black/20 border border-white/5">
+                                        <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/[0.1]">
                                             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Final Date</p>
                                             <p className="text-lg font-black text-white">
                                                 {collection.metadata?.deadline 
@@ -476,7 +476,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                             </div>
                         </div>
 
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-10 relative overflow-hidden group">
+                        <div className="rounded-3xl p-8 md:p-10 relative overflow-hidden group" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl opacity-50"></div>
 
                             {!connected ? (
@@ -503,7 +503,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                         </div>
                                     )}
 
-                                    <div className="flex items-center justify-between gap-4 p-5 bg-black/40 border border-white/5 rounded-2xl">
+                                    <div className="flex items-center justify-between gap-4 p-5 bg-white/[0.04] border border-white/[0.1] rounded-2xl">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20 overflow-hidden">
                                                 {applicantProfile?.avatarUrl ? (
@@ -551,7 +551,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                         onClick={() => setPrimarySignal(signal)}
                                                         className={`p-4 rounded-xl border text-xs font-bold transition-all ${primarySignal === signal
                                                             ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                                            : 'bg-black/40 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
+                                                            : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400 hover:text-slate-200'
                                                             }`}
                                                     >
                                                         {signal}
@@ -572,7 +572,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                         onClick={() => setRoleStrength(role)}
                                                         className={`p-4 rounded-xl border text-xs font-bold transition-all ${roleStrength === role
                                                             ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                                            : 'bg-black/40 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
+                                                            : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400 hover:text-slate-200'
                                                             }`}
                                                     >
                                                         {role}
@@ -628,7 +628,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                         {existingSubmission && (
                             <div 
                               id="application-status"
-                              className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 text-left space-y-6 max-w-lg mx-auto scroll-mt-24 transition-all duration-1000"
+                              className="rounded-3xl p-8 text-left space-y-6 max-w-lg mx-auto scroll-mt-24 transition-all duration-1000" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -647,7 +647,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-bold text-white">Application Snapshot</h3>
-                                    <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
+                                    <div className="bg-white/[0.04] rounded-2xl p-4 border border-white/[0.1] space-y-3">
                                         <div className="flex justify-between text-[11px] font-medium">
                                             <span className="text-slate-500">Signal Area</span>
                                             <span className="text-emerald-400">{existingSubmission.primary_signal || 'General'}</span>

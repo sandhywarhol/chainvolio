@@ -484,7 +484,7 @@ export default function CreateCollection() {
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <header className="mb-7">
                             <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>ChainVolio Recruit</p>
-                            <h1 className="text-xl font-bold text-white tracking-tight">Create Hiring Collection</h1>
+                            <h1 className="text-xl font-bold text-white tracking-tight">Create <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Hiring Collection</span></h1>
                             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Define criteria and collect verifiable on-chain portfolios from candidates.</p>
                         </header>
 
@@ -576,9 +576,10 @@ export default function CreateCollection() {
 
                             {/* Main Info Card */}
                             {/* ── 1. Job Overview ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                    <Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #10b981" }}>
+                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+                                    <Briefcase style={{ width: 13, height: 13, color: "#34d399" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Job Overview</span>
                                 </div>
                                 <div className="space-y-4">
@@ -590,7 +591,7 @@ export default function CreateCollection() {
                                             placeholder="e.g. Content Creator, Frontend Engineer"
                                             value={formData.title}
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                            className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.title ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                         />
                                     </div>
                                     <div>
@@ -599,16 +600,17 @@ export default function CreateCollection() {
                                             placeholder="Briefly describe the role, key responsibilities, or specific requirements..."
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed"
+                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.description ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* ── 2. Recruiter Identity ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                    <Building2 style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+                                    <Building2 style={{ width: 13, height: 13, color: "#2dd4bf" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Recruiter Identity</span>
                                     {isAutoFilled && (
                                         <span style={{ fontSize: 9, color: "rgba(52,211,153,0.7)", fontWeight: 600, marginLeft: "auto" }}>Auto-filled from profile</span>
@@ -624,9 +626,9 @@ export default function CreateCollection() {
                                                     placeholder="e.g. Satoshi (Founder)"
                                                     value={formData.recruiterName}
                                                     onChange={(e) => setFormData({ ...formData, recruiterName: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 pr-9 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                    className={`w-full rounded-lg px-3 py-2.5 pr-9 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.recruiterName ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
-                                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
                                             </div>
                                         </div>
                                         <div>
@@ -636,7 +638,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. CTO, Head of Talent"
                                                 value={formData.recruiterRole}
                                                 onChange={(e) => setFormData({ ...formData, recruiterRole: e.target.value })}
-                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.recruiterRole ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                             />
                                         </div>
                                     </div>
@@ -649,7 +651,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. ChainVolio"
                                                 value={formData.companyName}
                                                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                                className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.companyName ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                             />
                                         </div>
                                         <div>
@@ -657,12 +659,12 @@ export default function CreateCollection() {
                                             <select
                                                 value={formData.projectStage}
                                                 onChange={(e) => setFormData({ ...formData, projectStage: e.target.value })}
-                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all text-sm cursor-pointer appearance-none"
+                                                className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all text-sm cursor-pointer appearance-none ${formData.projectStage ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-emerald-400 font-bold focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                             >
-                                                <option value="Stealth">Stealth</option>
-                                                <option value="Early">Early Stage</option>
-                                                <option value="Live">Mainnet / Live</option>
-                                                <option value="Scaling">Scaling / Growth</option>
+                                                <option value="Stealth" className="bg-[#0e0f12] text-white">Stealth</option>
+                                                <option value="Early" className="bg-[#0e0f12] text-white">Early Stage</option>
+                                                <option value="Live" className="bg-[#0e0f12] text-white">Mainnet / Live</option>
+                                                <option value="Scaling" className="bg-[#0e0f12] text-white">Scaling / Growth</option>
                                             </select>
                                         </div>
                                     </div>
@@ -674,7 +676,7 @@ export default function CreateCollection() {
                                             placeholder="Subtle, high-signal recruitment infrastructure for Web3."
                                             value={formData.companyDescription}
                                             onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm font-medium focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600"
+                                            className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.companyDescription ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                         />
                                     </div>
 
@@ -687,63 +689,63 @@ export default function CreateCollection() {
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                             <div className="relative">
-                                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="text"
                                                     placeholder="Website URL"
                                                     value={formData.websiteUrl}
                                                     onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.websiteUrl ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <XIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <XIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="text"
                                                     placeholder="X / Twitter handle"
                                                     value={formData.twitterUrl}
                                                     onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.twitterUrl ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <DiscordIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <DiscordIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="text"
                                                     placeholder="Discord Link"
                                                     value={formData.discordUrl}
                                                     onChange={(e) => setFormData({ ...formData, discordUrl: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.discordUrl ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="email"
                                                     placeholder="Company Email"
                                                     value={formData.companyEmail}
                                                     onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.companyEmail ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <Send className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <Send className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="text"
                                                     placeholder="Telegram Group / Channel"
                                                     value={formData.telegramUrl}
                                                     onChange={(e) => setFormData({ ...formData, telegramUrl: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.telegramUrl ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <LinkedInIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                                                <LinkedInIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                                                 <input
                                                     type="text"
                                                     placeholder="Company LinkedIn"
                                                     value={formData.linkedinUrl}
                                                     onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
-                                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                    className={`w-full rounded-lg pl-9 pr-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.linkedinUrl ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                                 />
                                             </div>
                                         </div>
@@ -754,7 +756,7 @@ export default function CreateCollection() {
                                                 placeholder="e.g. DM on X, Discord Ticket, or Email"
                                                 value={formData.contactChannel}
                                                 onChange={(e) => setFormData({ ...formData, contactChannel: e.target.value })}
-                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 focus:border-emerald-500/60 outline-none transition-all placeholder:text-slate-600 text-xs"
+                                                className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all placeholder:text-slate-600 text-xs ${formData.contactChannel ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
                                             />
                                         </div>
                                     </div>
@@ -762,101 +764,103 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 3. Role Details ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                    <Briefcase style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+                                    <Briefcase style={{ width: 13, height: 13, color: "#60a5fa" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Role Details</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.roleType ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Role Type</label>
                                         <select
                                             value={formData.roleType}
                                             onChange={(e) => setFormData({ ...formData, roleType: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm appearance-none font-medium cursor-pointer"
+                                            className={`w-full bg-transparent border-none outline-none text-sm appearance-none cursor-pointer ${formData.roleType ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         >
-                                            <option className="bg-[#121214] text-white">Full-time</option>
-                                            <option className="bg-[#121214] text-white">Contract</option>
-                                            <option className="bg-[#121214] text-white">Freelance</option>
-                                            <option className="bg-[#121214] text-white">Part-time</option>
-                                            <option className="bg-[#121214] text-white">Internship</option>
+                                            <option className="bg-[#0e0f12] text-white">Full-time</option>
+                                            <option className="bg-[#0e0f12] text-white">Contract</option>
+                                            <option className="bg-[#0e0f12] text-white">Freelance</option>
+                                            <option className="bg-[#0e0f12] text-white">Part-time</option>
+                                            <option className="bg-[#0e0f12] text-white">Internship</option>
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.workMode ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Work Mode</label>
                                         <select
                                             value={formData.workMode}
                                             onChange={(e) => setFormData({ ...formData, workMode: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm appearance-none font-medium cursor-pointer"
+                                            className={`w-full bg-transparent border-none outline-none text-sm appearance-none cursor-pointer ${formData.workMode ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         >
-                                            <option className="bg-[#121214] text-white">Remote</option>
-                                            <option className="bg-[#121214] text-white">Hybrid</option>
-                                            <option className="bg-[#121214] text-white">On-site</option>
+                                            <option className="bg-[#0e0f12] text-white">Remote</option>
+                                            <option className="bg-[#0e0f12] text-white">Hybrid</option>
+                                            <option className="bg-[#0e0f12] text-white">On-site</option>
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.timezone ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Timezone</label>
                                         <select
                                             value={formData.timezone}
                                             onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm appearance-none font-medium cursor-pointer"
+                                            className={`w-full bg-transparent border-none outline-none text-sm appearance-none cursor-pointer ${formData.timezone ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         >
-                                            <option className="bg-[#121214] text-white">Any Timezone</option>
-                                            <option className="bg-[#121214] text-white">Americas (UTC-5)</option>
-                                            <option className="bg-[#121214] text-white">Europe (UTC+1)</option>
-                                            <option className="bg-[#121214] text-white">Asia (UTC+8)</option>
+                                            <option className="bg-[#0e0f12] text-white">Any Timezone</option>
+                                            <option className="bg-[#0e0f12] text-white">Americas (UTC-5)</option>
+                                            <option className="bg-[#0e0f12] text-white">Europe (UTC+1)</option>
+                                            <option className="bg-[#0e0f12] text-white">Asia (UTC+8)</option>
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.experienceLevel ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Experience</label>
                                         <select
                                             value={formData.experienceLevel}
                                             onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm appearance-none font-medium cursor-pointer"
+                                            className={`w-full bg-transparent border-none outline-none text-sm appearance-none cursor-pointer ${formData.experienceLevel ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         >
-                                            <option className="bg-[#121214] text-white">Senior</option>
-                                            <option className="bg-[#121214] text-white">Mid-Level</option>
-                                            <option className="bg-[#121214] text-white">Junior</option>
-                                            <option className="bg-[#121214] text-white">Lead / Architect</option>
+                                            <option className="bg-[#0e0f12] text-white">Senior</option>
+                                            <option className="bg-[#0e0f12] text-white">Mid-Level</option>
+                                            <option className="bg-[#0e0f12] text-white">Junior</option>
+                                            <option className="bg-[#0e0f12] text-white">Lead / Architect</option>
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.compensationType ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Comp. Model</label>
                                         <select
                                             value={formData.compensationType}
                                             onChange={(e) => setFormData({ ...formData, compensationType: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm appearance-none font-medium cursor-pointer"
+                                            className={`w-full bg-transparent border-none outline-none text-sm appearance-none cursor-pointer ${formData.compensationType ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         >
-                                            <option className="bg-[#121214] text-white">Crypto + Equity</option>
-                                            <option className="bg-[#121214] text-white">Fiat + Equity</option>
-                                            <option className="bg-[#121214] text-white">Crypto Only</option>
-                                            <option className="bg-[#121214] text-white">DAO Tokens</option>
-                                            <option className="bg-[#121214] text-white">Unpaid / Contributor</option>
+                                            <option className="bg-[#0e0f12] text-white">Crypto + Equity</option>
+                                            <option className="bg-[#0e0f12] text-white">Fiat + Equity</option>
+                                            <option className="bg-[#0e0f12] text-white">Crypto Only</option>
+                                            <option className="bg-[#0e0f12] text-white">DAO Tokens</option>
+                                            <option className="bg-[#0e0f12] text-white">Unpaid / Contributor</option>
                                         </select>
                                     </div>
 
-                                    <div className="rounded-lg px-3 py-2.5" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                    <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.salary ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Salary</label>
                                         <input
                                             type="text"
                                             placeholder="e.g. $120k – $180k"
                                             value={formData.salary}
                                             onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                                            className="w-full bg-transparent border-none outline-none text-sm font-medium placeholder:text-slate-500"
+                                            className={`w-full bg-transparent border-none outline-none text-sm placeholder:text-slate-600 ${formData.salary ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* ── 4. Evaluation Focus ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="flex items-center justify-between mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <div className="flex items-center gap-2">
-                                        <ShieldCheck style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                                        <ShieldCheck style={{ width: 13, height: 13, color: "#a78bfa" }} />
                                         <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Evaluation Focus</span>
                                     </div>
                                     <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>optional</span>
@@ -866,15 +870,15 @@ export default function CreateCollection() {
                                         <div
                                             key={opt.id}
                                             onClick={() => toggleFocus(opt.id)}
-                                            className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
+                                            className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}
                                         >
                                             <div className="flex items-start gap-2.5 relative z-10">
-                                                <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500 group-hover:text-slate-300'}`}>
+                                                <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.focusAreas.includes(opt.id) ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/30 group-hover:text-white/60'}`}>
                                                     <opt.icon className="w-4 h-4" />
                                                 </div>
                                                 <div>
                                                     <p className={`text-xs font-bold mb-0.5 ${formData.focusAreas.includes(opt.id) ? 'text-emerald-100' : 'text-slate-300'}`}>{opt.label}</p>
-                                                    <p className="text-[10px] text-slate-600 leading-tight">{opt.desc}</p>
+                                                    <p className="text-[10px] leading-tight" style={{ color: "rgba(255,255,255,0.22)" }}>{opt.desc}</p>
                                                 </div>
                                             </div>
                                             {formData.focusAreas.includes(opt.id) && (
@@ -884,9 +888,9 @@ export default function CreateCollection() {
                                     ))}
 
                                     {/* Custom Focus Box */}
-                                    <div className={`p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.customFocus ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}>
+                                    <div className={`p-3.5 rounded-xl border transition-all duration-200 group relative overflow-hidden ${formData.customFocus ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}>
                                         <div className="flex items-start gap-2.5 relative z-10">
-                                            <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.customFocus ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500 group-hover:text-slate-300'}`}>
+                                            <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${formData.customFocus ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/30 group-hover:text-white/60'}`}>
                                                 <Target className="w-4 h-4" />
                                             </div>
                                             <div className="flex-1">
@@ -895,9 +899,9 @@ export default function CreateCollection() {
                                                     placeholder="Add Your Focus..."
                                                     value={formData.customFocus}
                                                     onChange={(e) => setFormData({ ...formData, customFocus: e.target.value })}
-                                                    className="bg-transparent border-none outline-none text-xs font-bold w-full placeholder:text-slate-500 text-white"
+                                                    className="bg-transparent border-none outline-none text-xs font-bold w-full placeholder:text-slate-600 text-white"
                                                 />
-                                                <p className="text-[10px] text-slate-600 leading-tight mt-0.5">Write your specific priority</p>
+                                                <p className="text-[10px] leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.22)" }}>Write your specific priority</p>
                                             </div>
                                         </div>
                                         {formData.customFocus && (
@@ -907,13 +911,13 @@ export default function CreateCollection() {
                                 </div>
                             </div>
 
-
                             {/* ── 5. Eligibility Filters ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="flex items-center justify-between mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <div className="flex items-center gap-2">
-                                        <Filter style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
-                                        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Eligibility Filters</span>
+                                         <Filter style={{ width: 13, height: 13, color: "#fbbf24" }} />
+                                         <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Eligibility Filters</span>
                                     </div>
                                     <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>Reduce Spam · optional</span>
                                 </div>
@@ -923,15 +927,15 @@ export default function CreateCollection() {
                                             ...prev,
                                             filters: { ...prev.filters, minReceiptsThreshold: prev.filters.minReceiptsThreshold === 5 ? 0 : 5 }
                                         }))}
-                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/10 border-indigo-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
+                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-slate-500'}`}>
+                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-white/30'}`}>
                                                 <Clock className="w-4 h-4" />
                                             </div>
                                             <div>
                                                 <p className={`text-xs font-bold ${formData.filters.minReceiptsThreshold === 5 ? 'text-indigo-100' : 'text-slate-300'}`}>Active Wallet Only</p>
-                                                <p className="text-[10px] text-slate-600">Requires 5+ on-chain receipts/txs</p>
+                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Requires 5+ on-chain receipts/txs</p>
                                             </div>
                                         </div>
                                         {formData.filters.minReceiptsThreshold === 5 && <div className="absolute top-2 right-2 text-indigo-500"><Check className="w-3.5 h-3.5" /></div>}
@@ -942,15 +946,15 @@ export default function CreateCollection() {
                                             ...prev,
                                             filters: { ...prev.filters, verifiedOnly: !prev.filters.verifiedOnly }
                                         }))}
-                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.verifiedOnly ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-zinc-800/60 border-zinc-700 hover:border-slate-600 hover:bg-zinc-800'}`}
+                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.verifiedOnly ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.verifiedOnly ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-500'}`}>
+                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.verifiedOnly ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/30'}`}>
                                                 <ShieldCheck className="w-4 h-4" />
                                             </div>
                                             <div>
                                                 <p className={`text-xs font-bold ${formData.filters.verifiedOnly ? 'text-emerald-100' : 'text-slate-300'}`}>Verified Profiles Only</p>
-                                                <p className="text-[10px] text-slate-600">Must have at least 1 attestation</p>
+                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Must have at least 1 attestation</p>
                                             </div>
                                         </div>
                                         {formData.filters.verifiedOnly && <div className="absolute top-2 right-2 text-emerald-500"><Check className="w-3.5 h-3.5" /></div>}
@@ -959,9 +963,10 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 6. Final Configuration ── */}
-                            <div className="rounded-xl p-4 bg-zinc-900 border border-zinc-800">
-                                <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                    <CalendarDays style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+                                    <CalendarDays style={{ width: 13, height: 13, color: "#f87171" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Final Configuration</span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -976,20 +981,20 @@ export default function CreateCollection() {
                                                 value={formData.deadline}
                                                 min={new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:border-emerald-500/60 outline-none transition-colors text-slate-300"
+                                                className={`w-full rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none transition-colors ${formData.deadline ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-emerald-400 font-bold' : 'bg-white/[0.04] border border-white/[0.1] text-white/70 focus:border-emerald-500/50'}`}
                                             />
                                         </div>
                                     </div>
 
                                     <div>
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Collection Visibility</label>
-                                        <div className="flex p-1 rounded-lg" style={{ background: "#27272a", border: "1px solid #3f3f46" }}>
+                                        <div className={`flex p-1 rounded-lg transition-all ${formData.visibility ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
                                             {['public', 'unlisted', 'private'].map((vis) => (
                                                 <button
                                                     key={vis}
                                                     type="button"
                                                     onClick={() => setFormData({ ...formData, visibility: vis })}
-                                                    className={`flex-1 py-1.5 rounded-md text-[11px] font-bold capitalize transition-all flex items-center justify-center gap-1.5 ${formData.visibility === vis ? 'bg-white/10 text-white' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.04]'}`}
+                                                    className={`flex-1 py-1.5 rounded-md text-[11px] font-bold capitalize transition-all flex items-center justify-center gap-1.5 ${formData.visibility === vis ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-white/25 hover:text-white/50 hover:bg-white/[0.04] border border-transparent'}`}
                                                 >
                                                     {vis === 'public' && <Globe className="w-3 h-3" />}
                                                     {vis === 'unlisted' && <Eye className="w-3 h-3" />}
