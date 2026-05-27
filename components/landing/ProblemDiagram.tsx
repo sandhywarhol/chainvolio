@@ -325,8 +325,8 @@ export default function ProblemDiagram() {
                     </g>
 
                     <g transform={`translate(${col2X}, 40)`} textAnchor="middle">
-                        <text fill="white" fontSize="13" fontWeight="700">Self Claimed</text>
-                        <text y="18" fill="white" fontSize="10" opacity="0.4" fontWeight="400">No verifiable proof</text>
+                        <text fill="white" fontSize="13" fontWeight="700">Unverifiable</text>
+                        <text y="18" fill="white" fontSize="10" opacity="0.4" fontWeight="400">Every claim gets challenged</text>
                         <foreignObject x="-6" y="24" width="12" height="12">
                             <ArrowDown size={12} className="text-white/20" />
                         </foreignObject>
