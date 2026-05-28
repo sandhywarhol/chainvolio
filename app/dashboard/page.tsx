@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -85,7 +85,6 @@ type HiringCollection = {
 export default function DashboardPage() {
   const { publicKey, connected, connecting, signMessage } = useWallet();
   const { session, orgAccount, loading: googleLoading, refetchOrgAccount } = useGoogleAuth();
-  const searchParams = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -182,16 +181,16 @@ export default function DashboardPage() {
 
   // Auto-open verification modal when redirected from recruiter create-profile
   useEffect(() => {
-    const reqVerify = searchParams.get("requestVerify");
-    if (!reqVerify || !profile) return;
-    // Map URL param to tier id used by VerificationRequestModal
+    if (!profile) return;
+    const reqVerify = new URLSearchParams(window.location.search).get("requestVerify");
+    if (!reqVerify) return;
     const tierMap: Record<string, string> = { company: "Company", community: "Community" };
     const tierId = tierMap[reqVerify];
     if (tierId) {
       setVerifyInitialTier(tierId);
       setShowVerificationModal(true);
     }
-  }, [searchParams, profile]);
+  }, [profile]);
 
   // Fetch applications when tab is activated
   useEffect(() => {
