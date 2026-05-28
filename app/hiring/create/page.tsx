@@ -554,7 +554,9 @@ export default function CreateCollection() {
     };
 
     // Derive hiring access state - delegates all tier logic to getHiringLimit() (single source of truth)
-    const hiringLimit = getHiringLimit(userTier);        // null=unlimited, n=capped
+    // Treasury wallet (project admin) always unlimited — self-payment would fail on verification
+    const isTreasuryWallet = publicKey?.toBase58() === TREASURY_WALLET;
+    const hiringLimit = isTreasuryWallet ? null : getHiringLimit(userTier);  // null=unlimited, n=capped
     const remaining = hiringLimit === null ? Infinity : Math.max(0, hiringLimit - collectionCount);
     type HiringAccess = "loading" | "limit_reached" | "capped_available" | "unlimited";
     const getHiringAccess = (): HiringAccess => {

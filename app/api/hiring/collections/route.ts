@@ -190,10 +190,13 @@ export async function POST(request: Request) {
             googleInactiveOrgPlan.toLowerCase().includes("community") ||
             googleInactiveOrgPlan.toLowerCase().includes("dao")
         );
-        const effectiveHiringLimit = isGoogleOrgActive ? null
+        // Treasury wallet (project admin) always gets unlimited — self-payment would fail anyway
+        const isTreasuryWallet = ownerWallet === TREASURY_WALLET;
+        const effectiveHiringLimit = isTreasuryWallet ? null
+            : isGoogleOrgActive ? null
             : isGoogleUnsubscribedOrg ? 2
             : getHiringLimit(verificationTier);
-        console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} googleOrg=${isGoogleOrgActive} limit=${effectiveHiringLimit}`);
+        console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} googleOrg=${isGoogleOrgActive} treasury=${isTreasuryWallet} limit=${effectiveHiringLimit}`);
 
         // ─── Hiring limit check + on-chain payment gate ───────────────────────
         let isPaidJobPost = false;
