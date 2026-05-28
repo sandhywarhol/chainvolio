@@ -325,8 +325,8 @@ function OrgEditProfileWalletContent() {
                                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                     <select value={form.country} onChange={set("country")}
                                         className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm appearance-none">
-                                        <option value="">Select region...</option>
-                                        {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                        <option value="" className="bg-slate-800 text-white">Select region...</option>
+                                        {COUNTRIES.map(c => <option key={c} value={c} className="bg-slate-800 text-white">{c}</option>)}
                                     </select>
                                 </div>
                             </div>

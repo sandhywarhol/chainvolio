@@ -37,16 +37,33 @@ export function useGoogleAuth() {
     const [loading, setLoading] = useState(true);
 
     const fetchOrgAccount = useCallback(async (authUid: string, accessToken?: string) => {
-        const headers: HeadersInit = {};
-        if (accessToken) {
-            headers["Authorization"] = `Bearer ${accessToken}`;
-        }
-        const res = await fetch(`/api/org-accounts?auth_uid=${authUid}`, { headers });
-        if (res.ok) {
-            const data = await res.json();
-            setOrgAccount(data.orgAccount ?? null);
-        } else {
-            setOrgAccount(null);
+        const doFetch = async (token?: string) => {
+            const headers: HeadersInit = {};
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+            const res = await fetch(`/api/org-accounts?auth_uid=${authUid}`, { headers });
+            return res;
+        };
+
+        try {
+            let res = await doFetch(accessToken);
+
+            // If token expired, refresh once and retry
+            if (res.status === 401 && supabaseAuth) {
+                const { data: refreshed } = await supabaseAuth.auth.refreshSession();
+                if (refreshed.session) {
+                    setSession(refreshed.session);
+                    res = await doFetch(refreshed.session.access_token);
+                }
+            }
+
+            if (res.ok) {
+                const data = await res.json();
+                setOrgAccount(data.orgAccount ?? null);
+            }
+            // On any non-ok response KEEP the existing orgAccount — a transient API
+            // error must not silently log the user out. Only explicit signOut clears it.
+        } catch {
+            // Network error — keep existing state
         }
     }, []);
 
@@ -66,29 +83,20 @@ export function useGoogleAuth() {
             }
         });
 
-        const { data: listener } = supabaseAuth.auth.onAuthStateChange((_event, s) => {
+        const { data: listener } = supabaseAuth.auth.onAuthStateChange((event, s) => {
             setSession(s);
             if (s?.user?.id) {
-                fetchOrgAccount(s.user.id, s?.access_token);
-            } else {
+                fetchOrgAccount(s.user.id, s.access_token);
+            } else if (event === "SIGNED_OUT") {
+                // Only clear orgAccount on explicit user-initiated sign out.
+                // TOKEN_REFRESHED failures, USER_DELETED, etc. must not silently
+                // redirect users away from what they were doing.
                 setOrgAccount(null);
             }
         });
 
         return () => listener.subscription.unsubscribe();
     }, [fetchOrgAccount]);
-
-    const signInWithGoogle = useCallback(async () => {
-        if (!supabaseAuth) return;
-        const { error } = await supabaseAuth.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-                queryParams: { access_type: "offline", prompt: "consent" },
-            },
-        });
-        if (error) throw error;
-    }, []);
 
     const signOut = useCallback(async () => {
         if (!supabaseAuth) return;
@@ -97,13 +105,33 @@ export function useGoogleAuth() {
         setOrgAccount(null);
     }, []);
 
+    const refetchOrgAccount = useCallback(async () => {
+        if (!supabaseAuth) return;
+        // Always get the freshest session token before refetching
+        const { data: { session: fresh } } = await supabaseAuth.auth.getSession();
+        const s = fresh ?? session;
+        if (!s?.user?.id) return;
+        if (fresh && fresh.access_token !== session?.access_token) setSession(fresh);
+        return fetchOrgAccount(s.user.id, s.access_token);
+    }, [session, fetchOrgAccount]);
+
     return {
         session,
         orgAccount,
         loading,
         isGoogleSignedIn: session?.user?.app_metadata?.provider === 'google',
-        signInWithGoogle,
+        signInWithGoogle: useCallback(async () => {
+            if (!supabaseAuth) return;
+            const { error } = await supabaseAuth.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                    queryParams: { access_type: "offline", prompt: "consent" },
+                },
+            });
+            if (error) throw error;
+        }, []),
         signOut,
-        refetchOrgAccount: () => session?.user?.id ? fetchOrgAccount(session.user.id, session.access_token) : Promise.resolve(),
+        refetchOrgAccount,
     };
 }

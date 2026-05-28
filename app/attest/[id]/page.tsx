@@ -702,9 +702,9 @@ export default function AttestPage() {
                                         <label className="block text-xs text-slate-500 mb-1">Entity Type</label>
                                         <select value={entityType} onChange={e => setEntityType(e.target.value)}
                                             className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none cursor-pointer transition-colors">
-                                            <option>Individual</option>
-                                            <option>Company</option>
-                                            <option>Organization / DAO</option>
+                                            <option className="bg-slate-800 text-white">Individual</option>
+                                            <option className="bg-slate-800 text-white">Company</option>
+                                            <option className="bg-slate-800 text-white">Organization / DAO</option>
                                         </select>
                                     </div>
                                 </div>
@@ -723,21 +723,21 @@ export default function AttestPage() {
                                         <label className="block text-xs text-slate-500 mb-1">Attestation Type</label>
                                         <select value={attestationType} onChange={e => setAttestationType(e.target.value)}
                                             className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
-                                            <option>Employment verification</option>
-                                            <option>Professional Attestation</option>
-                                            <option>Project Completion</option>
-                                            <option>Recommendation Letter</option>
-                                            <option>Performance Evaluation</option>
-                                            <option>Partnership Confirmation</option>
+                                            <option className="bg-slate-800 text-white">Employment verification</option>
+                                            <option className="bg-slate-800 text-white">Professional Attestation</option>
+                                            <option className="bg-slate-800 text-white">Project Completion</option>
+                                            <option className="bg-slate-800 text-white">Recommendation Letter</option>
+                                            <option className="bg-slate-800 text-white">Performance Evaluation</option>
+                                            <option className="bg-slate-800 text-white">Partnership Confirmation</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label className="block text-xs text-slate-500 mb-1">Confidence Level</label>
                                         <select value={confidenceLevel} onChange={e => setConfidenceLevel(e.target.value)}
                                             className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-sm appearance-none transition-colors">
-                                            <option>Strongly confirm</option>
-                                            <option>Confirm</option>
-                                            <option>Partial / limited confirmation</option>
+                                            <option className="bg-slate-800 text-white">Strongly confirm</option>
+                                            <option className="bg-slate-800 text-white">Confirm</option>
+                                            <option className="bg-slate-800 text-white">Partial / limited confirmation</option>
                                         </select>
                                     </div>
                                 </div>

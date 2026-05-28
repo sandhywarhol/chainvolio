@@ -964,9 +964,9 @@ export default function DashboardPage() {
                         <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Timezone</label>
                         <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
                           className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60">
-                          <option value="">Select</option>
+                          <option value="" className="bg-slate-900 text-white">Select</option>
                           {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
-                            <option key={tz} value={tz} className="bg-slate-900">{tz}</option>
+                            <option key={tz} value={tz} className="bg-slate-900 text-white">{tz}</option>
                           ))}
                         </select>
                       </div>

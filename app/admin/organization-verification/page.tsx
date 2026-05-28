@@ -442,12 +442,12 @@ export default function AdminVerificationPage() {
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
-                                <option value="all">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="verified">Verified</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="expired">Expired</option>
-                                <option value="revoked">Revoked</option>
+                                <option value="all" className="bg-slate-900 text-white">All Status</option>
+                                <option value="pending" className="bg-slate-900 text-white">Pending</option>
+                                <option value="verified" className="bg-slate-900 text-white">Verified</option>
+                                <option value="rejected" className="bg-slate-900 text-white">Rejected</option>
+                                <option value="expired" className="bg-slate-900 text-white">Expired</option>
+                                <option value="revoked" className="bg-slate-900 text-white">Revoked</option>
                             </select>
                         </div>
 
@@ -457,11 +457,11 @@ export default function AdminVerificationPage() {
                                 value={tierFilter}
                                 onChange={(e) => setTierFilter(e.target.value)}
                             >
-                                <option value="all">All Tiers</option>
-                                <option value="builder">Builder</option>
-                                <option value="public_figure">Public Figure</option>
-                                <option value="community">Community / DAO</option>
-                                <option value="company">Company / Org</option>
+                                <option value="all" className="bg-slate-900 text-white">All Tiers</option>
+                                <option value="builder" className="bg-slate-900 text-white">Builder</option>
+                                <option value="public_figure" className="bg-slate-900 text-white">Public Figure</option>
+                                <option value="community" className="bg-slate-900 text-white">Community / DAO</option>
+                                <option value="company" className="bg-slate-900 text-white">Company / Org</option>
                             </select>
                         </div>
 

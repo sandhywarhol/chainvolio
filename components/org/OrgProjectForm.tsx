@@ -125,8 +125,8 @@ export function OrgProjectForm({ ownerWallet, ownerAuthUid, accessToken, onSucce
                             value={form.project_type} onChange={set("project_type")}
                             className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 text-sm transition-colors appearance-none"
                         >
-                            <option value="">Select type...</option>
-                            {PROJECT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            <option value="" className="bg-slate-800 text-white">Select type...</option>
+                            {PROJECT_TYPES.map(t => <option key={t} value={t} className="bg-slate-800 text-white">{t}</option>)}
                         </select>
                     </div>
 

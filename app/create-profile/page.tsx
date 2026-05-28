@@ -463,9 +463,9 @@ export default function CreateProfilePage() {
                 onChange={(e) => setForm({ ...form, timezone: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-slate-200"
               >
-                <option value="">Select Timezone</option>
+                <option value="" className="bg-slate-800 text-white">Select Timezone</option>
                 {["GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7", "GMT-6", "GMT-5", "GMT-4", "GMT-3", "GMT-2", "GMT-1", "GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5", "GMT+6", "GMT+7", "GMT+8", "GMT+9", "GMT+10", "GMT+11", "GMT+12"].map(tz => (
-                  <option key={tz} value={tz}>{tz}</option>
+                  <option key={tz} value={tz} className="bg-slate-800 text-white">{tz}</option>
                 ))}
               </select>
             </div>

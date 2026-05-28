@@ -244,14 +244,14 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       <div>
         <label className="block text-xs text-white/40 mb-1.5 font-medium">Work type *</label>
         <select value={form.workType} onChange={(e) => setForm({ ...form, workType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors">
-          {WORK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          {WORK_TYPES.map((t) => <option key={t} value={t} className="bg-zinc-950 text-white">{t}</option>)}
         </select>
       </div>
       <div>
         <label className="block text-xs text-white/40 mb-1.5 font-medium">Compensation (optional)</label>
         <select value={form.compensationType} onChange={(e) => setForm({ ...form, compensationType: e.target.value })} disabled={isLocked} className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] focus:border-white/30 outline-none text-white disabled:opacity-40 transition-colors">
-          <option value="">None</option>
-          {COMP_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          <option value="" className="bg-zinc-950 text-white">None</option>
+          {COMP_TYPES.map((t) => <option key={t} value={t} className="bg-zinc-950 text-white">{t}</option>)}
         </select>
       </div>
 
@@ -315,7 +315,7 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
                 newLinks[index].label = e.target.value;
                 setForm({ ...form, evidenceLinks: newLinks });
               }} disabled={isLocked} className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.1] outline-none text-sm text-white disabled:opacity-40 transition-colors">
-                {LINK_LABELS.map((l) => <option key={l} value={l}>{l}</option>)}
+                {LINK_LABELS.map((l) => <option key={l} value={l} className="bg-zinc-950 text-white">{l}</option>)}
               </select>
               <div className="flex gap-2 flex-1">
                 <input type="url" value={link.url} onChange={(e) => {
