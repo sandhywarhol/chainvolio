@@ -113,7 +113,9 @@ export default function DashboardPage() {
   const [editUploading, setEditUploading] = useState(false);
   const [editCropModal, setEditCropModal] = useState<{ isOpen: boolean; image: string | null }>({ isOpen: false, image: null });
   const [selectedReceiptForDetail, setSelectedReceiptForDetail] = useState<any>(null);
-  
+  const [applications, setApplications] = useState<any[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
+
   // Timeout for wallet adapter hanging on connecting=true
   const [connectingTimedOut, setConnectingTimedOut] = useState(false);
 
@@ -175,6 +177,26 @@ export default function DashboardPage() {
 
     return () => controller.abort();
   }, [publicKey, connected, connecting]);
+
+  // Fetch applications when tab is activated
+  useEffect(() => {
+    if (activeTab !== "applications") return;
+    if (!publicKey && !session) return;
+    setApplicationsLoading(true);
+    const params = new URLSearchParams();
+    if (publicKey) params.set("wallet", publicKey.toBase58());
+    else if (session?.user?.id) params.set("auth_uid", session.user.id);
+    const headers: HeadersInit = {};
+    // For Google users, pass auth token
+    if (session && !publicKey) {
+      // We'll try without auth header first since this is just display data
+    }
+    fetch(`/api/hiring/submissions?${params}`, { headers })
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(json => setApplications(json.data || []))
+      .catch(() => setApplications([]))
+      .finally(() => setApplicationsLoading(false));
+  }, [activeTab, publicKey, session]);
 
   const handleDeleteCertificate = async (id: string) => {
     if (!publicKey || !signMessage) return;
@@ -1356,15 +1378,73 @@ export default function DashboardPage() {
             )}
             {/* ── MY APPLICATIONS tab ── */}
             {activeTab === "applications" && (
-              <div className="py-16 rounded-xl flex flex-col items-center justify-center text-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <Send style={{ width: 20, height: 20, color: "rgba(255,255,255,0.2)" }} />
+              <div className="space-y-3">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.75)" }}>My Applications</p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 2 }}>Jobs you&apos;ve submitted your profile to.</p>
+                  </div>
+                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", padding: "3px 10px", borderRadius: 99, fontWeight: 600 }}>
+                    {applications.length} submitted
+                  </span>
                 </div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>My Applications</p>
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", lineHeight: 1.6, maxWidth: 280 }}>Track the companies and opportunities you've applied to. This feature is coming soon.</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  Coming Soon
-                </span>
+
+                {/* Loading */}
+                {applicationsLoading && (
+                  <div className="py-12 flex justify-center">
+                    <div className="w-5 h-5 border-2 border-white/10 border-t-white/40 rounded-full animate-spin" />
+                  </div>
+                )}
+
+                {/* Empty */}
+                {!applicationsLoading && applications.length === 0 && (
+                  <div className="py-14 rounded-xl flex flex-col items-center justify-center text-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <Send style={{ width: 20, height: 20, color: "rgba(255,255,255,0.2)" }} />
+                    </div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginBottom: 5 }}>No applications yet</p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", maxWidth: 260, lineHeight: 1.6 }}>When you apply to a hiring link, it will appear here.</p>
+                    <Link href="/hiring" className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      Browse Jobs <ExternalLink style={{ width: 11, height: 11 }} />
+                    </Link>
+                  </div>
+                )}
+
+                {/* Application cards */}
+                {!applicationsLoading && applications.map((app: any) => {
+                  const col = app.hiring_collections;
+                  const meta = col?.metadata || {};
+                  const appliedAt = app.submitted_at ? format(new Date(app.submitted_at), "MMM d, yyyy") : "";
+                  return (
+                    <div key={app.id} className="rounded-xl p-4 flex items-start gap-4 transition-all" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      {/* Company avatar */}
+                      <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-sm" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.2)", color: "#a78bfa" }}>
+                        {(meta.companyName || col?.title || "?").charAt(0).toUpperCase()}
+                      </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate" style={{ fontSize: 13, color: "rgba(255,255,255,0.85)" }}>{col?.title || "Untitled Position"}</p>
+                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
+                          {meta.companyName || meta.recruiterName || "Unknown Company"}
+                          {meta.projectStage && <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase" style={{ background: "rgba(16,185,129,0.1)", color: "rgba(52,211,153,0.7)", border: "1px solid rgba(16,185,129,0.15)" }}>{meta.projectStage}</span>}
+                        </p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>Applied {appliedAt}</span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase" style={{ background: "rgba(16,185,129,0.08)", color: "rgba(52,211,153,0.6)", border: "1px solid rgba(16,185,129,0.12)" }}>
+                            ✓ Submitted
+                          </span>
+                        </div>
+                      </div>
+                      {/* Link */}
+                      {col?.slug && (
+                        <Link href={`/r/${col.slug}`} target="_blank" className="flex-shrink-0 p-1.5 rounded-lg transition-colors" style={{ color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                          <ExternalLink style={{ width: 13, height: 13 }} />
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
             {/* ── HIRING CENTER tab (non-recruiter / builder) ── */}

@@ -17,6 +17,63 @@ function getIpHash() {
     return crypto.createHash("sha256").update(ip).digest("hex");
 }
 
+export async function GET(request: Request) {
+    if (!supabase) return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);
+
+    try {
+        const { searchParams } = new URL(request.url);
+        const wallet = searchParams.get("wallet");
+        const authUid = searchParams.get("auth_uid");
+
+        if (!wallet && !authUid) {
+            return errorResponse("ERR_INVALID_REQUEST", "wallet or auth_uid is required", 400);
+        }
+
+        const candidateWallet = wallet || `gauth:${authUid}`;
+
+        // For Google auth users, verify token
+        if (authUid || candidateWallet.startsWith("gauth:")) {
+            const authHeader = request.headers.get("authorization");
+            if (authHeader?.startsWith("Bearer ")) {
+                const token = authHeader.split(" ")[1];
+                const { data: { user }, error } = await supabase.auth.getUser(token);
+                if (error || !user || user.id !== (authUid || candidateWallet.replace("gauth:", ""))) {
+                    return errorResponse("ERR_UNAUTHORIZED", "Invalid token", 401);
+                }
+            }
+        }
+
+        const { data, error } = await supabase
+            .from("collection_submissions")
+            .select(`
+                id,
+                submitted_at,
+                primary_signal,
+                role_strength,
+                snapshot_data,
+                collection_id,
+                hiring_collections (
+                    title,
+                    slug,
+                    metadata,
+                    created_at,
+                    owner_wallet
+                )
+            `)
+            .eq("candidate_wallet", candidateWallet)
+            .order("submitted_at", { ascending: false });
+
+        if (error) {
+            console.error("Submissions fetch error:", error);
+            return errorResponse("ERR_DATABASE_ERROR", error.message, 500);
+        }
+
+        return NextResponse.json({ ok: true, data: data || [] });
+    } catch (err: any) {
+        return errorResponse("ERR_SERVER_ERROR", err.message || "Server Error", 500);
+    }
+}
+
 export async function POST(request: Request) {
     if (!supabase) {
         return errorResponse("ERR_CONFIG_ERROR", "Supabase not configured", 503);
