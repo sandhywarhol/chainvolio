@@ -7,7 +7,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
-import { getHiringLimit, RETAIL_JOB_POST_USDC_DISPLAY } from "@/lib/paymentConfig";
+import { getHiringLimit, RETAIL_JOB_POST_USDC_DISPLAY, RETAIL_JOB_POST_USDC, USDC_MINT_MAINNET, TREASURY_WALLET } from "@/lib/paymentConfig";
 import {
     Loader2,
     Plus,
@@ -289,20 +289,20 @@ export default function CreateCollection() {
                 body: JSON.stringify(requestBody),
             });
 
-            // ── Handle x402 payment required ────────────────────────────────
+            // ── Handle payment required ────────────────────────────────
             if (res.status === 402) {
-                const xPaymentResponse = res.headers.get("X-PAYMENT-RESPONSE");
-                if (xPaymentResponse && !isGoogleUser) {
-                    try {
-                        const { decodePaymentRequiredHeader } = await import("@x402/core/http");
-                        const paymentRequired = decodePaymentRequiredHeader(xPaymentResponse);
-                        setX402Pending({ paymentRequired, requestBody });
-                        setCollectionCount(hiringLimit ?? 0);
-                    } catch {
-                        setToast({ message: "Payment required but could not decode payment details.", type: "error" });
-                    }
+                let errorCode = "ERR_PAYMENT_REQUIRED";
+                try { const d = await res.json(); errorCode = d.error?.code || errorCode; } catch {}
+                if (errorCode === "ERR_PAYMENT_REQUIRED" && !isGoogleUser) {
+                    setX402Pending({
+                        paymentRequired: {
+                            accepts: [{ asset: USDC_MINT_MAINNET, payTo: TREASURY_WALLET, amount: RETAIL_JOB_POST_USDC }],
+                            resource: { url: "/api/hiring/collections" },
+                        },
+                        requestBody,
+                    });
+                    setCollectionCount(hiringLimit ?? 0);
                 } else {
-                    // Google user or no header — show upgrade prompt
                     setToast({ message: "Free job post limit reached. Upgrade for unlimited access.", type: "warning" });
                     setCollectionCount(hiringLimit ?? 0);
                 }
@@ -345,72 +345,65 @@ export default function CreateCollection() {
     };
 
     /**
-     * x402 payment handler.
-     * Called when the user confirms the $2 USDC payment in the overlay.
-     * Builds a VersionedTransaction (USDC transfer to treasury), signs it WITHOUT
-     * submitting, encodes it as ExactSvmPayloadV1, then retries the original POST
-     * with the X-PAYMENT header so the server can verify + settle via Dexter.
+     * Payment handler — submits a USDC transfer to the treasury on-chain,
+     * then retries the POST with the confirmed tx signature so the server
+     * can verify payment directly via Solana RPC (no external facilitator).
      */
     const handleX402Pay = async () => {
         if (!x402Pending || !publicKey || !signTransaction) return;
         setX402PayLoading(true);
         try {
             const { Connection, PublicKey, TransactionMessage, VersionedTransaction } = await import("@solana/web3.js");
-            const { getAssociatedTokenAddress, createTransferCheckedInstruction } = await import("@solana/spl-token");
-            const { encodePaymentSignatureHeader } = await import("@x402/core/http");
+            const {
+                getAssociatedTokenAddress,
+                createTransferCheckedInstruction,
+                createAssociatedTokenAccountIdempotentInstruction,
+            } = await import("@solana/spl-token");
 
             const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
             const conn = new Connection(rpcUrl, "confirmed");
 
-            // Resolve token accounts
             const requirements = x402Pending.paymentRequired.accepts[0];
             const usdcMint = new PublicKey(requirements.asset);
             const treasury = new PublicKey(requirements.payTo);
             const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
             const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
 
-            // USDC transfer instruction (6 decimals, 2 USDC = 2_000_000 base units)
-            const transferIx = createTransferCheckedInstruction(
-                fromATA,
-                usdcMint,
-                toATA,
-                publicKey,
-                BigInt(requirements.amount), // "2000000"
-                6 // USDC decimals
+            // Ensure treasury USDC ATA exists (no-op if already created)
+            const createToATAIx = createAssociatedTokenAccountIdempotentInstruction(
+                publicKey, toATA, treasury, usdcMint
             );
 
-            // Build versioned transaction (required by x402 SVM scheme)
-            const { blockhash } = await conn.getLatestBlockhash("confirmed");
+            // USDC transfer instruction (6 decimals)
+            const transferIx = createTransferCheckedInstruction(
+                fromATA, usdcMint, toATA, publicKey,
+                BigInt(requirements.amount), 6
+            );
+
+            // Build + sign the versioned transaction
+            const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
             const message = new TransactionMessage({
                 payerKey: publicKey,
                 recentBlockhash: blockhash,
-                instructions: [transferIx],
+                instructions: [createToATAIx, transferIx],
             }).compileToV0Message();
             const versionedTx = new VersionedTransaction(message);
-
-            // Sign WITHOUT submitting
             const signedTx = await signTransaction(versionedTx as any);
-            const base64Tx = Buffer.from((signedTx as any).serialize()).toString("base64");
 
-            // Build PaymentPayload (x402 v2 format)
-            const paymentPayload = {
-                x402Version: 2,
-                resource: x402Pending.paymentRequired.resource,
-                accepted: requirements,
-                payload: { transaction: base64Tx },
-            };
+            // Submit to Solana and wait for confirmation
+            const txSignature = await conn.sendRawTransaction((signedTx as any).serialize(), {
+                skipPreflight: false,
+            });
+            await conn.confirmTransaction(
+                { signature: txSignature, blockhash, lastValidBlockHeight },
+                "confirmed"
+            );
 
-            // Encode as X-PAYMENT header
-            const xPaymentHeader = encodePaymentSignatureHeader(paymentPayload as any);
-
-            // Retry the original POST with X-PAYMENT header
+            // Retry the original POST — server verifies the tx on-chain
             const res = await fetch("/api/hiring/collections", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-PAYMENT": xPaymentHeader,
-                },
-                body: JSON.stringify(x402Pending.requestBody),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...x402Pending.requestBody, x_payment_txsig: txSignature }),
             });
 
             const responseData = await res.json();
@@ -422,7 +415,6 @@ export default function CreateCollection() {
                 return;
             }
 
-            // Success — clear payment state and show the created slug
             setX402Pending(null);
             const slug = responseData?.data?.slug || responseData?.slug;
             if (slug) {

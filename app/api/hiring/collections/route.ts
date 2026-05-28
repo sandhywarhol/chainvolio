@@ -1,21 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer as supabase } from "@/lib/supabase/server";
-import { isRecruiterTier, getHiringLimit, TREASURY_WALLET, RETAIL_JOB_POST_USDC, USDC_MINT_MAINNET } from "@/lib/paymentConfig";
-
-// ─── x402 constants ───────────────────────────────────────────────────────────
-const DEXTER_FACILITATOR_URL = "https://x402.org/facilitator";
-const SOLANA_MAINNET_CAIP2 = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
-
-/** The PaymentRequirements object we advertise and verify against. */
-const JOB_POST_REQUIREMENTS = {
-    scheme: "exact",
-    network: SOLANA_MAINNET_CAIP2,
-    asset: USDC_MINT_MAINNET,
-    amount: RETAIL_JOB_POST_USDC,
-    payTo: TREASURY_WALLET,
-    maxTimeoutSeconds: 300,
-    extra: {} as Record<string, unknown>,
-};
+import { isRecruiterTier, getHiringLimit, TREASURY_WALLET, RETAIL_JOB_POST_USDC, RETAIL_JOB_POST_USDC_DISPLAY, USDC_MINT_MAINNET } from "@/lib/paymentConfig";
 
 const errorResponse = (code: string, message: string, status: number = 400) => {
     return NextResponse.json({
@@ -210,7 +195,7 @@ export async function POST(request: Request) {
             : getHiringLimit(verificationTier);
         console.log(`[hiring-api] wallet=${ownerWallet} tier=${verificationTier} googleOrg=${isGoogleOrgActive} limit=${effectiveHiringLimit}`);
 
-        // ─── Hiring limit check + x402 payment gate ───────────────────────────
+        // ─── Hiring limit check + on-chain payment gate ───────────────────────
         let isPaidJobPost = false;
 
         if (effectiveHiringLimit !== null) {
@@ -223,62 +208,69 @@ export async function POST(request: Request) {
             console.log(`[hiring-api] collections used=${used} limit=${effectiveHiringLimit}`);
 
             if (used >= effectiveHiringLimit!) {
-                const xPaymentHeader = request.headers.get("X-PAYMENT");
+                const xPaymentTxSig = body.x_payment_txsig as string | undefined;
 
-                if (!xPaymentHeader) {
-                    // ── First request: return HTTP 402 with payment requirements ──
-                    const { encodePaymentRequiredHeader } = await import("@x402/core/http");
-                    const origin = (() => {
-                        try { return new URL(request.url).origin; } catch { return "https://chainvolio.com"; }
-                    })();
-                    const paymentRequired = {
-                        x402Version: 2,
-                        resource: {
-                            url: `${origin}/api/hiring/collections`,
-                            description: "Post a job on ChainVolio",
-                        },
-                        accepts: [JOB_POST_REQUIREMENTS],
-                        extensions: {},
-                    };
-                    const encoded = encodePaymentRequiredHeader(paymentRequired as any);
+                if (!xPaymentTxSig) {
+                    // ── First request: return 402 with static payment details ──
                     return new NextResponse(
                         JSON.stringify({
                             ok: false,
                             error: {
                                 code: "ERR_PAYMENT_REQUIRED",
-                                message: "Free job post limit reached. Pay $2 USDC to post additional jobs.",
+                                message: `Free job post limit reached. Pay $${RETAIL_JOB_POST_USDC_DISPLAY} USDC to post additional jobs.`,
+                                paymentDetails: {
+                                    asset: USDC_MINT_MAINNET,
+                                    payTo: TREASURY_WALLET,
+                                    amount: RETAIL_JOB_POST_USDC,
+                                    network: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+                                },
                             },
                         }),
-                        {
-                            status: 402,
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-PAYMENT-RESPONSE": encoded,
-                            },
-                        }
+                        { status: 402, headers: { "Content-Type": "application/json" } }
                     );
                 }
 
-                // ── Retry with X-PAYMENT header: verify via Dexter ──────────────
+                // ── Retry with tx signature: verify on Solana RPC ──────────────
                 try {
-                    const { decodePaymentSignatureHeader, HTTPFacilitatorClient } = await import("@x402/core/http");
-                    const paymentPayload = decodePaymentSignatureHeader(xPaymentHeader);
-                    const facilitator = new HTTPFacilitatorClient({ url: DEXTER_FACILITATOR_URL });
+                    const { Connection } = await import("@solana/web3.js");
+                    const rpcUrl = process.env.SOLANA_RPC_URL || process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+                    const conn = new Connection(rpcUrl, "confirmed");
 
-                    const verifyResult = await facilitator.verify(paymentPayload, JOB_POST_REQUIREMENTS as any);
-                    console.log(`[hiring-api][x402] verify result: isValid=${verifyResult.isValid} reason=${verifyResult.invalidReason}`);
+                    const tx = await conn.getParsedTransaction(xPaymentTxSig, {
+                        maxSupportedTransactionVersion: 0,
+                        commitment: "confirmed",
+                    });
 
-                    if (!verifyResult.isValid) {
+                    if (!tx || tx.meta?.err !== null) {
+                        return errorResponse("ERR_PAYMENT_INVALID", "Transaction not found or failed on-chain.", 402);
+                    }
+
+                    // Verify treasury received the required USDC amount
+                    const treasuryPost = tx.meta?.postTokenBalances?.find(b =>
+                        b.owner === TREASURY_WALLET && b.mint === USDC_MINT_MAINNET
+                    );
+                    const treasuryPre = tx.meta?.preTokenBalances?.find(b =>
+                        b.owner === TREASURY_WALLET && b.mint === USDC_MINT_MAINNET
+                    );
+
+                    const postAmt = parseInt(treasuryPost?.uiTokenAmount.amount ?? "0");
+                    const preAmt = parseInt(treasuryPre?.uiTokenAmount.amount ?? "0");
+                    const received = postAmt - preAmt;
+                    const required = parseInt(RETAIL_JOB_POST_USDC);
+
+                    console.log(`[hiring-api][payment] txsig=${xPaymentTxSig} received=${received} required=${required}`);
+
+                    if (received < required) {
                         return errorResponse(
-                            "ERR_PAYMENT_INVALID",
-                            `Payment verification failed: ${verifyResult.invalidReason || "unknown reason"}`,
+                            "ERR_PAYMENT_INSUFFICIENT",
+                            `Insufficient payment: received ${received} base units, required ${required}.`,
                             402
                         );
                     }
 
                     isPaidJobPost = true;
-                } catch (x402Err: any) {
-                    console.error("[hiring-api][x402] verification error:", x402Err);
+                } catch (verifyErr: any) {
+                    console.error("[hiring-api][payment] verification error:", verifyErr);
                     return errorResponse("ERR_PAYMENT_VERIFY_ERROR", "Unable to verify payment. Please try again.", 402);
                 }
             }
@@ -354,24 +346,6 @@ export async function POST(request: Request) {
         if (error) {
             console.error("Collection Creation Error:", error);
             return errorResponse("ERR_DATABASE_ERROR", error.message, 500);
-        }
-
-        // ── x402 settlement: fire-and-forget after successful creation ─────────
-        if (isPaidJobPost) {
-            const xPaymentHeader = request.headers.get("X-PAYMENT")!;
-            (async () => {
-                try {
-                    const { decodePaymentSignatureHeader, HTTPFacilitatorClient } = await import("@x402/core/http");
-                    const paymentPayload = decodePaymentSignatureHeader(xPaymentHeader);
-                    const facilitator = new HTTPFacilitatorClient({ url: DEXTER_FACILITATOR_URL });
-                    const settleResult = await facilitator.settle(paymentPayload, JOB_POST_REQUIREMENTS as any);
-                    console.log(`[hiring-api][x402] settle result: success=${settleResult.success} tx=${settleResult.transaction}`);
-                } catch (settleErr) {
-                    // Settlement failure is logged but does NOT affect the user — the job post
-                    // was already created and payment was verified. Dexter may retry on their side.
-                    console.error("[hiring-api][x402] settlement error (non-fatal):", settleErr);
-                }
-            })();
         }
 
         return NextResponse.json({ ok: true, data });
