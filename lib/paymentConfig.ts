@@ -63,9 +63,9 @@ export function getRetailAttestationLamports(): number {
     return Math.round(RETAIL_ATTESTATION_SOL * LAMPORTS_PER_SOL);
 }
 
-// ─── Retail pay-per-job-post pricing (x402 protocol) ─────────────────────────
-// Used when a non-subscribed user exceeds their 2 free job posts.
-// Payment is processed via the x402 HTTP 402 protocol using Dexter facilitator.
+// ─── Retail pay-per-job-post pricing ──────────────────────────────────────────
+// Used when a non-subscribed user exceeds their free job post limit.
+// Payment is a direct on-chain USDC transfer to the treasury, verified server-side.
 
 /** USDC price for one additional job post in base units (6 decimals = 0.10 USDC) */
 export const RETAIL_JOB_POST_USDC = "100000";
@@ -219,7 +219,7 @@ export function isRecruiterTier(tier?: string): boolean {
  *   2     = all other tiers (builder, public figure, unverified)
  *
  * Non-subscribed users exceeding their free limit can pay per post
- * via the x402 HTTP 402 payment protocol ($0.50 USDC each).
+ * via direct on-chain USDC transfer ($0.10 USDC each).
  *
  * Limits by tier:
  *   null = unlimited → verified/active Company/Org or Community/DAO wallet users

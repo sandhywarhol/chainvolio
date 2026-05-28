@@ -116,12 +116,22 @@ export default function CreateCollection() {
     const [collectionCount, setCollectionCount] = useState<number>(0);
     const [tierLoading, setTierLoading] = useState(false);
 
-    // x402 payment state — set when server returns 402 + X-PAYMENT-RESPONSE
+    // Payment state — set when server returns 402 (free limit reached)
     const [x402Pending, setX402Pending] = useState<{
         paymentRequired: any;       // decoded PaymentRequired from X-PAYMENT-RESPONSE header
         requestBody: Record<string, any>; // original POST body to retry
     } | null>(null);
     const [x402PayLoading, setX402PayLoading] = useState(false);
+
+    // Draft state
+    const [draftSaved, setDraftSaved] = useState(false);
+    const [draftRestored, setDraftRestored] = useState(false);
+
+    const draftKey = publicKey
+        ? `hiring_draft_${publicKey.toBase58()}`
+        : session?.user?.id
+        ? `hiring_draft_gauth_${session.user.id}`
+        : null;
 
     const [formData, setFormData] = useState({
         title: "",
@@ -259,6 +269,35 @@ export default function CreateCollection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [publicKey, isGoogleUser, googleOrgAccount]);
 
+    // Load saved draft when user connects (runs after auto-fill so draft wins)
+    useEffect(() => {
+        if (!draftKey) return;
+        try {
+            const saved = localStorage.getItem(draftKey);
+            if (saved) {
+                const draft = JSON.parse(saved);
+                setFormData(prev => ({ ...prev, ...draft }));
+                setDraftRestored(true);
+            }
+        } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [draftKey]);
+
+    const saveDraft = () => {
+        if (!draftKey) return;
+        try {
+            localStorage.setItem(draftKey, JSON.stringify(formData));
+            setDraftSaved(true);
+            setTimeout(() => setDraftSaved(false), 2500);
+        } catch {}
+    };
+
+    const clearDraft = () => {
+        if (!draftKey) return;
+        localStorage.removeItem(draftKey);
+        setDraftRestored(false);
+    };
+
     const toggleFocus = (area: string) => {
         setFormData(prev => ({
             ...prev,
@@ -392,6 +431,7 @@ export default function CreateCollection() {
 
             const slug = responseData?.data?.slug || responseData?.slug;
             if (slug) {
+                clearDraft();
                 setCreatedSlug(slug);
                 setCollectionCount(prev => prev + 1);
             } else {
@@ -506,13 +546,14 @@ export default function CreateCollection() {
             setX402Pending(null);
             const slug = responseData?.data?.slug || responseData?.slug;
             if (slug) {
+                clearDraft();
                 setCreatedSlug(slug);
                 setCollectionCount(prev => prev + 1);
             } else {
                 setToast({ message: "Job post created but no slug returned.", type: "error" });
             }
         } catch (err: any) {
-            console.error("[x402pay]", err);
+            console.error("[usdc-pay]", err);
             setToast({ message: err?.message || "Payment failed. Please try again.", type: "error" });
         } finally {
             setX402PayLoading(false);
@@ -738,6 +779,13 @@ export default function CreateCollection() {
                                         </header>
 
                                         <form onSubmit={handleSubmit} className="space-y-3">
+                                            {/* Draft restored banner */}
+                                            {draftRestored && !createdSlug && (
+                                                <div className="flex items-center justify-between px-3 py-2 rounded-xl text-[11px]" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                                                    <span className="text-emerald-400 font-medium">✦ Draft restored — your previous progress has been loaded.</span>
+                                                    <button type="button" onClick={() => { clearDraft(); setFormData({ title: "", description: "", keyResponsibilities: "", requirements: "", whatWeOffer: "", roleType: "Full-time", workMode: "Remote", timezone: "UTC", experienceLevel: "Senior", compensationType: "Crypto + Equity", salary: "", recruiterName: "", recruiterRole: "", companyName: "", companyDescription: "", websiteUrl: "", twitterUrl: "", discordUrl: "", projectStage: "Early", companyEmail: "", telegramUrl: "", linkedinUrl: "", contactChannel: "", deadline: "", visibility: "public", focusAreas: [], customFocus: "", filters: { minReceiptsThreshold: 0, verifiedOnly: false, activeWalletOnly: false, regionRestriction: "", workPreference: "", languages: "", socialExposure: "" } }); }} className="text-white/30 hover:text-white/60 transition-colors ml-3">Clear</button>
+                                                </div>
+                                            )}
                                             {/* Google-user notice — no on-chain record, no hiring dashboard */}
                                             {isGoogleUser && (
                                                 <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
@@ -1286,7 +1334,7 @@ export default function CreateCollection() {
                                 </div>
                             </div>
 
-                            <div className="pt-2">
+                            <div className="pt-2 space-y-2">
                                 <button
                                     type="submit"
                                     disabled={loading || !formData.title || !!x402Pending}
@@ -1294,7 +1342,16 @@ export default function CreateCollection() {
                                 >
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Plus className="w-4 h-4" /> Generate Hiring Link</>}
                                 </button>
-                                <p className="text-center text-[10px] mt-3" style={{ color: "rgba(255,255,255,0.15)" }}>
+                                <button
+                                    type="button"
+                                    onClick={saveDraft}
+                                    disabled={!draftKey || !formData.title}
+                                    className="w-full py-2.5 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: draftSaved ? "rgba(52,211,153,0.9)" : "rgba(255,255,255,0.45)" }}
+                                >
+                                    {draftSaved ? <><Check className="w-3.5 h-3.5" /> Draft Saved</> : <><FolderOpen className="w-3.5 h-3.5" /> Save Draft</>}
+                                </button>
+                                <p className="text-center text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.15)" }}>
                                     By creating this collection, you agree to handle candidate data with care.
                                 </p>
                             </div>
