@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -14,8 +14,10 @@ import { Toast } from "@/components/ui/Toast";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
-export default function CreateProfilePage() {
+function CreateProfileContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRecruiter = searchParams.get("role") === "recruiter";
   const { publicKey, connected, signMessage } = useWallet();
   const { session } = useGoogleAuth();
   const [loading, setLoading] = useState(false);
@@ -184,8 +186,8 @@ export default function CreateProfilePage() {
       });
 
       if (res.ok) {
-        setToast({ message: "Profile saved successfully!", type: "success" });
-        setTimeout(() => router.push("/dashboard"), 1000);
+        setToast({ message: isRecruiter ? "Profile created! You can request organization verification from your dashboard." : "Profile saved successfully!", type: "success" });
+        setTimeout(() => router.push("/dashboard"), 1500);
       } else {
         const data = await res.json();
         setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
@@ -511,5 +513,13 @@ export default function CreateProfilePage() {
         />
       )}
     </main>
+  );
+}
+
+export default function CreateProfilePage() {
+  return (
+    <Suspense>
+      <CreateProfileContent />
+    </Suspense>
   );
 }

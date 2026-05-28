@@ -595,7 +595,7 @@ export default function DashboardPage() {
                 <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>Choose your role to set up your account</p>
               </div>
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <Link href="/create-profile?role=builder" className="p-5 rounded-[20px] border border-white/5 bg-white/[0.02] hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all flex flex-col items-center text-center gap-3 group">
+                <Link href="/create-profile" className="p-5 rounded-[20px] border border-white/5 bg-white/[0.02] hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all flex flex-col items-center text-center gap-3 group">
                   <div className="w-12 h-12 rounded-2xl bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center text-2xl transition-colors">🏗</div>
                   <div>
                     <p className="font-black text-sm text-white">Builder</p>
@@ -611,6 +611,7 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <p className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>You can change this later in settings</p>
+              <p className="text-center text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.12)" }}>Recruiter accounts require organization verification after signup</p>
             </div>
           </div>
         ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox"].includes(activeTab))) ? (
@@ -1884,10 +1885,11 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
   const { connected: walletConnected, publicKey: walletPublicKey } = useWallet();
   const [walletLinkShown, setWalletLinkShown] = useState(false);
 
-  const needsOnboarding = !orgAccount || !orgAccount.onboarding_complete;
+  // Only redirect to /auth/role if there's truly no account yet (not just missing org details)
+  const noAccount = !orgAccount;
   useEffect(() => {
-    if (needsOnboarding) router.replace("/onboarding/org");
-  }, [needsOnboarding, router]);
+    if (noAccount) router.replace("/auth/role");
+  }, [noAccount, router]);
 
   // Detect wallet linked successfully — show success toast once and save to DB
   useEffect(() => {
@@ -1950,7 +1952,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
       .catch(() => {});
   }, [orgAccount, session]);
 
-  if (needsOnboarding) return <LoadingScreen message="Setting up your organization..." />;
+  if (noAccount) return <LoadingScreen message="Setting up your account..." />;
 
   const googleProfile = {
     displayName: orgAccount?.org_name ?? session.user.email?.split("@")[0] ?? "My Organization",

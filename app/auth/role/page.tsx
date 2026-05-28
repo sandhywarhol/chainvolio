@@ -16,8 +16,8 @@ export default function AuthRolePage() {
     useEffect(() => {
         if (loading) return;
         if (!session) { router.replace("/"); return; }
-        // Already has an account — go straight to dashboard
-        if (orgAccount) { router.replace("/dashboard"); return; }
+        // Only skip role selection if account is fully set up
+        if (orgAccount?.onboarding_complete) { router.replace("/dashboard"); return; }
     }, [loading, session, orgAccount, router]);
 
     const handleContinue = async () => {
@@ -25,24 +25,30 @@ export default function AuthRolePage() {
         setSaving(true);
         setError(null);
 
-        if (selectedRole === "recruiter") {
-            // Let /onboarding/org handle org_accounts creation
-            router.replace("/onboarding/org");
-            return;
-        }
+        // Both builder and recruiter create their account immediately and go to dashboard.
+        // Recruiter can fill in org name/type later in edit profile — no blocking onboarding step.
+        const defaultOrgName =
+            (session.user.user_metadata?.full_name as string | undefined) ||
+            (session.user.user_metadata?.name as string | undefined) ||
+            session.user.email?.split("@")[0] ||
+            "My Organization";
 
-        // Builder — create org_accounts row immediately with onboarding_complete=true
         const res = await fetch("/api/org-accounts", {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${session.access_token}`
+                "Authorization": `Bearer ${session.access_token}`,
             },
             body: JSON.stringify({
                 auth_uid: session.user.id,
                 email: session.user.email ?? "",
-                account_type: "builder",
+                account_type: selectedRole,           // "builder" or "recruiter"
                 onboarding_complete: true,
+                // Recruiter defaults — user updates these in edit profile
+                ...(selectedRole === "recruiter" && {
+                    org_name: defaultOrgName,
+                    org_type: "company",
+                }),
             }),
         });
 
@@ -56,7 +62,7 @@ export default function AuthRolePage() {
     };
 
     if (loading || !session) return <LoadingScreen message="Loading..." />;
-    if (orgAccount) return <LoadingScreen message="Loading your dashboard..." />;
+    if (orgAccount?.onboarding_complete) return <LoadingScreen message="Loading your dashboard..." />;
 
     const avatarUrl = session.user.user_metadata?.avatar_url as string | undefined;
 
