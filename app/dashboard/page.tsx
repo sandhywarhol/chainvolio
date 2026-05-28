@@ -586,14 +586,32 @@ export default function DashboardPage() {
             </button>
           </div>
         ) : !profile?.displayName ? (
-          <div className="mb-8 p-4 rounded-lg bg-slate-800 border border-slate-700">
-            <p className="mb-4">No profile yet. Create one first.</p>
-            <Link
-              href="/create-profile"
-              className="inline-block px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600"
-            >
-              Create Profile
-            </Link>
+          // ── New wallet — role selection onboarding ─────────────────────────────
+          <div className="min-h-[60vh] flex items-center justify-center px-4">
+            <div className="w-full max-w-sm">
+              <div className="text-center mb-7">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "rgba(255,255,255,0.25)" }}>Welcome to ChainVolio</p>
+                <h2 className="text-xl font-black text-white">How will you use this?</h2>
+                <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>Choose your role to set up your account</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <Link href="/create-profile?role=builder" className="p-5 rounded-[20px] border border-white/5 bg-white/[0.02] hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all flex flex-col items-center text-center gap-3 group">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center text-2xl transition-colors">🏗</div>
+                  <div>
+                    <p className="font-black text-sm text-white">Builder</p>
+                    <p className="text-[10px] mt-1 leading-snug" style={{ color: "rgba(255,255,255,0.35)" }}>Talent, dev, designer, creator</p>
+                  </div>
+                </Link>
+                <Link href="/create-profile?role=recruiter" className="p-5 rounded-[20px] border border-white/5 bg-white/[0.02] hover:border-amber-500/40 hover:bg-amber-500/10 transition-all flex flex-col items-center text-center gap-3 group">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 group-hover:bg-amber-500/20 flex items-center justify-center text-2xl transition-colors">🔍</div>
+                  <div>
+                    <p className="font-black text-sm text-white">Recruiter</p>
+                    <p className="text-[10px] mt-1 leading-snug" style={{ color: "rgba(255,255,255,0.35)" }}>Company, DAO, community</p>
+                  </div>
+                </Link>
+              </div>
+              <p className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>You can change this later in settings</p>
+            </div>
           </div>
         ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox"].includes(activeTab))) ? (
           // ── Org Dashboard (Community / Company wallet accounts) ───────────────
