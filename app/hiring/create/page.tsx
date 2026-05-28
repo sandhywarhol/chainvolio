@@ -467,10 +467,25 @@ export default function CreateCollection() {
             const txSignature = await conn.sendRawTransaction((signedTx as any).serialize(), {
                 skipPreflight: false,
             });
-            await conn.confirmTransaction(
-                { signature: txSignature, blockhash, lastValidBlockHeight },
-                "confirmed"
-            );
+            try {
+                await conn.confirmTransaction(
+                    { signature: txSignature, blockhash, lastValidBlockHeight },
+                    "confirmed"
+                );
+            } catch (confirmErr: any) {
+                // Blockhash can expire if wallet approval took too long — check if
+                // the tx was actually included in a block before declaring failure.
+                if (confirmErr?.name === "TransactionExpiredBlockHeightExceededError") {
+                    const status = await conn.getSignatureStatus(txSignature);
+                    const cs = status?.value?.confirmationStatus;
+                    if (cs !== "confirmed" && cs !== "finalized") {
+                        throw new Error("Transaction expired. Please try again (click Pay & Post Job once more).");
+                    }
+                    // Transaction was confirmed despite timeout — continue normally
+                } else {
+                    throw confirmErr;
+                }
+            }
 
             // Retry the original POST — server verifies the tx on-chain
             const res = await fetch("/api/hiring/collections", {
