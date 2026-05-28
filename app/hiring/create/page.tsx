@@ -47,7 +47,7 @@ import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function CreateCollection() {
-    const { publicKey, signMessage, signTransaction } = useWallet();
+    const { publicKey, signMessage, sendTransaction } = useWallet();
     const { session, orgAccount: googleOrgAccount, loading: googleLoading } = useGoogleAuth();
     const isGoogleUser = !publicKey && !!session;
     const [loading, setLoading] = useState(false);
@@ -458,15 +458,15 @@ export default function CreateCollection() {
     };
 
     /**
-     * Payment handler — submits a USDC transfer to the treasury on-chain,
-     * then retries the POST with the confirmed tx signature so the server
-     * can verify payment directly via Solana RPC (no external facilitator).
+     * Payment handler — same pattern as attestation:
+     * uses sendTransaction (wallet handles signing + submission atomically)
+     * then polls getSignatureStatus to avoid blockhash-expiry errors.
      */
     const handleX402Pay = async () => {
-        if (!x402Pending || !publicKey || !signTransaction) return;
+        if (!x402Pending || !publicKey || !sendTransaction) return;
         setX402PayLoading(true);
         try {
-            const { Connection, PublicKey, TransactionMessage, VersionedTransaction } = await import("@solana/web3.js");
+            const { Connection, PublicKey, Transaction, ComputeBudgetProgram } = await import("@solana/web3.js");
             const {
                 getAssociatedTokenAddress,
                 createTransferCheckedInstruction,
@@ -482,50 +482,43 @@ export default function CreateCollection() {
             const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
             const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
 
-            // Ensure treasury USDC ATA exists (no-op if already created)
-            const createToATAIx = createAssociatedTokenAccountIdempotentInstruction(
-                publicKey, toATA, treasury, usdcMint
-            );
+            const tx = new Transaction();
+            tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 5000 }));
+            tx.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }));
 
-            // USDC transfer instruction (6 decimals)
-            const transferIx = createTransferCheckedInstruction(
+            // Ensure treasury USDC ATA exists (no-op if already created)
+            tx.add(createAssociatedTokenAccountIdempotentInstruction(
+                publicKey, toATA, treasury, usdcMint
+            ));
+
+            // USDC transfer (6 decimals)
+            tx.add(createTransferCheckedInstruction(
                 fromATA, usdcMint, toATA, publicKey,
                 BigInt(requirements.amount), 6
-            );
+            ));
 
-            // Build + sign the versioned transaction
-            const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
-            const message = new TransactionMessage({
-                payerKey: publicKey,
-                recentBlockhash: blockhash,
-                instructions: [createToATAIx, transferIx],
-            }).compileToV0Message();
-            const versionedTx = new VersionedTransaction(message);
-            const signedTx = await signTransaction(versionedTx as any);
-
-            // Submit to Solana and wait for confirmation
-            const txSignature = await conn.sendRawTransaction((signedTx as any).serialize(), {
-                skipPreflight: false,
+            // sendTransaction handles signing + submission atomically inside Phantom —
+            // blockhash is fetched at the last moment so it never expires during approval.
+            const txSignature = await sendTransaction(tx, conn, {
+                skipPreflight: true,
+                preflightCommitment: "confirmed",
+                maxRetries: 5,
             });
-            try {
-                await conn.confirmTransaction(
-                    { signature: txSignature, blockhash, lastValidBlockHeight },
-                    "confirmed"
-                );
-            } catch (confirmErr: any) {
-                // Blockhash can expire if wallet approval took too long — check if
-                // the tx was actually included in a block before declaring failure.
-                if (confirmErr?.name === "TransactionExpiredBlockHeightExceededError") {
-                    const status = await conn.getSignatureStatus(txSignature);
-                    const cs = status?.value?.confirmationStatus;
-                    if (cs !== "confirmed" && cs !== "finalized") {
-                        throw new Error("Transaction expired. Please try again (click Pay & Post Job once more).");
-                    }
-                    // Transaction was confirmed despite timeout — continue normally
-                } else {
-                    throw confirmErr;
+
+            // Poll for confirmation (same as attestation — no blockhash expiry risk)
+            let confirmed = false;
+            const start = Date.now();
+            while (Date.now() - start < 60000) {
+                const statusRes = await conn.getSignatureStatus(txSignature, { searchTransactionHistory: true });
+                const status = statusRes?.value;
+                if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
+                    confirmed = true;
+                    break;
                 }
+                if (status?.err) throw new Error(`Transaction failed on Solana: ${JSON.stringify(status.err)}`);
+                await new Promise(r => setTimeout(r, 2000));
             }
+            if (!confirmed) throw new Error("Transaction confirmation timed out. Please try again.");
 
             // Retry the original POST — server verifies the tx on-chain
             const res = await fetch("/api/hiring/collections", {
