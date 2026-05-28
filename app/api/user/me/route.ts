@@ -57,6 +57,12 @@ export async function GET(request: Request) {
             .not("role", "is", null)
             .neq("role", "");
 
+        const { count: attestedReceiptCount } = await supabase
+            .from("receipts")
+            .select("id", { count: "exact", head: true })
+            .eq("wallet_address", wallet)
+            .eq("status", "Attested");
+
         if (powErr) {
             console.error("Supabase PoW Error:", powErr);
             // Don't throw here, just treat as 0
@@ -94,6 +100,7 @@ export async function GET(request: Request) {
             walletAddress: wallet,
             isVerified,
             verificationTier,
+            attestedReceiptCount: attestedReceiptCount || 0,
             verificationStatus: (isVerified && orgData?.pending_upgrade_status === 'pending') ? 'pending' : (orgData?.status || 'unverified'),
             isExpired,
             verificationType: orgData?.type || null,

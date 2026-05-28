@@ -134,12 +134,8 @@ export async function POST(request: Request) {
         // 5. Enforce Eligibility Filters (Server-Side)
         const filters = collection.eligibility_filters || {};
 
-        if (filters.minReceiptsThreshold && receiptList.length < (filters.minReceiptsThreshold)) {
-            return errorResponse("ERR_ELIGIBILITY_HISTORY", `This position requires at least ${filters.minReceiptsThreshold} work records.`, 403);
-        }
-
-        if (filters.verifiedOnly && attestedCount < 1) {
-            return errorResponse("ERR_ELIGIBILITY_ATTESTATION", "This position requires at least one verified (attested) work record.", 403);
+        if (filters.activeWalletOnly && attestedCount < 1) {
+            return errorResponse("ERR_ELIGIBILITY_ACTIVE_WALLET", "This position requires an active wallet with at least 1 attested proof of work.", 403);
         }
 
         // 6. Compute Dynamic Snapshot Tags

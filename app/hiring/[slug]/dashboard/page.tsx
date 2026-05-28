@@ -12,6 +12,7 @@ import {
     ChevronUp,
     ExternalLink,
     ShieldCheck,
+    BadgeCheck,
     Clock,
     Building2,
     Briefcase,
@@ -634,6 +635,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
         // Sorting — rejected candidates always sink to bottom regardless of sort mode
         list.sort((a, b) => {
+            // verifiedOnly priority sorting: unverified candidates sink to the bottom
+            const verifiedOnlyActive = !!data?.collection?.eligibility_filters?.verifiedOnly;
+            if (verifiedOnlyActive) {
+                const aUnverified = a.isVerified ? 0 : 1;
+                const bUnverified = b.isVerified ? 0 : 1;
+                if (aUnverified !== bUnverified) return aUnverified - bUnverified;
+            }
+
             const aRejected = a.recruiterStatus === 'rejected' ? 1 : 0;
             const bRejected = b.recruiterStatus === 'rejected' ? 1 : 0;
             if (aRejected !== bRejected) return aRejected - bRejected;
@@ -1059,7 +1068,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
             {/* ── 3-PANEL BODY ── */}
             <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-12 pt-3 pb-3 flex flex-col">
-                <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1380px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+                <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1380px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
 
                     {/* ── LEFT SIDEBAR ── */}
                     <aside className="hidden md:flex w-[240px] flex-shrink-0 flex-col overflow-y-auto" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1318,98 +1327,114 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCandidates.map((candidate) => (
-                                    <React.Fragment key={candidate.id}>
-                                        <tr
-                                            key={candidate.id}
-                                            onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
-                                            className={`group hover:bg-white/[0.01] transition-all cursor-pointer border-b border-white/[0.02] relative ${expandedId === candidate.id ? 'bg-[#121214] border-indigo-500/30' : ''} ${candidate.recruiterStatus === 'rejected' ? 'opacity-40 grayscale-[0.8]' : ''}`}
-                                        >
-                                            <td className="px-4 py-5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="relative flex-shrink-0">
-                                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm shadow-indigo-500/5 group-hover:border-indigo-500/20 transition-all duration-300">
-                                                            {candidate.avatarUrl ? (
-                                                                <img src={candidate.avatarUrl} alt="" className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
-                                                            ) : (
-                                                                <span className="text-[10px] font-black text-indigo-400 font-mono italic opacity-60 uppercase">{candidate.wallet.slice(0, 2)}</span>
+                                filteredCandidates.map((candidate) => {
+                                    const isUnverifiedSubdued = !!data?.collection?.eligibility_filters?.verifiedOnly && !candidate.isVerified;
+                                    return (
+                                        <React.Fragment key={candidate.id}>
+                                            <tr
+                                                key={candidate.id}
+                                                onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
+                                                className={`group hover:bg-white/[0.01] transition-all cursor-pointer border-b border-white/[0.02] relative ${
+                                                    expandedId === candidate.id ? (isUnverifiedSubdued ? 'bg-black/95 border-zinc-800' : 'bg-[#121214] border-indigo-500/30') : ''
+                                                } ${
+                                                    candidate.recruiterStatus === 'rejected' ? 'opacity-40 grayscale-[0.8]' : ''
+                                                } ${
+                                                    isUnverifiedSubdued ? 'bg-black text-zinc-500 border-zinc-900 opacity-50 grayscale hover:opacity-60' : ''
+                                                }`}
+                                            >
+                                                <td className="px-4 py-5">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative flex-shrink-0">
+                                                            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm shadow-indigo-500/5 group-hover:border-indigo-500/20 transition-all duration-300 ${isUnverifiedSubdued ? 'opacity-40 grayscale' : ''}`}>
+                                                                {candidate.avatarUrl ? (
+                                                                    <img src={candidate.avatarUrl} alt="" className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
+                                                                ) : (
+                                                                    <span className={`text-[10px] font-black font-mono italic opacity-60 uppercase ${isUnverifiedSubdued ? 'text-zinc-600' : 'text-indigo-400'}`}>{candidate.wallet.slice(0, 2)}</span>
+                                                                )}
+                                                            </div>
+                                                            {candidate.recruiterStatus === 'shortlisted' && (
+                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#121215] shadow-lg shadow-emerald-500/20"></div>
+                                                            )}
+                                                            {candidate.recruiterStatus === 'rejected' && (
+                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#121215] shadow-lg shadow-red-500/20"></div>
                                                             )}
                                                         </div>
-                                                        {candidate.recruiterStatus === 'shortlisted' && (
-                                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#121215] shadow-lg shadow-emerald-500/20"></div>
-                                                        )}
-                                                        {candidate.recruiterStatus === 'rejected' && (
-                                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#121215] shadow-lg shadow-red-500/20"></div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-col gap-1.5 overflow-hidden">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`text-[13px] font-bold tracking-tight transition-colors truncate max-w-[140px] md:max-w-[200px] ${candidate.recruiterStatus === 'rejected' ? 'text-slate-600' : 'text-white'}`}>
-                                                                {candidate.displayName || "Anonymous Professional"}
-                                                            </span>
-                                                            {candidate.cardNumber && (
-                                                                <span className="text-[9px] font-mono text-slate-500 font-bold bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
-                                                                    #{String(candidate.cardNumber).padStart(5, '0')}
+                                                        <div className="flex flex-col gap-1.5 overflow-hidden">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`text-[13px] font-bold tracking-tight transition-colors truncate max-w-[140px] md:max-w-[200px] ${isUnverifiedSubdued ? 'text-zinc-500' : candidate.recruiterStatus === 'rejected' ? 'text-slate-600' : 'text-white'}`}>
+                                                                    {candidate.displayName || "Anonymous Professional"}
                                                                 </span>
-                                                            )}
-                                                            {candidate.attestedCount > 0 && (
-                                                                <div className="group/shield relative">
-                                                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
-                                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/shield:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
-                                                                        Attested
+                                                                {candidate.isVerified && (
+                                                                    <div className="group/verified relative">
+                                                                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-450/90" />
+                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-28 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/verified:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                                                            Verified Profile
+                                                                        </div>
                                                                     </div>
-                                                                </div>
+                                                                )}
+                                                                {candidate.cardNumber && (
+                                                                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border ${isUnverifiedSubdued ? 'text-zinc-700 bg-black/45 border-zinc-900' : 'text-slate-500 bg-white/5 border-white/5'}`}>
+                                                                        #{String(candidate.cardNumber).padStart(5, '0')}
+                                                                    </span>
+                                                                )}
+                                                                {candidate.attestedCount > 0 && (
+                                                                    <div className="group/shield relative">
+                                                                        <ShieldCheck className={`w-3.5 h-3.5 ${isUnverifiedSubdued ? 'text-zinc-650' : 'text-emerald-400/80'}`} />
+                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/shield:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                                                            Attested
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1.5">
+                                                                <span className={`text-[9px] font-mono truncate max-w-[100px] transition-colors uppercase select-none ${isUnverifiedSubdued ? 'text-zinc-700 hover:text-zinc-600' : 'text-slate-500 hover:text-slate-300'}`}>
+                                                                    {candidate.wallet.slice(0, 6)}...{candidate.wallet.slice(-4)}
+                                                                </span>
+                                                                {candidate.snapshotTags?.slice(0, 2).map((tag: string) => (
+                                                                    <span key={tag} className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${isUnverifiedSubdued ? 'bg-black border border-zinc-900/50 text-zinc-700' : 'bg-white/[0.03] border border-white/[0.04] text-slate-500'}`}>
+                                                                        {tag}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-5 text-center">
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${isUnverifiedSubdued ? 'bg-black text-zinc-700 border-zinc-900' : candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20 shadow-sm shadow-amber-400/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                            {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
+                                                            {candidate.signalStrength === 'Medium' && "CALIBRATED"}
+                                                            {candidate.signalStrength === 'Low' && "LOW SIGNAL"}
+                                                        </div>
+                                                        <div className="w-16 h-1 bg-white/[0.02] rounded-full overflow-hidden">
+                                                            <div className={`h-full rounded-full transition-all duration-700 ${isUnverifiedSubdued ? 'bg-zinc-800' : candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-5 hidden md:table-cell">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className={`text-xs font-bold capitalize truncate max-w-[180px] ${isUnverifiedSubdued ? 'text-zinc-600' : 'text-slate-200'}`}>{candidate.role}</span>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className={`text-[10px] font-medium uppercase tracking-widest ${isUnverifiedSubdued ? 'text-zinc-700' : 'text-slate-600'}`}>{candidate.primarySignal || "Standard Contribution"}</span>
+                                                            {candidate.signalMatch && !isUnverifiedSubdued && (
+                                                                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-black text-emerald-400 uppercase tracking-widest">MATCH</span>
                                                             )}
                                                         </div>
-                                                        <div className="flex flex-wrap gap-1.5">
-                                                            <span className="text-[9px] font-mono text-slate-500 truncate max-w-[100px] hover:text-slate-300 transition-colors uppercase select-none">
-                                                                {candidate.wallet.slice(0, 6)}...{candidate.wallet.slice(-4)}
-                                                            </span>
-                                                            {candidate.snapshotTags?.slice(0, 2).map((tag: string) => (
-                                                                <span key={tag} className="px-1.5 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.04] text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                                                                    {tag}
-                                                                </span>
-                                                            ))}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-5">
+                                                    <div className="flex items-center justify-center gap-6">
+                                                        <div className="flex flex-col items-center gap-0.5">
+                                                            <span className={`text-sm font-black font-mono ${isUnverifiedSubdued ? 'text-zinc-600' : 'text-white'}`}>{candidate.powCount}</span>
+                                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">PROOFS</span>
+                                                        </div>
+                                                        <div className="w-[1px] h-6 bg-white/[0.04]" />
+                                                        <div className="flex flex-col items-center gap-0.5">
+                                                            <span className={`text-sm font-black font-mono transition-colors ${isUnverifiedSubdued ? 'text-zinc-700' : candidate.attestedCount > 0 ? 'text-emerald-400' : 'text-slate-700'}`}>{candidate.attestedCount}</span>
+                                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">ATTESTED</span>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-5 text-center">
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20 shadow-sm shadow-amber-400/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
-                                                        {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
-                                                        {candidate.signalStrength === 'Medium' && "CALIBRATED"}
-                                                        {candidate.signalStrength === 'Low' && "LOW SIGNAL"}
-                                                    </div>
-                                                    <div className="w-16 h-1 bg-white/[0.02] rounded-full overflow-hidden">
-                                                        <div className={`h-full rounded-full transition-all duration-700 ${candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-5 hidden md:table-cell">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-xs font-bold text-slate-200 capitalize truncate max-w-[180px]">{candidate.role}</span>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">{candidate.primarySignal || "Standard Contribution"}</span>
-                                                        {candidate.signalMatch && (
-                                                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-black text-emerald-400 uppercase tracking-widest">MATCH</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-5">
-                                                <div className="flex items-center justify-center gap-6">
-                                                    <div className="flex flex-col items-center gap-0.5">
-                                                        <span className="text-sm font-black text-white font-mono">{candidate.powCount}</span>
-                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">PROOFS</span>
-                                                    </div>
-                                                    <div className="w-[1px] h-6 bg-white/[0.04]" />
-                                                    <div className="flex flex-col items-center gap-0.5">
-                                                        <span className={`text-sm font-black font-mono transition-colors ${candidate.attestedCount > 0 ? 'text-emerald-400' : 'text-slate-700'}`}>{candidate.attestedCount}</span>
-                                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">ATTESTED</span>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                                </td>
                                             <td className="px-4 py-5 hidden lg:table-cell">
                                                 <div className="flex flex-wrap gap-2 max-w-[280px]">
                                                     {candidate.attestedOrgs.slice(0, 2).map((org: string) => (
@@ -1671,7 +1696,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                             </tr>
                                         )}
                                     </React.Fragment>
-                                ))
+                                );
+                            })
                             )}
                                     </tbody>
                                 </table>

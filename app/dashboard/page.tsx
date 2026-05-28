@@ -330,7 +330,7 @@ export default function DashboardPage() {
   if (!publicKey) {
     // Definitely not signed in (autoConnect finished or never started)
     return (
-      <main className="min-h-screen text-white relative bg-black theme-bg-page theme-aware">
+      <main className="min-h-screen text-white relative theme-bg-page theme-aware" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
           <div className="text-center space-y-4">
@@ -358,14 +358,14 @@ export default function DashboardPage() {
   );
 
   return (
-    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "#000000" }}>
+    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
       <div className="flex-shrink-0" style={{ height: 96 }} />{/* navbar spacer */}
 
       {/* ── 3-PANEL BODY ── */}
-      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-3 flex flex-col">
-        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-6 md:pb-10 flex flex-col">
+        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
 
         {/* ── LEFT SIDEBAR ── */}
         <aside className="hidden md:flex w-[220px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1661,9 +1661,6 @@ export default function DashboardPage() {
         </div>{/* end inner rounded box */}
       </div>{/* end 3-panel body */}
 
-      {/* Bottom vignette gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-[60]" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }} />
-
       {showVerificationModal && profile && (
         <VerificationRequestModal
           walletAddress={walletAddress}
@@ -1726,7 +1723,7 @@ export default function DashboardPage() {
         isVerified={!!profile?.isVerified}
         verificationTier={profile?.verificationTier}
       />
-      <Footer />
+      <Footer className="bg-[#0d0d0f]" />
     </main>
   );
 }
@@ -1743,7 +1740,7 @@ function GoogleBuilderNoWalletView({ session }: { session: Session }) {
     { icon: "🔍", label: "Discoverable Profile",    desc: "Show up in recruiter searches as a verified builder" },
   ];
   return (
-    <main className="min-h-screen text-white relative bg-black theme-bg-page theme-aware">
+    <main className="min-h-screen text-white relative theme-bg-page theme-aware" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8 px-4 py-12">
         {/* Header */}
@@ -1894,14 +1891,14 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
   const meta = tabMeta[activeTab] ?? tabMeta.profile;
 
   return (
-    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "#000000" }}>
+    <main className="flex flex-col h-screen overflow-hidden text-white relative selection:bg-teal-500/30 selection:text-white" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       <Navbar />
       <div className="flex-shrink-0" style={{ height: 96 }} />
 
       {/* ── 3-PANEL BODY ── */}
-      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-3 flex flex-col">
-        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-6 md:pb-10 flex flex-col">
+        <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
 
           {/* ── LEFT SIDEBAR ── */}
           <aside className="hidden md:flex w-[220px] flex-shrink-0 flex-col overflow-y-auto custom-scrollbar" style={{ background: "#0d0d10", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
@@ -2104,8 +2101,6 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
 
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-[60]" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }} />
 
       {showVerifyModal && (
         <VerificationRequestModal

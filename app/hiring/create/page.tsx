@@ -7,6 +7,7 @@ import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import { getHiringLimit, RETAIL_JOB_POST_USDC_DISPLAY, RETAIL_JOB_POST_USDC, USDC_MINT_MAINNET, TREASURY_WALLET } from "@/lib/paymentConfig";
 import {
     Loader2,
@@ -32,7 +33,14 @@ import {
     User,
     Mail,
     Send,
-    Target
+    Target,
+    FolderOpen,
+    Activity,
+    Inbox,
+    ExternalLink,
+    Share2,
+    CheckCircle2,
+    MapPin
 } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
@@ -47,6 +55,61 @@ export default function CreateCollection() {
     const [copied, setCopied] = useState(false);
     const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "warning" } | null>(null);
     const [isAutoFilled, setIsAutoFilled] = useState(false);
+    const [activeSection, setActiveSection] = useState("recruiter-identity");
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+    const handleSectionClick = (id: string) => {
+        setActiveSection(id);
+        const container = document.getElementById("form-scroll-container");
+        const target = document.getElementById(id);
+        if (container && target) {
+            const containerRect = container.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const scrollOffset = targetRect.top - containerRect.top + container.scrollTop;
+            container.scrollTo({
+                top: scrollOffset - 10,
+                behavior: "smooth"
+            });
+        }
+    };
+
+    useEffect(() => {
+        const container = document.getElementById("form-scroll-container");
+        if (!container) return;
+
+        const handleScroll = () => {
+            const sections = [
+                "recruiter-identity",
+                "job-description",
+                "job-details",
+                "evaluation-focus",
+                "eligibility-filters",
+                "final-configuration"
+            ];
+
+            const containerRect = container.getBoundingClientRect();
+            let activeId = "recruiter-identity";
+
+            for (const sectionId of sections) {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    const relativeTop = rect.top - containerRect.top;
+                    const relativeBottom = rect.bottom - containerRect.top;
+
+                    // If the top of the element is near or above the top of the container view,
+                    // and its bottom is still below the top offset, it's the active one.
+                    if (relativeTop <= 120 && relativeBottom > 40) {
+                        activeId = sectionId;
+                    }
+                }
+            }
+            setActiveSection(activeId);
+        };
+
+        container.addEventListener("scroll", handleScroll, { passive: true });
+        return () => container.removeEventListener("scroll", handleScroll);
+    }, []);
 
     // Tier enforcement state
     const [userTier, setUserTier] = useState<string>("unverified");
@@ -62,7 +125,10 @@ export default function CreateCollection() {
 
     const [formData, setFormData] = useState({
         title: "",
-        description: "",
+        description: "", // maps to Job Summary
+        keyResponsibilities: "",
+        requirements: "",
+        whatWeOffer: "",
         roleType: "Full-time",
         workMode: "Remote",
         timezone: "UTC",
@@ -87,7 +153,12 @@ export default function CreateCollection() {
         customFocus: "",
         filters: {
             minReceiptsThreshold: 0,
-            verifiedOnly: false
+            verifiedOnly: false,
+            activeWalletOnly: false,
+            regionRestriction: "",
+            workPreference: "",
+            languages: "",
+            socialExposure: ""
         }
     });
 
@@ -147,7 +218,7 @@ export default function CreateCollection() {
                 try {
                     const { data, error } = await supabase
                         .from("profiles")
-                        .select("display_name, headline, professional_role, organization, website, twitter")
+                        .select("display_name, headline, professional_role, organization, website, twitter, avatar_url")
                         .eq("wallet_address", publicKey.toBase58())
                         .single();
 
@@ -165,6 +236,7 @@ export default function CreateCollection() {
                             websiteUrl: prev.websiteUrl || data.website || "",
                             twitterUrl: prev.twitterUrl || data.twitter || ""
                         }));
+                        setAvatarUrl(data.avatar_url || null);
                         setIsAutoFilled(true);
                     }
                 } catch (err) {
@@ -178,6 +250,7 @@ export default function CreateCollection() {
                     websiteUrl: prev.websiteUrl || googleOrgAccount.website || "",
                     twitterUrl: prev.twitterUrl || googleOrgAccount.twitter || "",
                 }));
+                setAvatarUrl(googleOrgAccount.avatar_url || null);
                 setIsAutoFilled(true);
             }
         };
@@ -467,139 +540,206 @@ export default function CreateCollection() {
     }
 
     return (
-        <main className="min-h-screen text-white selection:bg-emerald-500/30 bg-black theme-bg-page theme-aware">
-            <Navbar />
-            <div className="h-20" />{/* spacer for sticky navbar */}
+        <main className="min-h-screen text-white selection:bg-emerald-500/30 theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
+            <div className="w-full min-h-screen" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
+                <Navbar />
+                <div className="h-20" />{/* spacer for sticky navbar */}
 
-            <section className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
-                {!createdSlug ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <header className="mb-7">
-                            <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>ChainVolio Recruit</p>
-                            <h1 className="text-xl font-bold text-white tracking-tight">Create <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Hiring Collection</span></h1>
-                            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Define criteria and collect verifiable on-chain portfolios from candidates.</p>
-                        </header>
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 relative z-10">
+                    <div className="w-full rounded-2xl overflow-hidden flex min-h-[750px] relative" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
+                        {/* Spotlight — thin cone from top-center */}
+                        <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: "radial-gradient(ellipse 45% 28% at 50% -1%, rgba(255,255,255,0.07) 0%, transparent 80%)" }} />
 
-                        <form onSubmit={handleSubmit} className="space-y-3">
-                        {/* Google-user notice — no on-chain record, no hiring dashboard */}
-                        {isGoogleUser && (
-                            <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
-                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <Mail className="w-4 h-4 text-blue-400" />
-                                </div>
-                                <div className="space-y-0.5">
-                                    <p className="text-[11px] font-bold text-blue-300 uppercase tracking-wider">Signed in with Google</p>
-                                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                                        Your collection will be saved to Supabase. Note: the hiring dashboard won&apos;t be available for Google-only accounts — connect a wallet later to unlock it.
-                                    </p>
-                                </div>
+                        {/* ── LEFT SIDEBAR ── */}
+                        <div className="hidden lg:flex w-[210px] flex-shrink-0 flex-col h-full self-stretch" style={{ background: "#111215", borderRight: "1px solid rgba(255,255,255,0.06)", minHeight: "750px" }}>
+                            {/* Logo */}
+                            <div className="flex items-center px-4 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                <img src="/chainvolio%20logo.png" alt="chainvolio" style={{ height: 20, width: "auto", objectFit: "contain" }} />
+                                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginLeft: 6, letterSpacing: "-0.01em" }}>chainvolio</span>
                             </div>
-                        )}
-                        {/* Tier-based hiring gate */}
-                        {hiringAccess === "limit_reached" ? (
-                            // Limit reached: any capped tier exhausted
-                            <div className="mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl bg-rose-500/5 border border-rose-500/20 text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
-                                <div className="w-14 h-14 mx-auto rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
-                                    <Lock className="w-6 h-6 text-rose-400" />
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-base font-bold text-white">You've used your free job post.</h3>
-                                    <p className="text-sm text-slate-400 max-w-sm mx-auto">
-                                        Fill the form and submit to pay <span className="text-violet-300 font-bold">${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC</span> per additional post, or upgrade for unlimited access.
-                                    </p>
-                                </div>
-                                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold">
-                                    <span className="text-slate-400">Hiring Usage:</span>
-                                    <span className="text-rose-400">{collectionCount} / {hiringLimit} used</span>
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                                    {!isGoogleUser && publicKey && (
-                                        <p className="self-center text-[10px] text-violet-400 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 font-medium">
-                                            ↓ Fill form below · pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC per additional post
-                                        </p>
+                            {/* Nav items */}
+                            <div className="px-2 py-3 flex-1 space-y-0.5">
+                                {([
+                                    { icon: Building2,    label: "Recruiter Identity",id: "recruiter-identity" },
+                                    { icon: Target,       label: "Job Description",   id: "job-description" },
+                                    { icon: Clock,        label: "Job Details",       id: "job-details" },
+                                    { icon: ShieldCheck,  label: "Evaluation Focus",  id: "evaluation-focus" },
+                                    { icon: Filter,       label: "Eligibility Filters",id: "eligibility-filters" },
+                                    { icon: CalendarDays, label: "Final Configuration",id: "final-configuration" },
+                                ] as Array<{ icon: React.ElementType; label: string; id: string }>).map(({ icon: Icon, label, id }) => {
+                                    const active = activeSection === id;
+                                    return (
+                                        <div key={id} 
+                                            onClick={() => handleSectionClick(id)}
+                                            className={`flex items-center gap-2.5 px-3 py-[7px] rounded-md relative transition-all duration-300 cursor-pointer ${active ? "" : "hover:bg-white/[0.03]"}`} 
+                                            style={active ? { background: "rgba(255,255,255,0.07)" } : {}}
+                                        >
+                                            {active && <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.4)" }} />}
+                                            <Icon style={{ width: 13, height: 13, flexShrink: 0, color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.3)" }} />
+                                            <span style={{ fontSize: 12, fontWeight: active ? 600 : 500, color: active ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.42)" }}>{label}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Recruiter info at bottom of sidebar */}
+                            <div className="px-3 py-3.5 flex items-center gap-2 hover:bg-white/[0.03] transition-colors cursor-default" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 bg-white/5 border border-white/10 flex items-center justify-center">
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-3.5 h-3.5 text-white/50" />
                                     )}
-                                    <Link
-                                        href="/dashboard"
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all"
-                                    >
-                                        <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
-                                    </Link>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1 }} className="truncate">
+                                        {formData.recruiterName || (publicKey ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}` : "Recruiter")}
+                                    </p>
+                                    <p style={{ fontSize: 8.5, color: "#4ade80", fontWeight: 600, marginTop: 2, letterSpacing: "0.03em" }}>ACTIVE</p>
                                 </div>
                             </div>
-                        ) : (
-                            // Available: capped with slots remaining, or unlimited
-                            <div className="mb-8 p-5 md:p-6 rounded-2xl md:rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
-                                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-                                    <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                        <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h4 className="text-sm font-bold text-white">Verification Status</h4>                                        {hiringAccess === "capped_available" ? (
-                                            <div className="flex flex-col gap-1.5">
-                                                <p className="text-[11px] md:text-xs text-slate-400">
-                                                    {remaining === 0
-                                                        ? <>Explore your <span className="text-emerald-400 font-bold">{hiringLimit} hiring opportunities.</span> Upgrade for unlimited talent access.</>
-                                                        : <>You have <span className={`font-bold ${remaining <= Math.ceil((hiringLimit ?? 1) * 0.2) ? 'text-amber-400' : 'text-emerald-400'}`}>{remaining} hiring {remaining === 1 ? 'slot' : 'slots'} remaining.</span> Upgrade for unlimited access.</>}
-                                                </p>
-                                                <div className="flex items-center gap-2 text-[10px] font-bold">
-                                                    <span className="text-slate-500">Hiring Usage:</span>
-                                                    <span className={`${remaining <= Math.ceil((hiringLimit ?? 1) * 0.2) ? 'text-amber-400' : 'text-emerald-400'}`}>
+                        </div>
+
+                        {/* ── CENTER PANEL ── */}
+                        <div className="flex-1 flex flex-col min-w-0 self-stretch z-10" style={{ background: "#0a0b0e" }}>
+                            {/* Top bar */}
+                            <div className="flex items-center justify-between px-6 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div>
+                                    <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>
+                                        {!createdSlug ? "Create Hiring Link" : "Hiring Link Live"}
+                                    </p>
+                                </div>
+
+                                {/* ── Hiring Status Indicator ── */}
+                                {!createdSlug && (
+                                    <div className="flex items-center gap-2">
+                                        {hiringAccess === "unlimited" ? (
+                                            /* Unlimited tier — show tier name with glow */
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md" style={{ background: "rgba(52,211,153,0.07)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                                <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: "0.04em" }}>
+                                                    {userTier === "Company / Organization" ? "Company / Org" : userTier} · Unlimited
+                                                </span>
+                                            </div>
+                                        ) : hiringAccess === "capped_available" ? (
+                                            /* Has slots remaining */
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md" style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)" }}>
+                                                    <Briefcase style={{ width: 10, height: 10, color: "rgba(165,180,252,0.8)" }} />
+                                                    <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(165,180,252,0.9)", letterSpacing: "0.03em" }}>
                                                         {collectionCount} / {hiringLimit} used
                                                     </span>
+                                                    {remaining <= 1 && (
+                                                        <span style={{ fontSize: 9, fontWeight: 700, color: "#fb923c", letterSpacing: "0.04em" }}>· {remaining} left</span>
+                                                    )}
+                                                </div>
+                                                <Link href="/dashboard" className="flex items-center gap-1 px-2 py-1 rounded-md transition-all hover:opacity-80" style={{ background: "rgba(20,184,166,0.08)", border: "1px solid rgba(20,184,166,0.18)", fontSize: 9, fontWeight: 700, color: "#2dd4bf", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                                                    Upgrade
+                                                </Link>
+                                            </div>
+                                        ) : hiringAccess === "limit_reached" ? (
+                                            /* Limit reached — suggest upgrade or pay-per-post */
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                                                    <Lock style={{ width: 9, height: 9, color: "#f87171" }} />
+                                                    <span style={{ fontSize: 10, fontWeight: 700, color: "#f87171", letterSpacing: "0.03em" }}>
+                                                        {collectionCount} / {hiringLimit} · Limit Reached
+                                                    </span>
+                                                </div>
+                                                {!isGoogleUser && publicKey && (
+                                                    <span style={{ fontSize: 9, color: "rgba(167,139,250,0.85)", fontWeight: 600 }}>
+                                                        Pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(0)} USDC ↓
+                                                    </span>
+                                                )}
+                                                <Link href="/dashboard" className="flex items-center gap-1 px-2 py-1 rounded-md transition-all hover:opacity-80" style={{ background: "rgba(20,184,166,0.08)", border: "1px solid rgba(20,184,166,0.18)", fontSize: 9, fontWeight: 700, color: "#2dd4bf", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                                                    Upgrade
+                                                </Link>
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Scrollable body content */}
+                            <div id="form-scroll-container" className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar max-h-[750px] relative">
+                                {/* Capped usage info inside center panel on mobile only */}
+                                <div className="block xl:hidden mb-6">
+                                    {hiringAccess === "limit_reached" ? (
+                                        <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/15 text-center space-y-3">
+                                            <div className="w-10 h-10 mx-auto rounded-full bg-rose-500/10 flex items-center justify-center">
+                                                <Lock className="w-5 h-5 text-rose-400" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <h3 className="text-sm font-bold text-white">You've used your free job post.</h3>
+                                                <p className="text-xs text-slate-400">
+                                                    Pay <span className="text-violet-300 font-bold">${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC</span> per additional post, or upgrade for unlimited access.
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400">
+                                                <span>Usage:</span>
+                                                <span className="text-rose-400">{collectionCount} / {hiringLimit} used</span>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-1">
+                                                {!isGoogleUser && publicKey && (
+                                                    <p className="self-center text-[10px] text-violet-400 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 font-medium">
+                                                        ↓ Fill form below · pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC per additional post
+                                                    </p>
+                                                )}
+                                                <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-black uppercase tracking-widest transition-all">
+                                                    <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center justify-between gap-4">
+                                            <div className="flex items-center gap-3 text-left">
+                                                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                    <ShieldCheck className="w-4 h-4" />
+                                                </div>
+                                                <div className="space-y-0.5">
+                                                    <h4 className="text-xs font-bold text-white">Verification Status</h4>
+                                                    {hiringAccess === "capped_available" ? (
+                                                        <p className="text-[10px] text-slate-400">
+                                                            Usage: <span className="font-bold text-emerald-400">{collectionCount} / {hiringLimit} used</span>. {remaining} remaining.
+                                                        </p>
+                                                    ) : (
+                                                        <p className="text-[10px] text-slate-400">Verify your organization for unlimited hiring.</p>
+                                                    )}
                                                 </div>
                                             </div>
-
-                                        ) : (
-                                            <div className="space-y-1">
-                                                <p className="text-[11px] md:text-xs text-slate-400 max-w-md">Verify your organization to unlock <span className="text-emerald-400 font-bold uppercase tracking-widest text-[9px] md:text-[10px] ml-1">Trusted Hiring Signal</span>.</p>
-                                                <p className="text-[10px] text-slate-500">Upgrade to unlock unlimited hiring and better talent access.</p>
-                                            </div>
-                                        )}
-                                    </div>
+                                            <Link href="/dashboard" className="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all border border-indigo-500/20">
+                                                {hiringAccess === "capped_available" ? "Upgrade" : "Verify"}
+                                            </Link>
+                                        </div>
+                                    )}
                                 </div>
-                                <Link
-                                    href="/dashboard"
-                                    className="w-full md:w-auto px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-indigo-500/20 text-center"
-                                >
-                                    {hiringAccess === "capped_available" ? "Upgrade for Unlimited" : "Get Verified"}
-                                </Link>
-                            </div>
-                        )}
 
-                            {/* Main Info Card */}
-                            {/* ── 1. Job Overview ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #10b981" }}>
-                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
-                                    <Briefcase style={{ width: 13, height: 13, color: "#34d399" }} />
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Job Overview</span>
-                                </div>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Position Title <span style={{ color: "rgba(255,255,255,0.18)", fontWeight: 400 }}>*</span></label>
-                                        <input
-                                            type="text"
-                                            required
-                                            placeholder="e.g. Content Creator, Frontend Engineer"
-                                            value={formData.title}
-                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                            className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.title ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Description <span style={{ color: "rgba(255,255,255,0.15)", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>optional</span></label>
-                                        <textarea
-                                            placeholder="Briefly describe the role, key responsibilities, or specific requirements..."
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.description ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                                {!createdSlug ? (
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <header className="mb-7">
+                                            <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>ChainVolio Recruit</p>
+                                            <h1 className="text-xl font-bold text-white tracking-tight">Create <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Hiring Collection</span></h1>
+                                            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Define criteria and collect verifiable on-chain portfolios from candidates.</p>
+                                        </header>
 
-                            {/* ── 2. Recruiter Identity ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                        <form onSubmit={handleSubmit} className="space-y-3">
+                                            {/* Google-user notice — no on-chain record, no hiring dashboard */}
+                                            {isGoogleUser && (
+                                                <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        <Mail className="w-4 h-4 text-blue-400" />
+                                                    </div>
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-[11px] font-bold text-blue-300 uppercase tracking-wider">Signed in with Google</p>
+                                                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                                                            Your collection will be saved to Supabase. Note: the hiring dashboard won&apos;t be available for Google-only accounts — connect a wallet later to unlock it.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                            {/* ── 1. Recruiter Identity ── */}
+                            <div id="recruiter-identity" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #2dd4bf" }}>
                                 <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <Building2 style={{ width: 13, height: 13, color: "#2dd4bf" }} />
@@ -607,6 +747,11 @@ export default function CreateCollection() {
                                     {isAutoFilled && (
                                         <span style={{ fontSize: 9, color: "rgba(52,211,153,0.7)", fontWeight: 600, marginLeft: "auto" }}>Auto-filled from profile</span>
                                     )}
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Information about the recruiter or your project/company to provide transparency to candidates.
+                                    </p>
                                 </div>
                                 <div className="space-y-3">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -755,12 +900,80 @@ export default function CreateCollection() {
                                 </div>
                             </div>
 
+                            {/* ── 2. Job Description ── */}
+                            <div id="job-description" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #10b981" }}>
+                                <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+                                    <Target style={{ width: 13, height: 13, color: "#34d399" }} />
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Job Description</span>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Define the job role details including summary, key responsibilities, requirements, and what you offer.
+                                    </p>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Position Title <span style={{ color: "rgba(255,255,255,0.18)", fontWeight: 400 }}>*</span></label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="e.g. Content Creator, Frontend Engineer"
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-600 ${formData.title ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Job Summary</label>
+                                        <textarea
+                                            placeholder="Briefly describe the role, key responsibilities, or specific requirements..."
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.description ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Key Responsibilities</label>
+                                        <textarea
+                                            placeholder="Describe the day-to-day duties and core focus..."
+                                            value={formData.keyResponsibilities}
+                                            onChange={(e) => setFormData({ ...formData, keyResponsibilities: e.target.value })}
+                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.keyResponsibilities ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Requirements</label>
+                                        <textarea
+                                            placeholder="Skills, years of experience, tools, stack, and certifications..."
+                                            value={formData.requirements}
+                                            onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.requirements ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>What We Offer</label>
+                                        <textarea
+                                            placeholder="Compensation, benefits, remote setup, tokens, team offsites, etc..."
+                                            value={formData.whatWeOffer}
+                                            onChange={(e) => setFormData({ ...formData, whatWeOffer: e.target.value })}
+                                            className={`w-full rounded-lg px-3 py-2.5 outline-none transition-all h-24 resize-none placeholder:text-slate-600 text-sm leading-relaxed ${formData.whatWeOffer ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* ── 3. Role Details ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                            <div id="job-details" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #60a5fa" }}>
                                 <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <Briefcase style={{ width: 13, height: 13, color: "#60a5fa" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Role Details</span>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Configure technical specifications such as role type, work mode, timezone, experience level, compensation model, and salary.
+                                    </p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                                     <div className={`rounded-lg px-3 py-2.5 transition-all focus-within:border-emerald-500/50 ${formData.roleType ? 'bg-emerald-500/[0.02] border border-emerald-500/30' : 'bg-white/[0.04] border border-white/[0.1]'}`}>
@@ -828,6 +1041,7 @@ export default function CreateCollection() {
                                         >
                                             <option className="bg-[#0e0f12] text-white">Crypto + Equity</option>
                                             <option className="bg-[#0e0f12] text-white">Fiat + Equity</option>
+                                            <option className="bg-[#0e0f12] text-white">Base Salary Only</option>
                                             <option className="bg-[#0e0f12] text-white">Crypto Only</option>
                                             <option className="bg-[#0e0f12] text-white">DAO Tokens</option>
                                             <option className="bg-[#0e0f12] text-white">Unpaid / Contributor</option>
@@ -838,7 +1052,7 @@ export default function CreateCollection() {
                                         <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Salary</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. $120k – $180k"
+                                            placeholder="e.g. $10k/month"
                                             value={formData.salary}
                                             onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                                             className={`w-full bg-transparent border-none outline-none text-sm placeholder:text-slate-600 ${formData.salary ? 'text-emerald-400 font-bold' : 'text-white font-medium'}`}
@@ -848,7 +1062,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 4. Evaluation Focus ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                            <div id="evaluation-focus" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #a78bfa" }}>
                                 <div className="flex items-center justify-between mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <div className="flex items-center gap-2">
@@ -856,6 +1070,11 @@ export default function CreateCollection() {
                                         <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Evaluation Focus</span>
                                     </div>
                                     <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>optional</span>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Specify how you will evaluate or assign extra points to candidates.
+                                    </p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                                     {focusOptions.map((opt) => (
@@ -904,7 +1123,7 @@ export default function CreateCollection() {
                             </div>
 
                             {/* ── 5. Eligibility Filters ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                            <div id="eligibility-filters" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #fbbf24" }}>
                                 <div className="flex items-center justify-between mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <div className="flex items-center gap-2">
@@ -913,24 +1132,29 @@ export default function CreateCollection() {
                                     </div>
                                     <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>Reduce Spam · optional</span>
                                 </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Additional filters to screen and reduce spam from bots or candidates who are less active on-chain.
+                                    </p>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                                     <div
                                         onClick={() => setFormData(prev => ({
                                             ...prev,
-                                            filters: { ...prev.filters, minReceiptsThreshold: prev.filters.minReceiptsThreshold === 5 ? 0 : 5 }
+                                            filters: { ...prev.filters, activeWalletOnly: !prev.filters.activeWalletOnly }
                                         }))}
-                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}
+                                        className={`cursor-pointer p-3.5 rounded-xl border transition-all duration-200 group relative ${formData.filters.activeWalletOnly ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400' : 'bg-white/[0.04] border-white/[0.1] hover:border-white/20 text-slate-400'}`}
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.minReceiptsThreshold === 5 ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-white/30'}`}>
+                                            <div className={`p-1.5 rounded-lg flex-shrink-0 ${formData.filters.activeWalletOnly ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-white/30'}`}>
                                                 <Clock className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <p className={`text-xs font-bold ${formData.filters.minReceiptsThreshold === 5 ? 'text-indigo-100' : 'text-slate-300'}`}>Active Wallet Only</p>
-                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Requires 5+ on-chain receipts/txs</p>
+                                                <p className={`text-xs font-bold ${formData.filters.activeWalletOnly ? 'text-indigo-100' : 'text-slate-300'}`}>Active Wallet Only</p>
+                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Must have at least 1 attested proof of work</p>
                                             </div>
                                         </div>
-                                        {formData.filters.minReceiptsThreshold === 5 && <div className="absolute top-2 right-2 text-indigo-500"><Check className="w-3.5 h-3.5" /></div>}
+                                        {formData.filters.activeWalletOnly && <div className="absolute top-2 right-2 text-indigo-500"><Check className="w-3.5 h-3.5" /></div>}
                                     </div>
 
                                     <div
@@ -946,20 +1170,68 @@ export default function CreateCollection() {
                                             </div>
                                             <div>
                                                 <p className={`text-xs font-bold ${formData.filters.verifiedOnly ? 'text-emerald-100' : 'text-slate-300'}`}>Verified Profiles Only</p>
-                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Must have at least 1 attestation</p>
+                                                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>Prioritize verified profiles; unverified profiles will sink to bottom</p>
                                             </div>
                                         </div>
                                         {formData.filters.verifiedOnly && <div className="absolute top-2 right-2 text-emerald-500"><Check className="w-3.5 h-3.5" /></div>}
                                     </div>
                                 </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Region / Membership Restriction</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Superteam Member Canada only"
+                                            value={formData.filters.regionRestriction || ""}
+                                            onChange={(e) => setFormData({ ...formData, filters: { ...formData.filters, regionRestriction: e.target.value } })}
+                                            className={`w-full rounded-lg px-3 py-2 text-xs font-medium outline-none transition-all placeholder:text-slate-600 ${formData.filters.regionRestriction ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Work Preference Restriction</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Hybrid / Office / Remote immediate"
+                                            value={formData.filters.workPreference || ""}
+                                            onChange={(e) => setFormData({ ...formData, filters: { ...formData.filters, workPreference: e.target.value } })}
+                                            className={`w-full rounded-lg px-3 py-2 text-xs font-medium outline-none transition-all placeholder:text-slate-600 ${formData.filters.workPreference ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Language Restriction</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Speak English + Mandarin only"
+                                            value={formData.filters.languages || ""}
+                                            onChange={(e) => setFormData({ ...formData, filters: { ...formData.filters, languages: e.target.value } })}
+                                            className={`w-full rounded-lg px-3 py-2 text-xs font-medium outline-none transition-all placeholder:text-slate-600 ${formData.filters.languages ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: "block", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.28)", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 6 }}>Social Exposure Requirement</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Twitter/X min 10k followers"
+                                            value={formData.filters.socialExposure || ""}
+                                            onChange={(e) => setFormData({ ...formData, filters: { ...formData.filters, socialExposure: e.target.value } })}
+                                            className={`w-full rounded-lg px-3 py-2 text-xs font-medium outline-none transition-all placeholder:text-slate-600 ${formData.filters.socialExposure ? 'bg-emerald-500/[0.02] border border-emerald-500/30 text-white focus:border-emerald-500' : 'bg-white/[0.04] border border-white/[0.1] text-white focus:border-emerald-500/50'}`}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* ── 6. Final Configuration ── */}
-                            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                            <div id="final-configuration" className="rounded-xl p-4 transition-all duration-300" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #f87171" }}>
                                 <div className="flex items-center gap-2 mb-4 pb-3 relative overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                                     <div className="animate-lightning-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
                                     <CalendarDays style={{ width: 13, height: 13, color: "#f87171" }} />
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Final Configuration</span>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-400 leading-normal">
+                                        Set the deadline for CV submission and the visibility of your hiring link.
+                                    </p>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
@@ -1079,7 +1351,286 @@ export default function CreateCollection() {
                         </div>
                     </div>
                 )}
-            </section>
+                            </div>
+                        </div>
+
+                        {/* ── RIGHT PANEL ── */}
+                        <div className="hidden xl:flex w-[280px] flex-shrink-0 flex-col h-full self-stretch" style={{ borderLeft: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+                            {/* Top bar */}
+                            <div className="flex items-center px-4 h-[46px] flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>Status & Preview</span>
+                            </div>
+
+                            <div className="p-4 space-y-6 overflow-y-auto custom-scrollbar flex-1 max-h-[750px]">
+                                {/* Capped usage / Upgrade info */}
+                                <div className="space-y-2.5">
+                                    <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Hiring Usage</p>
+                                    
+                                    {hiringAccess === "limit_reached" ? (
+                                        <div className="p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/10 space-y-2.5">
+                                            <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs">
+                                                <Lock className="w-3.5 h-3.5" /> Limit Reached
+                                            </div>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.4 }}>
+                                                You have used your free job post. Submit form to pay per post, or upgrade below.
+                                            </p>
+                                            <Link href="/dashboard" className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[10px] font-black uppercase tracking-wider hover:bg-teal-500/20 transition-all">
+                                                Upgrade Now
+                                            </Link>
+                                        </div>
+                                    ) : (
+                                        <div className="p-3.5 rounded-xl bg-indigo-500/5 border border-indigo-500/10 space-y-2.5">
+                                            <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs">
+                                                <ShieldCheck className="w-3.5 h-3.5" /> {userTier === "Company / Organization" ? "Verified Org" : "Standard"}
+                                            </div>
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.4 }}>
+                                                {hiringLimit === null 
+                                                    ? "You have unlimited hiring collections." 
+                                                    : `Usage: ${collectionCount} / ${hiringLimit} used. (${remaining} remaining)`
+                                                }
+                                            </p>
+                                            {hiringLimit !== null && (
+                                                <Link href="/dashboard" className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-wider hover:bg-indigo-500/20 transition-all">
+                                                    Upgrade Plan
+                                                </Link>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Live preview card */}
+                                <div className="space-y-3.5">
+                                    <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Live Preview</p>
+                                    
+                                    <div className="p-4 rounded-xl border relative overflow-hidden flex flex-col gap-3.5 transition-all duration-300 max-h-[500px] overflow-y-auto custom-scrollbar font-sans text-left"
+                                        style={{
+                                            background: "rgba(255, 255, 255, 0.02)",
+                                            borderColor: "rgba(255, 255, 255, 0.08)",
+                                        }}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="px-2 py-0.5 text-[8.5px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 rounded uppercase tracking-wider">
+                                                {formData.roleType || "Full-time"}
+                                            </span>
+                                            <span className="text-[9px] text-white/40 font-mono">
+                                                {formData.workMode || "Remote"}
+                                            </span>
+                                        </div>
+
+                                        {/* Recruiter Identity Preview */}
+                                        {(formData.recruiterName || formData.companyName || formData.recruiterRole || formData.companyDescription || formData.websiteUrl || formData.twitterUrl || formData.discordUrl || formData.companyEmail || formData.telegramUrl || formData.linkedinUrl) && (
+                                            <div className="p-2.5 rounded-lg bg-white/[0.01] border border-white/[0.04] space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 bg-white/5 border border-white/10 flex items-center justify-center">
+                                                        {avatarUrl ? (
+                                                            <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <User className="w-4 h-4 text-white/40" />
+                                                        )}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[10px] font-bold text-white/80 truncate leading-none">
+                                                            {formData.recruiterName || "Recruiter"}
+                                                        </p>
+                                                        <p className="text-[8.5px] text-slate-400 truncate mt-0.5 leading-none">
+                                                            {formData.recruiterRole || "Hiring Manager"} {formData.companyName && `@ ${formData.companyName}`}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Company Description */}
+                                                {formData.companyDescription && (
+                                                    <p className="text-[9.5px] text-white/60 leading-relaxed italic border-t border-white/[0.03] pt-1.5 whitespace-pre-wrap">
+                                                        {formData.companyDescription}
+                                                    </p>
+                                                )}
+
+                                                {/* Official Presence Links */}
+                                                {(formData.websiteUrl || formData.twitterUrl || formData.discordUrl || formData.companyEmail || formData.telegramUrl || formData.linkedinUrl) && (
+                                                    <div className="flex flex-col gap-1 border-t border-white/[0.03] pt-1.5 text-[9px] text-slate-400">
+                                                        {formData.websiteUrl && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <Globe className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.websiteUrl}</span>
+                                                            </div>
+                                                        )}
+                                                        {formData.twitterUrl && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <XIcon className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.twitterUrl}</span>
+                                                            </div>
+                                                        )}
+                                                        {formData.discordUrl && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <DiscordIcon className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.discordUrl}</span>
+                                                            </div>
+                                                        )}
+                                                        {formData.companyEmail && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <Mail className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.companyEmail}</span>
+                                                            </div>
+                                                        )}
+                                                        {formData.telegramUrl && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <Send className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.telegramUrl}</span>
+                                                            </div>
+                                                        )}
+                                                        {formData.linkedinUrl && (
+                                                            <div className="flex items-center gap-1.5 truncate">
+                                                                <LinkedInIcon className="w-3 h-3 flex-shrink-0 text-white/30" />
+                                                                <span className="truncate">{formData.linkedinUrl}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <h4 className="text-sm font-bold text-white leading-tight truncate">
+                                                {formData.title || "Position Title"}
+                                            </h4>
+                                            {formData.companyName && (
+                                                <p className="text-xs text-white/50 font-medium truncate mt-0.5">
+                                                    {formData.companyName}
+                                                    {formData.projectStage && (
+                                                        <span className="ml-1.5 px-1 py-0.5 text-[7px] text-amber-400 bg-amber-400/10 rounded uppercase">
+                                                            {formData.projectStage}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Description & Subfields */}
+                                        {(formData.description || formData.keyResponsibilities || formData.requirements || formData.whatWeOffer) && (
+                                            <div className="space-y-2 mt-1">
+                                                {formData.description && (
+                                                    <div>
+                                                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider mb-0.5">Summary</p>
+                                                        <p className="text-[9.5px] text-white/50 leading-relaxed whitespace-pre-wrap line-clamp-3">{formData.description}</p>
+                                                    </div>
+                                                )}
+                                                {formData.keyResponsibilities && (
+                                                    <div>
+                                                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider mb-0.5">Responsibilities</p>
+                                                        <p className="text-[9.5px] text-white/50 leading-relaxed whitespace-pre-wrap line-clamp-3">{formData.keyResponsibilities}</p>
+                                                    </div>
+                                                )}
+                                                {formData.requirements && (
+                                                    <div>
+                                                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider mb-0.5">Requirements</p>
+                                                        <p className="text-[9.5px] text-white/50 leading-relaxed whitespace-pre-wrap line-clamp-3">{formData.requirements}</p>
+                                                    </div>
+                                                )}
+                                                {formData.whatWeOffer && (
+                                                    <div>
+                                                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider mb-0.5">What We Offer</p>
+                                                        <p className="text-[9.5px] text-white/50 leading-relaxed whitespace-pre-wrap line-clamp-3">{formData.whatWeOffer}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
+
+                                        <div className="flex flex-col gap-1.5 text-[9.5px]">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white/30">Experience</span>
+                                                <span className="text-white/70 font-semibold">{formData.experienceLevel || "Senior"}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white/30">Salary</span>
+                                                <span className="text-emerald-400 font-bold">{formData.salary || "Negotiable"}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white/30">Timezone</span>
+                                                <span className="text-white/70 font-medium truncate max-w-[90px]" title={formData.timezone}>{formData.timezone || "Any"}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white/30">Comp Model</span>
+                                                <span className="text-white/70 font-medium truncate max-w-[90px]" title={formData.compensationType}>{formData.compensationType || "Standard"}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Focus areas */}
+                                        {(formData.focusAreas.length > 0 || formData.customFocus) && (
+                                            <div className="space-y-1.5 mt-1">
+                                                <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider">Evaluation Focus</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {formData.focusAreas.map((area) => (
+                                                        <span key={area} className="px-1.5 py-0.5 text-[8.5px] text-white/60 bg-white/5 rounded border border-white/5 capitalize">
+                                                            {area.replace("_", " ")}
+                                                        </span>
+                                                    ))}
+                                                    {formData.customFocus && (
+                                                        <span className="px-1.5 py-0.5 text-[8.5px] text-white/60 bg-white/5 rounded border border-white/5 truncate max-w-[120px]">
+                                                            {formData.customFocus}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Eligibility Filters */}
+                                        {(formData.filters.activeWalletOnly || formData.filters.verifiedOnly || formData.filters.regionRestriction || formData.filters.workPreference || formData.filters.languages || formData.filters.socialExposure) && (
+                                            <div className="space-y-1 mt-1">
+                                                <p className="text-[8px] font-bold text-white/20 uppercase tracking-wider">Eligibility Filters</p>
+                                                <div className="flex flex-col gap-1">
+                                                    {formData.filters.activeWalletOnly && (
+                                                        <span className="text-[9px] text-indigo-300 font-medium flex items-center gap-1">
+                                                            <Clock className="w-2.5 h-2.5" /> Active Wallet (At least 1 attested)
+                                                        </span>
+                                                    )}
+                                                    {formData.filters.verifiedOnly && (
+                                                        <span className="text-[9px] text-emerald-400 font-medium flex items-center gap-1">
+                                                            <ShieldCheck className="w-2.5 h-2.5" /> Prioritize Verified Profiles
+                                                        </span>
+                                                    )}
+                                                    {formData.filters.regionRestriction && (
+                                                        <span className="text-[9px] text-amber-400 font-medium flex items-center gap-1">
+                                                            <MapPin className="w-2.5 h-2.5 text-amber-400" /> {formData.filters.regionRestriction}
+                                                        </span>
+                                                    )}
+                                                    {formData.filters.workPreference && (
+                                                        <span className="text-[9px] text-sky-400 font-medium flex items-center gap-1">
+                                                            <Briefcase className="w-2.5 h-2.5 text-sky-400" /> {formData.filters.workPreference}
+                                                        </span>
+                                                    )}
+                                                    {formData.filters.languages && (
+                                                        <span className="text-[9px] text-purple-400 font-medium flex items-center gap-1">
+                                                            <Globe className="w-2.5 h-2.5 text-purple-400" /> {formData.filters.languages}
+                                                        </span>
+                                                    )}
+                                                    {formData.filters.socialExposure && (
+                                                        <span className="text-[9px] text-pink-400 font-medium flex items-center gap-1">
+                                                            <XIcon className="w-2.5 h-2.5 text-pink-400" /> {formData.filters.socialExposure}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Configuration details */}
+                                        {(formData.deadline || formData.visibility) && (
+                                            <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[9px] text-white/40">
+                                                <span className="flex items-center gap-1">
+                                                    <CalendarDays className="w-2.5 h-2.5" /> {formData.deadline ? `Till ${formData.deadline}` : "No deadline"}
+                                                </span>
+                                                <span className="capitalize px-1.5 py-0.5 bg-white/5 rounded">
+                                                    {formData.visibility}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
             {toast && (
                 <Toast
@@ -1154,6 +1705,8 @@ export default function CreateCollection() {
                     </div>
                 </div>
             )}
+            <Footer className="bg-[#0d0d0f]" />
+            </div>
         </main>
     );
 }

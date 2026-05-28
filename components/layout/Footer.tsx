@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import superteamLogo from "@/public/superteam indonesia logo.png";
 
-export function Footer() {
+export function Footer({ className = "bg-transparent" }: { className?: string }) {
     return (
-        <footer className="w-full bg-transparent border-t border-white/5 relative z-[100] font-sans mt-auto">
+        <footer className={`w-full border-t border-white/5 relative z-[100] font-sans mt-auto ${className}`}>
             <div className="max-w-[1600px] w-full mx-auto px-8 py-4">
                 {/* MOBILE/TABLET FOOTER (≤1023px) */}
                 <div className="lg:hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
