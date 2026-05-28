@@ -515,7 +515,7 @@ export default function CreateCollection() {
                                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                                     {!isGoogleUser && publicKey && (
                                         <p className="self-center text-[10px] text-violet-400 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 font-medium">
-                                            ↓ Fill form below · pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC via x402
+                                            ↓ Fill form below · pay ${RETAIL_JOB_POST_USDC_DISPLAY.toFixed(2)} USDC per additional post
                                         </p>
                                     )}
                                     <Link
@@ -1102,7 +1102,7 @@ export default function CreateCollection() {
 
                         {/* Title + amount */}
                         <div className="text-center space-y-2">
-                            <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">x402 Payment</p>
+                            <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">USDC Payment</p>
                             <h3 className="text-xl font-bold text-white">Post Additional Job</h3>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 You&apos;ve used your 2 free job posts. Pay once to publish this additional position.
@@ -1118,10 +1118,9 @@ export default function CreateCollection() {
                             </div>
                         </div>
 
-                        {/* x402 badge */}
                         <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500">
                             <div className="w-1.5 h-1.5 rounded-full bg-violet-400/60" />
-                            Processed via x402 protocol · Dexter facilitator
+                            Verified on-chain · Solana mainnet
                         </div>
 
                         {/* Actions */}

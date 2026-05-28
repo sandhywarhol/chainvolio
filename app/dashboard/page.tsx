@@ -1395,7 +1395,7 @@ export default function DashboardPage() {
                   </div>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
                     Your plan includes <span style={{ color: "#a78bfa", fontWeight: 700 }}>1 free job post</span>.
-                    Additional posts cost <span style={{ color: "#a78bfa", fontWeight: 700 }}>$0.50 USDC each</span> (via x402 — no subscription needed).
+                    Additional posts cost <span style={{ color: "#a78bfa", fontWeight: 700 }}>$0.50 USDC each</span> (one-time on-chain payment — no subscription needed).
                     Upgrade to Community/DAO or Company/Org for <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>unlimited posts</span>.
                   </div>
                 </div>
