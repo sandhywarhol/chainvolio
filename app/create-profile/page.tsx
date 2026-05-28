@@ -44,6 +44,7 @@ function CreateProfileContent() {
     organization: "",
   });
 
+  const [orgType, setOrgType] = useState<"company" | "community" | "">("");
   const [profileExists, setProfileExists] = useState(false);
   const [cropModal, setCropModal] = useState<{ isOpen: boolean; image: string | null }>({
     isOpen: false,
@@ -186,8 +187,9 @@ function CreateProfileContent() {
       });
 
       if (res.ok) {
-        setToast({ message: isRecruiter ? "Profile created! You can request organization verification from your dashboard." : "Profile saved successfully!", type: "success" });
-        setTimeout(() => router.push("/dashboard"), 1500);
+        setToast({ message: isRecruiter ? "Organization profile created! Request verification from your dashboard to unlock hiring features." : "Profile saved successfully!", type: "success" });
+        const dest = isRecruiter && orgType ? `/dashboard?requestVerify=${orgType}` : "/dashboard";
+        setTimeout(() => router.push(dest), 1500);
       } else {
         const data = await res.json();
         setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
@@ -235,9 +237,42 @@ function CreateProfileContent() {
       <Navbar />
 
       <section className="max-w-xl mx-auto px-6 pt-32 pb-12">
-        <h1 className="text-2xl font-bold mb-8">{form.displayName ? "Edit Profile" : "Create Profile"}</h1>
+        <h1 className="text-2xl font-bold mb-1">
+          {isRecruiter ? (form.displayName ? "Edit Organization" : "Set up your Organization") : (form.displayName ? "Edit Profile" : "Create Profile")}
+        </h1>
+        {isRecruiter && (
+          <p className="text-sm text-slate-500 mb-8">Tell us about your organization. You can complete verification after setup.</p>
+        )}
+        {!isRecruiter && <div className="mb-8" />}
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Org type selector — recruiter only */}
+          {isRecruiter && (
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">Organization Type *</label>
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  { value: "company", label: "🏢 Company / Org", desc: "Business, agency, startup" },
+                  { value: "community", label: "🌐 Community / DAO", desc: "DAO, open community, non-profit" },
+                ] as const).map(t => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => setOrgType(t.value)}
+                    className={`text-left px-4 py-3 rounded-xl border transition-colors ${
+                      orgType === t.value
+                        ? "border-amber-500/60 bg-amber-500/10 text-white"
+                        : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500"
+                    }`}
+                  >
+                    <div className="font-semibold text-sm">{t.label}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">{t.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm text-slate-400 mb-2">Profile Picture</label>
             <div className="flex items-center gap-4">
@@ -262,48 +297,49 @@ function CreateProfileContent() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Display name *</label>
+            <label className="block text-sm text-slate-400 mb-2">{isRecruiter ? "Organization Name *" : "Display name *"}</label>
             <input
               type="text"
               required
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-              placeholder="Name or pseudonym"
+              placeholder={isRecruiter ? "e.g. Solana Foundation, MetaDAO" : "Name or pseudonym"}
             />
           </div>
 
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm text-slate-400 mb-2">Current Role (optional)</label>
-              <input
-                type="text"
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="CEO, Lead Developer, etc."
-              />
+          {!isRecruiter && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm text-slate-400 mb-2">Current Role (optional)</label>
+                <input
+                  type="text"
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                  placeholder="CEO, Lead Developer, etc."
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-2">Current Organization (optional)</label>
+                <input
+                  type="text"
+                  value={form.organization}
+                  onChange={(e) => setForm({ ...form, organization: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                  placeholder="Google, Solana Foundation, DAO, etc."
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm text-slate-400 mb-2">Current Organization (optional)</label>
-              <input
-                type="text"
-                value={form.organization}
-                onChange={(e) => setForm({ ...form, organization: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
-                placeholder="Google, Solana Foundation, DAO, etc."
-              />
-            </div>
-          </div>
+          )}
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Bio</label>
+            <label className="block text-sm text-slate-400 mb-2">{isRecruiter ? "Organization Description" : "Bio"}</label>
             <textarea
               value={form.bio}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-24"
-              placeholder="Brief intro about you"
+              placeholder={isRecruiter ? "What does your organization do?" : "Brief intro about you"}
             />
           </div>
 

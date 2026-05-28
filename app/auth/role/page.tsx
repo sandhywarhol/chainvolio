@@ -160,7 +160,7 @@ export default function AuthRolePage() {
                             }
                         </button>
 
-                        <p className="text-center text-[10px] text-slate-600">You can change this later in settings</p>
+                        <p className="text-center text-[10px] text-slate-600">Your role determines your dashboard experience</p>
                     </div>
                 </div>
             </div>

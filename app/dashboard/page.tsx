@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -85,11 +85,13 @@ type HiringCollection = {
 export default function DashboardPage() {
   const { publicKey, connected, connecting, signMessage } = useWallet();
   const { session, orgAccount, loading: googleLoading, refetchOrgAccount } = useGoogleAuth();
+  const searchParams = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collections, setCollections] = useState<HiringCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verifyInitialTier, setVerifyInitialTier] = useState<string | null>(null);
   const [editingReceipt, setEditingReceipt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isRenewal, setIsRenewal] = useState(false);
@@ -177,6 +179,19 @@ export default function DashboardPage() {
 
     return () => controller.abort();
   }, [publicKey, connected, connecting]);
+
+  // Auto-open verification modal when redirected from recruiter create-profile
+  useEffect(() => {
+    const reqVerify = searchParams.get("requestVerify");
+    if (!reqVerify || !profile) return;
+    // Map URL param to tier id used by VerificationRequestModal
+    const tierMap: Record<string, string> = { company: "Company", community: "Community" };
+    const tierId = tierMap[reqVerify];
+    if (tierId) {
+      setVerifyInitialTier(tierId);
+      setShowVerificationModal(true);
+    }
+  }, [searchParams, profile]);
 
   // Fetch applications when tab is activated
   useEffect(() => {
@@ -610,8 +625,8 @@ export default function DashboardPage() {
                   </div>
                 </Link>
               </div>
-              <p className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>You can change this later in settings</p>
-              <p className="text-center text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.12)" }}>Recruiter accounts require organization verification after signup</p>
+              <p className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>Your role determines your dashboard experience</p>
+              <p className="text-center text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.12)" }}>Recruiter accounts require organization verification to unlock hiring features</p>
             </div>
           </div>
         ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox"].includes(activeTab))) ? (
@@ -1770,9 +1785,11 @@ export default function DashboardPage() {
           currentTier={profile.verificationTier || null}
           isRenewal={isRenewal}
           isOrg={isRecruiterTier(profile.verificationType ?? "")}
+          initialTierId={verifyInitialTier ?? undefined}
           onClose={() => {
             setShowVerificationModal(false);
             setIsRenewal(false);
+            setVerifyInitialTier(null);
           }}
           onSuccess={() => {
             setShowVerificationModal(false);
