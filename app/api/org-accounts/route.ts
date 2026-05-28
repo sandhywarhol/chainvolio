@@ -18,29 +18,33 @@ export async function GET(req: NextRequest) {
     const authUid = req.nextUrl.searchParams.get("auth_uid");
     if (!authUid) return NextResponse.json({ error: "auth_uid required" }, { status: 400 });
 
-    const isAuthorized = await verifyUser(req, authUid);
-    if (!isAuthorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "").trim();
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { data, error } = await supabaseServer
-        .from("org_accounts")
-        .select("*")
-        .eq("auth_uid", authUid)
-        .single();
+    // Run auth verification and DB fetch in parallel — saves one sequential round trip
+    const [authResult, dbResult] = await Promise.all([
+        supabaseServer.auth.getUser(token),
+        supabaseServer.from("org_accounts").select("*").eq("auth_uid", authUid).maybeSingle(),
+    ]);
 
-    if (error && error.code !== "PGRST116") {
+    const { data: { user }, error: authError } = authResult;
+    if (authError || !user || user.id !== authUid) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { data, error } = dbResult;
+    if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Count query for org_id_number (sequential display label — run after main fetch)
     let org_id_number = 1;
     if (data?.created_at) {
-        const { count, error: countError } = await supabaseServer
+        const { count } = await supabaseServer
             .from("org_accounts")
             .select("*", { count: "exact", head: true })
             .lte("created_at", data.created_at);
-        
-        if (!countError && count !== null) {
-            org_id_number = count;
-        }
+        if (count !== null) org_id_number = count;
     }
 
     return NextResponse.json({ orgAccount: data ? { ...data, org_id_number } : null });

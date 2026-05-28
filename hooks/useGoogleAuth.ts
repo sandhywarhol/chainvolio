@@ -31,6 +31,22 @@ export interface OrgAccount {
     org_id_number?: number;
 }
 
+const CACHE_KEY_PREFIX = "cv_orgAccount_";
+
+function readCachedOrgAccount(uid: string): OrgAccount | null {
+    try {
+        const raw = sessionStorage.getItem(CACHE_KEY_PREFIX + uid);
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+
+function writeCachedOrgAccount(uid: string, account: OrgAccount | null) {
+    try {
+        if (account) sessionStorage.setItem(CACHE_KEY_PREFIX + uid, JSON.stringify(account));
+        else sessionStorage.removeItem(CACHE_KEY_PREFIX + uid);
+    } catch {}
+}
+
 export function useGoogleAuth() {
     const [session, setSession] = useState<Session | null>(null);
     const [orgAccount, setOrgAccount] = useState<OrgAccount | null>(null);
@@ -58,7 +74,9 @@ export function useGoogleAuth() {
 
             if (res.ok) {
                 const data = await res.json();
-                setOrgAccount(data.orgAccount ?? null);
+                const account = data.orgAccount ?? null;
+                setOrgAccount(account);
+                writeCachedOrgAccount(authUid, account);
             }
             // On any non-ok response KEEP the existing orgAccount — a transient API
             // error must not silently log the user out. Only explicit signOut clears it.
@@ -77,7 +95,16 @@ export function useGoogleAuth() {
             const s = data.session ?? null;
             setSession(s);
             if (s?.user?.id) {
-                fetchOrgAccount(s.user.id, s.access_token).finally(() => setLoading(false));
+                // Restore from cache immediately so dashboard renders without waiting
+                const cached = readCachedOrgAccount(s.user.id);
+                if (cached) {
+                    setOrgAccount(cached);
+                    setLoading(false);
+                    // Still refresh in background to pick up any plan/subscription changes
+                    fetchOrgAccount(s.user.id, s.access_token);
+                } else {
+                    fetchOrgAccount(s.user.id, s.access_token).finally(() => setLoading(false));
+                }
             } else {
                 setLoading(false);
             }
@@ -100,10 +127,12 @@ export function useGoogleAuth() {
 
     const signOut = useCallback(async () => {
         if (!supabaseAuth) return;
+        const uid = session?.user?.id;
         await supabaseAuth.auth.signOut();
         setSession(null);
         setOrgAccount(null);
-    }, []);
+        if (uid) writeCachedOrgAccount(uid, null);
+    }, [session]);
 
     const refetchOrgAccount = useCallback(async () => {
         if (!supabaseAuth) return;
