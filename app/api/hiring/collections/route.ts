@@ -3,7 +3,7 @@ import { supabaseServer as supabase } from "@/lib/supabase/server";
 import { isRecruiterTier, getHiringLimit, TREASURY_WALLET, RETAIL_JOB_POST_USDC, USDC_MINT_MAINNET } from "@/lib/paymentConfig";
 
 // ─── x402 constants ───────────────────────────────────────────────────────────
-const DEXTER_FACILITATOR_URL = "https://dexter.cash/facilitator";
+const DEXTER_FACILITATOR_URL = "https://x402.org/facilitator";
 const SOLANA_MAINNET_CAIP2 = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
 
 /** The PaymentRequirements object we advertise and verify against. */
