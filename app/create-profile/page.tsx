@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
@@ -16,8 +16,11 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 function CreateProfileContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const isRecruiter = searchParams.get("role") === "recruiter";
+  // Read role from URL — works both SSR and client-side
+  const [isRecruiter, setIsRecruiter] = useState(false);
+  useEffect(() => {
+    setIsRecruiter(new URLSearchParams(window.location.search).get("role") === "recruiter");
+  }, []);
   const { publicKey, connected, signMessage } = useWallet();
   const { session } = useGoogleAuth();
   const [loading, setLoading] = useState(false);
