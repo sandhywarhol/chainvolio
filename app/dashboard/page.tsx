@@ -1199,12 +1199,11 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center relative group">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Monthly Benefits</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Attestations Given</span>
                     <span className="text-sm font-bold text-white leading-tight">
                       {profile?.attestationUsed ?? 0} <span className="text-slate-500">/</span> {profile?.attestationQuota ?? 0}
                     </span>
-                    <span className="text-[9px] text-slate-600 mt-1 uppercase tracking-tight">Attestations used</span>
-                    
+                    <span className="text-[9px] text-slate-600 mt-1 uppercase tracking-tight">This month</span>
                     {profile?.attestationResetDate && (
                       <div className="absolute -bottom-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                         <span className="text-[8px] text-slate-600 font-mono">Resets {format(new Date(profile.attestationResetDate), 'MMM d')}</span>
@@ -1212,18 +1211,9 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact Tier</span>
-                    <span className={`text-2xl font-bold ${
-                      profile?.verifierTier === 4 ? "text-amber-400" :
-                      profile?.verifierTier === 3 ? "text-blue-400" :
-                      profile?.verifierTier === 2 ? "text-pink-400" :
-                      "text-emerald-400"
-                    }`}>
-                      {profile?.verifierTier === 4 ? "IV" : 
-                       profile?.verifierTier === 3 ? "III" : 
-                       profile?.verifierTier === 2 ? "II" : 
-                       "I"}
-                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Attestations Received</span>
+                    <span className="text-2xl font-bold text-emerald-400">{attestationCount}</span>
+                    <span className="text-[9px] text-slate-600 mt-1 uppercase tracking-tight">Total all time</span>
                   </div>
                 </div>
               </div>
@@ -1449,24 +1439,35 @@ export default function DashboardPage() {
                   const col = app.hiring_collections;
                   const meta = col?.metadata || {};
                   const appliedAt = app.submitted_at ? format(new Date(app.submitted_at), "MMM d, yyyy") : "";
+                  const jobExpired = meta.deadline ? new Date(meta.deadline) < new Date() : false;
                   return (
-                    <div key={app.id} className="rounded-xl p-4 flex items-start gap-4 transition-all" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div key={app.id} className="rounded-xl p-4 flex items-start gap-4 transition-all" style={{ background: jobExpired ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                       {/* Company avatar */}
                       <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-sm" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.2)", color: "#a78bfa" }}>
                         {(meta.companyName || col?.title || "?").charAt(0).toUpperCase()}
                       </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate" style={{ fontSize: 13, color: "rgba(255,255,255,0.85)" }}>{col?.title || "Untitled Position"}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold truncate" style={{ fontSize: 13, color: jobExpired ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.85)" }}>{col?.title || "Untitled Position"}</p>
+                          {jobExpired && <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.07)" }}>Closed</span>}
+                        </div>
                         <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
                           {meta.companyName || meta.recruiterName || "Unknown Company"}
                           {meta.projectStage && <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase" style={{ background: "rgba(16,185,129,0.1)", color: "rgba(52,211,153,0.7)", border: "1px solid rgba(16,185,129,0.15)" }}>{meta.projectStage}</span>}
                         </p>
                         <div className="flex items-center gap-3 mt-2">
                           <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>Applied {appliedAt}</span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase" style={{ background: "rgba(16,185,129,0.08)", color: "rgba(52,211,153,0.6)", border: "1px solid rgba(16,185,129,0.12)" }}>
-                            ✓ Submitted
-                          </span>
+                          {!jobExpired && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase" style={{ background: "rgba(16,185,129,0.08)", color: "rgba(52,211,153,0.6)", border: "1px solid rgba(16,185,129,0.12)" }}>
+                              ✓ Submitted
+                            </span>
+                          )}
+                          {meta.deadline && (
+                            <span style={{ fontSize: 10, color: jobExpired ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.3)" }}>
+                              {jobExpired ? `Ended ${format(new Date(meta.deadline), "MMM d, yyyy")}` : `Closes ${format(new Date(meta.deadline), "MMM d, yyyy")}`}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {/* Link */}

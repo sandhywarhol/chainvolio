@@ -21,11 +21,9 @@ export interface OrgAccount {
     discord: string | null;
     telegram: string | null;
     country: string | null;
-    // Stripe subscription fields
-    stripe_customer_id: string | null;
-    stripe_subscription_id: string | null;
-    subscription_status: string;       // 'free' | 'active' | 'past_due' | 'canceled' | 'trialing'
-    plan_name: string;                  // 'free' | 'starter' | 'pro' | 'enterprise'
+    // Verification / plan fields
+    subscription_status: string;       // 'free' | 'active' | 'past_due' | 'canceled'
+    plan_name: string;                  // 'free' | 'community' | 'company' | 'enterprise'
     current_period_end: string | null;
     saved_candidates_count: number;
     org_id_number?: number;

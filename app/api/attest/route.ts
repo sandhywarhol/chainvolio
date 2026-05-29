@@ -306,7 +306,7 @@ export async function POST(request: Request) {
             .eq("wallet_address", attesterWallet)
             .maybeSingle();
 
-        // Check if attester wallet belongs to a Google org (Stripe subscriber)
+        // Check if attester wallet belongs to a verified Google org
         const { data: googleOrgData } = await supabase
             .from("org_accounts")
             .select("auth_uid, org_name, plan_name, subscription_status, current_period_end")
@@ -336,7 +336,7 @@ export async function POST(request: Request) {
 
         // 1. Resolve Identity
         if (isGoogleOrgActive && googleOrgData) {
-            // Google Stripe org: use org name as the attester identity
+            // Verified Google org: use org name as the attester identity
             finalAttesterName = googleOrgData.org_name || finalAttesterName;
             finalAttesterOrg = googleOrgData.org_name || null;
             finalAttesterRole = getVerificationLabel(verificationTier);

@@ -621,7 +621,7 @@ export default function AttestPage() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-white">{googleOrg.org_name}</p>
-                                            <p className="text-xs text-teal-400">{getVerificationLabel(googleOrgPlan)} · Stripe Verified</p>
+                                            <p className="text-xs text-teal-400">✓ {getVerificationLabel(googleOrgPlan)}</p>
                                         </div>
                                     </div>
                                 </div>

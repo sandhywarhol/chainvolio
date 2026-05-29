@@ -74,6 +74,7 @@ type HiringCollection = {
   title: string;
   slug: string;
   created_at: string;
+  metadata?: { deadline?: string } | null;
 };
 
 type Props = {
@@ -410,22 +411,38 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             <div className="px-4 pb-4 pt-4">
               {collections.length > 0 ? (
                 <div className="grid gap-3">
-                  {collections.map(col => (
-                    <div key={col.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all">
-                      <div>
-                        <h3 className="text-sm font-bold text-white group-hover:text-white/80 transition-colors">{col.title}</h3>
-                        <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
-                          <span>{new Date(col.created_at).toLocaleDateString()}</span>
-                          <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={e => e.stopPropagation()}>
-                            Public Page <ExternalLink className="w-2.5 h-2.5" />
-                          </Link>
+                  {collections.map(col => {
+                    const deadline = col.metadata?.deadline;
+                    const isExpiredPost = deadline ? new Date(deadline) < new Date() : false;
+                    return (
+                      <div key={col.id} className={`p-3 border rounded-xl flex items-center justify-between group transition-all ${isExpiredPost ? "bg-white/[0.01] border-white/[0.03]" : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"}`}>
+                        <div className="min-w-0 flex-1 mr-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className={`text-sm font-bold transition-colors truncate ${isExpiredPost ? "text-white/40" : "text-white group-hover:text-white/80"}`}>{col.title}</h3>
+                            {isExpiredPost && (
+                              <span className="flex-shrink-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                                Closed
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-[10px] text-slate-500 mt-0.5">
+                            <span>Created {new Date(col.created_at).toLocaleDateString()}</span>
+                            {deadline && (
+                              <span className={isExpiredPost ? "text-white/25" : "text-slate-400"}>
+                                {isExpiredPost ? `Ended ${new Date(deadline).toLocaleDateString()}` : `Closes ${new Date(deadline).toLocaleDateString()}`}
+                              </span>
+                            )}
+                            <Link href={`/r/${col.slug}`} target="_blank" className="hover:text-white flex items-center gap-1 transition-colors" onClick={e => e.stopPropagation()}>
+                              View <ExternalLink className="w-2.5 h-2.5" />
+                            </Link>
+                          </div>
                         </div>
+                        <Link href={`/hiring/${col.slug}/dashboard`} className="flex-shrink-0 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10">
+                          Dashboard
+                        </Link>
                       </div>
-                      <Link href={`/hiring/${col.slug}/dashboard`} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold rounded-lg transition-colors border border-white/10">
-                        Dashboard
-                      </Link>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="py-8 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center">
@@ -842,7 +859,10 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             ) : (
               <div className="space-y-2.5 group">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-slate-400">Monthly Attestation Usage</span>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-400">Attestations Given This Month</span>
+                    <p className="text-[9px] text-slate-600 mt-0.5">Endorsements you've issued to builders</p>
+                  </div>
                   <span className={`text-[11px] font-bold ${attestationNearLimit ? "text-amber-400" : "text-slate-400"}`}>
                     {attestationUsed} / {attestationQuota}
                   </span>
@@ -854,7 +874,10 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                   />
                 </div>
                 {attestationNearLimit && (
-                  <p className="text-[11px] text-amber-400/80 font-medium">⚠ Approaching monthly limit — {attestationQuota - attestationUsed} left this period</p>
+                  <p className="text-[11px] text-amber-400/80 font-medium">⚠ Approaching monthly limit — {attestationQuota - attestationUsed} remaining</p>
+                )}
+                {!attestationNearLimit && attestationUsed === 0 && (
+                  <p className="text-[10px] text-slate-600">No attestations issued yet this month. Quota: {attestationQuota}/month.</p>
                 )}
                 {profile.attestationResetDate && (
                   <p className="text-[9px] text-slate-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
