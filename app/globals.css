@@ -3,11 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  @media (max-width: 767px) {
-    html, body {
-      overflow-x: hidden;
-      max-width: 100vw;
-      touch-action: pan-y;
+  @media (max-width: 1279px) {
+    /* Force desktop view scaling on mobile */
+    html, body, main {
+      overflow-x: visible !important;
     }
   }
 

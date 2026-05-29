@@ -1554,7 +1554,7 @@ export function LandingPageClient() {
                 onAttestationClick={() => router.push('/guides/attestation')}
             />
 
-            <main className="flex-1 flex flex-col relative overflow-hidden theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
+            <main className="flex-1 flex flex-col relative theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
                 <div className="w-full" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
                 <section className="relative pt-20 sm:pt-28 md:pt-36 pb-0 px-4 sm:px-6 z-20 max-w-[1100px] mx-auto flex flex-col w-full">
 

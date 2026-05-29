@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
@@ -81,16 +81,41 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 1280,
+};
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Restore saved theme before React hydrates — prevents flash of wrong theme */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('cv-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();` }} />
+        {/* Bulletproof viewport scaler for mobile devices. Forces exact fit. */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            function setScale() {
+              var targetWidth = 1280;
+              var sw = window.screen.width;
+              if (sw > 0 && sw < targetWidth) {
+                var scale = sw / targetWidth;
+                var meta = document.querySelector('meta[name="viewport"]');
+                if (meta) {
+                  meta.content = 'width=' + targetWidth + ', initial-scale=' + scale + ', minimum-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=no';
+                }
+              }
+            }
+            setScale();
+            window.addEventListener('resize', setScale);
+            window.addEventListener('orientationchange', setScale);
+          })();
+        ` }} />
       </head>
       <body className={`${inter.variable} font-sans min-h-screen text-white relative`}>
         <script
