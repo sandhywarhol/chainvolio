@@ -188,10 +188,12 @@ export default function CreateCollection() {
                 .catch(() => {})
                 .finally(async () => {
                     if (supabase) {
+                        const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
                         const { count } = await supabase
                             .from("hiring_collections")
                             .select("*", { count: "exact", head: true })
-                            .eq("owner_wallet", walletStr);
+                            .eq("owner_wallet", walletStr)
+                            .gte("created_at", firstOfMonth);
                         setCollectionCount(count ?? 0);
                     }
                     setTierLoading(false);
@@ -207,9 +209,11 @@ export default function CreateCollection() {
             setUserTier(isActive ? "Company / Organization" : "unverified");
 
             if (supabase) {
+                const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
                 void supabase.from("hiring_collections")
                     .select("*", { count: "exact", head: true })
                     .eq("owner_wallet", `gauth:${authUid}`)
+                    .gte("created_at", firstOfMonth)
                     .then(({ count }) => {
                         setCollectionCount(count ?? 0);
                         setTierLoading(false);

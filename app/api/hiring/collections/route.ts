@@ -202,13 +202,16 @@ export async function POST(request: Request) {
         let isPaidJobPost = false;
 
         if (effectiveHiringLimit !== null) {
+            // Count only this calendar month's posts — limit resets on the 1st
+            const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
             const { count: existingCount } = await supabase
                 .from("hiring_collections")
                 .select("*", { count: "exact", head: true })
-                .eq("owner_wallet", ownerWallet);
+                .eq("owner_wallet", ownerWallet)
+                .gte("created_at", firstOfMonth);
 
             const used = existingCount ?? 0;
-            console.log(`[hiring-api] collections used=${used} limit=${effectiveHiringLimit}`);
+            console.log(`[hiring-api] collections used=${used} limit=${effectiveHiringLimit} (this month)`);
 
             if (used >= effectiveHiringLimit!) {
                 const xPaymentTxSig = body.x_payment_txsig as string | undefined;

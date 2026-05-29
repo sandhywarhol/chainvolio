@@ -100,15 +100,25 @@ export function normalizeTier(tier?: string): string {
 /**
  * Monthly attestation quota by verification tier.
  * This is the SINGLE SOURCE OF TRUTH for all quota decisions.
- * Growth-mode quotas: unverified=2, builder=5, public figure=10, community/dao=20, company/org=40
+ *
+ * Quotas:
+ *   unverified (no profile / incomplete)  →  1
+ *   builder (verified)                    →  2  /month
+ *   public figure (verified)              →  5  /month
+ *   community/dao (verified + subscribed) → 30  /month
+ *   company/org   (verified + subscribed) → 60  /month
+ *
+ * Note: Google org users WITHOUT an active subscription are handled
+ * separately in the attest API route — they receive 2/month regardless
+ * of this function's return value for "unverified".
  */
 export function getAttestationQuota(tier?: string): number {
     const t = normalizeTier(tier);
-    if (t.includes("builder")) return 5;
-    if (t.includes("figure") || t.includes("public")) return 10;
-    if (t.includes("community") || t.includes("dao")) return 20;
-    if (t.includes("company") || t.includes("organization") || t.includes("org")) return 40;
-    return 2; // default for unverified or unknown - always safe fallback
+    if (t.includes("builder")) return 2;
+    if (t.includes("figure") || t.includes("public")) return 5;
+    if (t.includes("community") || t.includes("dao")) return 30;
+    if (t.includes("company") || t.includes("organization") || t.includes("org")) return 60;
+    return 1; // unverified — no profile or incomplete profile
 }
 
 
@@ -212,26 +222,21 @@ export function isRecruiterTier(tier?: string): boolean {
 }
 
 /**
- * Returns the maximum number of hiring collections a tier can create.
+ * Monthly hiring collection limit by tier.
  * This is the SINGLE SOURCE OF TRUTH for all hiring limit decisions.
- * Growth-mode limits:
- *   null  = unlimited (Community/DAO, Company/Org — subscribed)
- *   2     = all other tiers (builder, public figure, unverified)
+ * The count window is the current calendar month (reset on the 1st).
  *
- * Non-subscribed users exceeding their free limit can pay per post
- * via direct on-chain USDC transfer ($0.10 USDC each).
+ * Limits:
+ *   null = unlimited → verified/subscribed Community/DAO or Company/Org
+ *   1    = 1 per month → all free tiers (builder, public figure, unverified)
  *
- * Limits by tier:
- *   null = unlimited → verified/active Company/Org or Community/DAO wallet users
- *   2    = 2 free    → Google org-type accounts without active subscription (API-level override)
- *   1    = 1 free    → Builder, Public Figure, Unverified
+ * Non-subscribed users who exceed their free monthly limit can pay
+ * $0.10 USDC per additional post (direct on-chain transfer).
  */
 export function getHiringLimit(tier?: string): number | null {
     const t = normalizeTier(tier);
-    // Verified & active wallet subscriptions → unlimited
     if (t.includes("company") || t.includes("organization") || t.includes("org")) return null;
     if (t.includes("community") || t.includes("dao")) return null;
-    // Builder, Public Figure, Unverified → 1 free post
-    return 1;
+    return 1; // 1 free post per month for all other tiers
 }
 

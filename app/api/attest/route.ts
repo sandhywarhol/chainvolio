@@ -358,7 +358,12 @@ export async function POST(request: Request) {
         // Skip all quota enforcement when the user has paid for this individual attestation.
         const skipQuota = isPaidAttestation && paymentVerified;
 
-        const quota = getAttestationQuota(verificationTier);
+        let quota = getAttestationQuota(verificationTier);
+        // Google org accounts without an active subscription get 2/month minimum
+        // (they're not "unverified" in intent, just unpaid — unverified fallback gives only 1)
+        if (verificationTier === "unverified" && googleOrgData && !isGoogleOrgActive) {
+            quota = 2;
+        }
         console.log(`[attest-api] wallet=${attesterWallet} tier=${verificationTier} quota=${quota} used=${profile?.attestation_used ?? 0} paid=${skipQuota}`);
 
         // a. Per-Target Monthly Limit Check for Unverified Users
