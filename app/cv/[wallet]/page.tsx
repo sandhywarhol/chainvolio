@@ -806,7 +806,7 @@ export default function CVPage(props: any) {
               </p>
             </footer>
           </section>
-          <Footer />
+          <Footer className="bg-[#030303]/90 backdrop-blur-md" />
         </main>
       );
     }
@@ -824,12 +824,12 @@ export default function CVPage(props: any) {
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_16px_48px_-8px_rgba(0,0,0,0.9)]">
+            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_30px_100px_-16px_rgba(0,0,0,1)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
-              {/* Main Card Background: Dark Grey */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-white/10 pointer-events-none" style={{ background: "#18181d" }}></div>
+              {/* Main Card Background: Deeper Dark */}
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-white/[0.04] pointer-events-none" style={{ background: "#0a0a0c" }}></div>
 
               {/* Top-Center Spotlight Effect (Conical Spread) */}
               <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl md:rounded-3xl">
@@ -843,11 +843,8 @@ export default function CVPage(props: any) {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-lightning-shine"></div>
               </div>
 
-              {/* Bottom black gradient overlay */}
-              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none" />
-
               {/* 3D Rim Light (Inner Edge Highlight) */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),inset_1px_0_0_0_rgba(255,255,255,0.05)] pointer-events-none z-30" />
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-2px_4px_rgba(0,0,0,0.8),inset_1.5px_0_2px_rgba(255,255,255,0.06),inset_-1.5px_0_2px_rgba(0,0,0,0.6)] pointer-events-none z-30" />
 
               {/* Outer glow with silver accent */}
               <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-400/20 via-white/10 to-slate-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl pointer-events-none"></div>
@@ -932,6 +929,14 @@ export default function CVPage(props: any) {
                       )}
                     </div>
                   ) : null}
+
+                  {/* Brand Logo & Text */}
+                  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-white/5 w-full justify-center md:justify-start">
+                    <div className="w-7 h-7 rounded-lg bg-black/60 border border-white/[0.06] flex items-center justify-center">
+                      <img src="/logo.png" alt="ChainVolio" className="h-4 w-auto opacity-70" />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">ChainVolio</span>
+                  </div>
                 </div>
 
 
@@ -999,7 +1004,7 @@ export default function CVPage(props: any) {
                   {profile?.skills ? (
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-3">
                       {profile.skills.split(',').map((skill, i) => (
-                        <span key={i} className="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-slate-800 border border-slate-700 text-[10px] md:text-xs text-slate-300">
+                        <span key={i} className="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-black/60 border border-white/[0.06] text-[10px] md:text-xs text-slate-300 hover:border-white/[0.12] transition-colors">
                           {skill.trim()}
                         </span>
                       ))}
@@ -1031,7 +1036,7 @@ export default function CVPage(props: any) {
                           href={`https://x.com/${profile.twitter.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
                           title="Twitter / X"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1045,7 +1050,7 @@ export default function CVPage(props: any) {
                           href={`https://github.com/${profile.github}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
                           title="GitHub"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1059,7 +1064,7 @@ export default function CVPage(props: any) {
                           href={profile.linkedin.startsWith('http') ? profile.linkedin : `https://linkedin.com/in/${profile.linkedin.replace(/^(www\.)?linkedin\.com\/in\//, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all"
                           title="LinkedIn"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1073,7 +1078,7 @@ export default function CVPage(props: any) {
                           href={`https://instagram.com/${profile.instagram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/20 transition-all font-bold"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/20 transition-all font-bold"
                           title="Instagram"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1088,7 +1093,7 @@ export default function CVPage(props: any) {
                           href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
                           title="Website"
                         >
                           <Globe className="w-3.5 h-3.5" />
@@ -1101,7 +1106,7 @@ export default function CVPage(props: any) {
                             navigator.clipboard.writeText(profile.discord!);
                             setToastMessage(`Discord handle copied: ${profile.discord}`);
                           }}
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/20 transition-all cursor-pointer"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/20 transition-all cursor-pointer"
                           title="Copy Discord Handle"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1115,7 +1120,7 @@ export default function CVPage(props: any) {
                           href={`https://t.me/${profile.telegram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-[#26A5E4] hover:bg-[#26A5E4]/10 hover:border-[#26A5E4]/20 transition-all"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-[#26A5E4] hover:bg-[#26A5E4]/10 hover:border-[#26A5E4]/20 transition-all"
                           title="Telegram"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1129,7 +1134,7 @@ export default function CVPage(props: any) {
                           href={`https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all font-bold"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all font-bold"
                           title="WhatsApp"
                         >
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1144,7 +1149,7 @@ export default function CVPage(props: any) {
                             navigator.clipboard.writeText(profile.email!);
                             setToastMessage(`Email address copied: ${profile.email}`);
                           }}
-                          className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all cursor-pointer"
+                          className="p-1.5 rounded-lg bg-black/60 border border-white/[0.06] text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all cursor-pointer"
                           title="Copy Email Address"
                         >
                           <Mail className="w-3.5 h-3.5" />
@@ -1620,7 +1625,7 @@ export default function CVPage(props: any) {
         />
       )}
 
-      <Footer />
+      <Footer className="bg-[#030303]/90 backdrop-blur-md" />
     </main>
   );
 }
