@@ -27,7 +27,12 @@ import {
     CalendarDays,
     Target,
     FileText,
-    User
+    User,
+    Sparkles,
+    X,
+    TrendingUp,
+    Award,
+    MessageSquare,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -65,6 +70,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     const [spamFilter, setSpamFilter] = useState(false); // Feature 4: Spam Filter
     const [focusMatchOnly, setFocusMatchOnly] = useState(false);
     const [needsAuth, setNeedsAuth] = useState(false);
+    const [showConclusion, setShowConclusion] = useState(false);
     // Tracks that wallet restore was already attempted; prevents premature sign-in flash
     // on initial load but correctly clears the spinner after a failed reconnect
     const hasAttemptedRestoreRef = useRef(false);
@@ -219,6 +225,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
             if (res.ok) {
                 setData(result);
                 setNeedsAuth(false);
+                // Detect if the viewer is an admin member (not the owner)
+                if (walletToUse && result.collection?.owner_wallet !== walletToUse) {
+                    setIsAdminMember(true);
+                }
             } else {
                 if (res.status === 401) {
                     const canonicalKey = `cv_sig_view_dashboard_${walletToUse}_${slug}`;
@@ -321,6 +331,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
     // Feature: Manage Candidate Status & Notes
     const [noteDraft, setNoteDraft] = useState("");
     const [isSavingNote, setIsSavingNote] = useState(false);
+
+    // Member access: track if current wallet user is an admin member (not the owner)
+    const [isAdminMember, setIsAdminMember] = useState(false);
+    const [memberNoteDraft, setMemberNoteDraft] = useState("");
+    const [isSavingMemberNote, setIsSavingMemberNote] = useState(false);
+    const [memberNoteSuccess, setMemberNoteSuccess] = useState(false);
 
     // Sync note draft when expanding a candidate
     useEffect(() => {
@@ -666,15 +682,50 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
         return Array.from(new Set(roles));
     }, [data]);
 
+    const handleSaveMemberNote = async () => {
+        if (!expandedId || !memberNoteDraft.trim() || !publicKey) return;
+        setIsSavingMemberNote(true);
+        setMemberNoteSuccess(false);
+        try {
+            const res = await fetch("/api/members/notes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    builderWallet: publicKey.toBase58(),
+                    hiringId: expandedId,
+                    content: memberNoteDraft.trim(),
+                }),
+            });
+            if (res.ok) {
+                setMemberNoteSuccess(true);
+                setMemberNoteDraft("");
+                setTimeout(() => setMemberNoteSuccess(false), 3000);
+            }
+        } catch { /* silent */ }
+        finally { setIsSavingMemberNote(false); }
+    };
+
     const handleDownloadReport = async () => {
         if (!data || !data.candidates.length) return;
-        
+
         setToast({ message: "Generating Hiring Intelligence Report...", type: "success" });
-        
+
         try {
-            // Generate PDF Intelligence Report
-            await generateHiringReport(data);
-            
+            // Fetch team (member) notes for all candidates
+            let teamNotes: Record<string, { authorName: string; content: string; created_at: string }[]> = {};
+            try {
+                const candidateIds = data.candidates.map((c: any) => c.id).join(",");
+                const ownerWallet = data.collection?.owner_wallet ?? "";
+                if (candidateIds && ownerWallet) {
+                    const notesRes = await fetch(
+                        `/api/members/notes/batch?recruiterWallet=${encodeURIComponent(ownerWallet)}&hiringIds=${candidateIds}`
+                    );
+                    const notesJson = await notesRes.json();
+                    if (notesJson.ok) teamNotes = notesJson.data;
+                }
+            } catch { /* non-blocking */ }
+
+            await generateHiringReport(data, teamNotes);
             setToast({ message: "Report generated successfully", type: "success" });
         } catch (err) {
             console.error("Report generation failed:", err);
@@ -1168,7 +1219,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md transition-all hover:bg-white/[0.03] text-left"
                                 >
                                     <Download style={{ width: 12, height: 12, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
-                                    <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.38)" }}>Download Report</span>
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.38)" }}>Download Full Report</span>
                                 </button>
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
@@ -1211,7 +1262,16 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>Candidate Pipeline</p>
                                 <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{filteredCandidates.length} of {data?.candidates?.length || 0} candidates shown</p>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowConclusion(true)}
+                                    disabled={!data?.candidates?.length}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-30"
+                                    style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", color: "rgba(167,139,250,0.9)" }}
+                                >
+                                    <Sparkles style={{ width: 11, height: 11 }} />
+                                    View Quick Result
+                                </button>
                                 <span className="md:hidden text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.3)" }}>{data?.collection.title}</span>
                                 <div className="md:hidden">
                                     {isGoogleUser && <WalletMultiButton />}
@@ -1692,6 +1752,33 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* Member Note (admin members only) */}
+                                                    {isAdminMember && (
+                                                        <div className="mt-3 px-4 pb-4">
+                                                            <div className="border border-indigo-500/15 rounded-xl p-3 bg-indigo-500/5">
+                                                                <p className="text-[9px] font-black uppercase tracking-widest text-indigo-400/60 mb-2">My Member Note</p>
+                                                                <textarea
+                                                                    value={memberNoteDraft}
+                                                                    onChange={(e) => setMemberNoteDraft(e.target.value)}
+                                                                    placeholder="Add your note about this candidate..."
+                                                                    className="w-full bg-black/30 border border-white/[0.06] rounded-lg p-2.5 text-[11px] text-white/70 placeholder:text-white/20 outline-none focus:border-indigo-500/30 resize-none min-h-[60px]"
+                                                                />
+                                                                <div className="flex items-center justify-end gap-2 mt-1.5">
+                                                                    {memberNoteSuccess && (
+                                                                        <span className="text-[9px] text-emerald-400 font-bold">Saved!</span>
+                                                                    )}
+                                                                    <button
+                                                                        onClick={handleSaveMemberNote}
+                                                                        disabled={isSavingMemberNote || !memberNoteDraft.trim()}
+                                                                        className="px-3 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest transition-all disabled:opacity-40"
+                                                                    >
+                                                                        {isSavingMemberNote ? "Saving…" : "Save Note"}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </td>
                                             </tr>
                                         )}
@@ -1789,6 +1876,150 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     type={toast.type}
                     onClose={() => setToast(null)}
                 />
+            )}
+
+            {/* ── View Quick Result Modal ── */}
+            {showConclusion && data && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-[#0a0a0e] border border-white/[0.08] rounded-3xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        {/* Header */}
+                        <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-white/[0.06]" style={{ background: "#0a0a0e" }}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)" }}>
+                                    <Sparkles style={{ width: 14, height: 14, color: "rgba(167,139,250,0.9)" }} />
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)" }}>Quick Result</p>
+                                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{data.collection.title}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setShowConclusion(false)} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors">
+                                <X style={{ width: 15, height: 15, color: "rgba(255,255,255,0.35)" }} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Stats overview */}
+                            {(() => {
+                                const total = data.candidates.length;
+                                const hired = data.candidates.filter((c: any) => c.status === "hired").length;
+                                const shortlisted = data.candidates.filter((c: any) => c.status === "shortlisted").length;
+                                const rejected = data.candidates.filter((c: any) => c.status === "rejected").length;
+                                const pending = total - hired - shortlisted - rejected;
+                                const avgScore = total > 0 ? Math.round(data.candidates.reduce((s: number, c: any) => s + (c.signalScore || 0), 0) / total) : 0;
+                                const verified = data.candidates.filter((c: any) => c.isVerified || c.isAttested).length;
+
+                                return (
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {[
+                                            { label: "Total Applicants", val: total, icon: Users, color: "rgba(255,255,255,0.6)", bg: "rgba(255,255,255,0.05)" },
+                                            { label: "Hired", val: hired, icon: Award, color: "#4ade80", bg: "rgba(74,222,128,0.08)" },
+                                            { label: "Shortlisted", val: shortlisted, icon: TrendingUp, color: "#f59e0b", bg: "rgba(245,158,11,0.08)" },
+                                            { label: "Rejected", val: rejected, icon: XCircle, color: "#f87171", bg: "rgba(248,113,113,0.08)" },
+                                            { label: "Avg Signal Score", val: avgScore, icon: Target, color: "rgba(167,139,250,0.9)", bg: "rgba(124,58,237,0.08)" },
+                                            { label: "On-Chain Verified", val: verified, icon: ShieldCheck, color: "#60a5fa", bg: "rgba(96,165,250,0.08)" },
+                                        ].map((s, i) => (
+                                            <div key={i} className="p-3 rounded-2xl" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
+                                                <s.icon style={{ width: 14, height: 14, color: s.color, marginBottom: 6 }} />
+                                                <p style={{ fontSize: 22, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.val}</p>
+                                                <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: 4 }}>{s.label}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Top candidates */}
+                            {(() => {
+                                const top = [...data.candidates]
+                                    .sort((a: any, b: any) => (b.signalScore || 0) - (a.signalScore || 0))
+                                    .slice(0, 5);
+                                return (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <TrendingUp style={{ width: 13, height: 13, color: "rgba(167,139,250,0.7)" }} />
+                                            <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Top Candidates by Signal</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {top.map((c: any, i: number) => {
+                                                const statusColors: Record<string, string> = {
+                                                    hired: "#4ade80", shortlisted: "#f59e0b", rejected: "#f87171",
+                                                };
+                                                const sc = statusColors[c.status] ?? "rgba(255,255,255,0.3)";
+                                                return (
+                                                    <div key={c.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                        <span style={{ fontSize: 11, fontWeight: 900, color: "rgba(255,255,255,0.2)", width: 16, flexShrink: 0 }}>#{i + 1}</span>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)" }} className="truncate">{c.name || c.displayName || c.walletAddress?.slice(0, 8) + "..."}</p>
+                                                            {c.recruiterNotes && (
+                                                                <p style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontStyle: "italic" }} className="truncate">"{c.recruiterNotes}"</p>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                                            {c.signalScore > 0 && (
+                                                                <span style={{ fontSize: 11, fontWeight: 900, color: "rgba(167,139,250,0.8)" }}>{c.signalScore}</span>
+                                                            )}
+                                                            {c.status && c.status !== "pending" && (
+                                                                <span style={{ fontSize: 9, fontWeight: 800, color: sc, textTransform: "uppercase", letterSpacing: "0.06em", padding: "2px 6px", borderRadius: 4, background: `${sc}15`, border: `1px solid ${sc}30` }}>
+                                                                    {c.status}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Candidates with notes */}
+                            {(() => {
+                                const withNotes = data.candidates.filter((c: any) => c.recruiterNotes?.trim());
+                                if (!withNotes.length) return null;
+                                return (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <MessageSquare style={{ width: 13, height: 13, color: "rgba(167,139,250,0.7)" }} />
+                                            <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Evaluation Notes</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {withNotes.map((c: any) => (
+                                                <div key={c.id} className="px-3 py-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                                    <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>{c.name || c.displayName || c.walletAddress?.slice(0, 8) + "..."}</p>
+                                                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontStyle: "italic", lineHeight: 1.6 }}>"{c.recruiterNotes}"</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Collection info */}
+                            <div className="pt-2 border-t border-white/[0.05]">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 700 }}>Collection</p>
+                                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{data.collection.title}</p>
+                                    </div>
+                                    {data.collection.metadata?.deadline && (
+                                        <div className="text-right">
+                                            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 700 }}>Deadline</p>
+                                            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{new Date(data.collection.metadata.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={() => { setShowConclusion(false); handleDownloadReport(); }}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+                                    >
+                                        <Download style={{ width: 11, height: 11 }} /> Download Full Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

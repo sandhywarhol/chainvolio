@@ -97,23 +97,74 @@ export default function RootLayout({
       <head>
         {/* Restore saved theme before React hydrates — prevents flash of wrong theme */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('cv-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();` }} />
-        {/* Bulletproof viewport scaler for mobile devices. Forces exact fit. */}
+        {/* Anti-FOUC and Bulletproof viewport scaler */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
-            function setScale() {
-              var targetWidth = 1280;
+            // Inject anti-FOUC style dynamically so React hydration doesn't complain
+            var style = document.createElement('style');
+            style.id = 'cv-viewport-fouc';
+            style.innerHTML = 'body { visibility: hidden !important; }';
+            document.head.appendChild(style);
+
+            var targetWidth = 1280;
+            function getScale() {
               var sw = window.screen.width;
-              if (sw > 0 && sw < targetWidth) {
-                var scale = sw / targetWidth;
-                var meta = document.querySelector('meta[name="viewport"]');
-                if (meta) {
-                  meta.content = 'width=' + targetWidth + ', initial-scale=' + scale + ', minimum-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=no';
-                }
+              return (sw > 0 && sw < targetWidth) ? (sw / targetWidth) : 1;
+            }
+            function getContent() {
+              var scale = getScale();
+              if (scale === 1) return 'width=device-width, initial-scale=1';
+              return 'width=' + targetWidth + ', initial-scale=' + scale + ', minimum-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=no';
+            }
+            
+            function updateMeta() {
+              var expected = getContent();
+              var meta = document.querySelector('meta[name="viewport"]');
+              if (meta && meta.content !== expected) {
+                meta.content = expected;
+              } else if (!meta) {
+                meta = document.createElement('meta');
+                meta.name = 'viewport';
+                meta.content = expected;
+                document.head.appendChild(meta);
               }
             }
-            setScale();
-            window.addEventListener('resize', setScale);
-            window.addEventListener('orientationchange', setScale);
+
+            // Run immediately
+            updateMeta();
+
+            // Observe for Next.js overriding it
+            var observer = new MutationObserver(function(mutations) {
+              mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.target.name === 'viewport') {
+                  if (mutation.target.content !== getContent()) updateMeta();
+                }
+                mutation.addedNodes.forEach(function(node) {
+                  if (node.tagName === 'META' && node.name === 'viewport') {
+                    if (node.content !== getContent()) updateMeta();
+                  }
+                });
+              });
+            });
+            observer.observe(document.head || document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+
+            // Reveal body safely after browser applies the scale
+            function reveal() {
+              var fouc = document.getElementById('cv-viewport-fouc');
+              if (fouc) fouc.remove();
+            }
+            
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+              setTimeout(reveal, 50); // slight delay to ensure browser layout recalc
+            } else {
+              document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(reveal, 50);
+              });
+            }
+
+            // Update on resize
+            window.addEventListener('resize', updateMeta);
+            window.addEventListener('orientationchange', updateMeta);
           })();
         ` }} />
       </head>

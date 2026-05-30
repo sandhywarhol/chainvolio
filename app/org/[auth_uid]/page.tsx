@@ -13,6 +13,10 @@ import {
   LayoutDashboard,
   Copy,
   Check,
+  Users,
+  X,
+  Crown,
+  UserCheck,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -57,11 +61,23 @@ type Collection = {
   created_at: string;
 };
 
+type PublicMember = {
+  id: string;
+  role: "member" | "admin";
+  joined_at: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  card_number: number | null;
+  wallet_address: string;
+};
+
 export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: string }) {
   const { auth_uid } = useParams<{ auth_uid: string }>();
   const [org, setOrg] = useState<PublicOrg | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [members, setMembers] = useState<PublicMember[]>([]);
+  const [showMembersModal, setShowMembersModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -74,15 +90,19 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
       return;
     }
 
+    const recruiterWallet = `gauth:${authUid}`;
+
     Promise.all([
       fetch(`/api/org/public?auth_uid=${authUid}`).then(r => r.json()),
       fetch(`/api/org/projects?auth_uid=${authUid}`).then(r => r.ok ? r.json() : { data: [] }),
       fetch(`/api/hiring/collections?auth_uid=${authUid}`).then(r => r.ok ? r.json() : { data: [] }),
-    ]).then(([orgRes, projRes, colRes]) => {
+      fetch(`/api/members/public?recruiterWallet=${encodeURIComponent(recruiterWallet)}`).then(r => r.ok ? r.json() : { data: [] }),
+    ]).then(([orgRes, projRes, colRes, membersRes]) => {
       if (orgRes.error || !orgRes.org) { setNotFound(true); return; }
       setOrg(orgRes.org);
       if (Array.isArray(projRes.data)) setProjects(projRes.data);
       if (Array.isArray(colRes.data)) setCollections(colRes.data);
+      if (Array.isArray(membersRes.data)) setMembers(membersRes.data);
     }).finally(() => setLoading(false));
   }, [auth_uid, authUidOverride]);
 
@@ -212,14 +232,14 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
           </div>
 
           {/* Stats pods */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="p-4 rounded-2xl bg-black border border-white/5 space-y-2">
               <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-emerald-500/10">
                 <LayoutDashboard className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
                 <p className="text-[20px] font-black text-white">{collections.length}</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Hiring Collections</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Hiring</p>
               </div>
             </div>
             <div className="p-4 rounded-2xl bg-black border border-white/5 space-y-2">
@@ -231,7 +251,65 @@ export default function PublicOrgPage({ authUidOverride }: { authUidOverride?: s
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Projects</p>
               </div>
             </div>
+            <button
+              onClick={() => members.length > 0 && setShowMembersModal(true)}
+              className={`p-4 rounded-2xl bg-black border space-y-2 text-left transition-all ${members.length > 0 ? "border-indigo-500/20 hover:border-indigo-500/40 cursor-pointer" : "border-white/5 cursor-default"}`}
+            >
+              <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-indigo-500/10">
+                <Users className="w-4 h-4 text-indigo-400" />
+              </div>
+              <div>
+                <p className="text-[20px] font-black text-white">{members.length}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Members</p>
+                {members.length > 0 && <p className="text-[9px] text-indigo-400/60 mt-0.5">Click to view</p>}
+              </div>
+            </button>
           </div>
+
+          {/* Members Modal */}
+          {showMembersModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+              <div className="w-full max-w-sm bg-[#0a0a0a] border border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-indigo-400" />
+                    <p className="text-sm font-bold text-white">Members ({members.length})</p>
+                  </div>
+                  <button onClick={() => setShowMembersModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors">
+                    <X className="w-4 h-4 text-white/40" />
+                  </button>
+                </div>
+                <div className="p-3 max-h-[60vh] overflow-y-auto space-y-2">
+                  {members.map((m) => {
+                    const name = m.display_name ?? (m.wallet_address.slice(0, 6) + "…" + m.wallet_address.slice(-4));
+                    const isAdmin = m.role === "admin";
+                    return (
+                      <div key={m.id} className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {m.avatar_url
+                            ? <img src={m.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : <span className="text-xs font-bold text-white/40">{name[0]?.toUpperCase()}</span>
+                          }
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white truncate">{name}</p>
+                          {m.card_number && <p className="text-[9px] text-white/20 font-bold">CV #{m.card_number}</p>}
+                        </div>
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border flex-shrink-0 ${
+                          isAdmin
+                            ? "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                            : "text-white/30 bg-white/5 border-white/10"
+                        }`}>
+                          {isAdmin ? <Crown className="w-2.5 h-2.5" /> : <UserCheck className="w-2.5 h-2.5" />}
+                          {m.role}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Projects */}
           {projects.length > 0 && (

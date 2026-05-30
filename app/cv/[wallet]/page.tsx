@@ -17,6 +17,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { RoleBadge } from "@/components/profile/RoleBadge";
+import { CompanyMemberBadge } from "@/components/members/CompanyMemberBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificatePreviewModal } from "@/components/profile/CertificatePreviewModal";
 import { TrustIssuerCV } from "@/components/cv/TrustIssuerCV";
@@ -277,8 +278,15 @@ function WorkRecordCard({
   return (
     <div
       onClick={() => onSelect(r)}
-      className="p-4 md:p-5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden"
+      className="p-4 md:p-5 rounded-lg hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden shadow-[0_6px_14px_-4px_rgba(0,0,0,0.8)] hover:shadow-[0_10px_20px_-4px_rgba(0,0,0,0.9)]"
+      style={{ background: "#18181d", border: "1px solid rgba(255,255,255,0.07)" }}
     >
+      {/* Lightning shine sweep */}
+      <div className="animate-lightning-shine absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none z-10" />
+      {/* Top spotlight */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-16 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04)_0%,transparent_70%)] pointer-events-none z-10" />
+
       {/* 3D Rim Light (Inner Edge Highlight) */}
       <div className="absolute inset-0 rounded-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_1px_0_0_0_rgba(255,255,255,0.02)] pointer-events-none z-10" />
 
@@ -544,6 +552,7 @@ export default function CVPage(props: any) {
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [contactedConversationId, setContactedConversationId] = useState<string | null>(null);
+  const [cvMemberships, setCvMemberships] = useState<{ id: string; company_name: string; role: "member" | "admin"; recruiter_avatar_url?: string | null }[]>([]);
   const { isGoogleSignedIn } = useGoogleAuth();
 
   const verifiedHiringRecords = useMemo(() => {
@@ -683,6 +692,11 @@ export default function CVPage(props: any) {
       });
 
     // --- NON-CRITICAL DATA: Receipts & Portfolio (fetched in background) ---
+    fetch(`/api/members/memberships?builderWallet=${wallet}`)
+      .then((r) => r.json())
+      .then((d) => { if (d.ok) setCvMemberships(d.data); })
+      .catch(() => {});
+
     Promise.all([
       fetch(`/api/receipts?wallet=${wallet}`).then((r) => r.json()),
       fetch(`/api/portfolio?wallet=${wallet}`).then((r) => r.json()),
@@ -800,7 +814,9 @@ export default function CVPage(props: any) {
   // ── End role routing - IndividualCV renders below ──────────────────────────
 
   return (
-    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+    <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white theme-aware">
+      {/* Fixed background — stays still while content scrolls */}
+      <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
       <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-28">
         {(!profile && !loading) ? (
@@ -808,12 +824,12 @@ export default function CVPage(props: any) {
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full">
+            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_16px_48px_-8px_rgba(0,0,0,0.9)]">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
-              {/* Main Card Background: Very Dark Grey */}
-              <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-black border border-white/10 pointer-events-none"></div>
+              {/* Main Card Background: Dark Grey */}
+              <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-white/10 pointer-events-none" style={{ background: "#18181d" }}></div>
 
               {/* Top-Center Spotlight Effect (Conical Spread) */}
               <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl md:rounded-3xl">
@@ -973,7 +989,9 @@ export default function CVPage(props: any) {
                     />
                     
                     <CommunityBadge cvId={profile?.cardNumber || 0} />
-                    
+                    {cvMemberships.map((m) => (
+                      <CompanyMemberBadge key={m.id} membership={m} />
+                    ))}
                     <ExperienceBadge years={totalYearsExperience} />
                   </div>
 
@@ -1172,7 +1190,10 @@ export default function CVPage(props: any) {
 
 
             {/* Recruiter Trust Disclaimer */}
-            <div className="mt-8 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-start gap-3">
+            <div className="mt-8 p-4 rounded-xl flex items-start gap-3 shadow-[0_8px_16px_-4px_rgba(0,0,0,0.7)] relative overflow-hidden" style={{ background: "#18181d", border: "1px solid rgba(255,255,255,0.07)" }}>
+              {/* Lightning shine */}
+              <div className="animate-lightning-shine absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none" style={{ animationDelay: "2s" }} />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
               <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Recruiter Note: Verified Integrity</p>
@@ -1191,7 +1212,7 @@ export default function CVPage(props: any) {
 
             {/* Profile Incomplete Prompt */}
             {publicKey?.toBase58() === wallet && !isProfileComplete && (
-               <div className="mt-8 mb-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-center justify-between gap-4">
+               <div className="mt-8 mb-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-center justify-between gap-4 shadow-[0_8px_16px_-4px_rgba(0,0,0,0.7)]">
                  <div className="flex items-center gap-3">
                    <Info className="w-5 h-5 text-amber-500 shrink-0" />
                    <p className="text-xs text-slate-400 leading-relaxed">

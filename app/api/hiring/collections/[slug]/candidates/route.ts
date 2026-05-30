@@ -74,8 +74,22 @@ export async function GET(
             }
 
             if (collection.owner_wallet !== wallet) {
-                console.error(`[Dashboard API] Unauthorized: Wallet ${wallet} is not owner ${collection.owner_wallet} for slug ${slug}`);
-                return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403, headers });
+                // Check if this wallet is an admin member of the recruiter who owns this collection.
+                // recruiter_wallet in company_members === owner_wallet in hiring_collections
+                // (both use the same canonical format: actual wallet or "gauth:{uid}")
+                const { data: memberRecord } = await supabase
+                    .from("company_members")
+                    .select("id")
+                    .eq("recruiter_wallet", collection.owner_wallet)
+                    .eq("builder_wallet", wallet)
+                    .eq("status", "active")
+                    .eq("role", "admin")
+                    .maybeSingle();
+
+                if (!memberRecord) {
+                    console.error(`[Dashboard API] Unauthorized: Wallet ${wallet} is not owner ${collection.owner_wallet} for slug ${slug}`);
+                    return NextResponse.json({ error: "Unauthorized. You are not the owner of this collection." }, { status: 403, headers });
+                }
             }
         }
         // Get owner profile

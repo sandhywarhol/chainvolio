@@ -16,10 +16,12 @@ import { supabase } from "@/lib/supabase/client";
 import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import { CommunityBadge } from "@/components/profile/CommunityBadge";
 import { RoleBadge } from "@/components/profile/RoleBadge";
+import { CompanyMemberBadge } from "@/components/members/CompanyMemberBadge";
 import { CertificateSection, type Certificate } from "@/components/profile/CertificateSection";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox, Building2, PenLine, Wallet } from "lucide-react";
+import { Github, Globe, MessageSquare, Mail, MapPin, Briefcase, Clock, LayoutDashboard, ExternalLink, Plus, Instagram, ShieldCheck, Link as LinkIcon, Copy, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, User, FileCheck2, FolderOpen, Activity, Share2, FileText, Send, Inbox, Building2, PenLine, Wallet, Users } from "lucide-react";
+import { MembersCenter } from "@/components/members/MembersCenter";
 import { getVerificationLabel, isRecruiterTier, getHiringLimit } from "@/lib/paymentConfig";
 import { OrgDashboard } from "@/components/dashboard/OrgDashboard";
 import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
@@ -97,6 +99,9 @@ export default function DashboardPage() {
   const [attestationCount, setAttestationCount] = useState(0);
   const [isHiringExpanded, setIsHiringExpanded] = useState(false);
   const [isImpactExpanded, setIsImpactExpanded] = useState(false);
+  const [memberships, setMemberships] = useState<{ id: string; company_name: string; role: "member" | "admin"; recruiter_avatar_url?: string | null }[]>([]);
+  const [sharedHirings, setSharedHirings] = useState<{ id: string; title: string; slug: string; created_at: string; company: { company_name: string; role: string; recruiter_avatar_url?: string | null } | null }[]>([]);
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [showCertModal, setShowCertModal] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -154,12 +159,16 @@ export default function DashboardPage() {
     Promise.all([
       fetch(`/api/dashboard/stats?wallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()),
       fetch(`/api/receipts?wallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()).catch(() => []),
+      fetch(`/api/members/memberships?builderWallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
+      fetch(`/api/members/shared-hirings?builderWallet=${walletAddr}`, { signal: controller.signal }).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
     ])
-      .then(([data, recs]) => {
+      .then(([data, recs, membershipsData, sharedData]) => {
         if (data.error) throw new Error(data.error);
         setProfile(data.profile);
         setCollections(data.collections || []);
         setAttestationCount(data.attestationCount || 0);
+        if (membershipsData.ok) setMemberships(membershipsData.data);
+        if (sharedData.ok) setSharedHirings(sharedData.data);
         if (Array.isArray(data.certificates)) {
           setCertificates(data.certificates);
         }
@@ -429,6 +438,8 @@ export default function DashboardPage() {
               { Icon: Building2,     label: "Profile",             id: "profile",      href: undefined },
               { Icon: FolderOpen,    label: "Hiring Center",       id: "hiring",       href: undefined },
               { Icon: LayoutDashboard, label: "Projects & Programs", id: "projects",   href: undefined },
+              { Icon: Users,         label: "Members",             id: "members",      href: undefined },
+              { Icon: Activity,      label: "Attestation Usage",   id: "attestation",  href: undefined },
               { Icon: Inbox,         label: "Inbox",               id: "inbox",        href: undefined },
             ] : [
               { Icon: User,        label: "Profile",           id: "profile",       href: undefined },
@@ -515,10 +526,12 @@ export default function DashboardPage() {
               projects:    { title: "Projects & Programs", desc: "Showcase admin initiatives and programs." },
               inbox:       { title: "Inbox",             desc: "Direct messages and candidate conversations." },
             } : isWalletRecruiter ? {
-              profile:  { title: "Profile",              desc: "Manage your organization profile and activity." },
-              hiring:   { title: "Hiring Center",        desc: "Manage your hiring collections and sourcing." },
-              projects: { title: "Projects & Programs",  desc: "Showcase your initiatives, hackathons, and programs." },
-              inbox:    { title: "Inbox",                desc: "Direct messages and candidate conversations." },
+              profile:     { title: "Profile",              desc: "Manage your organization profile and activity." },
+              hiring:      { title: "Hiring Center",        desc: "Manage your hiring collections and sourcing." },
+              projects:    { title: "Projects & Programs",  desc: "Showcase your initiatives, hackathons, and programs." },
+              members:     { title: "Members",              desc: "Manage your team members and send invitations." },
+              attestation: { title: "Attestation Usage",   desc: "Track your monthly attestation quota and usage." },
+              inbox:       { title: "Inbox",                desc: "Direct messages and candidate conversations." },
             } : {
               profile:     { title: "Profile",           desc: "Manage your professional identity and information." },
               credential:  { title: "Credential",        desc: "Your verified credentials and badges." },
@@ -628,23 +641,151 @@ export default function DashboardPage() {
               <p className="text-center text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.12)" }}>Recruiter accounts require organization verification to unlock hiring features</p>
             </div>
           </div>
-        ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox"].includes(activeTab))) ? (
+        ) : (isWalletRecruiter || (isAdmin && ["hiring", "projects", "inbox", "attestation"].includes(activeTab))) ? (
           // ── Org Dashboard (Community / Company wallet accounts) ───────────────
           activeTab === "inbox" ? (
-            <InboxPanel />
-          ) : (
-            <OrgDashboard
-              profile={profile}
-              walletAddress={walletAddress}
-              collections={collections}
-              attestationCount={attestationCount}
-              activeSection={activeTab === "hiring" ? "hiring" : activeTab === "projects" ? "projects" : undefined}
-              hideActionBar={true}
-              onRequestVerification={(renewal) => {
-                setIsRenewal(renewal);
-                setShowVerificationModal(true);
+            <InboxPanel
+              onMembershipAccepted={async () => {
+                const [mRes, sRes] = await Promise.all([
+                  fetch(`/api/members/memberships?builderWallet=${walletAddress}`).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
+                  fetch(`/api/members/shared-hirings?builderWallet=${walletAddress}`).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
+                ]);
+                if (mRes.ok) setMemberships(mRes.data);
+                if (sRes.ok) setSharedHirings(sRes.data);
               }}
             />
+          ) : activeTab === "members" ? (
+            <MembersCenter
+              recruiterWallet={walletAddress}
+              companyName={profile?.displayName ?? ""}
+              avatarUrl={profile?.avatarUrl}
+            />
+          ) : activeTab === "attestation" ? (
+            <div className="space-y-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center justify-between px-4 py-2" style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                      <Activity style={{ width: 13, height: 13, color: "rgba(255,255,255,0.35)" }} />
+                    </div>
+                    <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>Attestation Usage</p>
+                  </div>
+                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Resets monthly</span>
+                </div>
+                <div className="px-4 py-3">
+                  {(() => {
+                    const used = profile?.attestationUsed ?? 0;
+                    const quota = profile?.attestationQuota ?? 2;
+                    const remaining = Math.max(0, quota - used);
+                    const pct = Math.min(100, (used / quota) * 100);
+                    const isLimitReached = used >= quota;
+                    const isNearLimit = !isLimitReached && pct >= 80;
+
+                    if (isLimitReached) return (
+                      <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-rose-400">You've reached your limit.</p>
+                            <p className="text-[11px] text-slate-500 mt-0.5">Attestation Usage: {used} / {quota} this month</p>
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border bg-rose-500/10 border-rose-500/30 text-rose-400">Limit Reached</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-rose-500 rounded-full w-full" />
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">Upgrade your tier for unlimited attestations.</p>
+                        <button
+                          onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                          className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" /> Upgrade Now
+                        </button>
+                      </div>
+                    );
+
+                    return (
+                      <div className={`p-4 rounded-2xl border space-y-3 relative group ${isNearLimit ? "bg-amber-500/5 border-amber-500/20" : "bg-white/[0.02] border-white/5"}`}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Attestation Usage</p>
+                            <p className="text-sm font-bold text-white">
+                              {used}
+                              <span className="text-slate-500 font-normal"> / {quota}</span>
+                              <span className="text-xs text-slate-500 font-normal ml-1.5">this month</span>
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${isNearLimit ? "text-amber-400 bg-amber-500/10 border-amber-500/20" : profile?.isVerified ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-slate-400 bg-slate-500/10 border-slate-500/20"}`}>
+                            {isNearLimit ? "Almost Full" : profile?.isVerified ? getVerificationLabel(profile?.verificationTier) : "Regular"}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-700 ${isNearLimit ? "bg-amber-500" : profile?.isVerified ? "bg-gradient-to-r from-white/50 to-white/70" : "bg-slate-600"}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        {isNearLimit && (
+                          <p className="text-[11px] text-amber-400/80 font-medium">⚠ You're almost at your limit — {remaining} left this month</p>
+                        )}
+                        {profile?.attestationResetDate && (
+                          <p className="text-[9px] text-slate-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                            Resets {format(new Date(profile.attestationResetDate), 'MMM d, yyyy')}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <OrgDashboard
+                profile={profile}
+                walletAddress={walletAddress}
+                collections={collections}
+                attestationCount={attestationCount}
+                activeSection={activeTab === "hiring" ? "hiring" : activeTab === "projects" ? "projects" : undefined}
+                hideActionBar={true}
+                onRequestVerification={(renewal) => {
+                  setIsRenewal(renewal);
+                  setShowVerificationModal(true);
+                }}
+              />
+              {/* Shared Hirings — tampil untuk recruiter/admin yang juga menjadi member company lain */}
+              {activeTab === "hiring" && sharedHirings.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  <p className="text-[11px] font-black uppercase tracking-widest" style={{ color: "rgba(99,102,241,0.7)" }}>
+                    Shared Hirings
+                  </p>
+                  <div className="space-y-2">
+                    {sharedHirings.map((h) => (
+                      <Link
+                        key={h.id}
+                        href={`/hiring/${h.slug}/dashboard`}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group"
+                        style={{ background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.15)" }}
+                      >
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
+                          style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)" }}>
+                          {h.company?.recruiter_avatar_url
+                            ? <img src={h.company.recruiter_avatar_url} alt="" className="w-full h-full object-cover" />
+                            : <Building2 style={{ width: 14, height: 14, color: "rgba(99,102,241,0.6)" }} />
+                          }
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)" }} className="truncate">{h.title}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(99,102,241,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h.company?.company_name}</span>
+                            {h.company?.role === "admin" && (
+                              <span style={{ fontSize: 9, fontWeight: 900, color: "#f59e0b", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", padding: "1px 6px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>Admin</span>
+                            )}
+                          </div>
+                        </div>
+                        <ExternalLink style={{ width: 13, height: 13, color: "rgba(255,255,255,0.2)", flexShrink: 0 }} />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )
         ) : (
           <>
@@ -670,6 +811,9 @@ export default function DashboardPage() {
                       CV ID #{String(profile.cardNumber).padStart(5, '0')}
                     </span>
                     <CommunityBadge cvId={profile.cardNumber || 0} />
+                    {memberships.map((m) => (
+                      <CompanyMemberBadge key={m.id} membership={m} />
+                    ))}
                   </div>
                 )}
 
@@ -1483,66 +1627,130 @@ export default function DashboardPage() {
             )}
             {/* ── HIRING CENTER tab (non-recruiter / builder) ── */}
             {activeTab === "hiring" && (
-              <div className="space-y-4 py-2">
-                {/* Header card */}
-                <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div className="flex items-start gap-4">
-                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                      <FolderOpen style={{ width: 18, height: 18, color: "#a78bfa" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginBottom: 4 }}>Post Job Openings</p>
-                      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", lineHeight: 1.6 }}>
-                        Create a hiring collection to gather verifiable on-chain CVs from candidates.
-                        Each post generates a shareable link you can post anywhere.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <div className="space-y-6 py-2">
 
-                {/* Limit notice */}
-                <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                  <div className="flex-shrink-0 mt-0.5">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(139,92,246,0.2)" }}>
-                      <span style={{ fontSize: 10, fontWeight: 900, color: "#a78bfa" }}>i</span>
+                {/* ── My Hirings ── */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white/40">My Hirings</p>
+                    <Link href="/hiring/create" className="text-[10px] font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                      <Plus className="w-3 h-3" /> New
+                    </Link>
+                  </div>
+
+                  {/* Header card */}
+                  <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 rounded-lg flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                        <FolderOpen style={{ width: 18, height: 18, color: "#a78bfa" }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.88)", marginBottom: 4 }}>Post Job Openings</p>
+                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", lineHeight: 1.6 }}>
+                          Create a hiring collection to gather verifiable on-chain CVs from candidates.
+                          Each post generates a shareable link you can post anywhere.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
-                    Your plan includes <span style={{ color: "#a78bfa", fontWeight: 700 }}>1 free job post</span>.
-                    Additional posts cost <span style={{ color: "#a78bfa", fontWeight: 700 }}>$0.50 USDC each</span> (one-time on-chain payment — no subscription needed).
-                    Upgrade to Community/DAO or Company/Org for <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>unlimited posts</span>.
-                  </div>
-                </div>
 
-                {/* CTA */}
-                <Link
-                  href="/hiring/create"
-                  className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold transition-all"
-                  style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: 13 }}
-                >
-                  <FolderOpen style={{ width: 15, height: 15 }} />
-                  Create a Hiring Collection
-                </Link>
-
-                {/* Upgrade nudge */}
-                <div className="rounded-xl p-4 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Want unlimited job posts?</p>
-                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>Upgrade to Community/DAO or Company/Org for unlimited hiring collections and a Trusted Hiring badge.</p>
+                  {/* Limit notice */}
+                  <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(139,92,246,0.2)" }}>
+                        <span style={{ fontSize: 10, fontWeight: 900, color: "#a78bfa" }}>i</span>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+                      Your plan includes <span style={{ color: "#a78bfa", fontWeight: 700 }}>1 free job post</span>.
+                      Additional posts cost <span style={{ color: "#a78bfa", fontWeight: 700 }}>$0.50 USDC each</span> (one-time on-chain payment — no subscription needed).
+                      Upgrade to Community/DAO or Company/Org for <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>unlimited posts</span>.
+                    </div>
                   </div>
-                  <button
-                    onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
-                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all"
-                    style={{ border: "1px solid rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.06)", fontSize: 10, color: "#4ade80", fontWeight: 700, whiteSpace: "nowrap" }}
+
+                  {/* CTA */}
+                  <Link
+                    href="/hiring/create"
+                    className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold transition-all"
+                    style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "#a78bfa", fontSize: 13 }}
                   >
-                    <ShieldCheck style={{ width: 10, height: 10 }} /> Upgrade
-                  </button>
+                    <FolderOpen style={{ width: 15, height: 15 }} />
+                    Create a Hiring Collection
+                  </Link>
+
+                  {/* Upgrade nudge */}
+                  <div className="rounded-xl p-4 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Want unlimited job posts?</p>
+                      <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>Upgrade to Community/DAO or Company/Org for unlimited hiring collections and a Trusted Hiring badge.</p>
+                    </div>
+                    <button
+                      onClick={() => { setIsRenewal(false); setShowVerificationModal(true); }}
+                      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all"
+                      style={{ border: "1px solid rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.06)", fontSize: 10, color: "#4ade80", fontWeight: 700, whiteSpace: "nowrap" }}
+                    >
+                      <ShieldCheck style={{ width: 10, height: 10 }} /> Upgrade
+                    </button>
+                  </div>
                 </div>
+
+                {/* ── Shared Hirings (company member) ── */}
+                {sharedHirings.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-indigo-400/60">Shared Hirings</p>
+                    <div className="space-y-2">
+                      {sharedHirings.map((h) => (
+                        <Link
+                          key={h.id}
+                          href={`/hiring/${h.slug}/dashboard`}
+                          className="flex items-center gap-3 p-3.5 rounded-2xl bg-indigo-500/5 border border-indigo-500/15 hover:border-indigo-500/30 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {h.company?.recruiter_avatar_url ? (
+                              <img src={h.company.recruiter_avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <Building2 className="w-4 h-4 text-indigo-400/60" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-white/80 truncate group-hover:text-white transition-colors">{h.title}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400/60">{h.company?.company_name}</span>
+                              <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
+                              <span className="text-[9px] text-white/20">
+                                {new Date(h.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                              </span>
+                              {h.company?.role === "admin" && (
+                                <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border text-amber-400 bg-amber-500/10 border-amber-500/20 ml-auto">
+                                  Admin
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <ExternalLink className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors flex-shrink-0" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
 
             {/* ── INBOX tab ── */}
-            {activeTab === "inbox" && <InboxPanel />}
+            {activeTab === "inbox" && (
+              <InboxPanel
+                onMembershipAccepted={async () => {
+                  // Refresh memberships + shared hirings after accepting an invitation
+                  const [mRes, sRes] = await Promise.all([
+                    fetch(`/api/members/memberships?builderWallet=${walletAddress}`).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
+                    fetch(`/api/members/shared-hirings?builderWallet=${walletAddress}`).then(r => r.json()).catch(() => ({ ok: false, data: [] })),
+                  ]);
+                  if (mRes.ok) setMemberships(mRes.data);
+                  if (sRes.ok) setSharedHirings(sRes.data);
+                }}
+              />
+            )}
           </>
         )}
       </section>
@@ -1899,6 +2107,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showWalletNudge, setShowWalletNudge] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
   const { connected: walletConnected, publicKey: walletPublicKey } = useWallet();
   const [walletLinkShown, setWalletLinkShown] = useState(false);
 
@@ -1996,6 +2205,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
     { Icon: Building2,      label: "Profile",             id: "profile"   },
     { Icon: FolderOpen,     label: "Hiring Center",       id: "hiring"    },
     { Icon: LayoutDashboard,label: "Projects & Programs", id: "projects"  },
+    { Icon: Users,          label: "Members",             id: "members"   },
     { Icon: Inbox,          label: "Inbox",               id: "inbox"     },
   ] as Array<{ Icon: React.ElementType; label: string; id: string }>;
 
@@ -2134,6 +2344,12 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
             <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
               {activeTab === "inbox" ? (
                 <InboxPanel googleSession={session} googleOrgAccount={orgAccount} />
+              ) : activeTab === "members" && orgAccount?.auth_uid ? (
+                <MembersCenter
+                  recruiterWallet={`gauth:${orgAccount.auth_uid}`}
+                  companyName={orgAccount.org_name ?? ""}
+                  avatarUrl={orgAccount.avatar_url}
+                />
               ) : (
                 <OrgDashboard
                   profile={googleProfile}

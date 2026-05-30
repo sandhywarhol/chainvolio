@@ -71,7 +71,11 @@ async function loadLogoBase64(): Promise<string | null> {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
-export const generateHiringReport = async (data: { collection: any; candidates: any[] }) => {
+// teamNotes: map of candidateId → array of { authorName, content, created_at }
+export const generateHiringReport = async (
+    data: { collection: any; candidates: any[] },
+    teamNotes: Record<string, { authorName: string; content: string; created_at: string }[]> = {}
+) => {
     const { collection, candidates } = data;
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -558,6 +562,35 @@ export const generateHiringReport = async (data: { collection: any; candidates: 
             const nl = doc.splitTextToSize(c.recruiterNotes, 172);
             doc.text(nl.slice(0, 3), 18, y);
             y += Math.min(nl.length, 3) * 4.5 + 4;
+        }
+
+        // ── Team notes (member notes) ──
+        const cNotes = teamNotes[c.id] ?? [];
+        if (cNotes.length > 0) {
+            y = needsPage(doc, y, 10);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            rgb(doc, C.darkGrey, "text");
+            doc.text("Team notes:", 18, y);
+            y += 5;
+            for (const tn of cNotes) {
+                y = needsPage(doc, y, 14);
+                // Author chip
+                rgb(doc, C.purple, "fill");
+                doc.roundedRect(18, y - 3.5, doc.getTextWidth(tn.authorName) + 6, 6.5, 1, 1, "F");
+                doc.setFontSize(7);
+                doc.setFont("helvetica", "bold");
+                rgb(doc, C.white, "text");
+                doc.text(tn.authorName, 21, y + 0.5);
+                y += 6;
+                // Note content
+                doc.setFontSize(8);
+                doc.setFont("helvetica", "italic");
+                rgb(doc, C.grey, "text");
+                const tnl = doc.splitTextToSize(tn.content, 168);
+                doc.text(tnl.slice(0, 3), 22, y);
+                y += Math.min(tnl.length, 3) * 4.5 + 3;
+            }
         }
 
         // Divider

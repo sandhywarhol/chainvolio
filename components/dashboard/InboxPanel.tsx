@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { InterviewRequestCard } from "@/components/messaging/InterviewRequestCard";
 import { ConversationThread } from "@/components/messaging/ConversationThread";
-import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle, ArrowLeft, Building2 } from "lucide-react";
+import { MemberInvitationCard } from "@/components/members/MemberInvitationCard";
 import { formatDistanceToNow } from "date-fns";
 import type { Session } from "@supabase/supabase-js";
 import type { OrgAccount } from "@/hooks/useGoogleAuth";
@@ -25,7 +26,18 @@ type RecruiterConversation = {
     accepted_at: string | null; unreadCount: number;
 };
 
-type InboxTab = "requests" | "conversations" | "outreach";
+type InboxTab = "requests" | "conversations" | "outreach" | "invitations";
+
+type MemberInvitation = {
+    id: string;
+    recruiter_wallet: string;
+    recruiter_company: string;
+    recruiter_avatar_url: string | null;
+    role: "member" | "admin";
+    status: string;
+    created_at: string;
+    expires_at: string;
+};
 
 type ActiveThread = { conversationId: string; role: "candidate" | "recruiter" } | null;
 
@@ -37,16 +49,18 @@ const OUTREACH_STATUS = {
 } as const;
 
 type Props = {
+    onMembershipAccepted?: () => void;
     googleSession?: Session | null;
     googleOrgAccount?: OrgAccount | null;
 };
 
-export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
+export function InboxPanel({ onMembershipAccepted, googleSession, googleOrgAccount }: Props = {}) {
     const walletState = useWallet();
     const wallet = walletState.publicKey?.toBase58();
 
     const [candidateConvs, setCandidateConvs] = useState<CandidateConversation[]>([]);
     const [recruiterConvs, setRecruiterConvs] = useState<RecruiterConversation[]>([]);
+    const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<InboxTab>("requests");
     const [activeThread, setActiveThread] = useState<ActiveThread>(null);
@@ -82,9 +96,19 @@ export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
                 promises.push(Promise.resolve({ ok: true, data: [] }));
             }
 
-            const [cData, rData] = await Promise.all(promises);
+            // Member invitations — only for wallet users (builders)
+            if (wallet) {
+                promises.push(
+                    fetch(`/api/members/invitations?builderWallet=${wallet}`).then(r => r.json()).catch(() => ({ ok: false, data: [] }))
+                );
+            } else {
+                promises.push(Promise.resolve({ ok: true, data: [] }));
+            }
+
+            const [cData, rData, invData] = await Promise.all(promises);
             if (cData.ok) setCandidateConvs(cData.data);
             if (rData.ok) setRecruiterConvs(rData.data);
+            if (invData.ok) setMemberInvitations(invData.data);
         } catch { /* silent */ }
         finally { setLoading(false); }
     }, [wallet, isGoogleRecruiter, googleSession]);
@@ -153,12 +177,15 @@ export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
     }
 
     const allTabs: { key: InboxTab; label: string; Icon: React.ElementType; count: number; unread: number }[] = [
-        { key: "requests",      label: "Requests",      Icon: Users,         count: pendingRequests.length, unread: 0 },
-        { key: "conversations", label: "Conversations", Icon: MessageSquare, count: acceptedConvs.length,   unread: candidateUnread },
-        { key: "outreach",      label: "My Outreach",   Icon: Send,          count: recruiterConvs.length,  unread: recruiterUnread },
+        { key: "requests",      label: "Requests",      Icon: Users,         count: pendingRequests.length,      unread: 0 },
+        { key: "conversations", label: "Conversations", Icon: MessageSquare, count: acceptedConvs.length,        unread: candidateUnread },
+        { key: "outreach",      label: "My Outreach",   Icon: Send,          count: recruiterConvs.length,       unread: recruiterUnread },
+        { key: "invitations",   label: "Invitations",   Icon: Building2,     count: memberInvitations.length,    unread: memberInvitations.length },
     ];
+    // Always show invitations tab when there are pending invitations, even if other tabs are empty
     const visibleTabs  = allTabs.filter(t => t.count > 0);
     const tabs         = visibleTabs.length > 0 ? visibleTabs : [allTabs[2]];
+    // Auto-switch to invitations tab if there are new invitations and user is on a blank tab
     const resolvedTab  = tabs.find(t => t.key === activeTab) ? activeTab : tabs[0].key;
 
     return (
@@ -306,6 +333,33 @@ export function InboxPanel({ googleSession, googleOrgAccount }: Props = {}) {
                             </button>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Tab: Member Invitations */}
+            {resolvedTab === "invitations" && (
+                <div className="space-y-3">
+                    {memberInvitations.length === 0 ? (
+                        <div className="py-12 flex flex-col items-center justify-center gap-2 text-center rounded-2xl"
+                            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                            <Building2 className="w-8 h-8 text-white/10" />
+                            <p className="text-white/25 text-sm font-bold">No invitations</p>
+                            <p className="text-white/15 text-xs max-w-xs">Company invitations to join as a member will appear here.</p>
+                        </div>
+                    ) : (
+                        memberInvitations.map((inv) => (
+                            <MemberInvitationCard
+                                key={inv.id}
+                                invitation={inv}
+                                builderWallet={wallet!}
+                                onAccepted={(id) => {
+                                    setMemberInvitations((prev) => prev.filter((i) => i.id !== id));
+                                    onMembershipAccepted?.();
+                                }}
+                                onRejected={(id) => setMemberInvitations((prev) => prev.filter((i) => i.id !== id))}
+                            />
+                        ))
+                    )}
                 </div>
             )}
         </div>

@@ -7,8 +7,9 @@ import { Footer } from "@/components/layout/Footer";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { InterviewRequestCard } from "@/components/messaging/InterviewRequestCard";
 import { ConversationThread } from "@/components/messaging/ConversationThread";
-import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Inbox, MessageSquare, Users, Send, Clock, CheckCircle2, XCircle, Building2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { MemberInvitationCard } from "@/components/members/MemberInvitationCard";
 
 type CandidateConversation = {
     id: string;
@@ -42,7 +43,18 @@ type RecruiterConversation = {
     unreadCount: number;
 };
 
-type Tab = "requests" | "conversations" | "outreach";
+type Tab = "requests" | "conversations" | "outreach" | "invitations";
+
+type MemberInvitation = {
+    id: string;
+    recruiter_wallet: string;
+    recruiter_company: string;
+    recruiter_avatar_url: string | null;
+    role: "member" | "admin";
+    status: string;
+    created_at: string;
+    expires_at: string;
+};
 
 type ActiveThread = {
     conversationId: string;
@@ -61,6 +73,7 @@ export default function InboxPage() {
 
     const [candidateConvs, setCandidateConvs] = useState<CandidateConversation[]>([]);
     const [recruiterConvs, setRecruiterConvs] = useState<RecruiterConversation[]>([]);
+    const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<Tab>("requests");
     const [activeThread, setActiveThread] = useState<ActiveThread>(null);
@@ -70,16 +83,19 @@ export default function InboxPage() {
     const fetchAll = useCallback(async () => {
         if (!wallet) return;
         try {
-            const [candidateRes, recruiterRes] = await Promise.all([
+            const [candidateRes, recruiterRes, invitationsRes] = await Promise.all([
                 fetch(`/api/messaging/conversations?role=candidate&wallet=${wallet}`),
                 fetch(`/api/messaging/conversations?role=recruiter&wallet=${wallet}`),
+                fetch(`/api/members/invitations?builderWallet=${wallet}`),
             ]);
-            const [candidateData, recruiterData] = await Promise.all([
+            const [candidateData, recruiterData, invitationsData] = await Promise.all([
                 candidateRes.json(),
                 recruiterRes.json(),
+                invitationsRes.json(),
             ]);
             if (candidateData.ok) setCandidateConvs(candidateData.data);
             if (recruiterData.ok) setRecruiterConvs(recruiterData.data);
+            if (invitationsData.ok) setMemberInvitations(invitationsData.data);
         } catch { /* silent */ }
         finally { setLoading(false); }
     }, [wallet]);
@@ -143,9 +159,10 @@ export default function InboxPage() {
 
     // Only show tabs that have data; fall back to showing outreach (for recruiters) or requests (for candidates)
     const allTabs: { key: Tab; label: string; Icon: React.ElementType; count: number; unread: number }[] = [
-        { key: "requests",      label: "Requests",      Icon: Users,         count: pendingRequests.length, unread: 0 },
-        { key: "conversations", label: "Conversations", Icon: MessageSquare, count: acceptedConvs.length,   unread: candidateUnread },
-        { key: "outreach",      label: "My Outreach",   Icon: Send,          count: recruiterConvs.length,  unread: recruiterUnread },
+        { key: "requests",      label: "Requests",      Icon: Users,         count: pendingRequests.length,     unread: 0 },
+        { key: "conversations", label: "Conversations", Icon: MessageSquare, count: acceptedConvs.length,       unread: candidateUnread },
+        { key: "outreach",      label: "My Outreach",   Icon: Send,          count: recruiterConvs.length,      unread: recruiterUnread },
+        { key: "invitations",   label: "Invitations",   Icon: Building2,     count: memberInvitations.length,   unread: memberInvitations.length },
     ];
     const visibleTabs = allTabs.filter((t) => t.count > 0);
     // If all empty: show "My Outreach" as default (most likely role for a first-time user here)
@@ -323,6 +340,31 @@ export default function InboxPage() {
                                     </button>
                                 );
                             })
+                        )}
+                    </div>
+                )}
+
+                {/* Tab: Member Invitations */}
+                {resolvedTab === "invitations" && (
+                    <div className="space-y-3">
+                        {memberInvitations.length === 0 ? (
+                            <div className="text-center py-16 space-y-3">
+                                <Building2 className="w-10 h-10 text-white/10 mx-auto" />
+                                <p className="text-white/25 text-sm font-bold">No invitations</p>
+                                <p className="text-white/15 text-xs max-w-xs mx-auto">
+                                    Company invitations to join as a member will appear here.
+                                </p>
+                            </div>
+                        ) : (
+                            memberInvitations.map((inv) => (
+                                <MemberInvitationCard
+                                    key={inv.id}
+                                    invitation={inv}
+                                    builderWallet={wallet!}
+                                    onAccepted={(id) => setMemberInvitations((prev) => prev.filter((i) => i.id !== id))}
+                                    onRejected={(id) => setMemberInvitations((prev) => prev.filter((i) => i.id !== id))}
+                                />
+                            ))
                         )}
                     </div>
                 )}

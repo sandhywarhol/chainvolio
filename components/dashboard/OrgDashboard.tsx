@@ -23,8 +23,10 @@ import {
   Zap,
   Link2,
   Unlink,
+  Users,
 } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { MembersPanel } from "@/components/members/MembersPanel";
 import { WalletMultiButton } from "@/components/wallet/WalletButton";
 import { Toast } from "@/components/ui/Toast";
 import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
@@ -101,6 +103,23 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
   const [showProjectForm, setShowProjectForm] = useState(false);
 
   const [managingSubscription] = useState(false);
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
+  const [memberCount, setMemberCount] = useState<number | null>(null);
+
+  // Canonical recruiter identity — matches hiring_collections.owner_wallet format:
+  //   wallet user  → actual wallet address
+  //   Google user  → "gauth:{auth_uid}"
+  const recruiterWallet = walletAddress
+    ?? (googleOrgAccount?.auth_uid ? `gauth:${googleOrgAccount.auth_uid}` : null);
+
+  // Fetch member count once
+  useEffect(() => {
+    if (!recruiterWallet) return;
+    fetch(`/api/members?recruiterWallet=${encodeURIComponent(recruiterWallet)}`)
+      .then(r => r.json())
+      .then(d => { if (d.ok) setMemberCount(d.data.length); })
+      .catch(() => {});
+  }, [recruiterWallet]);
 
   // Wallet linking state (Google org users only)
   const { publicKey } = useWallet();
@@ -532,6 +551,14 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
               </button>
             ) : null
           ) : null}
+          {recruiterWallet && (
+            <button
+              onClick={() => setShowMembersPanel(true)}
+              className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 text-xs font-medium text-white transition-colors flex items-center gap-1.5"
+            >
+              <Users className="w-3.5 h-3.5" /> Members
+            </button>
+          )}
           <button
             onClick={handleShare}
             className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 text-xs font-medium text-white transition-colors flex items-center gap-1.5"
@@ -674,7 +701,7 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
         </div>
       </div>
 
-      {/* 4 impact pods */}
+      {/* Impact pods */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
@@ -684,10 +711,11 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             col: "text-white/60",
             bg: "bg-white/5",
             warn: isAtEffectiveLimit,
+            onClick: undefined as (() => void) | undefined,
           },
           isGooglePath
-            ? { icon: CreditCard, label: "Saved Candidates", val: googleOrgAccount!.saved_candidates_count, col: "text-blue-400", bg: "bg-blue-500/10", warn: false }
-            : { icon: ShieldCheck, label: "Attestations Issued", val: attestationCount, col: "text-blue-400", bg: "bg-blue-500/10", warn: false },
+            ? { icon: CreditCard, label: "Saved Candidates", val: googleOrgAccount!.saved_candidates_count, col: "text-blue-400", bg: "bg-blue-500/10", warn: false, onClick: undefined }
+            : { icon: ShieldCheck, label: "Attestations Issued", val: attestationCount, col: "text-blue-400", bg: "bg-blue-500/10", warn: false, onClick: undefined },
           {
             icon: ShieldCheck,
             label: "Status",
@@ -695,10 +723,23 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
             col: isActive ? (isCommunity ? "text-teal-400" : "text-amber-400") : "text-slate-400",
             bg: isActive ? (isCommunity ? "bg-teal-500/10" : "bg-amber-500/10") : "bg-slate-700/50",
             warn: false,
+            onClick: undefined,
           },
-          { icon: FolderOpen, label: "Projects", val: projects.length, col: "text-indigo-400", bg: "bg-indigo-500/10", warn: false },
+          {
+            icon: Users,
+            label: "Members",
+            val: memberCount ?? "—",
+            col: "text-indigo-400",
+            bg: "bg-indigo-500/10",
+            warn: false,
+            onClick: recruiterWallet ? () => setShowMembersPanel(true) : undefined,
+          },
         ].map((pod, i) => (
-          <div key={i} className={`p-4 rounded-2xl bg-black border space-y-2 hover:border-white/10 transition-all ${pod.warn ? "border-rose-500/30" : "border-white/5"}`}>
+          <div
+            key={i}
+            onClick={pod.onClick}
+            className={`p-4 rounded-2xl bg-black border space-y-2 transition-all ${pod.warn ? "border-rose-500/30" : "border-white/5"} ${pod.onClick ? "cursor-pointer hover:border-indigo-500/30 hover:bg-indigo-500/5" : "hover:border-white/10"}`}
+          >
             <div className={`w-8 h-8 flex items-center justify-center rounded-xl ${pod.bg}`}>
               <pod.icon className={`w-4 h-4 ${pod.warn ? "text-rose-400" : pod.col}`} />
             </div>
@@ -709,6 +750,9 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
                 isGooglePath
                   ? <p className="text-[9px] text-rose-400 mt-0.5"><Link href="/recruiter/pricing" className="hover:underline">Upgrade →</Link></p>
                   : <p className="text-[9px] text-rose-400 mt-0.5">Limit reached</p>
+              )}
+              {pod.onClick && (
+                <p className="text-[9px] text-indigo-400/60 mt-0.5">Click to manage</p>
               )}
             </div>
           </div>
@@ -1048,6 +1092,14 @@ export function OrgDashboard({ profile, walletAddress, collections, attestationC
           accessToken={accessToken}
           onSuccess={(p) => { setProjects(prev => [p, ...prev]); setShowProjectForm(false); }}
           onClose={() => setShowProjectForm(false)}
+        />
+      )}
+      {showMembersPanel && recruiterWallet && (
+        <MembersPanel
+          recruiterWallet={recruiterWallet}
+          companyName={profile.displayName}
+          avatarUrl={profile.avatarUrl}
+          onClose={() => setShowMembersPanel(false)}
         />
       )}
     </div>
