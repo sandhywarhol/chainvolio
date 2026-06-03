@@ -42,9 +42,9 @@ const getTierStyles = (type?: string) => {
     
     return {
       label: "Verified Builder",
-      color: "#34d399", 
-      bg: "rgba(52, 211, 153, 0.1)",
-      border: "rgba(52, 211, 153, 0.2)",
+      color: "#10b981", 
+      bg: "rgba(16, 185, 129, 0.1)",
+      border: "rgba(16, 185, 129, 0.2)",
       bars: 1
     };
 };
@@ -81,7 +81,7 @@ const ProofOfWorkCard = ({ work, onPress }: ProofOfWorkCardProps) => {
                 <Image source={{ uri: work.attesterAvatar }} style={styles.attesterAvatar} />
               ) : (
                 <View style={styles.attesterAvatarPlaceholder}>
-                   <Ionicons name="person" size={12} color="rgba(255,255,255,0.4)" />
+                   <Ionicons name="person" size={12} color="#9ca3af" />
                 </View>
               )}
               <View style={styles.attesterTextCol}>
@@ -101,8 +101,7 @@ const ProofOfWorkCard = ({ work, onPress }: ProofOfWorkCardProps) => {
                                             width: 10, 
                                             height: 2, 
                                             borderRadius: 1, 
-                                            backgroundColor: i < (tier.bars || 1) ? tier.color : 'rgba(255,255,255,0.1)',
-                                            opacity: i < (tier.bars || 1) ? 0.8 : 0.3
+                                            backgroundColor: i < (tier.bars || 1) ? tier.color : '#e5e7eb',
                                         }} 
                                     />
                                 ))}
@@ -125,11 +124,16 @@ const ProofOfWorkCard = ({ work, onPress }: ProofOfWorkCardProps) => {
 const styles = StyleSheet.create({
   workCard: { 
     padding: 20, 
-    backgroundColor: 'rgba(255,255,255,0.03)', 
+    backgroundColor: '#ffffff', 
     borderRadius: 24, 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: '#e5e7eb',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
   workCardTop: { 
     flexDirection: 'row', 
@@ -137,34 +141,34 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start', 
     marginBottom: 14 
   },
-  workRole: { color: '#fff', fontSize: 17, fontWeight: 'bold' },
-  workOrg: { color: '#10b981', fontSize: 15, fontWeight: '700', marginTop: 4 },
-  workMeta: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontWeight: '700', marginTop: 6 },
+  workRole: { color: '#1f2937', fontSize: 17, fontWeight: 'bold' },
+  workOrg: { color: '#1f2937', fontSize: 15, fontWeight: '700', marginTop: 4 },
+  workMeta: { color: '#6b7280', fontSize: 10, fontWeight: '700', marginTop: 6 },
   attestedTag: { 
     paddingHorizontal: 10, 
     paddingVertical: 5, 
     borderRadius: 8, 
-    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    backgroundColor: 'rgba(244, 63, 94, 0.1)',
     borderWidth: 1, 
-    borderColor: 'rgba(16, 185, 129, 0.2)' 
+    borderColor: 'rgba(244, 63, 94, 0.2)' 
   },
-  attestedTagText: { color: '#10b981', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
+  attestedTagText: { color: '#1f2937', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
   workDescription: { 
-    color: 'rgba(255,255,255,0.4)', 
+    color: '#4b5563', 
     fontSize: 13, 
     fontWeight: '500', 
     lineHeight: 20,
     marginBottom: 12
   },
   attesterFooter: { marginTop: 8 },
-  footerLine: { height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 14 },
+  footerLine: { height: 1, backgroundColor: '#f3f4f6', marginBottom: 14 },
   attesterRow: { flexDirection: 'row', alignItems: 'center' },
-  attesterAvatar: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  attesterAvatarPlaceholder: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
+  attesterAvatar: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: '#e5e7eb' },
+  attesterAvatarPlaceholder: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
   attesterTextCol: { marginLeft: 12, flex: 1 },
   attesterNameLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  attesterName: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
-  attesterStatusSub: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '500', marginTop: 2 },
+  attesterName: { color: '#1f2937', fontSize: 13, fontWeight: 'bold' },
+  attesterStatusSub: { color: '#6b7280', fontSize: 10, fontWeight: '500', marginTop: 2 },
   tierBadge: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -172,11 +176,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, 
     paddingVertical: 3, 
     borderRadius: 100, 
-    backgroundColor: 'rgba(16,185,129,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.15)'
   },
-  tierText: { color: '#10b981', fontSize: 7, fontWeight: '900', letterSpacing: 0.3 },
+  tierText: { fontSize: 7, fontWeight: '900', letterSpacing: 0.3 },
 });
 
 export default ProofOfWorkCard;
+
+

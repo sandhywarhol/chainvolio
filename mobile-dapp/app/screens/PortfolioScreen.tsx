@@ -64,7 +64,7 @@ const PortfolioScreen = ({ navigation }: any) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
+        <ActivityIndicator size="large" color="#1f2937" />
         <Text style={styles.loadingText}>COLLECTING ACHIEVEMENTS...</Text>
       </View>
     );
@@ -72,13 +72,20 @@ const PortfolioScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Legacy Portfolio</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Add Proof')} style={styles.addBtn}>
-             <Ionicons name="add" size={24} color="#10b981" />
-          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Proof of Work</Text>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity onPress={() => navigation.navigate('Add Credential')} style={styles.addBtn} activeOpacity={0.7}>
+               <Ionicons name="document-text-outline" size={18} color="#ffffff" />
+               <Text style={styles.addBtnText}>Add Credential</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Add Proof')} style={styles.addBtn} activeOpacity={0.7}>
+               <Ionicons name="add" size={20} color="#ffffff" />
+               <Text style={styles.addBtnText}>Add Proof</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -98,7 +105,7 @@ const PortfolioScreen = ({ navigation }: any) => {
 
           {receipts.length === 0 ? (
             <View style={styles.emptyState}>
-               <Ionicons name="layers-outline" size={64} color="rgba(255,255,255,0.05)" />
+               <Ionicons name="layers-outline" size={64} color="rgba(0,0,0,0.1)" />
                <Text style={styles.emptyMsg}>No projects anchored yet.</Text>
                <TouchableOpacity 
                  style={styles.emptyBtn}
@@ -127,10 +134,10 @@ const PortfolioScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 20 },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#6b7280', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
   header: {
     height: 70,
     flexDirection: 'row',
@@ -138,46 +145,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 25,
   },
-  headerTitle: { color: '#fff', fontSize: 20, fontFamily: 'SpaceGrotesk-Bold' },
-  addBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: 'rgba(16,185,129,0.05)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.1)' },
+  headerTitle: { color: '#1f2937', fontSize: 20, fontWeight: '600' },
+  headerButtons: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  addBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: '#1f2937', borderWidth: 1, borderColor: '#111827' },
+  addBtnText: { color: '#ffffff', fontSize: 11,  letterSpacing: 0.5, fontWeight: '600' },
   scrollContent: { paddingHorizontal: 25, paddingTop: 20 },
   statsRow: { flexDirection: 'row', gap: 15, marginBottom: 40 },
   statBox: { 
     flex: 1, 
     height: 80, 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
+    backgroundColor: '#f3f4f6', 
     borderRadius: 18, 
-    borderWidth: 0.5, 
-    borderColor: 'rgba(255,255,255,0.05)', 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb', 
     justifyContent: 'center', 
     paddingHorizontal: 20 
   },
-  statVal: { color: '#fff', fontSize: 24, fontFamily: 'SpaceGrotesk-Bold' },
-  statLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 1, marginTop: 2 },
-  sectionHeading: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 2, marginBottom: 20 },
+  statVal: { color: '#1f2937', fontSize: 24, fontWeight: '600' },
+  statLabel: { color: '#6b7280', fontSize: 9,  letterSpacing: 1, marginTop: 2, fontWeight: '600' },
+  sectionHeading: { color: '#6b7280', fontSize: 9,  letterSpacing: 2, marginBottom: 20, fontWeight: '600' },
   receiptGrid: { gap: 16 },
-  receiptCard: { 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
-    borderRadius: 20, 
-    padding: 20, 
-    borderWidth: 0.5, 
-    borderColor: 'rgba(255,255,255,0.05)' 
-  },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  orgText: { color: '#10b981', fontSize: 13, fontFamily: 'Inter-Bold' },
-  verifiedTag: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, py: 3, borderRadius: 6, backgroundColor: 'rgba(16,185,129,0.05)', borderWidth: 0.5, borderColor: 'rgba(16,185,129,0.1)' },
-  verifiedText: { color: '#10b981', fontSize: 8, fontFamily: 'Inter-Bold', letterSpacing: 0.5 },
-  requestButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, py: 4, borderRadius: 8, backgroundColor: 'rgba(99, 102, 241, 0.05)', borderWidth: 1, borderColor: 'rgba(99, 102, 241, 0.15)' },
-  requestText: { color: '#818cf8', fontSize: 8, fontFamily: 'Inter-Bold', letterSpacing: 0.5 },
-  roleText: { color: '#fff', fontSize: 17, fontFamily: 'SpaceGrotesk-Bold', marginBottom: 20 },
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  dateText: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontFamily: 'Inter-Bold' },
-  detailsLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  detailsText: { color: 'rgba(255,255,255,0.3)', fontSize: 9, fontFamily: 'Inter-Bold' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80, gap: 15 },
-  emptyMsg: { color: 'rgba(255,255,255,0.15)', fontSize: 14, fontFamily: 'Inter-Bold' },
-  emptyBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(16,185,129,0.1)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.3)' },
-  emptyBtnText: { color: '#10b981', fontSize: 10, fontFamily: 'Inter-Bold' },
+  emptyMsg: { color: '#6b7280', fontSize: 14, fontWeight: '400' },
+  emptyBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, backgroundColor: '#1f2937', borderWidth: 1, borderColor: '#111827' },
+  emptyBtnText: { color: '#ffffff', fontSize: 11, fontWeight: '600' },
 });
 
 export default PortfolioScreen;
+
+
+
+

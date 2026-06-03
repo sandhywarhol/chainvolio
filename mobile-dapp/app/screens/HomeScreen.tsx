@@ -7,9 +7,8 @@ import {
   Dimensions,
   StatusBar,
   Animated,
-  Easing,
-  Platform,
-  FlatList
+  Image,
+  ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,347 +16,339 @@ import { useWallet } from '../context/WalletContext';
 import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const SLIDES = [
-  { id: '1', src: require('../../assets/images/slides/cv_view_2.png'), label: 'Professional Profile Hub' },
-  { id: '2', src: require('../../assets/images/slides/dashboard_2.png'), label: 'Recruiter Dashboard' },
-  { id: '3', src: require('../../assets/images/slides/edit_profile_2.png'), label: 'Profile Customization' },
-  { id: '4', src: require('../../assets/images/slides/proof_of_work_2.png'), label: 'Verifiable Proof of Work' },
-  { id: '5', src: require('../../assets/images/slides/apply.png'), label: 'Talent Application Pipeline' },
-  { id: '6', src: require('../../assets/images/slides/attestation.png'), label: 'On-chain Attestation Infrastructure' },
-  { id: '7', src: require('../../assets/images/slides/status.png'), label: 'Verification Status Tracking' },
+const SLIDE_IMAGES = [
+  { img: { uri: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop' }, title: 'Work Anywhere', subtitle: 'Global freedom', desc: 'Find a role that respects your family time and boundaries.' },
+  { img: { uri: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop' }, title: 'Dream Web3 Job', subtitle: 'Top tier roles', desc: 'Limitless career opportunities in the global Web3 ecosystem.' },
+  { img: { uri: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=800&auto=format&fit=crop' }, title: 'More Income', subtitle: 'Crypto payouts', desc: 'Get paid borderlessly with stable cryptocurrencies anywhere.' },
+  { img: { uri: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop' }, title: 'Global Network', subtitle: 'Build together', desc: 'Build connections with elite professionals worldwide.' },
+  { img: { uri: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=800&auto=format&fit=crop' }, title: 'New Adventures', subtitle: 'Explore life', desc: 'Explore a new lifestyle and freedom as a digital nomad.' },
 ];
 
-const MOCKUP_WIDTH = width * 0.88;
-
-const NAV_BUTTONS = [
-  { id: '1', label: 'Add Proof', icon: 'add-circle-outline', route: 'Add Proof' },
-  { id: '2', label: 'My CV', icon: 'document-text-outline', route: 'CV' },
-  { id: '3', label: 'Credential', icon: 'ribbon-outline', route: 'Add Credential' },
-  { id: '4', label: 'Timeline', icon: 'time-outline', route: 'Timeline' },
-  { id: '5', label: 'CV Score', icon: 'stats-chart-outline', route: 'CV Score' },
-  { id: '6', label: 'Hiring', icon: 'briefcase-outline', route: 'Hiring' },
+const WORK_LOGOS = [
+  require('../../assets/images/logos/notion.png'),
+  require('../../assets/images/logos/github.png'),
+  require('../../assets/images/logos/discord.png'),
+  require('../../assets/images/logos/figma.png'),
+  require('../../assets/images/logos/canva.png'),
+  require('../../assets/images/logos/dropbox.png'),
+  require('../../assets/images/logos/slack.png'),
+  require('../../assets/images/logos/linkedin.png'),
+  require('../../assets/images/logos/google drive.png'),
+  require('../../assets/images/logos/telegram.png'),
+  require('../../assets/images/logos/solana.png'),
+  require('../../assets/images/logos/alchemy.png'),
 ];
 
-const HomeScreen = ({ navigation }: any) => {
-  const { isConnected, walletAddress, disconnect } = useWallet();
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const flatListRef = useRef<FlatList>(null);
-  const pulseAnim = useRef(new Animated.Value(0)).current;
+const AnimatedGridLogo = ({ logo }: { logo: any }) => {
+  const anim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Elegant Carousel logic
-    const slideInterval = setInterval(() => {
-      let nextIndex = (currentIndex + 1) % SLIDES.length;
-      setCurrentIndex(nextIndex);
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-    }, 6000);
-
-    // Ambient Pulse logic
-    Animated.loop(
+    let timeout: any;
+    const pulse = () => {
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1, duration: 4000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 0, duration: 4000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ])
-    ).start();
+        Animated.timing(anim, { toValue: 1.15, duration: 800, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1, duration: 800, useNativeDriver: true })
+      ]).start(() => {
+        timeout = setTimeout(pulse, Math.random() * 5000 + 500);
+      });
+    };
+    timeout = setTimeout(pulse, Math.random() * 3000);
+    return () => clearTimeout(timeout);
+  }, [anim]);
 
-    return () => clearInterval(slideInterval);
-  }, [currentIndex]);
-
-  const glowOpacity = pulseAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.02, 0.05]
-  });
-
-  const glowScale = pulseAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.1]
-  });
-
-  const handleWalletActions = () => {
-    if (!isConnected) {
-      navigation.navigate('Welcome');
-      return;
-    }
-    disconnect();
-  };
-
-  const renderSlide = ({ item }: { item: any }) => (
-    <View style={styles.mockupFrame}>
-      <ExpoImage source={item.src} style={styles.mockupImg} contentFit="cover" />
-      <LinearGradient
-        colors={['transparent', 'rgba(5,5,5,0.6)']}
-        style={styles.mockupOverlay}
+  return (
+    <View style={styles.stackIconBox}>
+      <Animated.Image 
+        source={logo} 
+        style={[styles.stackIcon, { transform: [{ scale: anim }], tintColor: '#1f2937' }]} 
+        resizeMode="contain"
       />
     </View>
   );
+};
+
+const HomeScreen = ({ navigation }: any) => {
+  const { isConnected, walletAddress } = useWallet();
 
   return (
-    <View style={styles.background}>
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
-
-        {/* AMBIENT LIGHT SOURCES */}
-        <Animated.View style={[styles.glowTop, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
-        <Animated.View style={[styles.glowBottom, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]} />
-        <View style={styles.glowCenter} />
-
-        {/* HEADER */}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#171717" translucent={false} />
+      
+      <SafeAreaView style={styles.safeArea}>
+        {/* Top Navigation */}
         <View style={styles.topNav}>
-          <View style={styles.logoGroup}>
-            <View style={styles.logoWrapper}>
-              <ExpoImage
-                source={require('../../assets/images/logo-white.png')}
-                style={styles.mainLogo}
-                contentFit="contain"
-              />
-            </View>
-            <Text style={styles.brandTitle}>ChainVolio</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.walletToggle}
-            onPress={handleWalletActions}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={['#151515', '#080808']}
-              style={styles.walletGradient}
-            >
-              <View style={styles.activeDot} />
-              <Text style={styles.walletToggleText}>
-                {isConnected ? `${walletAddress?.slice(0, 4)}...${walletAddress?.slice(-4)}` : 'Connect'}
-              </Text>
-            </LinearGradient>
+          <TouchableOpacity style={styles.iconButton}>
+            <ExpoImage 
+              source={require('../../assets/images/logo.png')} 
+              style={styles.logoIcon} 
+              contentFit="contain" 
+            />
+            <Text style={styles.logoText}>Chainvolio</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.walletBtn} activeOpacity={0.7}>
+            <Ionicons name="wallet-outline" size={16} color="#ffffff" />
+            <Text style={styles.walletText}>
+              {isConnected ? `${walletAddress?.slice(0, 4)}...${walletAddress?.slice(-4)}` : 'Connect'}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.mainContent}>
-          {/* HERO SECTION */}
-          <View style={styles.heroSection}>
-            <Text style={styles.mainTitle}>Verifiable professional identity for Web3 careers.</Text>
-          </View>
-
-          {/* CAROUSEL MOCKUP */}
-          <View style={styles.carouselContainer}>
-            <FlatList
-              ref={flatListRef}
-              data={SLIDES}
-              renderItem={renderSlide}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              scrollEnabled={false}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.flatListContent}
-            />
-            <View style={styles.dotRow}>
-              {SLIDES.map((_, i) => (
-                <View key={i} style={[styles.dot, currentIndex === i && styles.activeDotLine]} />
-              ))}
-            </View>
-            <Text style={styles.carouselLabel}>
-              {SLIDES[currentIndex].label.toUpperCase()}
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          
+          {/* Greeting */}
+          <View style={styles.greetingContainer}>
+            <Text style={styles.greetingText}>
+              <Text style={{ color: '#f97316', fontWeight: 'bold' }}>GM Builders!</Text> What are we building today?
             </Text>
           </View>
 
-          {/* ACTION GRID */}
-          <View style={styles.gridSection}>
-            <View style={styles.grid}>
-              {NAV_BUTTONS.map((btn) => (
-                <TouchableOpacity
-                  key={btn.id}
-                  style={styles.gridBtn}
-                  onPress={() => navigation.navigate(btn.route)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.btnIconBox}>
-                    <LinearGradient
-                      colors={['rgba(255,255,255,0.06)', 'transparent']}
-                      style={styles.iconGradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Ionicons name={btn.icon as any} size={20} color="rgba(255,255,255,0.85)" />
-                    </LinearGradient>
+          {/* Image Slider */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Get Remote Hired Today</Text>
+            <TouchableOpacity activeOpacity={0.7}>
+              <Ionicons name="ellipsis-horizontal" size={20} color="#f97316" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.sliderContainer}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              contentContainerStyle={styles.horizontalList}
+            >
+              {SLIDE_IMAGES.map((item, index) => (
+                <View key={index} style={styles.slideCard}>
+                  <View style={styles.slideItemWrapper}>
+                    <ExpoImage 
+                      source={item.img} 
+                      style={styles.slideImage} 
+                      contentFit="cover" 
+                    />
+                    <View style={styles.slideOverlay}>
+                      <TouchableOpacity style={styles.heartBtn} activeOpacity={0.7}>
+                        <Ionicons name="heart" size={22} color="#f97316" />
+                      </TouchableOpacity>
+                      <View style={styles.slideTextContainer}>
+                        <Text style={styles.slideTitle}>{item.title}</Text>
+                        <View style={styles.slideSubtitleRow}>
+                          <Ionicons name="calendar-outline" size={14} color="#fff" style={{marginRight: 4}} />
+                          <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
+                        </View>
+                      </View>
+                    </View>
                   </View>
-                  <Text style={styles.gridBtnLabel}>{btn.label}</Text>
-                </TouchableOpacity>
+                  <Text style={styles.slideDescription}>{item.desc}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Work Logos Stack Grid */}
+          <View style={styles.stackContainer}>
+            <Text style={styles.stackTitle}>POWERING YOUR WEB3 CAREER STACK</Text>
+            <View style={styles.stackGrid}>
+              {WORK_LOGOS.map((logo, index) => (
+                <AnimatedGridLogo key={index} logo={logo} />
               ))}
             </View>
+            <Text style={styles.desktopHintText}>
+              For the best experience in hiring and building your CV, we recommend using a desktop browser.
+            </Text>
           </View>
-        </View>
 
+          {/* Bottom spacer for tab bar */}
+          <View style={{ height: 30 }} />
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
-  container: { flex: 1 },
-  glowTop: {
-    position: 'absolute',
-    top: -height * 0.15,
-    right: -width * 0.2,
-    width: width * 1.2,
-    height: width * 1.2,
-    backgroundColor: '#6366f1',
-    borderRadius: width,
+  container: {
+    flex: 1,
+    backgroundColor: '#fafafa', // Milky white background
   },
-  glowBottom: {
-    position: 'absolute',
-    bottom: -height * 0.15,
-    left: -width * 0.2,
-    width: width * 1.2,
-    height: width * 1.2,
-    backgroundColor: '#10b981',
-    borderRadius: width,
-  },
-  glowCenter: {
-    position: 'absolute',
-    top: height * 0.3,
-    left: '25%',
-    width: width * 0.5,
-    height: width * 0.5,
-    backgroundColor: 'rgba(99, 102, 241, 0.02)',
-    borderRadius: width,
+  safeArea: { 
+    flex: 1, 
+    backgroundColor: '#171717', // Very dark grey for top nav
   },
   topNav: {
-    height: 100,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 25,
-    paddingTop: Platform.OS === 'android' ? 35 : 0
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#171717',
   },
-  logoGroup: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  logoWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainLogo: { width: 22, height: 22 },
-  brandTitle: {
-    color: '#fff',
-    fontSize: 18,
-    letterSpacing: -1,
-    fontFamily: 'SpaceGrotesk-Bold',
-  },
-  walletToggle: {
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.15)',
-  },
-  walletGradient: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  iconButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  activeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10b981',
-    shadowColor: '#10b981',
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
+  logoIcon: {
+    width: 22,
+    height: 22,
   },
-  walletToggleText: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 11,
+  logoText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
     letterSpacing: 0.5,
-    fontFamily: 'Inter-Bold',
   },
-  mainContent: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingBottom: 40,
-  },
-  heroSection: {
-    paddingHorizontal: 35,
-    marginTop: 65,
-    marginBottom: 35
-  },
-  mainTitle: {
-    color: '#fff',
-    fontSize: 28,
-    lineHeight: 36,
-    textAlign: 'center',
-    letterSpacing: -1,
-    fontFamily: 'SpaceGrotesk-Bold',
-  },
-  carouselContainer: { alignItems: 'center', marginBottom: 40 },
-  flatListContent: { paddingHorizontal: (width - MOCKUP_WIDTH) / 2 },
-  mockupFrame: {
-    width: MOCKUP_WIDTH,
-    height: height * 0.25,
-    marginHorizontal: (width - MOCKUP_WIDTH) / 2,
-    overflow: 'hidden',
-  },
-  mockupImg: { width: '100%', height: '100%' },
-  mockupOverlay: { ...StyleSheet.absoluteFillObject },
-  carouselLabel: {
-    color: 'rgba(255,255,255,0.25)',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 4,
-    marginTop: 20,
-    textAlign: 'center',
-    fontFamily: 'Inter-Bold',
-  },
-  dotRow: { flexDirection: 'row', gap: 6, marginTop: 24 },
-  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.08)' },
-  activeDotLine: { backgroundColor: '#6366f1', width: 14 },
-  gridSection: { paddingHorizontal: 25 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 14 },
-  gridBtn: {
-    width: (width - 50 - 28) / 3,
-    aspectRatio: 1,
+  walletBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
+    gap: 6,
+    backgroundColor: '#f97316',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ea580c',
   },
-  btnIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+  walletText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  scrollContent: {
+    paddingTop: 0,
+    backgroundColor: '#fafafa',
+  },
+  greetingContainer: {
+    paddingHorizontal: 25,
+    marginTop: 15,
+    marginBottom: 20,
+  },
+  greetingText: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1f2937',
+    lineHeight: 34,
+    marginBottom: 12,
+  },
+  stackContainer: {
+    paddingHorizontal: 25,
+    marginBottom: 30,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.01)',
   },
-  iconGradient: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gridBtnLabel: {
-    color: 'rgba(255,255,255,0.45)',
+  stackTitle: {
     fontSize: 10,
+    fontWeight: '600',
+    color: '#6b7280',
+    letterSpacing: 1.5,
+    marginBottom: 15,
+    textTransform: 'uppercase',
+  },
+  stackGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    maxWidth: 350, // fits exactly 8 logos (8*36 + 7*8 = 344)
+  },
+  stackIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  stackIcon: {
+    width: 18,
+    height: 18,
+    opacity: 0.8,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 25,
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  sliderContainer: {
+    marginBottom: 15,
+  },
+  horizontalList: {
+    paddingHorizontal: 25,
+    gap: 20,
+  },
+  slideCard: {
+    width: width * 0.65,
+  },
+  slideItemWrapper: {
+    width: '100%',
+    height: (width * 0.65) * 1.4, // vertical portrait
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#f3f4f6',
+    marginBottom: 10,
+  },
+  slideImage: {
+    width: '100%',
+    height: '100%',
+  },
+  slideOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'space-between',
+    padding: 15,
+  },
+  heartBtn: {
+    alignSelf: 'flex-end',
+  },
+  slideTextContainer: {
+    justifyContent: 'flex-end',
+  },
+  slideTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: -1, height: 1},
+    textShadowRadius: 10
+  },
+  slideSubtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  slideSubtitle: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  slideDescription: {
+    color: '#4b5563',
+    fontSize: 11,
+    lineHeight: 16,
+    paddingHorizontal: 4,
+  },
+  desktopHintText: {
+    marginTop: 20,
+    fontSize: 11,
+    color: '#9ca3af',
     textAlign: 'center',
-    letterSpacing: 0.3,
-    fontFamily: 'Inter-Bold',
-  }
+    paddingHorizontal: 20,
+    lineHeight: 16,
+  },
 });
 
-
-
-
-
 export default HomeScreen;
-
-
-
-
-

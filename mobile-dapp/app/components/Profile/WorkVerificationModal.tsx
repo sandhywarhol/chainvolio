@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     left: 8, 
     fontSize: 40, 
     color: 'rgba(16,185,129,0.2)', 
-    fontFamily: 'serif' 
+     
   },
   quoteMarkRight: { 
     position: 'absolute', 
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     right: 8, 
     fontSize: 40, 
     color: 'rgba(16,185,129,0.2)', 
-    fontFamily: 'serif' 
+     
   },
   detailsGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 20, columnGap: 24 },
   gridItem: { width: '46%' },
@@ -482,3 +482,4 @@ const styles = StyleSheet.create({
 });
 
 export default WorkVerificationModal;
+

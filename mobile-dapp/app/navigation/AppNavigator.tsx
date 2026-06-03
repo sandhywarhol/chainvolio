@@ -21,6 +21,7 @@ import CreateHiringScreen from '../screens/CreateHiringScreen';
 import PortfolioScreen from '../screens/PortfolioScreen';
 import MemoScreen from '../screens/MemoScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import ScanScreen from '../screens/ScanScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,9 +48,22 @@ const ProfileStack = () => (
     </Stack.Navigator>
 );
 
+const CVStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="CVScreen" component={CVScreen} />
+    </Stack.Navigator>
+);
+
 const PortfolioStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="PortfolioScreen" component={PortfolioScreen} />
+      <Stack.Screen name="Add Proof" component={AddProofScreen} />
+    </Stack.Navigator>
+);
+
+const ScanStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ScanScreen" component={ScanScreen} />
     </Stack.Navigator>
 );
 
@@ -61,13 +75,16 @@ const MainTabs = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any;
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
-          else if (route.name === 'Portfolio') iconName = focused ? 'layers' : 'layers-outline';
+          else if (route.name === 'Proof of Work') iconName = focused ? 'layers' : 'layers-outline';
+          else if (route.name === 'Scan') iconName = focused ? 'scan-circle' : 'scan-circle-outline';
+          else if (route.name === 'My CV') iconName = focused ? 'document-text' : 'document-text-outline';
           else if (route.name === 'Profile') iconName = focused ? 'person-circle' : 'person-circle-outline';
-          
-          return <Ionicons name={iconName} size={size + 4} color={color} />;
+
+          const scanSize = route.name === 'Scan' ? size + 12 : size + 4;
+          return <Ionicons name={iconName} size={scanSize} color={color} />;
         },
-        tabBarActiveTintColor: '#10b981',
-        tabBarInactiveTintColor: '#444',
+        tabBarActiveTintColor: '#f97316',
+        tabBarInactiveTintColor: '#9ca3af',
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontSize: 10,
@@ -75,8 +92,8 @@ const MainTabs = () => {
           marginBottom: 8,
         },
         tabBarStyle: {
-          backgroundColor: '#050505',
-          borderTopColor: '#111',
+          backgroundColor: '#171717',
+          borderTopColor: '#333333',
           height: 85,
           paddingTop: 10,
           borderTopWidth: 1,
@@ -90,9 +107,22 @@ const MainTabs = () => {
         options={{ title: 'Home' }}
       />
       <Tab.Screen 
-        name="Portfolio" 
+        name="Proof of Work" 
         component={PortfolioStack} 
-        options={{ title: 'Portfolio' }}
+        options={{ title: 'Proof of Work' }}
+      />
+      <Tab.Screen
+        name="Scan"
+        component={ScanStack}
+        options={{
+          title: 'Scan',
+          tabBarActiveTintColor: '#f97316',
+        }}
+      />
+      <Tab.Screen 
+        name="My CV" 
+        component={CVStack} 
+        options={{ title: 'My CV' }}
       />
       <Tab.Screen 
         name="Profile" 
@@ -117,3 +147,5 @@ const AppNavigator = () => {
 };
 
 export default AppNavigator;
+
+

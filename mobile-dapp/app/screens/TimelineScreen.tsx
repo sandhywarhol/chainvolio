@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   background: { flex: 1, backgroundColor: '#050505' },
   container: { flex: 1 },
   loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 20 },
+  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
   header: {
     height: 70,
     flexDirection: 'row',
@@ -149,11 +149,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18, fontFamily: 'SpaceGrotesk-Bold' },
+  headerTitle: { color: '#fff', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   introSection: { marginBottom: 40 },
-  tagline: { color: '#10b981', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 3, marginBottom: 8 },
-  desc: { color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: 'Inter-Bold', lineHeight: 20 },
+  tagline: { color: '#10b981', fontSize: 9,  letterSpacing: 3, marginBottom: 8 },
+  desc: { color: 'rgba(255,255,255,0.3)', fontSize: 13,  lineHeight: 20 },
   timelineContainer: { borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.05)', marginLeft: 6, paddingLeft: 24 },
   verticalLine: { position: 'absolute', left: -1, top: 15, bottom: 0, width: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
   timelineItem: { marginBottom: 45, position: 'relative' },
@@ -177,20 +177,21 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, 
     borderColor: 'rgba(255,255,255,0.05)' 
   },
-  dateLabel: { color: '#fff', fontSize: 12, fontFamily: 'SpaceGrotesk-Bold' },
-  durationLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', marginTop: 2 },
+  dateLabel: { color: '#fff', fontSize: 12,  },
+  durationLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  marginTop: 2 },
   mainInfo: { marginVertical: 14 },
-  orgName: { color: '#10b981', fontSize: 15, fontFamily: 'Inter-Bold' },
-  roleName: { color: '#fff', fontSize: 14, fontFamily: 'Inter-Bold', marginTop: 2 },
+  orgName: { color: '#10b981', fontSize: 15,  },
+  roleName: { color: '#fff', fontSize: 14,  marginTop: 2 },
   badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   verifiedBadge: { px: 6, py: 2, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: 4, borderWidth: 0.5, borderColor: 'rgba(16, 185, 129, 0.2)' },
-  verifiedBadgeText: { color: '#10b981', fontSize: 7, fontFamily: 'Inter-Bold', letterSpacing: 1 },
-  workType: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', textTransform: 'uppercase' },
-  description: { color: 'rgba(255,255,255,0.4)', fontSize: 12, fontFamily: 'Inter-Bold', lineHeight: 18 },
+  verifiedBadgeText: { color: '#10b981', fontSize: 7,  letterSpacing: 1 },
+  workType: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  textTransform: 'uppercase' },
+  description: { color: 'rgba(255,255,255,0.4)', fontSize: 12,  lineHeight: 18 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80, gap: 15 },
-  emptyText: { color: 'rgba(255,255,255,0.1)', fontSize: 14, fontFamily: 'Inter-Bold' },
+  emptyText: { color: 'rgba(255,255,255,0.1)', fontSize: 14,  },
   anchorBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' },
-  anchorBtnText: { color: '#10b981', fontSize: 11, fontFamily: 'Inter-Bold' }
+  anchorBtnText: { color: '#10b981', fontSize: 11,  }
 });
 
 export default TimelineScreen;
+

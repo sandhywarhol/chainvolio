@@ -72,7 +72,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const glowOpacity = pulseAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.04, 0.12]
+    outputRange: [0.02, 0.1]
   });
 
   const fetchData = async (isRefresh = false) => {
@@ -122,8 +122,6 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-
-  // ... previous logic
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -179,7 +177,7 @@ const ProfileScreen = ({ navigation }: any) => {
   if (loading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
+        <ActivityIndicator size="large" color="#1f2937" />
         <Text style={styles.loadingText}>RESOLVING IDENTITY...</Text>
       </View>
     );
@@ -187,7 +185,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       
       {/* AMBIENT LIGHT SOURCES */}
       <Animated.View style={[styles.glowLeft, { opacity: glowOpacity }]} />
@@ -200,7 +198,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Text style={styles.headerSub}>{isEditing ? 'Syncing changes to trust layer' : 'Your verifiable persona'}</Text>
             </View>
             <TouchableOpacity style={[styles.editModeBtn, isEditing && styles.editModeBtnActive]} onPress={() => setIsEditing(!isEditing)}>
-                <Ionicons name={isEditing ? "eye-outline" : "create-outline"} size={22} color={isEditing ? "#10b981" : "#fff"} />
+                <Ionicons name={isEditing ? "eye-outline" : "create-outline"} size={22} color={isEditing ? "#1f2937" : "#1f2937"} />
             </TouchableOpacity>
         </View>
 
@@ -211,19 +209,19 @@ const ProfileScreen = ({ navigation }: any) => {
             <RefreshControl 
                 refreshing={refreshing} 
                 onRefresh={() => { setRefreshing(true); fetchData(true); }} 
-                tintColor="#10b981" 
+                tintColor="#1f2937" 
             />
           }
         >
           <View style={styles.editorContent}>
              <View style={styles.avatarSection}>
                 <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage} disabled={isUploading}>
-                   {isUploading ? <ActivityIndicator size="small" color="#10b981" /> : (
+                   {isUploading ? <ActivityIndicator size="small" color="#1f2937" /> : (
                      form.avatarUrl ? <Image source={{ uri: form.avatarUrl }} style={styles.avatarImg} /> : (
                        <View style={styles.avatarPlaceholder}><Text style={styles.avatarLetter}>{form.displayName?.[0] || '?'}</Text></View>
                      )
                    )}
-                   <View style={styles.editBadge}><Ionicons name="camera" size={14} color="#000" /></View>
+                   <View style={styles.editBadge}><Ionicons name="camera" size={14} color="#fff" /></View>
                 </TouchableOpacity>
                 <View style={styles.headerInfo}>
                    <Text style={styles.walletAddr}>{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</Text>
@@ -235,11 +233,11 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Text style={styles.groupLabel}>PERSONAL INFORMATION</Text>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>DISPLAY NAME</Text>
-                    <TextInput style={styles.input} value={form.displayName} onChangeText={v => handleUpdateField('displayName', v)} placeholder="Pseudonym or Real Name" placeholderTextColor="rgba(255,255,255,0.1)" />
+                    <TextInput style={styles.input} value={form.displayName} onChangeText={v => handleUpdateField('displayName', v)} placeholder="Pseudonym or Real Name" placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>PROFESSIONAL BIO</Text>
-                    <TextInput style={[styles.input, { height: 100, textAlignVertical: 'top' }]} value={form.bio} onChangeText={v => handleUpdateField('bio', v)} multiline placeholder="Career highlights..." placeholderTextColor="rgba(255,255,255,0.1)" />
+                    <TextInput style={[styles.input, { height: 100, textAlignVertical: 'top' }]} value={form.bio} onChangeText={v => handleUpdateField('bio', v)} multiline placeholder="Career highlights..." placeholderTextColor="#9ca3af" />
                 </View>
               </View>
 
@@ -247,23 +245,23 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Text style={styles.groupLabel}>PROFESSIONAL INFORMATION</Text>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>CURRENT ROLE</Text>
-                    <TextInput style={styles.input} value={form.role} onChangeText={v => handleUpdateField('role', v)} placeholder="Lead Dev" placeholderTextColor="rgba(255,255,255,0.1)" />
+                    <TextInput style={styles.input} value={form.role} onChangeText={v => handleUpdateField('role', v)} placeholder="Lead Dev" placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>ORGANIZATION</Text>
-                    <TextInput style={styles.input} value={form.organization} onChangeText={v => handleUpdateField('organization', v)} placeholder="Trust Org" placeholderTextColor="rgba(255,255,255,0.1)" />
+                    <TextInput style={styles.input} value={form.organization} onChangeText={v => handleUpdateField('organization', v)} placeholder="Trust Org" placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>CORE SKILLS</Text>
-                    <TextInput style={styles.input} value={form.skills} onChangeText={v => handleUpdateField('skills', v)} placeholder="Rust, Next.js, Solana..." placeholderTextColor="rgba(255,255,255,0.1)" />
+                    <TextInput style={styles.input} value={form.skills} onChangeText={v => handleUpdateField('skills', v)} placeholder="Rust, Next.js, Solana..." placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>COUNTRY</Text>
-                    <TextInput style={styles.input} value={form.country} onChangeText={v => handleUpdateField('country', v)} placeholder="Global" placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.country} onChangeText={v => handleUpdateField('country', v)} placeholder="Global" placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>TIMEZONE</Text>
-                    <TextInput style={styles.input} value={form.timezone} onChangeText={v => handleUpdateField('timezone', v)} placeholder="UTC" placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.timezone} onChangeText={v => handleUpdateField('timezone', v)} placeholder="UTC" placeholderTextColor="#9ca3af" />
                 </View>
               </View>
 
@@ -280,21 +278,21 @@ const ProfileScreen = ({ navigation }: any) => {
                 ].map(s => (
                   <View key={s.key} style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>{s.label}</Text>
-                    <TextInput style={styles.input} value={form[s.key]} onChangeText={v => handleUpdateField(s.key, v)} placeholder={s.placeholder} placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form[s.key]} onChangeText={v => handleUpdateField(s.key, v)} placeholder={s.placeholder} placeholderTextColor="#9ca3af" />
                   </View>
                 ))}
                 
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>WHATSAPP</Text>
-                    <TextInput style={styles.input} value={form.whatsapp} onChangeText={v => handleUpdateField('whatsapp', v)} placeholder="+..." placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.whatsapp} onChangeText={v => handleUpdateField('whatsapp', v)} placeholder="+..." placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>EMAIL</Text>
-                    <TextInput style={styles.input} value={form.email} onChangeText={v => handleUpdateField('email', v)} placeholder="me@..." placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.email} onChangeText={v => handleUpdateField('email', v)} placeholder="me@..." placeholderTextColor="#9ca3af" />
                 </View>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>WEBSITE</Text>
-                    <TextInput style={styles.input} value={form.website} onChangeText={v => handleUpdateField('website', v)} placeholder="https://..." placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.website} onChangeText={v => handleUpdateField('website', v)} placeholder="https://..." placeholderTextColor="#9ca3af" />
                 </View>
               </View>
 
@@ -302,7 +300,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Text style={styles.groupLabel}>CAREER GOALS</Text>
                 <View style={styles.inputStack}>
                     <Text style={styles.fieldLabel}>LOOKING FOR</Text>
-                    <TextInput style={styles.input} value={form.lookingFor} onChangeText={v => handleUpdateField('lookingFor', v.slice(0, 160))} placeholder="Open to roles..." placeholderTextColor="rgba(255,255,255,0.05)" />
+                    <TextInput style={styles.input} value={form.lookingFor} onChangeText={v => handleUpdateField('lookingFor', v.slice(0, 160))} placeholder="Open to roles..." placeholderTextColor="#9ca3af" />
                     <Text style={styles.charCount}>{form.lookingFor?.length || 0}/160</Text>
                 </View>
                 <View style={styles.inputStack}>
@@ -318,7 +316,7 @@ const ProfileScreen = ({ navigation }: any) => {
               </View>
 
               <TouchableOpacity style={styles.saveBtn} onPress={handleUpdateProfile}>
-                 <LinearGradient colors={['#10b981', '#059669']} style={styles.saveGradient}><Text style={styles.saveBtnText}>Save Changes</Text></LinearGradient>
+                 <LinearGradient colors={['#f97316', '#ea580c']} style={styles.saveGradient}><Text style={styles.saveBtnText}>Save Changes</Text></LinearGradient>
               </TouchableOpacity>
               
               <TouchableOpacity style={styles.disconnectBtn} onPress={() => {
@@ -327,7 +325,7 @@ const ProfileScreen = ({ navigation }: any) => {
                   { text: 'Disconnect', onPress: () => { disconnect(); navigation.replace('Welcome'); } }
                 ]);
               }}>
-                 <Ionicons name="log-out-outline" size={18} color="rgba(255,59,48,0.6)" />
+                 <Ionicons name="log-out-outline" size={18} color="rgba(31,41,55,0.8)" />
                  <Text style={styles.disconnectText}>Disconnect Session</Text>
               </TouchableOpacity>
           </View>
@@ -340,7 +338,7 @@ const ProfileScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
   glowLeft: {
     position: 'absolute',
@@ -348,7 +346,7 @@ const styles = StyleSheet.create({
     left: -width * 0.3,
     width: width,
     height: width,
-    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+    backgroundColor: 'rgba(244, 63, 94, 0.1)',
     borderRadius: width,
   },
   glowRight: {
@@ -357,42 +355,42 @@ const styles = StyleSheet.create({
      right: -width * 0.3,
      width: width,
      height: width,
-     backgroundColor: 'rgba(16, 185, 129, 0.08)',
+     backgroundColor: 'rgba(59, 130, 246, 0.1)',
      borderRadius: width,
   },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, marginTop: 20, fontFamily: 'Inter-Bold', letterSpacing: 2 },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#6b7280', fontSize: 10, marginTop: 20,  letterSpacing: 2 },
   scrollContent: { paddingHorizontal: 25, paddingBottom: 40 },
   header: { 
     height: 100, 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between',
-    paddingTop: 20
+    paddingTop: 20,
+    paddingHorizontal: 25
   },
-  headerTitle: { color: '#fff', fontSize: 22, fontFamily: 'SpaceGrotesk-Bold' },
-  headerSub: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontFamily: 'Inter-Bold', marginTop: 2 },
-  editModeBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  editModeBtnActive: { backgroundColor: 'rgba(16,185,129,0.1)', borderColor: 'rgba(16,185,129,0.2)' },
+  headerTitle: { color: '#1f2937', fontSize: 22,  },
+  headerSub: { color: '#6b7280', fontSize: 11,  marginTop: 2 },
+  editModeBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e5e7eb' },
+  editModeBtnActive: { backgroundcolor: '#1f2937', bordercolor: '#1f2937' },
   headerInfo: { marginLeft: 20, flex: 1 },
-  identityLabel: { color: '#10b981', fontSize: 8, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 4 },
+  identityLabel: { color: '#1f2937', fontSize: 8,  letterSpacing: 2, marginTop: 4 },
   
-
   /* EDITOR STYLES */
   avatarSection: { alignItems: 'center', marginVertical: 30 },
   avatarWrapper: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: '#f3f4f6',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: '#e5e7eb',
     position: 'relative',
     padding: 3
   },
   avatarImg: { width: '100%', height: '100%', borderRadius: 45 },
-  avatarPlaceholder: { width: '100%', height: '100%', backgroundColor: '#111', borderRadius: 45, alignItems: 'center', justifyContent: 'center' },
-  avatarLetter: { color: '#fff', fontSize: 32, fontFamily: 'SpaceGrotesk-Bold' },
+  avatarPlaceholder: { width: '100%', height: '100%', backgroundColor: '#e5e7eb', borderRadius: 45, alignItems: 'center', justifyContent: 'center' },
+  avatarLetter: { color: '#1f2937', fontSize: 32,  },
   editBadge: {
     position: 'absolute',
     bottom: 0,
@@ -400,58 +398,58 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#10b981',
+    backgroundcolor: '#1f2937',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#050505'
+    borderColor: '#ffffff'
   },
-  walletAddr: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'SpaceGrotesk-Bold', marginTop: 12, letterSpacing: 1 },
+  walletAddr: { color: '#6b7280', fontSize: 10,  marginTop: 12, letterSpacing: 1 },
   
   formSection: { marginBottom: 40 },
-  groupLabel: { color: '#10b981', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginBottom: 25 },
+  groupLabel: { color: '#1f2937', fontSize: 10,  letterSpacing: 2, marginBottom: 25 },
   inputStack: { marginBottom: 20 },
-  fieldLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 1, marginBottom: 10 },
+  fieldLabel: { color: '#6b7280', fontSize: 9,  letterSpacing: 1, marginBottom: 10 },
   input: { 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
+    backgroundColor: '#f9fafb', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.08)', 
+    borderColor: '#e5e7eb', 
     borderRadius: 16, 
     padding: 16, 
-    color: '#fff', 
+    color: '#1f2937', 
     fontSize: 14, 
-    fontFamily: 'Inter-Bold' 
+     
   },
-  charCount: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'Inter-Bold', textAlign: 'right', marginTop: 4 },
+  charCount: { color: '#6b7280', fontSize: 8,  textAlign: 'right', marginTop: 4 },
   
   tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tag: { 
     paddingHorizontal: 14, 
     paddingVertical: 8, 
     borderRadius: 10, 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
+    backgroundColor: '#f9fafb', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)' 
+    borderColor: '#e5e7eb' 
   },
   tagActive: { 
-    backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-    borderColor: 'rgba(16, 185, 129, 0.3)' 
+    backgroundColor: 'rgba(244, 63, 94, 0.1)', 
+    borderColor: 'rgba(244, 63, 94, 0.3)' 
   },
-  tagText: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontFamily: 'Inter-Bold' },
-  tagTextActive: { color: '#10b981' },
+  tagText: { color: '#6b7280', fontSize: 10,  },
+  tagTextActive: { color: '#1f2937' },
   
   saveBtn: { marginTop: 20, borderRadius: 18, overflow: 'hidden' },
   saveGradient: { height: 60, alignItems: 'center', justifyContent: 'center' },
-  saveBtnText: { color: '#000', fontSize: 16, fontFamily: 'SpaceGrotesk-Bold' },
+  saveBtnText: { color: '#ffffff', fontSize: 16,  },
   
   cancelBtn: { marginTop: 12, height: 50, alignItems: 'center', justifyContent: 'center' },
-  cancelBtnText: { color: 'rgba(255,255,255,0.3)', fontSize: 13, fontFamily: 'Inter-Bold' },
+  cancelBtnText: { color: '#6b7280', fontSize: 13,  },
   disconnectBtn: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,59,48,0.05)',
+    backgroundcolor: '#1f2937',
     borderWidth: 1,
-    borderColor: 'rgba(255,59,48,0.15)',
+    bordercolor: '#1f2937',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -460,10 +458,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   disconnectText: {
-    color: 'rgba(255,59,48,0.6)',
+    color: '#1f2937',
     fontSize: 13,
-    fontFamily: 'Inter-Bold',
+    
   }
 });
 
 export default ProfileScreen;
+
+
+
+

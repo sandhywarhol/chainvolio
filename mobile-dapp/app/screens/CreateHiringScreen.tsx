@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18, fontFamily: 'SpaceGrotesk-Bold' },
+  headerTitle: { color: '#fff', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   formContainer: { gap: 32 },
   inputGroup: { gap: 12 },
-  label: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: 'Inter-Bold', letterSpacing: 2 },
+  label: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  letterSpacing: 2 },
   input: {
     height: 56,
     backgroundColor: 'rgba(255,255,255,0.02)',
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     color: '#fff',
     fontSize: 15,
-    fontFamily: 'Inter-Bold',
+    
   },
   textArea: { height: 100, paddingTop: 16, textAlignVertical: 'top' },
   optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
@@ -188,14 +188,15 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   optionBtnActive: { borderColor: 'rgba(16,185,129,0.5)', backgroundColor: 'rgba(16,185,129,0.05)' },
-  optionText: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontFamily: 'Inter-Bold' },
+  optionText: { color: 'rgba(255,255,255,0.3)', fontSize: 11,  },
   optionTextActive: { color: '#10b981' },
   submitSection: { marginTop: 10, gap: 16 },
   submitBtn: { height: 60, borderRadius: 18, overflow: 'hidden' },
   submitBtnDisabled: { opacity: 0.5 },
   submitGradient: { flex: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 },
-  submitBtnText: { color: '#fff', fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', letterSpacing: 1 },
-  footerNote: { textAlign: 'center', color: 'rgba(255,255,255,0.15)', fontSize: 10, fontFamily: 'Inter-Bold', lineHeight: 16 },
+  submitBtnText: { color: '#fff', fontSize: 14,  letterSpacing: 1 },
+  footerNote: { textAlign: 'center', color: 'rgba(255,255,255,0.15)', fontSize: 10,  lineHeight: 16 },
 });
 
 export default CreateHiringScreen;
+

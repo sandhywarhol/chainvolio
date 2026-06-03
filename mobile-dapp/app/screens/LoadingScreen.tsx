@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, StatusBar, Image } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, StatusBar, ImageBackground } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useWallet } from '../context/WalletContext';
 import { getUserMe } from '../services/api';
+import { Platform } from 'react-native';
 
 const LoadingScreen = ({ navigation }: any) => {
   const { walletAddress, setHasProfile } = useWallet();
@@ -10,8 +14,6 @@ const LoadingScreen = ({ navigation }: any) => {
     let isMounted = true;
 
     const checkProfile = async () => {
-      // 1. Wait for Context Catch-up
-      // Mobile state updates can sometimes trail navigation. We give it 500ms to propagate.
       if (!walletAddress) {
         console.log('LOADING SCREEN: Waiting for wallet context...');
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -26,12 +28,9 @@ const LoadingScreen = ({ navigation }: any) => {
         return;
       }
 
-      // 2. Synchronization Handshake
       const timeout = setTimeout(() => {
         if (isMounted) {
           console.log('LOADING SCREEN: Handshake Slow - Still attempting to resolve...');
-          // We don't force Setup here anymore, just log it. 
-          // The try/catch block will handle the navigation when the API finally returns or fails.
         }
       }, 7000);
 
@@ -42,6 +41,15 @@ const LoadingScreen = ({ navigation }: any) => {
         }
       }, 15000);
 
+      if (Platform.OS === 'web') {
+        console.log('LOADING SCREEN: Web UI Bypass enabled');
+        clearTimeout(timeout);
+        clearTimeout(finalTimeout);
+        setHasProfile(true);
+        navigation.replace('MainTabs', { screen: 'Home' });
+        return;
+      }
+
       try {
         const userData = await getUserMe(activeWallet);
         clearTimeout(timeout);
@@ -51,7 +59,6 @@ const LoadingScreen = ({ navigation }: any) => {
 
         console.log('LOADING SCREEN: API Response:', userData);
 
-        // If userData is not null and has a display name, the profile exists
         if (userData && (userData.displayName || userData.display_name)) {
           console.log('LOADING SCREEN: Profile found, going to Dashboard');
           setHasProfile(true);
@@ -66,7 +73,6 @@ const LoadingScreen = ({ navigation }: any) => {
         clearTimeout(finalTimeout);
         console.error('LOADING SCREEN: Profile check error:', error);
         if (isMounted) {
-          // If we hit an error (e.g. 404 or network error), treat as new user
           setHasProfile(false);
           navigation.replace('Setup');
         }
@@ -82,17 +88,28 @@ const LoadingScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.content}>
-        <Image 
-          source={require('../../assets/images/logo-white.png')} 
-          style={{ width: 140, height: 40, marginBottom: 10 }} 
-          resizeMode="contain" 
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <ImageBackground 
+        source={{ uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1740&auto=format&fit=crop' }} 
+        style={styles.backgroundImage}
+      >
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.9)']}
+          style={styles.gradientOverlay}
         />
-        <ActivityIndicator size="large" color="#10b981" />
-        <Text style={styles.text}>Synchronizing with ChainVolio...</Text>
-        <Text style={styles.subtext}>Connecting to Trust Layer</Text>
-      </View>
+        <SafeAreaView style={styles.contentArea}>
+          <View style={styles.content}>
+            <ExpoImage 
+              source={require('../../assets/images/logo.png')} 
+              style={{ width: 200, height: 50, marginBottom: 20 }} 
+              contentFit="contain" 
+            />
+            <ActivityIndicator size="large" color="#1f2937" />
+            <Text style={styles.text}>Synchronizing with ChainVolio...</Text>
+            <Text style={styles.subtext}>Connecting to Trust Layer</Text>
+          </View>
+        </SafeAreaView>
+      </ImageBackground>
     </View>
   );
 };
@@ -101,21 +118,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  backgroundImage: { 
+    flex: 1, 
+    width: '100%', 
+    height: '100%',
+  },
+  gradientOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  contentArea: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   content: {
     alignItems: 'center',
-    gap: 20,
+    gap: 15,
   },
   text: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
     marginTop: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: 0, height: 2},
+    textShadowRadius: 4,
   },
   subtext: {
-    color: '#444',
+    color: 'rgba(255,255,255,0.8)',
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 2,
@@ -124,3 +155,5 @@ const styles = StyleSheet.create({
 });
 
 export default LoadingScreen;
+
+

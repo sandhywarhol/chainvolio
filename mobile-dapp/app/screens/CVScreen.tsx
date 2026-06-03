@@ -84,7 +84,7 @@ const CVScreen = ({ navigation }: any) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
+        <ActivityIndicator size="large" color="#1f2937" />
         <Text style={styles.loadingText}>RESOLVING PROFESSIONAL LEGACY...</Text>
       </View>
     );
@@ -92,17 +92,13 @@ const CVScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* HEADER */}
         <View style={styles.appHeader}>
            <View style={styles.logoRow}>
-              <View style={styles.logoCircle} />
-              <Text style={styles.brandText}>ChainVolio</Text>
-           </View>
-           <View style={styles.headerIcons}>
-              <Ionicons name="notifications-outline" size={24} color="#fff" style={{ marginRight: 20 }} />
-              <Ionicons name="menu-outline" size={28} color="#fff" />
+              <Image source={require('../../assets/images/logo.png')} style={{width: 24, height: 24, tintColor: '#1f2937'}} resizeMode="contain" />
+              <Text style={styles.brandText}>Chainvolio</Text>
            </View>
         </View>
 
@@ -110,7 +106,7 @@ const CVScreen = ({ navigation }: any) => {
            contentContainerStyle={styles.scrollContent} 
            showsVerticalScrollIndicator={false}
            refreshControl={
-             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10b981" />
+             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1f2937" />
            }
         >
           {/* CV CARD */}
@@ -123,7 +119,7 @@ const CVScreen = ({ navigation }: any) => {
 
           {/* SECTIONS */}
           <View style={styles.disclaimerBox}>
-             <Ionicons name="shield-checkmark" size={20} color="#10b981" />
+             <Ionicons name="shield-checkmark" size={20} color="#1f2937" />
              <View style={styles.disclaimerContent}>
                 <Text style={styles.disclaimerTitle}>RECRUITER NOTE: VERIFIED INTEGRITY</Text>
                 <Text style={styles.disclaimerSubtitle}>Attestations marked with ✓ Attested are cryptographically signed by third-party verifiers.</Text>
@@ -131,12 +127,12 @@ const CVScreen = ({ navigation }: any) => {
           </View>
 
           <TouchableOpacity style={styles.expandableSection} onPress={() => navigation.navigate('Timeline')}>
-             <View style={styles.expandableIconBox}><Ionicons name="trending-up-outline" size={18} color="#10b981" /></View>
+             <View style={styles.expandableIconBox}><Ionicons name="trending-up-outline" size={18} color="#1f2937" /></View>
              <View style={styles.expandableText}>
                 <Text style={styles.expandableTitle}>Career Timeline</Text>
                 <Text style={styles.expandableSub}>Verified professional history.</Text>
              </View>
-             <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.4)" />
+             <Ionicons name="chevron-forward" size={20} color="rgba(0,0,0,0.3)" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.expandableSection} onPress={() => navigation.navigate('Add Credential')}>
@@ -145,7 +141,7 @@ const CVScreen = ({ navigation }: any) => {
                 <Text style={styles.expandableTitle}>Verified Credentials</Text>
                 <Text style={styles.expandableSub}>{certificates.length} items verified.</Text>
              </View>
-             <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.4)" />
+             <Ionicons name="chevron-forward" size={20} color="rgba(0,0,0,0.3)" />
           </TouchableOpacity>
 
           <Text style={styles.powHeader}>Proof of Work</Text>
@@ -174,28 +170,30 @@ const CVScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, letterSpacing: 2, marginTop: 20 },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#6b7280', fontSize: 10, letterSpacing: 2, marginTop: 20 },
   appHeader: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 25 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff' },
-  brandText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  logoCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#1f2937' },
+  brandText: { color: '#1f2937', fontSize: 18, fontWeight: '600' },
   headerIcons: { flexDirection: 'row', alignItems: 'center' },
   scrollContent: { paddingHorizontal: 15, paddingTop: 10 },
-  disclaimerBox: { flexDirection: 'row', gap: 14, padding: 16, backgroundColor: 'rgba(16,185,129,0.03)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)', marginBottom: 25 },
+  disclaimerBox: { flexDirection: 'row', gap: 14, padding: 16, backgroundcolor: '#1f2937', borderRadius: 12, borderWidth: 1, bordercolor: '#1f2937', marginBottom: 25 },
   disclaimerContent: { flex: 1 },
-  disclaimerTitle: { color: '#10b981', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  disclaimerSubtitle: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '500', marginTop: 4, lineHeight: 15 },
-  expandableSection: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', marginBottom: 12 },
-  expandableIconBox: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(16,185,129,0.1)', alignItems: 'center', justifyContent: 'center' },
+  disclaimerTitle: { color: '#1f2937', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
+  disclaimerSubtitle: { color: '#4b5563', fontSize: 10, fontWeight: '500', marginTop: 4, lineHeight: 15 },
+  expandableSection: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#f3f4f6', borderRadius: 14, borderWidth: 1, borderColor: '#e5e7eb', marginBottom: 12 },
+  expandableIconBox: { width: 36, height: 36, borderRadius: 10, backgroundcolor: '#1f2937', alignItems: 'center', justifyContent: 'center' },
   expandableText: { flex: 1, paddingLeft: 14 },
-  expandableTitle: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
-  expandableSub: { color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: '500', marginTop: 2 },
-  powHeader: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
+  expandableTitle: { color: '#1f2937', fontSize: 13, fontWeight: '600' },
+  expandableSub: { color: '#6b7280', fontSize: 11, fontWeight: '500', marginTop: 2 },
+  powHeader: { color: '#1f2937', fontSize: 20, fontWeight: '600', marginBottom: 20 },
   workList: { gap: 16 },
 });
 
-
 export default CVScreen;
+
+
+

@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -22,22 +23,21 @@ const CVCard = ({ profile, scoreData, walletAddress, onScorePress }: CVCardProps
   return (
     <View style={styles.cvCardBorder}>
       <View style={styles.cvCardMain}>
-        <Image 
-          source={require('../../../assets/images/card_background.jpeg')} 
-          style={styles.cardBg} 
-          resizeMode="cover" 
+        <LinearGradient
+          colors={['#1f2937', '#111827', '#030712']}
+          style={styles.cardBg}
         />
         <View style={styles.cardOverlay} />
         <View style={styles.cardInner}>
           <View style={styles.lookingForBox}>
-            <Ionicons name="briefcase-outline" size={10} color="#10b981" />
+            <Ionicons name="briefcase-outline" size={10} color="#ffffff" />
             <Text style={styles.lookingForText}>{profile?.lookingFor || 'Founders Mode'}</Text>
           </View>
 
           <View style={styles.absScore}>
             {profile?.isVerified && (
               <View style={styles.verifiedRosette}>
-                <Ionicons name="shield-checkmark" size={14} color="#10b981" />
+                <Ionicons name="shield-checkmark" size={14} color="#f97316" />
               </View>
             )}
             {scoreData && (
@@ -55,13 +55,13 @@ const CVCard = ({ profile, scoreData, walletAddress, onScorePress }: CVCardProps
                   <Image source={{ uri: profile.avatarUrl }} style={styles.cardAvatar} />
                 ) : (
                   <View style={styles.cardAvatarPlaceholder}>
-                    <Text style={{ color: '#fff', fontSize: 24 }}>👤</Text>
+                    <Text style={{ color: '#ffffff', fontSize: 24 }}>👤</Text>
                   </View>
                 )}
               </View>
               <View style={styles.sideMeta}>
                 <View style={styles.sideMetaRow}>
-                  <Ionicons name="location-outline" size={9} color="rgba(255,255,255,0.3)" />
+                  <Ionicons name="location-outline" size={9} color="#9ca3af" />
                   <Text style={styles.sideMetaText}>{profile?.country || 'Global'}</Text>
                 </View>
                 <View style={[styles.sideMetaRow, { marginTop: 8 }]}>
@@ -85,7 +85,7 @@ const CVCard = ({ profile, scoreData, walletAddress, onScorePress }: CVCardProps
                   <Text style={styles.badgeTextEmer}>BUILDER</Text>
                 </View>
                 <View style={[styles.cardBadge, styles.badgeOrange]}>
-                  <Ionicons name="star" size={8} color="#f59e0b" />
+                  <Ionicons name="star" size={8} color="#f97316" />
                   <Text style={styles.badgeTextOrange}>GENESIS 100</Text>
                 </View>
               </View>
@@ -105,9 +105,9 @@ const CVCard = ({ profile, scoreData, walletAddress, onScorePress }: CVCardProps
 
           <View style={styles.cardFooter}>
             <View style={styles.socialIcons}>
-              <FontAwesome5 name="twitter" size={13} color="rgba(255,255,255,0.4)" />
-              <FontAwesome5 name="github" size={13} color="rgba(255,255,255,0.4)" />
-              <FontAwesome5 name="linkedin" size={13} color="rgba(255,255,255,0.4)" />
+              <FontAwesome5 name="twitter" size={13} color="#6b7280" />
+              <FontAwesome5 name="github" size={13} color="#6b7280" />
+              <FontAwesome5 name="linkedin" size={13} color="#6b7280" />
             </View>
             <View style={styles.cardWalletInfo}>
               <Text style={styles.cardWalletAddr}>
@@ -128,19 +128,19 @@ const styles = StyleSheet.create({
   cvCardBorder: { 
     borderRadius: 24, 
     padding: 1, 
-    backgroundColor: 'rgba(255,255,255,0.1)', 
+    backgroundColor: '#374151', // Dark border 
     marginBottom: 25,
     width: '100%',
   },
   cvCardMain: { 
     borderRadius: 23, 
-    backgroundColor: '#0f172a', 
+    backgroundColor: '#1f2937', // Dark Grey background
     overflow: 'hidden', 
     padding: 18, 
     paddingBottom: 20 
   },
-  cardBg: { ...StyleSheet.absoluteFillObject, opacity: 0.3 },
-  cardOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.4)' },
+  cardBg: { ...StyleSheet.absoluteFillObject },
+  cardOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(31, 41, 55, 0.4)' },
   cardInner: { zIndex: 1 },
   lookingForBox: { 
     alignSelf: 'center', 
@@ -150,12 +150,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, 
     paddingVertical: 6, 
     borderRadius: 100, 
-    backgroundColor: 'rgba(16,185,129,0.05)', 
+    backgroundColor: 'rgba(255,255,255,0.1)', 
     borderWidth: 1, 
-    borderColor: 'rgba(16,185,129,0.2)', 
+    borderColor: 'rgba(255,255,255,0.2)', 
     marginBottom: 8 
   },
-  lookingForText: { color: '#10b981', fontSize: 9, fontWeight: '900' },
+  lookingForText: { color: '#ffffff', fontSize: 9, fontWeight: '700' },
   absScore: { 
     position: 'absolute', 
     top: -5, 
@@ -170,23 +170,29 @@ const styles = StyleSheet.create({
     borderRadius: 14, 
     borderStyle: 'dashed', 
     borderWidth: 1, 
-    borderColor: '#10b981', 
+    borderColor: '#f97316', 
     alignItems: 'center', 
-    justifyContent: 'center' 
+    justifyContent: 'center',
+    backgroundColor: '#111827',
   },
   scoreOrbit: { 
     alignItems: 'center', 
-    backgroundColor: 'rgba(15,23,42,0.8)', 
+    backgroundColor: '#111827', 
     padding: 6, 
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(168, 85, 247, 0.3)',
+    borderColor: 'rgba(249, 115, 22, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  scoreVal: { color: '#fff', fontSize: 24, fontWeight: '900' },
+  scoreVal: { color: '#ffffff', fontSize: 24, fontWeight: '700' },
   scoreLabel: { 
-    color: '#a855f7', 
+    color: '#9ca3af', 
     fontSize: 6, 
-    fontWeight: '900', 
+    fontWeight: '700', 
     letterSpacing: 1, 
     marginTop: -2 
   },
@@ -197,23 +203,23 @@ const styles = StyleSheet.create({
     height: 80, 
     borderRadius: 40, 
     borderWidth: 2, 
-    borderColor: '#1e293b', 
+    borderColor: '#4b5563', 
     overflow: 'hidden' 
   },
   cardAvatar: { width: '100%', height: '100%' },
   cardAvatarPlaceholder: { 
     flex: 1, 
-    backgroundColor: '#1e293b', 
+    backgroundColor: '#374151', 
     alignItems: 'center', 
     justifyContent: 'center' 
   },
   sideMeta: { gap: 4, marginTop: 8, alignItems: 'center', width: '100%' },
   sideMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  sideMetaText: { color: 'rgba(255,255,255,0.4)', fontSize: 8, fontWeight: '700' },
+  sideMetaText: { color: '#9ca3af', fontSize: 8, fontWeight: '600' },
   availLabel: { 
-    color: 'rgba(255,255,255,0.15)', 
+    color: '#6b7280', 
     fontSize: 6, 
-    fontWeight: '900', 
+    fontWeight: '700', 
     letterSpacing: 1, 
     textAlign: 'center' 
   },
@@ -221,17 +227,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, 
     paddingVertical: 3, 
     borderRadius: 6, 
-    backgroundColor: 'rgba(16,185,129,0.1)', 
+    backgroundColor: 'rgba(255,255,255,0.1)', 
     borderWidth: 1, 
-    borderColor: 'rgba(16,185,129,0.2)', 
+    borderColor: 'rgba(255,255,255,0.15)', 
     width: '100%', 
     alignItems: 'center' 
   },
-  availPillText: { color: '#10b981', fontSize: 8, fontWeight: '900' },
+  availPillText: { color: '#ffffff', fontSize: 8, fontWeight: '600' },
   cardRightCol: { flex: 1, paddingRight: 45 },
   identityHeader: { marginBottom: 6 },
-  cardName: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  cardTitle: { color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: '700', marginTop: 1 },
+  cardName: { color: '#ffffff', fontSize: 20, fontWeight: '600' },
+  cardTitle: { color: '#d1d5db', fontSize: 11, fontWeight: '500', marginTop: 1 },
   badgesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   cardBadge: { 
     flexDirection: 'row', 
@@ -242,25 +248,25 @@ const styles = StyleSheet.create({
     borderRadius: 4, 
     borderWidth: 1 
   },
-  badgeEmer: { backgroundColor: 'rgba(16,185,129,0.05)', borderColor: 'rgba(16,185,129,0.2)' },
-  dotEmer: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#10b981' },
-  badgeTextEmer: { color: '#10b981', fontSize: 7, fontWeight: '900' },
-  badgeOrange: { backgroundColor: 'rgba(245,158,11,0.05)', borderColor: 'rgba(245,158,11,0.2)' },
-  badgeTextOrange: { color: '#f59e0b', fontSize: 7, fontWeight: '900' },
+  badgeEmer: { backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)' },
+  dotEmer: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#ffffff' },
+  badgeTextEmer: { color: '#ffffff', fontSize: 7, fontWeight: '700' },
+  badgeOrange: { backgroundColor: 'rgba(249, 115, 22, 0.15)', borderColor: 'rgba(249, 115, 22, 0.3)' },
+  badgeTextOrange: { color: '#f97316', fontSize: 7, fontWeight: '700' },
   skillsBox: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 10 },
   skillPill: { 
     paddingHorizontal: 6, 
     paddingVertical: 3, 
     borderRadius: 6, 
-    backgroundColor: 'rgba(255,255,255,0.03)', 
+    backgroundColor: 'rgba(255,255,255,0.05)', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.08)' 
+    borderColor: 'rgba(255,255,255,0.1)' 
   },
-  skillPillText: { color: 'rgba(255,255,255,0.4)', fontSize: 7, fontWeight: '900' },
+  skillPillText: { color: '#d1d5db', fontSize: 7, fontWeight: '600' },
   cardBio: { 
-    color: 'rgba(255,255,255,0.6)', 
+    color: '#9ca3af', 
     fontSize: 10, 
-    fontWeight: '500', 
+    fontWeight: '400', 
     lineHeight: 14, 
     marginTop: 12 
   },
@@ -269,14 +275,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', 
     alignItems: 'center', 
     borderTopWidth: 0.5, 
-    borderTopColor: 'rgba(255,255,255,0.08)', 
+    borderTopColor: '#374151', 
     paddingTop: 12, 
     marginTop: 20 
   },
   socialIcons: { flexDirection: 'row', gap: 10 },
   cardWalletInfo: { alignItems: 'flex-end', gap: 2 },
-  cardWalletAddr: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontWeight: '700' },
-  cardId: { color: 'rgba(255,255,255,0.1)', fontSize: 8, fontWeight: '700' },
+  cardWalletAddr: { color: '#6b7280', fontSize: 8, fontWeight: '600' },
+  cardId: { color: '#4b5563', fontSize: 8, fontWeight: '600' },
 });
 
 export default CVCard;

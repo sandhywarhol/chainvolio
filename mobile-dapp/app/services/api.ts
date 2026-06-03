@@ -214,10 +214,39 @@ export const uploadAvatar = async (uri: string, walletAddress: string) => {
   }
 };
 
+/**
+ * Fetches explore talent data.
+ * Mirrors /api/explore-talent
+ */
+export const getExploreTalents = async (params?: {
+  page?: number;
+  search?: string;
+  category?: string;
+  skillTag?: string;
+  sort?: string;
+}) => {
+  try {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.search) query.set('search', params.search);
+    if (params?.category) query.set('category', params.category);
+    if (params?.skillTag) query.set('skillTag', params.skillTag);
+    if (params?.sort) query.set('sort', params.sort);
+
+    const response = await fetch(`${BASE_URL.replace('/api', '')}/api/explore-talent?${query.toString()}`);
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching explore talent:', error);
+    return { talents: [], organizations: [], total: 0 };
+  }
+};
+
 export default {
   getUserMe,
   getProfile,
   updateProfile,
   getDashboardStats,
-  uploadAvatar
+  uploadAvatar,
+  getExploreTalents,
 };

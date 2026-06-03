@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Inter-Bold', letterSpacing: 2, marginTop: 20 },
+  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
   scrollContent: {
     paddingHorizontal: 25,
     paddingBottom: 40,
@@ -289,12 +289,12 @@ const styles = StyleSheet.create({
   greeting: {
     color: '#fff',
     fontSize: 22,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
   },
   subGreeting: {
     color: 'rgba(255,255,255,0.3)',
     fontSize: 11,
-    fontFamily: 'Inter-Bold',
+    
     marginTop: 2,
   },
   editBtn: {
@@ -336,13 +336,13 @@ const styles = StyleSheet.create({
   completionTitle: {
     color: 'rgba(255,255,255,0.4)',
     fontSize: 9,
-    fontFamily: 'Inter-Bold',
+    
     letterSpacing: 1.5,
   },
   completionPercent: {
     color: '#10b981',
     fontSize: 14,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
   },
   progressBar: {
     height: 4,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   completionHint: {
     color: 'rgba(255,255,255,0.25)',
     fontSize: 10,
-    fontFamily: 'Inter-Bold',
+    
     lineHeight: 16,
   },
   whiteText: {
@@ -393,12 +393,12 @@ const styles = StyleSheet.create({
   sectionMainTitle: {
     color: '#fff',
     fontSize: 15,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
   },
   sectionSubTitle: {
     color: 'rgba(255,255,255,0.3)',
     fontSize: 10,
-    fontFamily: 'Inter-Bold',
+    
     marginTop: 2,
   },
   expandedContent: {
@@ -424,14 +424,14 @@ const styles = StyleSheet.create({
   statLabel: {
     color: 'rgba(255,255,255,0.2)',
     fontSize: 8,
-    fontFamily: 'Inter-Bold',
+    
     letterSpacing: 1,
     marginBottom: 6,
   },
   statVal: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
   },
   dimText: {
     color: 'rgba(255,255,255,0.1)',
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   statSub: {
     color: 'rgba(255,255,255,0.2)',
     fontSize: 9,
-    fontFamily: 'Inter-Bold',
+    
     marginTop: 2,
   },
   emptyContainer: {
@@ -449,13 +449,13 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#fff',
     fontSize: 15,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
     marginBottom: 8,
   },
   emptySub: {
     color: 'rgba(255,255,255,0.3)',
     fontSize: 11,
-    fontFamily: 'Inter-Bold',
+    
     textAlign: 'center',
     lineHeight: 16,
     marginBottom: 20,
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
   actionBtnText: {
     color: '#fff',
     fontSize: 13,
-    fontFamily: 'Inter-Bold',
+    
   },
   workSection: {
     marginTop: 40,
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   workTitle: {
     color: '#fff',
     fontSize: 17,
-    fontFamily: 'SpaceGrotesk-Bold',
+    
   },
   addProofBtn: {
     backgroundColor: 'rgba(16,185,129,0.1)',
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   addProofText: {
     color: '#10b981',
     fontSize: 11,
-    fontFamily: 'Inter-Bold',
+    
   },
   receiptCard: {
     backgroundColor: 'rgba(255,255,255,0.02)',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   receiptRole: {
     color: '#fff',
     fontSize: 15,
-    fontFamily: 'Inter-Bold',
+    
     flex: 1,
     marginRight: 10
   },
@@ -533,14 +533,14 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 8,
-    fontFamily: 'Inter-Bold',
+    
     fontWeight: '900',
     letterSpacing: 0.5
   },
   receiptOrg: {
     color: 'rgba(16,185,129,0.7)',
     fontSize: 13,
-    fontFamily: 'Inter-Bold',
+    
     marginBottom: 15,
   },
   receiptMeta: {
@@ -555,16 +555,17 @@ const styles = StyleSheet.create({
   receiptDate: {
     color: 'rgba(255,255,255,0.2)',
     fontSize: 11,
-    fontFamily: 'Inter-Bold',
+    
   },
   emptyWorkBox: { alignItems: 'center', paddingVertical: 40, gap: 12 },
   emptySectionText: {
     color: 'rgba(255,255,255,0.1)',
     fontSize: 12,
-    fontFamily: 'Inter-Bold',
+    
     fontStyle: 'italic',
     textAlign: 'center',
   }
 });
 
 export default DashboardScreen;
+
