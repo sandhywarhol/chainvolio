@@ -37,8 +37,11 @@ export function CertificateCard({ cert, isOwner, onDelete, onPreview }: Certific
   return (
     <div 
         onClick={() => onPreview?.(cert)}
-        className="group relative flex items-start gap-4 p-4 rounded-xl border border-slate-800/60 bg-slate-900/40 hover:bg-slate-800/60 hover:border-indigo-500/30 transition-all duration-300 cursor-pointer overflow-hidden"
+        className="group relative flex items-start gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 transition-all duration-300 cursor-pointer overflow-hidden shadow-[0_8px_16px_-6px_rgba(0,0,0,0.8)]"
+        style={{ background: "#0a0a0c" }}
     >
+      {/* Lightning shine */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
       {/* Background Glow */}
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-transparent to-transparent opacity-0 group-hover:opacity-10 transition-opacity" />
 

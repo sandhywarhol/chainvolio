@@ -278,8 +278,8 @@ function WorkRecordCard({
   return (
     <div
       onClick={() => onSelect(r)}
-      className="p-4 md:p-5 rounded-lg hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden shadow-[0_6px_14px_-4px_rgba(0,0,0,0.8)] hover:shadow-[0_10px_20px_-4px_rgba(0,0,0,0.9)]"
-      style={{ background: "#18181d", border: "1px solid rgba(255,255,255,0.07)" }}
+      className="p-4 md:p-5 rounded-lg hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]"
+      style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.08)" }}
     >
       {/* Lightning shine sweep */}
       <div className="animate-lightning-shine absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none z-10" />
@@ -293,7 +293,6 @@ function WorkRecordCard({
       {/* Specular corner highlights */}
       <div className="absolute top-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none z-10" />
       <div className="absolute top-0 right-0 w-16 h-16 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
-      <div className="absolute bottom-0 right-0 w-16 h-16 bg-[radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none z-10" />
       <div className="absolute bottom-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
 
       <div className="flex justify-between items-start gap-4">
@@ -788,7 +787,8 @@ export default function CVPage(props: any) {
 
     if (isCompany || isCommunity) {
       return (
-        <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+        <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white theme-bg-page theme-aware">
+          <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
           <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
           <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
             <TrustIssuerCV
@@ -824,7 +824,7 @@ export default function CVPage(props: any) {
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_30px_100px_-16px_rgba(0,0,0,1)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
+            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_12px_24px_-8px_rgba(0,0,0,0.9)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
@@ -1195,7 +1195,7 @@ export default function CVPage(props: any) {
 
 
             {/* Recruiter Trust Disclaimer */}
-            <div className="mt-8 p-4 rounded-xl flex items-start gap-3 shadow-[0_8px_16px_-4px_rgba(0,0,0,0.7)] relative overflow-hidden" style={{ background: "#18181d", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div className="mt-8 p-4 rounded-xl flex items-start gap-3 shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)] relative overflow-hidden" style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.08)" }}>
               {/* Lightning shine */}
               <div className="animate-lightning-shine absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none" style={{ animationDelay: "2s" }} />
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />

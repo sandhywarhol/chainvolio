@@ -227,8 +227,9 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
       
       {/* ── 1. Hero Module ────────────────────────────────────────────────────── */}
-      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/5 bg-black">
+      <div className="relative p-6 md:p-8 rounded-3xl overflow-hidden border border-white/[0.08] shadow-[0_12px_24px_-8px_rgba(0,0,0,0.9)]" style={{ background: "#0a0a0c" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(135deg, ${accentHex}10 0%, transparent 60%)` }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent animate-lightning-shine pointer-events-none z-10" />
         
         {profile.isVerified && (
           <div className="absolute top-6 right-6 md:top-8 md:right-8 z-30">
@@ -320,8 +321,10 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
           <div 
             key={i} 
             onClick={pod.onClick}
-            className={`p-4 rounded-2xl bg-black border border-white/5 space-y-2 cursor-pointer hover:border-white/10 hover:bg-white/[0.04] transition-all`}
+            className={`relative overflow-hidden p-4 rounded-2xl border border-white/[0.06] shadow-[0_8px_16px_-6px_rgba(0,0,0,0.8)] space-y-2 cursor-pointer hover:border-white/12 hover:bg-white/[0.04] transition-all`}
+            style={{ background: "#0a0a0c" }}
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
             <div className={`w-8 h-8 flex items-center justify-center rounded-xl ${pod.bg}`}>
               <pod.icon className={`w-4 h-4 ${pod.col}`} />
             </div>
@@ -337,7 +340,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 4. Talent Impact (Expertise) ───────────────────────────────────────── */}
       {sortedRoles.length > 0 && (
-        <div className="p-6 rounded-2xl bg-black border border-white/5">
+        <div className="relative overflow-hidden p-6 rounded-2xl border border-white/[0.06] shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]" style={{ background: "#0a0a0c" }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-500" /> Talent Impact
           </h2>
@@ -354,7 +358,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 5. Recent Endorsements (List View) ────────────────────────────────── */}
       {sortedEndorsements.length > 0 && (
-        <div className="p-6 rounded-3xl bg-black border border-white/5">
+        <div className="relative overflow-hidden p-6 rounded-3xl border border-white/[0.06] shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]" style={{ background: "#0a0a0c" }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
                <UserCheck className="w-4 h-4 text-emerald-500" />
@@ -416,7 +421,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
 
       {/* ── 6. Projects & Programs ────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div className="p-6 rounded-3xl bg-black border border-white/5">
+        <div className="relative overflow-hidden p-6 rounded-3xl border border-white/[0.06] shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]" style={{ background: "#0a0a0c" }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
             <FolderOpen className="w-4 h-4 text-white/50" /> Projects &amp; Programs
           </h2>
@@ -485,7 +491,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
              {distinctRecipients.length > 0 && (
-               <div className="p-6 rounded-3xl bg-black border border-white/5 flex flex-col items-start">
+               <div className="relative overflow-hidden p-6 rounded-3xl border border-white/[0.06] shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)] flex flex-col items-start" style={{ background: "#0a0a0c" }}>
+                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
                  <div className="flex items-center justify-between mb-6 w-full">
                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Active Members</h2>
                    <Users className="w-4 h-4 text-blue-500" />
@@ -518,7 +525,8 @@ export function TrustIssuerCV({ profile, receipts: rawAttestations, scoreData, w
              )}
              
              {sortedRoles.length > 0 && (
-               <div className="p-6 rounded-3xl bg-black border border-white/5">
+               <div className="relative overflow-hidden p-6 rounded-3xl border border-white/[0.06] shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]" style={{ background: "#0a0a0c" }}>
+                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-lightning-shine pointer-events-none" />
                  <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center justify-between">
                    Breakdown
                    <TrendingUp className="w-4 h-4 text-amber-500" />

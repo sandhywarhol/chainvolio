@@ -2520,44 +2520,15 @@ export function LandingPageClient() {
                             </div>
                         </div>
 
-                        {/* Feature text blocks: 01 / 02 / 03 */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 mt-10 pt-8 border-t border-white/[0.06]">
-                            {[
-                                {
-                                    num: "01",
-                                    title: "One Unified Profile",
-                                    body: "No more scattered contributions. You own a single source of truth that follows you across every protocol, DAO, and organization.",
-                                },
-                                {
-                                    num: "02",
-                                    title: "On-Chain Attestation",
-                                    body: "Trust is verifiable, not just claimed. Issuers sign your record once, so anyone can verify it without asking you to prove it again.",
-                                },
-                                {
-                                    num: "03",
-                                    title: "Portable Trust",
-                                    body: "Doors that once required warm introductions become more accessible. Your verified record speaks before you do.",
-                                },
-                            ].map(({ num, title, body }) => (
-                                <div key={num} className="flex flex-col gap-2.5">
-                                    <span className="text-[10px] font-black text-white/20 tracking-[0.18em]">{num}</span>
-                                    <h4 className="text-[13px] font-bold text-white/70 leading-snug">{title}</h4>
-                                    <p className="text-[12px] text-white/35 leading-relaxed font-normal">{body}</p>
-                                </div>
-                            ))}
-                        </div>
-
-
-
-                        {/* Bottom bar */}
-                        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-1">
-                            <p className="text-[11px] text-white/25 italic max-w-xs leading-relaxed">
-                                &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
-                            </p>
-                            <p className="text-[11px] text-white/25 italic">
-                                Recruiters see proof, not promises. Real contributors rise above the noise.
-                            </p>
-                        </div>
+                            {/* Bottom bar */}
+                            <div className="mt-10 pt-6 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-4 px-1">
+                                <p className="text-[11px] text-white/25 italic max-w-xs leading-relaxed">
+                                    &ldquo;ChainVolio doesn&apos;t replace LinkedIn. It adds cryptographic proof to your existing presence anywhere you already share your work.&rdquo;
+                                </p>
+                                <p className="text-[11px] text-white/25 italic">
+                                    Recruiters see proof, not promises. Real contributors rise above the noise.
+                                </p>
+                            </div>
 
                     </div>
 
