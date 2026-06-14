@@ -815,8 +815,9 @@ export default function CVPage(props: any) {
 
   return (
     <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white theme-aware">
-      {/* Fixed background — stays still while content scrolls */}
-      <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
+      {/* Fixed background — desktop dark gradient, mobile very dark grey */}
+      <div className="hidden md:block fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
+      <div className="block md:hidden fixed inset-0 -z-10" style={{ background: "#111111" }} />
       <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
       <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-28">
         {(!profile && !loading) ? (
@@ -824,7 +825,7 @@ export default function CVPage(props: any) {
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_12px_24px_-8px_rgba(0,0,0,0.9)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
+            <div className="relative flex flex-col justify-between md:min-h-[360px] mb-8 p-5 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_12px_24px_-8px_rgba(0,0,0,0.9)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
@@ -856,7 +857,7 @@ export default function CVPage(props: any) {
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.04)_0%,transparent_70%)] pointer-events-none z-30" />
 
 
-              <div className="absolute top-6 right-6 z-50 flex flex-col gap-4 items-center pointer-events-auto">
+              <div className="absolute top-6 right-6 z-50 hidden md:flex flex-col gap-4 items-center pointer-events-auto">
                 {profile?.isVerified && (
                   <div className="hidden md:block">
                     <VerifiedCheckBadge verificationType={profile?.verificationType} />
@@ -876,31 +877,103 @@ export default function CVPage(props: any) {
               </div>
 
               {/* Content wrapper */}
-              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 w-full z-40 flex-1">
-                {/* Avatar Column */}
-                <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
-                  <div className="relative group/avatar">
-                    {profile?.avatarUrl ? (
-                      <img
-                        src={profile.avatarUrl}
-                        alt={profile.displayName}
-                        className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-800 shadow-xl"
-                      />
-                    ) : (
-                      <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-3xl md:text-4xl border-4 border-slate-800 shadow-xl">
-                        👤
+              <div className="relative flex flex-col md:flex-row items-start gap-3 md:gap-8 w-full z-40 flex-1">
+
+                {/* ── MOBILE HEADER (replaces avatar col + top identity on mobile) ── */}
+                <div className="md:hidden w-full space-y-4 mb-1">
+
+                  {/* Row 1: lookingFor pill + CV score */}
+                  <div className="flex items-start justify-between gap-3">
+                    {profile?.lookingFor ? (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/55 text-[13px]">
+                        <Briefcase className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="font-medium leading-snug">{profile.lookingFor}</span>
                       </div>
+                    ) : <div />}
+                    {scoreData && (
+                      <button onClick={() => setIsScoreModalOpen(true)} className="flex flex-col items-end cursor-pointer flex-shrink-0">
+                        <span className="text-[28px] font-black leading-none text-transparent bg-clip-text bg-gradient-to-br from-[#a855f7] via-fuchsia-400 to-blue-500">
+                          {scoreData.score}
+                        </span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[#a855f7]/70 mt-0.5">CV Score</span>
+                      </button>
                     )}
-                    
-                    {/* Mobile-only Trust Badge Overlay */}
-                    <div className="md:hidden absolute -bottom-2 -right-2">
-                       {profile?.isVerified && <VerifiedCheckBadge verificationType={profile?.verificationType} />}
+                  </div>
+
+                  {/* Row 2: Avatar + Identity */}
+                  <div className="flex items-center gap-4">
+                    {/* Avatar */}
+                    <div className="relative flex-shrink-0 pb-2 pr-2">
+                      {profile?.avatarUrl ? (
+                        <img src={profile.avatarUrl} alt={profile.displayName}
+                          className="w-[88px] h-[88px] rounded-full object-cover border-4 border-slate-800 shadow-xl" />
+                      ) : (
+                        <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-3xl border-4 border-slate-800 shadow-xl">👤</div>
+                      )}
+                      {profile?.isVerified && (
+                        <div className="absolute bottom-0 right-0 scale-75 origin-bottom-right">
+                          <VerifiedCheckBadge verificationType={profile?.verificationType} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Identity */}
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-xl font-bold text-white leading-tight truncate">
+                        {profile?.displayName}
+                      </h1>
+                      {(profile?.role || profile?.organization) && (
+                        <p className="text-sm text-slate-400 mt-0.5 leading-snug">
+                          {profile.role}{profile.role && profile.organization ? " at " : ""}{profile.organization}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-slate-500">
+                        {profile?.country && (
+                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{profile.country}</span>
+                        )}
+                        {profile?.timezone && (
+                          <span className="flex items-center gap-1 font-mono"><Clock className="w-3 h-3" />{profile.timezone}</span>
+                        )}
+                      </div>
+                      {profile?.workPreference && profile.workPreference.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                          {profile.workPreference.map((pref) => (
+                            <span key={pref} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/50">
+                              {pref}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Country below avatar - only render if present */}
-                  {(profile?.country || profile?.timezone || profile?.workPreference?.length) ? (
-                    <div className="flex flex-col items-center md:items-start gap-2 mt-4 text-slate-400">
+                </div>
+
+                {/* Avatar Column — desktop only */}
+                <div className="hidden md:flex flex-shrink-0 flex-col items-start w-auto">
+                  {/* Mobile: row (avatar left | meta right), Desktop: column (avatar above, meta below) */}
+                  <div className="flex flex-row md:flex-col items-start gap-4 md:gap-0">
+                    {/* Avatar */}
+                    <div className="relative group/avatar flex-shrink-0 pb-3 pr-3">
+                      {profile?.avatarUrl ? (
+                        <img
+                          src={profile.avatarUrl}
+                          alt={profile.displayName}
+                          className="w-[112px] h-[112px] md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-800 shadow-xl"
+                        />
+                      ) : (
+                        <div className="w-[112px] h-[112px] md:w-32 md:h-32 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-3xl md:text-4xl border-4 border-slate-800 shadow-xl">
+                          👤
+                        </div>
+                      )}
+                      {/* Trust Badge Overlay — scaled down on mobile */}
+                      <div className="absolute bottom-0 right-0 scale-75 md:scale-100 origin-bottom-right">
+                        {profile?.isVerified && <VerifiedCheckBadge verificationType={profile?.verificationType} />}
+                      </div>
+                    </div>
+
+                    {/* Meta: mobile = right of avatar, desktop = below avatar */}
+                    <div className="flex flex-col items-start gap-2 pt-1 md:pt-0 md:mt-4 text-slate-400">
                       {profile?.country && (
                         <div className="flex items-center gap-1.5">
                           <MapPin className="w-4 h-4" />
@@ -913,12 +986,11 @@ export default function CVPage(props: any) {
                           <span className="font-mono">{profile.timezone}</span>
                         </div>
                       )}
-
-                      {/* Work Preference */}
+                      {/* Availability — desktop only here; mobile shows below name */}
                       {profile?.workPreference && profile.workPreference.length > 0 && (
-                        <div className="flex flex-col items-center md:items-start gap-1.5 mt-2">
+                        <div className="hidden md:flex flex-col items-start gap-1.5 mt-1">
                           <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Availability</span>
-                          <div className="flex flex-wrap items-center md:justify-start gap-1.5 max-w-[200px]">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             {profile.workPreference.map((pref) => (
                               <span key={pref} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/50">
                                 {pref}
@@ -928,10 +1000,10 @@ export default function CVPage(props: any) {
                         </div>
                       )}
                     </div>
-                  ) : null}
+                  </div>
 
-                  {/* Brand Logo & Text */}
-                  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-white/5 w-full justify-center md:justify-start">
+                  {/* Brand Logo & Text — desktop only */}
+                  <div className="hidden md:flex items-center gap-2 mt-6 pt-4 border-t border-white/5 w-full justify-start">
                     <div className="w-7 h-7 rounded-lg bg-black/60 border border-white/[0.06] flex items-center justify-center">
                       <img src="/logo.png" alt="ChainVolio" className="h-4 w-auto opacity-70" />
                     </div>
@@ -941,13 +1013,13 @@ export default function CVPage(props: any) {
 
 
                 {/* Info Column */}
-                <div className="flex-1 flex flex-col text-center md:text-left space-y-4 w-full h-full">
+                <div className="flex-1 flex flex-col text-left space-y-4 w-full h-full">
 
 
 
-                  {/* Looking For Badge */}
+                  {/* Looking For Badge — desktop only (mobile version is above avatar) */}
                   {profile?.lookingFor && (
-                    <div className="flex items-center justify-center md:justify-start gap-2">
+                    <div className="hidden md:flex items-center justify-start gap-2">
                       <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm">
                         <Briefcase className="w-3.5 h-3.5" />
                         <span className="font-medium">{profile.lookingFor}</span>
@@ -955,32 +1027,29 @@ export default function CVPage(props: any) {
                     </div>
                   )}
 
-                  <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
-                    <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start flex-1 min-w-0">
+                  {/* Name — desktop only (mobile: in mobile header above) */}
+                  <div className="hidden md:flex flex-col md:flex-row md:items-center gap-3 w-full">
+                    <div className="flex items-center gap-3 flex-wrap justify-start flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold text-white truncate max-w-full">
                         {profile?.displayName}
                       </h1>
                     </div>
                   </div>
-                  
-                  {/* Mobile-only Action Area (Hidden) */}
-                  <div className="md:hidden flex flex-col gap-3 w-full pt-2">
-                  </div>
 
-                  {/* Profile Identity (Role/Organization) */}
+                  {/* Profile Identity — desktop only */}
                   {profile?.role ? (
-                    <p className="text-sm font-medium text-slate-400 leading-snug">
+                    <p className="hidden md:block text-sm font-medium text-slate-400 leading-snug">
                       {profile.role}
                       {profile.organization && <span> at {profile.organization}</span>}
                     </p>
                   ) : profile?.organization ? (
-                    <p className="text-sm font-medium text-slate-400 leading-snug">
+                    <p className="hidden md:block text-sm font-medium text-slate-400 leading-snug">
                       {profile.organization}
                     </p>
                   ) : null}
 
                   {/* Badges & Trust Hierarchy */}
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
+                  <div className="flex flex-wrap items-center justify-start gap-3 mt-4">
                     <RoleBadge 
                       isVerified={!!profile?.isVerified} 
                       type={profile?.verificationTier} 
@@ -1002,7 +1071,7 @@ export default function CVPage(props: any) {
 
                   {/* Skills Pills */}
                   {profile?.skills ? (
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-3">
+                    <div className="flex flex-wrap items-center justify-start gap-1.5 md:gap-2 mt-3">
                       {profile.skills.split(',').map((skill, i) => (
                         <span key={i} className="px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-black/60 border border-white/[0.06] text-[10px] md:text-xs text-slate-300 hover:border-white/[0.12] transition-colors">
                           {skill.trim()}
@@ -1544,7 +1613,7 @@ export default function CVPage(props: any) {
           />
         )}
 
-        <footer className="mt-auto text-center border-t border-slate-800 pt-8 pb-4">
+        <footer className="hidden md:block mt-auto text-center border-t border-slate-800 pt-8 pb-4">
           <p className="text-slate-600 text-xs max-w-md mx-auto">
             ChainVolio provides infrastructure for career history. Verification is performed by cryptographic signatures, not by ChainVolio itself. Please verify critical claims independently.
           </p>
@@ -1561,7 +1630,7 @@ export default function CVPage(props: any) {
         if (!viewerIsRecruiter || candidateIsOrg || publicKey?.toBase58() === wallet || !profile) return null;
 
         return (
-          <div className="fixed bottom-0 inset-x-0 z-[9000] px-4 pb-5 md:pb-6 pointer-events-none">
+          <div className="fixed bottom-0 inset-x-0 z-[9000] px-4 pb-[95px] md:pb-6 pointer-events-none">
             <div className="max-w-3xl mx-auto pointer-events-auto">
               <div className="flex items-center justify-between gap-4 px-4 md:px-5 py-3 md:py-3.5 rounded-2xl border border-white/[0.10] bg-black/40 backdrop-blur-2xl shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.5)]">
 
@@ -1625,7 +1694,9 @@ export default function CVPage(props: any) {
         />
       )}
 
-      <Footer className="bg-[#030303]/90 backdrop-blur-md" />
+      <div className="hidden md:block">
+        <Footer className="bg-[#030303]/90 backdrop-blur-md" />
+      </div>
     </main>
   );
 }

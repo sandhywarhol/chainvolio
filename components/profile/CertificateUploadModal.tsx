@@ -168,21 +168,21 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
   const isLoading = status === "processing" || status === "uploading";
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-lg bg-slate-900/95 border border-slate-700/60 rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg bg-[#0f0f11] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/40">
+        <div className="flex items-center justify-between p-6 border-b border-white/5">
           <div>
             <h2 className="text-lg font-bold text-white">Add Certificate</h2>
-            <p className="text-[11px] text-slate-500 mt-0.5">Upload a credential to your profile</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Upload a credential to your profile</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-700/50 transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -190,9 +190,9 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
 
         {/* Progress Bar */}
         {isLoading && (
-          <div className="h-0.5 bg-slate-800">
+          <div className="h-0.5 bg-white/5">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -202,7 +202,7 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
           {/* Title */}
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
-              Certificate Title <span className="text-indigo-400">*</span>
+              Certificate Title <span className="text-amber-400">*</span>
             </label>
             <input
               type="text"
@@ -211,7 +211,7 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
               placeholder="e.g. AWS Certified Solutions Architect"
               required
               disabled={isLoading}
-              className="w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all disabled:opacity-50"
+              className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] focus:border-white/30 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none transition-all disabled:opacity-50"
             />
           </div>
 
@@ -226,7 +226,7 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
               onChange={e => setIssuer(e.target.value)}
               placeholder="e.g. Amazon Web Services"
               disabled={isLoading}
-              className="w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all disabled:opacity-50"
+              className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] focus:border-white/30 rounded-xl text-sm text-white placeholder:text-zinc-600 focus:outline-none transition-all disabled:opacity-50"
             />
           </div>
 
@@ -240,20 +240,20 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
               value={dateIssued}
               onChange={e => setDate(e.target.value)}
               disabled={isLoading}
-              className="w-full px-3 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all disabled:opacity-50 [color-scheme:dark]"
+              className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] focus:border-white/30 rounded-xl text-sm text-white focus:outline-none transition-all disabled:opacity-50 [color-scheme:dark]"
             />
           </div>
 
           {/* File Upload */}
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
-              Certificate File <span className="text-indigo-400">*</span>
+              Certificate File <span className="text-amber-400">*</span>
             </label>
             <div
               className={`relative border-2 border-dashed rounded-xl transition-all cursor-pointer ${
                 file
                   ? "border-emerald-500/40 bg-emerald-500/5"
-                  : "border-slate-700/60 bg-slate-800/30 hover:border-indigo-500/40 hover:bg-indigo-500/5"
+                  : "border-white/[0.1] bg-white/[0.02] hover:border-amber-500/40 hover:bg-amber-500/5"
               }`}
               onDrop={handleDrop}
               onDragOver={e => e.preventDefault()}
@@ -301,7 +301,7 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
           {/* Status message */}
           {isLoading && (
             <div className="flex items-center gap-2 text-xs text-slate-400">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
               {statusLabel[status]}
             </div>
           )}
@@ -318,14 +318,14 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-sm text-slate-300 font-medium transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-sm text-slate-300 font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || !file || !title.trim()}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <><Loader2 className="w-3.5 h-3.5 animate-spin" />{statusLabel[status]}</>

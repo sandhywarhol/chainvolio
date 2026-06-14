@@ -188,6 +188,12 @@ export default function DashboardPage() {
     return () => controller.abort();
   }, [publicKey, connected, connecting]);
 
+  // Auto-switch tab when redirected with ?tab= param (e.g. from mobile Add Credential button)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab");
+    if (tabParam) setActiveTab(tabParam);
+  }, []);
+
   // Auto-open verification modal when redirected from recruiter create-profile
   useEffect(() => {
     if (!profile) return;
@@ -409,7 +415,7 @@ export default function DashboardPage() {
       <div className="flex-shrink-0" style={{ height: 96 }} />{/* navbar spacer */}
 
       {/* ── 3-PANEL BODY ── */}
-      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-6 md:pb-10 flex flex-col">
+      <div className="flex-1 overflow-hidden min-h-0 px-2 md:px-16 pt-3 pb-[95px] md:pb-10 flex flex-col">
         <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
 
         {/* ── LEFT SIDEBAR ── */}
@@ -575,8 +581,52 @@ export default function DashboardPage() {
             );
           })()}
 
+          {/* Mobile horizontal tab bar — only visible on small screens, sidebar handles desktop */}
+          <div className="md:hidden flex overflow-x-auto scrollbar-hide gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+            {(isAdmin ? [
+              { Icon: User, label: "Profile", id: "profile" },
+              { Icon: ShieldCheck, label: "Credential", id: "credential" },
+              { Icon: FileCheck2, label: "Proof of Work", id: "proof-work" },
+              { Icon: Activity, label: "Attestation", id: "attestation" },
+              { Icon: Briefcase, label: "Timeline", id: "timeline" },
+              { Icon: Send, label: "Applications", id: "applications" },
+              { Icon: FolderOpen, label: "Hiring", id: "hiring" },
+              { Icon: Inbox, label: "Inbox", id: "inbox" },
+            ] : isWalletRecruiter ? [
+              { Icon: Building2, label: "Profile", id: "profile" },
+              { Icon: FolderOpen, label: "Hiring", id: "hiring" },
+              { Icon: Users, label: "Members", id: "members" },
+              { Icon: Activity, label: "Attestation", id: "attestation" },
+              { Icon: Inbox, label: "Inbox", id: "inbox" },
+            ] : [
+              { Icon: User, label: "Profile", id: "profile" },
+              { Icon: ShieldCheck, label: "Credential", id: "credential" },
+              { Icon: FileCheck2, label: "Proof of Work", id: "proof-work" },
+              { Icon: Briefcase, label: "Timeline", id: "timeline" },
+              { Icon: Send, label: "Applications", id: "applications" },
+              { Icon: FolderOpen, label: "Hiring", id: "hiring" },
+              { Icon: Inbox, label: "Inbox", id: "inbox" },
+            ] as Array<{ Icon: React.ElementType; label: string; id: string }>).map(({ Icon, label, id }) => {
+              const active = activeTab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 transition-all active:scale-95"
+                  style={{
+                    background: active ? "rgba(253,230,138,0.08)" : "rgba(255,255,255,0.03)",
+                    border: active ? "1px solid rgba(253,230,138,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
+                  <Icon style={{ width: 11, height: 11, color: active ? "rgba(253,230,138,0.85)" : "rgba(255,255,255,0.35)", flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, fontWeight: active ? 700 : 500, color: active ? "rgba(253,230,138,0.85)" : "rgba(255,255,255,0.45)" }}>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-3 md:px-5 py-4 custom-scrollbar">
       <section id="profile" className="flex-1">
         {loading ? (
           <LoadingScreen message="Aggregating professional reputation..." />
@@ -2224,7 +2274,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
       <div className="flex-shrink-0" style={{ height: 96 }} />
 
       {/* ── 3-PANEL BODY ── */}
-      <div className="flex-1 overflow-hidden min-h-0 px-4 md:px-16 pt-3 pb-6 md:pb-10 flex flex-col">
+      <div className="flex-1 overflow-hidden min-h-0 px-2 md:px-16 pt-3 pb-[95px] md:pb-10 flex flex-col">
         <div className="flex flex-1 overflow-hidden min-h-0 w-full max-w-[1230px] mx-auto rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
 
           {/* ── LEFT SIDEBAR ── */}
@@ -2310,6 +2360,27 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
                 </Link>
               )}
             </div>
+            {/* Mobile tab bar — org dashboard */}
+            <div className="md:hidden flex overflow-x-auto scrollbar-hide gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "#0a0b0e" }}>
+              {googleNavTabs.map(({ Icon, label, id }) => {
+                const active = activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setActiveTab(id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 transition-all active:scale-95"
+                    style={{
+                      background: active ? "rgba(253,230,138,0.08)" : "rgba(255,255,255,0.03)",
+                      border: active ? "1px solid rgba(253,230,138,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                    }}
+                  >
+                    <Icon style={{ width: 11, height: 11, color: active ? "rgba(253,230,138,0.85)" : "rgba(255,255,255,0.35)", flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, fontWeight: active ? 700 : 500, color: active ? "rgba(253,230,138,0.85)" : "rgba(255,255,255,0.45)" }}>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Link Wallet nudge — dismissible, shown once */}
             {showWalletNudge && (
               <div className="mx-4 mt-3 flex items-start gap-3 px-4 py-3 rounded-xl" style={{ background: "rgba(45,212,191,0.06)", border: "1px solid rgba(45,212,191,0.18)" }}>
@@ -2341,7 +2412,7 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
               </div>
             )}
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-3 md:px-5 py-4 custom-scrollbar">
               {activeTab === "inbox" ? (
                 <InboxPanel googleSession={session} googleOrgAccount={orgAccount} />
               ) : activeTab === "members" && orgAccount?.auth_uid ? (

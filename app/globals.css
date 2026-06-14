@@ -3,10 +3,44 @@
 @tailwind utilities;
 
 @layer base {
-  @media (max-width: 1279px) {
-    /* Force desktop view scaling on mobile */
-    html, body, main {
-      overflow-x: visible !important;
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Mobile light theme — match mobile dapp: #fafafa background, dark text */
+  @media (max-width: 767px) {
+    body {
+      background-color: #111111 !important;
+      color: #f9fafb;
+      padding-bottom: 85px;
+    }
+
+    /* Override dark text to dark-on-light */
+    .mobile-light .text-white { color: #1f2937 !important; }
+    .mobile-light [class*="text-white\/"] { color: #1f2937 !important; }
+    .mobile-light .text-slate-400, .mobile-light .text-slate-300, .mobile-light .text-slate-200 { color: #6b7280 !important; }
+    .mobile-light .text-gray-400, .mobile-light .text-gray-500 { color: #6b7280 !important; }
+
+    /* Override dark backgrounds to light */
+    .mobile-light .bg-black { background-color: #fafafa !important; }
+    .mobile-light [class*="bg-\[#0"] { background-color: #f3f4f6 !important; }
+    .mobile-light [class*="bg-\[#1"] { background-color: #f3f4f6 !important; }
+    .mobile-light [class*="bg-white\/"] { background-color: transparent !important; }
+    .mobile-light .border-white\/10, .mobile-light [class*="border-white\/"] { border-color: #e5e7eb !important; }
+
+    /* Cards: dark glass → light card */
+    .mobile-card {
+      background-color: #ffffff !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 14px !important;
+      color: #1f2937 !important;
+    }
+
+    /* Section backgrounds */
+    .mobile-section {
+      background-color: #f3f4f6 !important;
+      border-radius: 18px !important;
+      border: 1px solid #e5e7eb !important;
     }
   }
 
@@ -116,11 +150,13 @@
     scrollbar-color: rgba(255,255,255,0.12) transparent;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
+  .scrollbar-hide::-webkit-scrollbar,
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
-  .scrollbar-hide {
+  .scrollbar-hide,
+  .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }

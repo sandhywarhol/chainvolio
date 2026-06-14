@@ -62,7 +62,7 @@ export function RecruiterSoftPrompt() {
     if (!visible || dismissed || session || connected) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-[9000] flex justify-center px-4 pb-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
+        <div className="fixed bottom-0 left-0 right-0 z-[9000] flex justify-center px-4 pb-[95px] md:pb-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
             <div className="w-full max-w-2xl bg-[#0d0d0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl px-5 py-4 flex items-center justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
                     <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mt-0.5">

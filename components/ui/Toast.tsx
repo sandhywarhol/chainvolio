@@ -39,7 +39,7 @@ export function Toast({ message, type = "success", onClose }: ToastProps) {
     const currentStyle = styles[type];
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[99999] animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-[100px] md:bottom-8 left-1/2 -translate-x-1/2 z-[99999] animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className={`backdrop-blur-md ${currentStyle.bg} border ${currentStyle.border} px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[320px] max-w-md`}>
                 <div className={`${currentStyle.text}`}>
                     {currentStyle.icon}

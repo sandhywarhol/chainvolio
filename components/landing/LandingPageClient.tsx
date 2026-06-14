@@ -64,6 +64,7 @@ import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { Toast } from "@/components/ui/Toast";
 import { Web3ResumeSection } from "./Web3ResumeSection";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { MobileHomeScreen } from "@/components/layout/MobileHomeScreen";
 
 // --- Interactive Verifiable Work History Flow (3D Chip Style) ---
 function VerifiableWorkHistoryFlow() {
@@ -1554,7 +1555,12 @@ export function LandingPageClient() {
                 onAttestationClick={() => router.push('/guides/attestation')}
             />
 
-            <main className="flex-1 flex flex-col relative theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
+            {/* Mobile Home Screen — exact replica of mobile dapp HomeScreen */}
+            <div className="block md:hidden pt-[52px]">
+                <MobileHomeScreen />
+            </div>
+
+            <main className="hidden md:flex flex-1 flex-col relative theme-bg-page theme-aware" style={{ background: "#0d0d0f" }}>
                 <div className="w-full" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
                 <section className="relative pt-20 sm:pt-28 md:pt-36 pb-0 px-4 sm:px-6 z-20 max-w-[1100px] mx-auto flex flex-col w-full">
 
@@ -1597,11 +1603,29 @@ export function LandingPageClient() {
                         </div>
                     </div>
 
+                    {/* Mobile CTA — only visible on small screens (desktop uses the top-right badge) */}
+                    <div className="flex sm:hidden items-center gap-3 mb-6">
+                        <Link
+                            href="/create-profile"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-[13px] font-bold transition-all active:scale-95"
+                            style={{ background: "#f97316", boxShadow: "0 4px 16px rgba(249,115,22,0.35)" }}
+                        >
+                            Get Started Free
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                        <Link
+                            href="/explore-talent"
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white/60 text-[13px] font-medium border border-white/10 transition-all active:scale-95"
+                        >
+                            Explore
+                        </Link>
+                    </div>
+
                     {/* HERO VISUAL - App UI Card Mockup */}
-                    <div className="relative w-full mt-6 sm:mt-8 flex items-center justify-center h-[260px] min-[400px]:h-[300px] sm:h-[400px] md:h-[520px] lg:h-[640px]">
+                    <div className="relative w-full mt-2 sm:mt-8 flex items-center justify-center h-[220px] min-[400px]:h-[260px] sm:h-[400px] md:h-[520px] lg:h-[640px]">
                         {/* Container scaled responsively */}
                         <div
-                            className="w-[960px] h-[540px] absolute left-1/2 -translate-x-1/2 top-0 scale-[0.45] min-[400px]:scale-[0.52] sm:scale-[0.7] md:scale-[0.88] lg:scale-[1.1] origin-top transition-all duration-300 flex-shrink-0"
+                            className="w-[960px] h-[540px] absolute left-1/2 -translate-x-1/2 top-0 scale-[0.38] min-[400px]:scale-[0.44] sm:scale-[0.7] md:scale-[0.88] lg:scale-[1.1] origin-top transition-all duration-300 flex-shrink-0"
                         >
                             {/* ── LINEAR-STYLE 3-PANEL APP MOCKUP ── */}
                             <div className="absolute inset-0 rounded-2xl overflow-hidden flex" style={{ background: "#0d0e11", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 40px 48px -20px rgba(0,0,0,0.98), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
