@@ -362,7 +362,7 @@ export default function ProfilePage() {
                         onClick={handleSave}
                         disabled={saving}
                         style={{
-                            width: "100%", height: 60, borderRadius: 18, border: "none",
+                            width: "100%", height: 60, borderRadius: 18,
                             background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)",
                             color: "#f9fafb", fontSize: 16, fontWeight: 700, cursor: "pointer",
                             marginBottom: 12, opacity: saving ? 0.7 : 1,
