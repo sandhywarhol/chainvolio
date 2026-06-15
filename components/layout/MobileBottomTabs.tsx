@@ -14,8 +14,8 @@ const INACTIVE = "rgba(255,255,255,0.3)";
 export function MobileBottomTabs() {
     const pathname = usePathname();
     const { publicKey } = useWallet();
-    const { isGoogleSignedIn } = useGoogleAuth();
-    const isLoggedIn = !!(publicKey || isGoogleSignedIn);
+    const { session: googleSession } = useGoogleAuth();
+    const isLoggedIn = !!(publicKey || googleSession);
     const cvHref = publicKey ? `/cv/${publicKey.toBase58()}` : null;
     const [showModal, setShowModal] = useState(false);
 
