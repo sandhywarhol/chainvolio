@@ -76,7 +76,7 @@ export function MobileHomeScreen() {
                     What are we building today?
                 </p>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginTop: 10 }}>
-                    The verifiable Web3 CV. Build your on-chain work history, get hired by top DAOs and crypto companies.
+                    ChainVolio is a trust infrastructure enabling verifiable CVs and proof-of-work, permanently anchored on Solana.
                 </p>
                 <Link
                     href="/create-profile"
