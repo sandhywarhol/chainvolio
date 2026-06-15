@@ -16,7 +16,13 @@ export function MobileBottomTabs() {
     const { publicKey } = useWallet();
     const { session: googleSession } = useGoogleAuth();
     const isLoggedIn = !!(publicKey || googleSession);
-    const cvHref = publicKey ? `/cv/${publicKey.toBase58()}` : null;
+
+    // Wallet user → /profile & /cv/[address]
+    // Google-only user → /org/[auth_uid] for both profile and CV tabs
+    const googleUid = !publicKey && googleSession ? googleSession.user.id : null;
+    const cvHref = publicKey ? `/cv/${publicKey.toBase58()}` : googleUid ? `/org/${googleUid}` : null;
+    const profileHref = publicKey ? "/profile" : googleUid ? `/org/${googleUid}` : "#";
+
     const [showModal, setShowModal] = useState(false);
 
     const tabs = [
@@ -24,7 +30,7 @@ export function MobileBottomTabs() {
         { href: "/proof-of-work", Icon: Layers, protected: true },
         { href: "/scan", Icon: ScanLine, protected: false },
         { href: cvHref || "#", Icon: FileText, protected: !cvHref },
-        { href: "/profile", Icon: User, protected: true },
+        { href: profileHref, Icon: User, protected: !isLoggedIn },
     ];
 
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/hiring") || pathname.startsWith("/r/") || pathname.startsWith("/scan")) return null;
