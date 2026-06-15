@@ -17,10 +17,10 @@ export function MobileBottomTabs() {
     const { session: googleSession } = useGoogleAuth();
     const isLoggedIn = !!(publicKey || googleSession);
 
-    // Wallet user → /profile & /cv/[address]
-    // Google-only user → /org/[auth_uid] for both profile and CV tabs
+    // Wallet user → /cv/[address] and /profile
+    // Google-only user → CV tab disabled (needs wallet), Profile → /org/[auth_uid]
     const googleUid = !publicKey && googleSession ? googleSession.user.id : null;
-    const cvHref = publicKey ? `/cv/${publicKey.toBase58()}` : googleUid ? `/org/${googleUid}` : null;
+    const cvHref = publicKey ? `/cv/${publicKey.toBase58()}` : null;
     const profileHref = publicKey ? "/profile" : googleUid ? `/org/${googleUid}` : "#";
 
     const [showModal, setShowModal] = useState(false);
