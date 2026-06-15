@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { PenLine, Eye } from "lucide-react";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 
 const WORK_PREFS = ["Full-time", "Contract", "Freelance", "Project-based"];
 
@@ -25,8 +27,10 @@ const ORANGE = "rgba(253,230,138,0.6)";
 
 export default function ProfilePage() {
     const { publicKey, disconnect } = useWallet();
+    const { isGoogleSignedIn } = useGoogleAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
     const [saving, setSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [savedMsg, setSavedMsg] = useState(false);
@@ -105,17 +109,27 @@ export default function ProfilePage() {
     };
 
     if (!publicKey) {
+        const isGoogleOnly = isGoogleSignedIn && !publicKey;
         return (
-            <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25 }}>
-                <p style={{ color: TEXT_PRIMARY, fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Not Connected</p>
-                <p style={{ color: TEXT_MUTED, fontSize: 13, marginBottom: 24, textAlign: "center" }}>Connect your wallet to view your profile.</p>
-                <button
-                    onClick={() => router.push("/auth/role")}
-                    style={{ padding: "14px 28px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", color: "#f9fafb", borderRadius: 16, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
-                >
-                    Connect Wallet
-                </button>
-            </div>
+            <>
+                <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25, textAlign: "center" }}>
+                    <p style={{ color: TEXT_PRIMARY, fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                        {isGoogleOnly ? "Wallet Required" : "Not Connected"}
+                    </p>
+                    <p style={{ color: TEXT_MUTED, fontSize: 13, marginBottom: 24, maxWidth: 260, lineHeight: 1.6 }}>
+                        {isGoogleOnly
+                            ? "Your profile and CV are tied to a Solana wallet address. Connect one to continue."
+                            : "Sign in to view and edit your profile."}
+                    </p>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        style={{ padding: "14px 28px", background: "rgba(253,230,138,0.1)", border: "1px solid rgba(253,230,138,0.3)", color: "rgba(253,230,138,0.85)", borderRadius: 16, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+                    >
+                        {isGoogleOnly ? "Connect a Wallet" : "Sign In"}
+                    </button>
+                </div>
+                <CustomWalletModal isOpen={showModal} onClose={() => setShowModal(false)} />
+            </>
         );
     }
 

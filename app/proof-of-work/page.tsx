@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { Layers, Plus, FileText, CheckCircle2, Clock } from "lucide-react";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 
 function getShortDate(dateStr: string | null) {
     if (!dateStr) return "";
@@ -20,9 +21,11 @@ const ORANGE = "rgba(253,230,138,0.6)";
 
 export default function ProofOfWorkPage() {
     const { publicKey } = useWallet();
+    const { isGoogleSignedIn } = useGoogleAuth();
     const router = useRouter();
     const [receipts, setReceipts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         if (typeof window !== "undefined" && window.innerWidth >= 768) {
@@ -40,14 +43,28 @@ export default function ProofOfWorkPage() {
     }, [publicKey]);
 
     if (!publicKey) {
+        const isGoogleOnly = isGoogleSignedIn && !publicKey;
         return (
-            <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25 }}>
-                <Layers size={64} color="rgba(255,255,255,0.08)" />
-                <p style={{ color: TEXT_MUTED, fontSize: 14, marginTop: 16, marginBottom: 24 }}>Connect your wallet to view your work.</p>
-                <Link href="/auth/role" style={{ padding: "12px 24px", backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", color: "#f9fafb", borderRadius: 14, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                    Connect Wallet
-                </Link>
-            </div>
+            <>
+                <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25, textAlign: "center" }}>
+                    <Layers size={64} color="rgba(255,255,255,0.08)" />
+                    <p style={{ color: TEXT_PRIMARY, fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>
+                        {isGoogleOnly ? "Wallet Required" : "Not Connected"}
+                    </p>
+                    <p style={{ color: TEXT_MUTED, fontSize: 13, lineHeight: 1.6, marginBottom: 28, maxWidth: 260 }}>
+                        {isGoogleOnly
+                            ? "Proof of Work is recorded on-chain and requires a Solana wallet. Connect one to get started."
+                            : "Sign in to view and manage your on-chain work history."}
+                    </p>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        style={{ padding: "12px 28px", backgroundColor: "rgba(253,230,138,0.1)", border: "1px solid rgba(253,230,138,0.3)", color: "rgba(253,230,138,0.85)", borderRadius: 14, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                    >
+                        {isGoogleOnly ? "Connect a Wallet" : "Sign In"}
+                    </button>
+                </div>
+                <CustomWalletModal isOpen={showModal} onClose={() => setShowModal(false)} />
+            </>
         );
     }
 
