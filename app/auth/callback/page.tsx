@@ -11,14 +11,17 @@ export default function AuthCallbackPage() {
 
     useEffect(() => {
         const handleCallback = async () => {
+            const isMobile = window.innerWidth < 768;
+            const dashDest = isMobile ? "/" : "/dashboard";
+
             if (!supabaseAuth) {
-                router.replace("/dashboard");
+                router.replace(dashDest);
                 return;
             }
 
             const params = new URLSearchParams(window.location.search);
             const code = params.get("code");
-            const next = params.get("next") ?? "/dashboard";
+            const next = params.get("next") ?? dashDest;
 
             const errorParam = params.get("error");
             if (errorParam) {
@@ -76,7 +79,7 @@ export default function AuthCallbackPage() {
                     <p className="text-slate-400 text-sm">{authError}</p>
                 </div>
                 <button
-                    onClick={() => router.replace("/dashboard")}
+                    onClick={() => router.replace("/")}
                     className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-colors"
                 >
                     Back to Home

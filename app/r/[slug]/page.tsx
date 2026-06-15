@@ -180,7 +180,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 className="min-h-screen text-white selection:bg-emerald-500/30 flex flex-col" 
                 style={{ 
                     background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)", 
-                    backgroundAttachment: "fixed" 
+                    backgroundAttachment: "scroll"
                 }}
             >
                 <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
@@ -202,7 +202,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 className="min-h-screen text-white selection:bg-emerald-500/30 flex flex-col" 
                 style={{ 
                     background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)", 
-                    backgroundAttachment: "fixed" 
+                    backgroundAttachment: "scroll"
                 }}
             >
                 <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto w-full border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
@@ -232,7 +232,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             className="min-h-screen text-white selection:bg-emerald-500/30" 
             style={{ 
                 background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)", 
-                backgroundAttachment: "fixed" 
+                backgroundAttachment: "scroll"
             }}
         >
             <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-55">

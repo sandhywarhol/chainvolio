@@ -17,7 +17,7 @@ export default function AuthRolePage() {
         if (loading) return;
         if (!session) { router.replace("/"); return; }
         // Only skip role selection if account is fully set up
-        if (orgAccount?.onboarding_complete) { router.replace("/dashboard"); return; }
+        if (orgAccount?.onboarding_complete) { router.replace(window.innerWidth < 768 ? "/" : "/dashboard"); return; }
     }, [loading, session, orgAccount, router]);
 
     const handleContinue = async () => {
@@ -58,7 +58,7 @@ export default function AuthRolePage() {
             return;
         }
 
-        router.replace("/dashboard");
+        router.replace(window.innerWidth < 768 ? "/" : "/dashboard");
     };
 
     if (loading || !session) return <LoadingScreen message="Loading..." />;
@@ -67,7 +67,7 @@ export default function AuthRolePage() {
     const avatarUrl = session.user.user_metadata?.avatar_url as string | undefined;
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+        <main className="min-h-screen flex items-center justify-center bg-[#111111] md:bg-black text-white px-4 pb-24 md:pb-0">
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="flex items-center justify-center gap-2 mb-8">

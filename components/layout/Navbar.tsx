@@ -110,8 +110,8 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
 
     return (
         <nav className={`theme-preserve fixed top-0 left-0 right-0 z-[100000] pointer-events-auto transition-all duration-500 border-b ${scrolled
-                ? "border-white/10 bg-[#111111] md:bg-black/80 md:backdrop-blur-2xl py-0 md:py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
-                : "border-[#2a2a2a] md:border-white/[0.06] bg-[#111111] md:bg-black/70 md:backdrop-blur-xl py-1 md:py-5"
+                ? "border-white/10 bg-[#0a0a0c] md:bg-black/80 md:backdrop-blur-2xl py-0 md:py-2 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+                : "border-white/[0.07] md:border-white/[0.06] bg-[#0a0a0c] md:bg-black/70 md:backdrop-blur-xl py-1 md:py-5"
             }`}>
             <div className="flex items-center justify-between px-4 md:px-8 py-1.5 md:py-3 max-w-[1600px] w-full mx-auto">
                 <div className="flex items-center gap-8">
@@ -202,7 +202,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                         )}
                     </div>
                     
-                    <NotificationBell />
+                    <div className="hidden md:block"><NotificationBell /></div>
 
                     {/* Mobile: hanya tampilkan WalletButton kecil, hamburger digantikan bottom tabs */}
                     <div className="flex md:hidden items-center">

@@ -789,8 +789,8 @@ export default function CVPage(props: any) {
       return (
         <main className="min-h-screen flex flex-col text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white theme-bg-page theme-aware">
           <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
-          <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-          <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-12">
+          <div className="hidden md:block"><Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} /></div>
+          <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-6 md:pt-32 pb-28 md:pb-12">
             <TrustIssuerCV
                profile={profile}
                receipts={endorsements}
@@ -818,8 +818,8 @@ export default function CVPage(props: any) {
       {/* Fixed background — desktop dark gradient, mobile very dark grey */}
       <div className="hidden md:block fixed inset-0 -z-10" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }} />
       <div className="block md:hidden fixed inset-0 -z-10" style={{ background: "#111111" }} />
-      <Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} />
-      <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-24 md:pt-32 pb-28">
+      <div className="hidden md:block"><Navbar isVerified={!!profile?.isVerified} verifierTier={profile?.verifierTier} verificationTier={profile?.verificationTier} /></div>
+      <section className="w-full max-w-full md:max-w-3xl mx-auto px-4 md:px-0 pt-6 md:pt-32 pb-28">
         {(!profile && !loading) ? (
           <p className="text-slate-500">Profile not found.</p>
         ) : (

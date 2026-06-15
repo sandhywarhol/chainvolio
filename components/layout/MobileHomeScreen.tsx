@@ -1,39 +1,45 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const AMBER = "rgba(253,230,138,0.6)";
 
 const SLIDES = [
     {
+        img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop",
+        title: "CV On-Chain",
+        subtitle: "Tamper-proof forever",
+        desc: "Your work history is permanently recorded on Solana. No one can fake it.",
+        tag: "Feature",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=800&auto=format&fit=crop",
+        title: "Attestation",
+        subtitle: "Verified by peers",
+        desc: "Colleagues and DAOs endorse your contributions on-chain. Real proof, not just claims.",
+        tag: "Feature",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop",
+        title: "Hiring Tool",
+        subtitle: "Find & hire faster",
+        desc: "Post jobs, verify applicants' on-chain credentials, and hire top Web3 talent instantly.",
+        tag: "For Recruiters",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop",
+        title: "Instant Trust",
+        subtitle: "Zero fake CVs",
+        desc: "Every credential is verifiable on-chain. Recruiters trust your profile immediately.",
+        tag: "Trust Layer",
+    },
+    {
         img: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop",
         title: "Work Anywhere",
         subtitle: "Global freedom",
-        desc: "Find a role that respects your family time and boundaries.",
-    },
-    {
-        img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
-        title: "Dream Web3 Job",
-        subtitle: "Top tier roles",
-        desc: "Limitless career opportunities in the global Web3 ecosystem.",
-    },
-    {
-        img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=800&auto=format&fit=crop",
-        title: "More Income",
-        subtitle: "Crypto payouts",
-        desc: "Get paid borderlessly with stable cryptocurrencies anywhere.",
-    },
-    {
-        img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
-        title: "Global Network",
-        subtitle: "Build together",
-        desc: "Build connections with elite professionals worldwide.",
-    },
-    {
-        img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=800&auto=format&fit=crop",
-        title: "New Adventures",
-        subtitle: "Explore life",
-        desc: "Explore a new lifestyle and freedom as a digital nomad.",
+        desc: "Get hired by top Web3 DAOs and companies, from anywhere in the world.",
+        tag: "Opportunity",
     },
 ];
 
@@ -72,6 +78,24 @@ export function MobileHomeScreen() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginTop: 10 }}>
                     The verifiable Web3 CV. Build your on-chain work history, get hired by top DAOs and crypto companies.
                 </p>
+                <Link
+                    href="/create-profile"
+                    style={{
+                        display: "inline-flex", alignItems: "center", gap: 8,
+                        marginTop: 18,
+                        padding: "12px 22px", borderRadius: 16,
+                        background: "rgba(253,230,138,0.1)",
+                        border: "1px solid rgba(253,230,138,0.3)",
+                        color: "rgba(253,230,138,0.85)",
+                        fontSize: 14, fontWeight: 700,
+                        textDecoration: "none",
+                    }}
+                >
+                    Create My Profile
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </Link>
             </div>
 
             {/* Section Header */}
@@ -83,7 +107,7 @@ export function MobileHomeScreen() {
                 paddingRight: 25,
                 marginBottom: 14,
             }}>
-                <p style={{ fontSize: 18, fontWeight: 600, color: "#f9fafb" }}>Get Remote Hired Today</p>
+                <p style={{ fontSize: 18, fontWeight: 600, color: "#f9fafb" }}>What ChainVolio Does</p>
                 <span style={{ color: AMBER, fontSize: 20, lineHeight: 1 }}>•••</span>
             </div>
 
@@ -123,18 +147,30 @@ export function MobileHomeScreen() {
                             <div style={{
                                 position: "absolute",
                                 inset: 0,
-                                background: "rgba(0,0,0,0.28)",
+                                background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.82) 100%)",
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
                                 padding: 14,
                             }}>
-                                <div style={{ alignSelf: "flex-end", fontSize: 20, color: AMBER }}>♥</div>
+                                {/* Tag badge top-right */}
+                                <div style={{ alignSelf: "flex-end" }}>
+                                    <span style={{
+                                        fontSize: 8, fontWeight: 700, letterSpacing: 1,
+                                        textTransform: "uppercase",
+                                        padding: "3px 8px", borderRadius: 20,
+                                        backgroundColor: "rgba(253,230,138,0.15)",
+                                        border: "1px solid rgba(253,230,138,0.35)",
+                                        color: AMBER,
+                                    }}>
+                                        {slide.tag}
+                                    </span>
+                                </div>
                                 <div>
-                                    <p style={{ color: "#fff", fontSize: 17, fontWeight: 600, marginBottom: 4, textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}>
+                                    <p style={{ color: "#fff", fontSize: 17, fontWeight: 700, marginBottom: 3, textShadow: "0 1px 8px rgba(0,0,0,0.9)", lineHeight: 1.25 }}>
                                         {slide.title}
                                     </p>
-                                    <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 11 }}>
+                                    <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 500 }}>
                                         {slide.subtitle}
                                     </p>
                                 </div>
@@ -169,6 +205,91 @@ export function MobileHomeScreen() {
                     </div>
                 ))}
             </div>
+
+            {/* How It Works — vertical with image thumbnail */}
+            <div style={{ paddingLeft: 25, paddingRight: 25, paddingTop: 32, paddingBottom: 8 }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 20 }}>
+                    HOW IT WORKS
+                </p>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                    {[
+                        {
+                            num: "01",
+                            title: "Create Profile",
+                            desc: "Your basic identity on-chain. Name, role, and wallet. Your Web3 passport.",
+                            img: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?q=80&w=200&auto=format&fit=crop",
+                        },
+                        {
+                            num: "02",
+                            title: "Add Proof of Work",
+                            desc: "Upload projects, work history, and contributions. Recorded forever on Solana.",
+                            img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=200&auto=format&fit=crop",
+                        },
+                        {
+                            num: "03",
+                            title: "Ask Attestation",
+                            desc: "Request your ex-boss or teammates to verify your work on-chain. Real proof, not just claims.",
+                            img: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=200&auto=format&fit=crop",
+                        },
+                        {
+                            num: "04",
+                            title: "Share & Apply",
+                            desc: "Post your CV on LinkedIn, X, or other socials, or apply directly to Web3 jobs.",
+                            img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=200&auto=format&fit=crop",
+                        },
+                    ].map((step, i, arr) => (
+                        <div key={step.num} style={{ display: "flex", gap: 14, position: "relative" }}>
+                            {/* Left col: image + connector line */}
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                                <div style={{
+                                    width: 68, height: 68, borderRadius: 16, overflow: "hidden", flexShrink: 0,
+                                    border: "1px solid rgba(255,255,255,0.08)",
+                                    position: "relative",
+                                }}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={step.img}
+                                        alt={step.title}
+                                        style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.75) saturate(0.8)" }}
+                                    />
+                                    {/* amber tint overlay */}
+                                    <div style={{
+                                        position: "absolute", inset: 0,
+                                        background: "rgba(253,230,138,0.06)",
+                                    }} />
+                                </div>
+                                {i < arr.length - 1 && (
+                                    <div style={{
+                                        width: 1, flex: 1, minHeight: 20,
+                                        background: "linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.03))",
+                                        margin: "8px 0",
+                                    }} />
+                                )}
+                            </div>
+
+                            {/* Right col: text */}
+                            <div style={{ paddingTop: 6, paddingBottom: i < arr.length - 1 ? 8 : 0 }}>
+                                <p style={{
+                                    fontSize: 9, fontWeight: 700, letterSpacing: 1.3,
+                                    color: "rgba(253,230,138,0.5)",
+                                    textTransform: "uppercase", marginBottom: 4,
+                                }}>
+                                    STEP {step.num}
+                                </p>
+                                <p style={{ fontSize: 15, fontWeight: 700, color: "#f9fafb", marginBottom: 5, lineHeight: 1.3 }}>
+                                    {step.title}
+                                </p>
+                                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.38)", lineHeight: 1.6 }}>
+                                    {step.desc}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ marginLeft: 25, marginRight: 25, marginTop: 28, height: 1, background: "linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
             {/* Tech Stack Logos Grid */}
             <div style={{ paddingLeft: 25, paddingRight: 25, paddingTop: 24, paddingBottom: 20, display: "flex", flexDirection: "column", alignItems: "center" }}>

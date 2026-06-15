@@ -206,8 +206,8 @@ function CreateProfileContent() {
 
   if (loading && !form.displayName) {
     return (
-      <div className="min-h-screen bg-black theme-bg-page theme-aware flex flex-col">
-        <Navbar />
+      <div className="min-h-screen bg-[#111111] md:bg-black theme-bg-page theme-aware flex flex-col">
+        <div className="hidden md:block"><Navbar /></div>
         <div className="flex-1 flex items-center justify-center">
           <LoadingScreen fullScreen={false} />
         </div>
@@ -217,8 +217,8 @@ function CreateProfileContent() {
 
   if (!connected || !publicKey) {
     return (
-      <main className="min-h-screen text-white flex flex-col bg-black theme-bg-page theme-aware">
-        <Navbar />
+      <main className="min-h-screen text-white flex flex-col bg-[#111111] md:bg-black theme-bg-page theme-aware">
+        <div className="hidden md:block"><Navbar /></div>
         <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
           <h1 className="text-2xl font-bold">Connect your wallet</h1>
           <p className="text-slate-400 text-center max-w-sm">
@@ -234,12 +234,29 @@ function CreateProfileContent() {
   }
 
   return (
-    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-black theme-bg-page theme-aware">
+    <main className="min-h-screen text-white relative overflow-x-hidden selection:bg-teal-500/30 selection:text-white bg-[#111111] md:bg-black theme-bg-page theme-aware">
       {/* Very subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.012] pointer-events-none z-[50]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-      <Navbar />
 
-      <section className="max-w-xl mx-auto px-6 pt-32 pb-12">
+      {/* Desktop navbar */}
+      <div className="hidden md:block"><Navbar /></div>
+
+      {/* Mobile top header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center px-5 py-4 border-b border-white/5" style={{ backgroundColor: "#111111" }}>
+        <button
+          onClick={() => router.back()}
+          className="w-9 h-9 flex items-center justify-center rounded-full"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+        </button>
+        <p className="flex-1 text-center text-[15px] font-semibold text-white">
+          {isRecruiter ? "Set up Organization" : profileExists ? "Edit Profile" : "Create Profile"}
+        </p>
+        <div className="w-9" />
+      </div>
+
+      <section className="max-w-xl mx-auto px-6 pt-16 md:pt-32 pb-28 md:pb-12">
         <h1 className="text-2xl font-bold mb-1">
           {isRecruiter ? (form.displayName ? "Edit Organization" : "Set up your Organization") : (form.displayName ? "Edit Profile" : "Create Profile")}
         </h1>
@@ -282,7 +299,7 @@ function CreateProfileContent() {
               {form.avatarUrl ? (
                 <img src={form.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover border border-slate-700" />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500">
+                <div className="w-16 h-16 rounded-full bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 flex items-center justify-center text-slate-500">
                   <span className="text-2xl">?</span>
                 </div>
               )}
@@ -306,7 +323,7 @@ function CreateProfileContent() {
               required
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder={isRecruiter ? "e.g. Solana Foundation, MetaDAO" : "Name or pseudonym"}
             />
           </div>
@@ -319,7 +336,7 @@ function CreateProfileContent() {
                   type="text"
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                   placeholder="CEO, Lead Developer, etc."
                 />
               </div>
@@ -329,7 +346,7 @@ function CreateProfileContent() {
                   type="text"
                   value={form.organization}
                   onChange={(e) => setForm({ ...form, organization: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                   placeholder="Google, Solana Foundation, DAO, etc."
                 />
               </div>
@@ -341,7 +358,7 @@ function CreateProfileContent() {
             <textarea
               value={form.bio}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none resize-none h-24"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white resize-none h-24"
               placeholder={isRecruiter ? "What does your organization do?" : "Brief intro about you"}
             />
           </div>
@@ -365,7 +382,7 @@ function CreateProfileContent() {
               type="text"
               value={form.twitter}
               onChange={(e) => setForm({ ...form, twitter: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder="@username"
             />
           </div>
@@ -379,7 +396,7 @@ function CreateProfileContent() {
               type="text"
               value={form.github}
               onChange={(e) => setForm({ ...form, github: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder="username"
             />
           </div>
@@ -393,7 +410,7 @@ function CreateProfileContent() {
               type="text"
               value={form.discord}
               onChange={(e) => setForm({ ...form, discord: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder="user#1234"
             />
           </div>
@@ -407,7 +424,7 @@ function CreateProfileContent() {
               type="text"
               value={form.telegram}
               onChange={(e) => setForm({ ...form, telegram: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder="@username"
             />
           </div>
@@ -423,7 +440,7 @@ function CreateProfileContent() {
                 type="text"
                 value={form.linkedin}
                 onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                 placeholder="username"
               />
             </div>
@@ -436,7 +453,7 @@ function CreateProfileContent() {
                 type="text"
                 value={form.instagram}
                 onChange={(e) => setForm({ ...form, instagram: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                 placeholder="@username"
               />
             </div>
@@ -450,7 +467,7 @@ function CreateProfileContent() {
               type="url"
               value={form.website}
               onChange={(e) => setForm({ ...form, website: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
               placeholder="https://yourportfolio.com"
             />
           </div>
@@ -465,7 +482,7 @@ function CreateProfileContent() {
                 type="text"
                 value={form.whatsapp}
                 onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                 placeholder="+628123..."
               />
             </div>
@@ -477,13 +494,13 @@ function CreateProfileContent() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                 placeholder="hello@example.com"
               />
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-6 mt-6">
+          <div className="border-t border-white/10 md:border-slate-800 pt-6 mt-6">
             <h3 className="text-lg font-medium text-white mb-4">Work Preferences</h3>
             <div className="mb-4">
               <label className="block text-sm text-slate-400 mb-2">Looking For (max 160 chars)</label>
@@ -491,7 +508,7 @@ function CreateProfileContent() {
                 type="text"
                 value={form.lookingFor}
                 onChange={(e) => setForm({ ...form, lookingFor: e.target.value.slice(0, 160) })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white"
                 placeholder="Open to remote brand & visual roles..."
               />
               <p className="text-right text-xs text-slate-500 mt-1">{form.lookingFor.length}/160</p>
@@ -502,7 +519,7 @@ function CreateProfileContent() {
               <select
                 value={form.timezone}
                 onChange={(e) => setForm({ ...form, timezone: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-slate-200"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 md:bg-slate-800 border border-white/10 md:border-slate-700 focus:border-emerald-500 outline-none text-white md:text-slate-200"
               >
                 <option value="" className="bg-slate-800 text-white">Select Timezone</option>
                 {["GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7", "GMT-6", "GMT-5", "GMT-4", "GMT-3", "GMT-2", "GMT-1", "GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5", "GMT+6", "GMT+7", "GMT+8", "GMT+9", "GMT+10", "GMT+11", "GMT+12"].map(tz => (
@@ -524,7 +541,7 @@ function CreateProfileContent() {
                         : [...form.workPreference, type];
                       setForm({ ...form, workPreference: newPrefs });
                     }}
-                    className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${form.workPreference.includes(type) ? "bg-emerald-500/10 border-emerald-500 text-emerald-400" : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600"}`}
+                    className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${form.workPreference.includes(type) ? "bg-amber-200/10 border-amber-200/30 text-amber-200/70 md:bg-emerald-500/10 md:border-emerald-500 md:text-emerald-400" : "bg-white/5 md:bg-slate-800 border-white/10 md:border-slate-700 text-white/40 md:text-slate-400 hover:border-slate-600"}`}
                   >
                     {type}
                   </button>
@@ -534,7 +551,7 @@ function CreateProfileContent() {
 
           </div>
 
-          <button type="submit" disabled={loading || uploading} className="w-full py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 font-medium">
+          <button type="submit" disabled={loading || uploading} className="w-full py-3.5 rounded-xl bg-white/[0.08] md:bg-emerald-500 border border-white/[0.14] md:border-transparent md:hover:bg-emerald-600 disabled:opacity-50 font-semibold text-white">
             {loading ? "Saving..." : "Save Profile"}
           </button>
         </form>

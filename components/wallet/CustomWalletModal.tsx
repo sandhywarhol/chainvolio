@@ -131,6 +131,8 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 const res = await fetch(`/api/check-wallet?wallet=${address}&mode=builder`);
                 const check = await res.json();
 
+                const dest = isMobile ? "/" : "/dashboard";
+
                 if (check.allowed === false) {
                     // Existing recruiter — go straight to dashboard
                     const wn = connectedWalletNameRef.current;
@@ -138,7 +140,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                     saveSession(address, wn, "recruiter");
                     setLoadingKey(null);
                     onClose();
-                    router.push("/dashboard");
+                    router.push(isMobile ? "/" : "/dashboard");
                     return;
                 }
 
@@ -150,7 +152,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                         saveSession(address, wn, "builder");
                         setLoadingKey(null);
                         onClose();
-                        router.push("/dashboard");
+                        router.push(dest);
                         return;
                     }
                     // Brand-new wallet — keep ref intact so handleRoleConfirm can use walletName
@@ -165,7 +167,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 saveSession(address, wn, "builder");
                 setLoadingKey(null);
                 onClose();
-                router.push("/dashboard");
+                router.push(dest);
             } catch {
                 // API error — still save session so the wallet auto-reconnects next visit
                 const wn = connectedWalletNameRef.current;
@@ -173,7 +175,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
                 saveSession(address, wn, "builder");
                 setLoadingKey(null);
                 onClose();
-                router.push("/dashboard");
+                router.push(isMobile ? "/" : "/dashboard");
             }
         };
 
@@ -231,7 +233,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
         if (selectedRole === "builder") {
             if (address) saveSession(address, connectedWalletNameRef.current, "builder");
             onClose();
-            router.push("/dashboard");
+            router.push(isMobile ? "/" : "/dashboard");
         } else {
             // Recruiter — pick org type next
             setStep("org-type");

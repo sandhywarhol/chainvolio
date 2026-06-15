@@ -129,10 +129,17 @@ function ExploreTalentInnerBody({ initialStats }: { initialStats: SiteStats }) {
     const stats = initialStats;
 
     return (
-        <main className="pt-24 pb-20 px-4 sm:px-6 max-w-[1320px] mx-auto">
+        <main className="pt-4 md:pt-24 pb-28 md:pb-20 px-4 sm:px-6 max-w-[1320px] mx-auto">
 
-            {/* ── Hero section ───────────────────────────────────────────── */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 mt-4 items-center">
+            {/* ── Mobile compact header ──────────────────────────────────── */}
+            <div className="md:hidden mb-5 pt-2">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: "rgba(253,230,138,0.6)" }}>Discover</p>
+                <h1 className="text-2xl font-bold text-white leading-tight">Web3 Talent</h1>
+                <p className="text-white/40 text-[13px] mt-1">Builders, creators &amp; organizations</p>
+            </div>
+
+            {/* ── Hero section (desktop only) ────────────────────────────── */}
+            <div className="hidden md:grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 mt-4 items-center">
                 <div className="lg:col-span-7 space-y-8">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mb-6">
@@ -315,7 +322,7 @@ function ExploreTalentInnerBody({ initialStats }: { initialStats: SiteStats }) {
                             <X className="w-3 h-3" /> Clear
                         </button>
                     )}
-                    <span className="text-[11px] text-white/25 font-bold uppercase tracking-widest">Sort by</span>
+                    <span className="hidden md:inline text-[11px] text-white/25 font-bold uppercase tracking-widest">Sort by</span>
                     <FilterSelect
                         value={filters.sort}
                         onChange={(v) => setFilter("sort", v)}
