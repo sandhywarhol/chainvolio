@@ -12,6 +12,7 @@ export default function AuthRolePage() {
     const [selectedRole, setSelectedRole] = useState<"builder" | "recruiter" | null>(null);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     useEffect(() => {
         if (loading) return;
@@ -93,7 +94,7 @@ export default function AuthRolePage() {
 
                     {/* Role cards */}
                     <div className="p-5 sm:p-7 space-y-4">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className={`grid gap-3 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
                             <div
                                 onClick={() => setSelectedRole("builder")}
                                 className={`p-5 rounded-[20px] border cursor-pointer transition-all flex flex-col items-center text-center gap-3 ${
@@ -116,28 +117,36 @@ export default function AuthRolePage() {
                                 )}
                             </div>
 
-                            <div
-                                onClick={() => setSelectedRole("recruiter")}
-                                className={`p-5 rounded-[20px] border cursor-pointer transition-all flex flex-col items-center text-center gap-3 ${
-                                    selectedRole === "recruiter"
-                                        ? "border-amber-500/50 bg-amber-500/10"
-                                        : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/5"
-                                }`}
-                            >
-                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${selectedRole === "recruiter" ? "bg-amber-500/20" : "bg-white/5"}`}>
-                                    🔍
-                                </div>
-                                <div>
-                                    <p className={`font-black text-sm ${selectedRole === "recruiter" ? "text-white" : "text-slate-300"}`}>Recruiter</p>
-                                    <p className="text-[10px] text-slate-500 mt-1 leading-snug">Company, DAO, community</p>
-                                </div>
-                                {selectedRole === "recruiter" && (
-                                    <div className="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
-                                        <div className="w-2 h-2 rounded-full bg-black" />
+                            {!isMobile && (
+                                <div
+                                    onClick={() => setSelectedRole("recruiter")}
+                                    className={`p-5 rounded-[20px] border cursor-pointer transition-all flex flex-col items-center text-center gap-3 ${
+                                        selectedRole === "recruiter"
+                                            ? "border-amber-500/50 bg-amber-500/10"
+                                            : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/5"
+                                    }`}
+                                >
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${selectedRole === "recruiter" ? "bg-amber-500/20" : "bg-white/5"}`}>
+                                        🔍
                                     </div>
-                                )}
-                            </div>
+                                    <div>
+                                        <p className={`font-black text-sm ${selectedRole === "recruiter" ? "text-white" : "text-slate-300"}`}>Recruiter</p>
+                                        <p className="text-[10px] text-slate-500 mt-1 leading-snug">Company, DAO, community</p>
+                                    </div>
+                                    {selectedRole === "recruiter" && (
+                                        <div className="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-black" />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
+
+                        {isMobile && (
+                            <p className="text-center text-[10px] text-slate-600">
+                                Recruiter? Sign up on desktop at chainvolio.xyz
+                            </p>
+                        )}
 
                         {error && <p className="text-[11px] text-red-400 text-center">{error}</p>}
 
