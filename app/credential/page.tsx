@@ -5,6 +5,8 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { Award, Plus, FileText, Image as ImageIcon, Trash2 } from "lucide-react";
 import { CertificateUploadModal } from "@/components/profile/CertificateUploadModal";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { signChainVolioAction } from "@/lib/wallet-utils";
 
 interface Certificate {
     id: string;
@@ -23,12 +25,17 @@ const TEXT_MUTED = "rgba(255,255,255,0.35)";
 const AMBER = "rgba(253,230,138,0.6)";
 
 export default function CredentialPage() {
-    const { publicKey } = useWallet();
+    const { publicKey, signMessage } = useWallet();
+    const { session, isGoogleSignedIn } = useGoogleAuth();
     const router = useRouter();
     const [certs, setCerts] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
+
+    const authUid = isGoogleSignedIn ? session?.user?.id ?? null : null;
+    const accessToken = isGoogleSignedIn ? session?.access_token ?? null : null;
+    const isAuthenticated = isGoogleSignedIn || !!publicKey;
 
     useEffect(() => {
         if (typeof window !== "undefined" && window.innerWidth >= 768) {
@@ -37,39 +44,55 @@ export default function CredentialPage() {
     }, [router]);
 
     const fetchCerts = useCallback(async () => {
-        if (!publicKey) { setLoading(false); return; }
+        if (!isAuthenticated) { setLoading(false); return; }
         try {
-            const res = await fetch(`/api/certificates?wallet=${publicKey.toBase58()}`);
+            const url = isGoogleSignedIn && authUid
+                ? `/api/certificates?auth_uid=${authUid}`
+                : publicKey ? `/api/certificates?wallet=${publicKey.toBase58()}` : null;
+            if (!url) { setLoading(false); return; }
+            const res = await fetch(url);
             const data = await res.json();
-            setCerts(data?.certificates || []);
+            setCerts(Array.isArray(data) ? data : []);
         } catch { setCerts([]); }
         setLoading(false);
-    }, [publicKey]);
+    }, [isAuthenticated, isGoogleSignedIn, authUid, publicKey]);
 
     useEffect(() => { fetchCerts(); }, [fetchCerts]);
 
     const handleDelete = async (id: string) => {
-        if (!publicKey || !confirm("Delete this credential?")) return;
+        if (!confirm("Delete this credential?")) return;
         setDeleting(id);
         try {
-            await fetch(`/api/certificates?id=${id}&wallet=${publicKey.toBase58()}`, { method: "DELETE" });
+            if (isGoogleSignedIn && authUid && accessToken) {
+                await fetch(`/api/certificates?id=${id}&auth_uid=${authUid}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${accessToken}` },
+                });
+            } else if (publicKey && signMessage) {
+                const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+                if (!signedAction) { setDeleting(null); return; }
+                await fetch(
+                    `/api/certificates?id=${id}&wallet=${publicKey.toBase58()}&signature=${signedAction.signature}&nonce=${signedAction.nonce}&timestamp=${signedAction.timestamp}`,
+                    { method: "DELETE" }
+                );
+            }
             setCerts(prev => prev.filter(c => c.id !== id));
         } catch { /* ignore */ }
         setDeleting(null);
     };
 
-    if (!publicKey) {
+    if (!isAuthenticated) {
         return (
             <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25 }}>
                 <Award size={56} color="rgba(255,255,255,0.07)" />
                 <p style={{ color: TEXT_MUTED, fontSize: 14, marginTop: 16, marginBottom: 24, textAlign: "center" }}>
-                    Connect your wallet to manage credentials.
+                    Sign in to manage your credentials.
                 </p>
                 <button
-                    onClick={() => router.push("/auth/role")}
+                    onClick={() => router.push("/")}
                     style={{ padding: "12px 24px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", color: "#f9fafb", borderRadius: 14, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                 >
-                    Connect Wallet
+                    Sign In
                 </button>
             </div>
         );
@@ -196,9 +219,12 @@ export default function CredentialPage() {
             </div>
 
             {/* Upload Modal */}
-            {showModal && publicKey && (
+            {showModal && (
                 <CertificateUploadModal
-                    walletAddress={publicKey.toBase58()}
+                    {...(isGoogleSignedIn && authUid && accessToken
+                        ? { authUid, accessToken }
+                        : { walletAddress: publicKey?.toBase58() }
+                    )}
                     onClose={() => setShowModal(false)}
                     onSuccess={() => { setShowModal(false); fetchCerts(); }}
                 />

@@ -1,6 +1,6 @@
 import { supabaseServer as supabase } from "@/lib/supabase/server";
 import CVPageClient from "../../cv/[wallet]/page";
-import PublicOrgPageClient from "../../org/[auth_uid]/page";
+import PublicOrgPageClient from "../../org/[auth_uid]/PublicOrgPage";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 

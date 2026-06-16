@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 const AMBER = "rgba(253,230,138,0.6)";
 
@@ -59,6 +61,10 @@ const LOGOS = [
 ];
 
 export function MobileHomeScreen() {
+    const { publicKey } = useWallet();
+    const { session: googleSession, isGoogleSignedIn } = useGoogleAuth();
+    const isLoggedIn = !!(publicKey || isGoogleSignedIn || googleSession);
+
     return (
         <div style={{ backgroundColor: "#111111" }}>
 
@@ -78,24 +84,26 @@ export function MobileHomeScreen() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginTop: 10 }}>
                     ChainVolio is a trust infrastructure enabling verifiable CVs and proof-of-work, permanently anchored on Solana.
                 </p>
-                <Link
-                    href="/create-profile"
-                    style={{
-                        display: "inline-flex", alignItems: "center", gap: 8,
-                        marginTop: 18,
-                        padding: "12px 22px", borderRadius: 16,
-                        background: "rgba(253,230,138,0.1)",
-                        border: "1px solid rgba(253,230,138,0.3)",
-                        color: "rgba(253,230,138,0.85)",
-                        fontSize: 14, fontWeight: 700,
-                        textDecoration: "none",
-                    }}
-                >
-                    Create My Profile
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </Link>
+                {!isLoggedIn && (
+                    <Link
+                        href="/create-profile"
+                        style={{
+                            display: "inline-flex", alignItems: "center", gap: 8,
+                            marginTop: 18,
+                            padding: "12px 22px", borderRadius: 16,
+                            background: "rgba(255,255,255,0.06)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            color: "rgba(255,255,255,0.7)",
+                            fontSize: 14, fontWeight: 700,
+                            textDecoration: "none",
+                        }}
+                    >
+                        Create My Profile
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </Link>
+                )}
             </div>
 
             {/* Section Header */}

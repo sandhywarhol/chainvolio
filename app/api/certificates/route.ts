@@ -7,12 +7,14 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const wallet = searchParams.get("wallet");
-  if (!wallet) return NextResponse.json({ error: "wallet required" }, { status: 400 });
+  const authUid = searchParams.get("auth_uid");
+  const effectiveWallet = authUid ? `gauth:${authUid}` : wallet;
+  if (!effectiveWallet) return NextResponse.json({ error: "wallet or auth_uid required" }, { status: 400 });
 
   const { data, error } = await supabase
     .from("user_certificates")
     .select("id, title, issuer_name, date_issued, file_url, file_type, created_at")
-    .eq("wallet_address", wallet)
+    .eq("wallet_address", effectiveWallet)
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -24,35 +26,48 @@ export async function POST(request: NextRequest) {
 
   try {
     const formData = (await request.formData()) as any;
-    const wallet   = formData.get("wallet")   as string;
+    const wallet   = formData.get("wallet")   as string | null;
+    const authUid  = formData.get("auth_uid") as string | null;
     const title    = formData.get("title")    as string;
     const issuer   = formData.get("issuer")   as string | null;
     const dateIssued = formData.get("dateIssued") as string | null;
     const file     = formData.get("file")     as File | null;
 
-    // Auth parameters
-    const signature = formData.get("signature") as string | null;
-    const nonce = formData.get("nonce") as string | null;
-    const timestamp = formData.get("timestamp") as string | null;
+    const isGoogleUser = !wallet && !!authUid;
+    const effectiveWallet = wallet || (authUid ? `gauth:${authUid}` : null);
 
-    if (!wallet || !title || !file) {
-      return NextResponse.json({ error: "wallet, title, and file are required" }, { status: 400 });
+    if (!effectiveWallet || !title || !file) {
+      return NextResponse.json({ error: "wallet or auth_uid, title, and file are required" }, { status: 400 });
     }
 
-    if (!signature || !nonce || !timestamp) {
-      return NextResponse.json({ error: "Unauthorized: Missing signature parameters" }, { status: 401 });
-    }
+    if (isGoogleUser) {
+      const token = request.headers.get("authorization")?.replace("Bearer ", "").trim();
+      if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+      if (authErr || !user || user.id !== authUid) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      // Auth parameters
+      const signature = formData.get("signature") as string | null;
+      const nonce = formData.get("nonce") as string | null;
+      const timestamp = formData.get("timestamp") as string | null;
 
-    const { isValid, error: sigError } = await verifySignature(
-      wallet,
-      "update_profile",
-      nonce,
-      parseInt(timestamp, 10),
-      signature
-    );
+      if (!signature || !nonce || !timestamp) {
+        return NextResponse.json({ error: "Unauthorized: Missing signature parameters" }, { status: 401 });
+      }
 
-    if (!isValid) {
-      return NextResponse.json({ error: `Unauthorized: ${sigError}` }, { status: 401 });
+      const { isValid, error: sigError } = await verifySignature(
+        wallet!,
+        "update_profile",
+        nonce,
+        parseInt(timestamp, 10),
+        signature
+      );
+
+      if (!isValid) {
+        return NextResponse.json({ error: `Unauthorized: ${sigError}` }, { status: 401 });
+      }
     }
 
     const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
@@ -75,8 +90,8 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const fileTimestamp = Date.now();
-    // Path format: certificates/{wallet_address}/{fileTimestamp}_certificate
-    const filePath = `${wallet}/${fileTimestamp}_certificate`;
+    const storageKey = effectiveWallet.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const filePath = `${storageKey}/${fileTimestamp}_certificate`;
     const fileType = file.type === "application/pdf" ? "pdf" : "image";
 
     const { error: uploadError } = await supabase.storage
@@ -97,7 +112,7 @@ export async function POST(request: NextRequest) {
     const { data: record, error: dbError } = await supabase
       .from("user_certificates")
       .insert({
-        wallet_address: wallet,
+        wallet_address: effectiveWallet,
         title,
         issuer_name: issuer || null,
         date_issued: dateIssued || null,
@@ -127,26 +142,39 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id     = searchParams.get("id");
     const wallet = searchParams.get("wallet");
-    const signature = searchParams.get("signature");
-    const nonce = searchParams.get("nonce");
-    const timestamp = searchParams.get("timestamp");
+    const authUid = searchParams.get("auth_uid");
+    const isGoogleUser = !wallet && !!authUid;
+    const effectiveWallet = wallet || (authUid ? `gauth:${authUid}` : null);
 
-    if (!id || !wallet) return NextResponse.json({ error: "id and wallet required" }, { status: 400 });
+    if (!id || !effectiveWallet) return NextResponse.json({ error: "id and wallet or auth_uid required" }, { status: 400 });
 
-    if (!signature || !nonce || !timestamp) {
-      return NextResponse.json({ error: "Unauthorized: Missing signature parameters" }, { status: 401 });
-    }
+    if (isGoogleUser) {
+      const token = request.headers.get("authorization")?.replace("Bearer ", "").trim();
+      if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+      if (authErr || !user || user.id !== authUid) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      const signature = searchParams.get("signature");
+      const nonce = searchParams.get("nonce");
+      const timestamp = searchParams.get("timestamp");
 
-    const { isValid, error: sigError } = await verifySignature(
-      wallet,
-      "update_profile",
-      nonce,
-      parseInt(timestamp, 10),
-      signature
-    );
+      if (!signature || !nonce || !timestamp) {
+        return NextResponse.json({ error: "Unauthorized: Missing signature parameters" }, { status: 401 });
+      }
 
-    if (!isValid) {
-      return NextResponse.json({ error: `Unauthorized: ${sigError}` }, { status: 401 });
+      const { isValid, error: sigError } = await verifySignature(
+        wallet!,
+        "update_profile",
+        nonce,
+        parseInt(timestamp, 10),
+        signature
+      );
+
+      if (!isValid) {
+        return NextResponse.json({ error: `Unauthorized: ${sigError}` }, { status: 401 });
+      }
     }
 
     const { data: cert, error: fetchErr } = await supabase
@@ -156,7 +184,7 @@ export async function DELETE(request: NextRequest) {
       .single();
 
     if (fetchErr || !cert) return NextResponse.json({ error: "Certificate not found" }, { status: 404 });
-    if (cert.wallet_address !== wallet) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (cert.wallet_address !== effectiveWallet) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
     // Extract storage path from URL and remove file
     const url = new URL(cert.file_url);

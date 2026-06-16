@@ -13,6 +13,9 @@ export const supabaseAuth: SupabaseClient | null =
                 persistSession: true,
                 autoRefreshToken: true,
                 detectSessionInUrl: true,
+                // Implicit flow avoids PKCE code_verifier cross-browser issues
+                // (e.g. OAuth completing in Chrome Custom Tab when started in another browser).
+                flowType: "implicit",
             },
         })
         : null;

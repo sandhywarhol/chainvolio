@@ -8,6 +8,7 @@ import { X, ExternalLink, ShieldCheck, AlertCircle, Building2, Users, ChevronRig
 import { useWalletConnect } from "@/hooks/useWalletConnect";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { Toast } from "@/components/ui/Toast";
+import { isInAppBrowser } from "@/lib/inAppBrowser";
 
 // Steps:
 //  "select"   — connect wallet / Google
@@ -52,6 +53,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     const [phantomAvailable, setPhantomAvailable] = useState(false);
     const [solflareAvailable, setSolflareAvailable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isInApp, setIsInApp] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [step, setStep] = useState<ModalStep>("select");
     const [selectedRole, setSelectedRole] = useState<"builder" | "recruiter" | null>(null);
@@ -64,6 +66,7 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
     useEffect(() => {
         setMounted(true);
         setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+        setIsInApp(isInAppBrowser());
     }, []);
 
     useEffect(() => {
@@ -483,6 +486,25 @@ export function CustomWalletModal({ isOpen, onClose }: CustomWalletModalProps) {
             )}
 
             <div className="p-5 sm:p-6 space-y-3">
+                {/* In-app browser warning */}
+                {isInApp && (
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-2.5">
+                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-[11px] text-amber-300 font-bold mb-0.5">Open in your browser first</p>
+                            <p className="text-[10px] text-amber-400/70 leading-relaxed">
+                                You are inside an in-app browser. Sign in may not work correctly. Open ChainVolio in Safari or Chrome for a reliable login experience.
+                            </p>
+                            <button
+                                onClick={() => { window.open(window.location.href, "_blank"); }}
+                                className="mt-2 text-[10px] font-black uppercase tracking-widest text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-lg hover:bg-amber-500/10 transition-colors"
+                            >
+                                Open in Browser
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* No wallet warning */}
                 {noneAvailable && !isMobile && (
                     <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-2">

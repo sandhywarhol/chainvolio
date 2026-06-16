@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServer
         .from("org_accounts")
         .select(
-            "auth_uid, org_name, org_type, bio, avatar_url, website, twitter, linkedin, discord, telegram, country, plan_name, subscription_status, current_period_end, onboarding_complete, created_at"
+            "auth_uid, org_name, org_type, account_type, bio, avatar_url, website, twitter, linkedin, discord, telegram, country, github, instagram, whatsapp, skills, role, timezone, looking_for, work_preference, plan_name, subscription_status, current_period_end, onboarding_complete, created_at"
         )
         .eq("auth_uid", authUid)
         .single();
@@ -38,18 +38,28 @@ export async function GET(req: NextRequest) {
         orgIdNumber = count || 1;
     }
 
+    const d = data as any;
     const org = {
-        auth_uid: data.auth_uid,
-        org_name: data.org_name,
-        org_type: data.org_type,
-        bio: data.bio,
-        avatar_url: data.avatar_url,
-        website: data.website,
-        twitter: data.twitter,
-        linkedin: data.linkedin,
-        discord: data.discord,
-        telegram: data.telegram,
-        country: data.country,
+        auth_uid: d.auth_uid,
+        org_name: d.org_name,
+        org_type: d.org_type,
+        account_type: d.account_type as string | null,
+        bio: d.bio,
+        avatar_url: d.avatar_url,
+        website: d.website,
+        twitter: d.twitter,
+        linkedin: d.linkedin,
+        discord: d.discord,
+        telegram: d.telegram,
+        country: d.country,
+        github: d.github ?? null,
+        instagram: d.instagram ?? null,
+        whatsapp: d.whatsapp ?? null,
+        skills: d.skills ?? null,
+        role: d.role ?? null,
+        timezone: d.timezone ?? null,
+        looking_for: d.looking_for ?? null,
+        work_preference: d.work_preference ?? null,
         effective_plan: effectivePlan as string,
         is_verified: effectivePlan !== "free",
         org_id_number: orgIdNumber,

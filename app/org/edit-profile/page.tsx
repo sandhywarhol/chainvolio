@@ -2,18 +2,47 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Globe, Send, Mail, MapPin, Building2, Save, Camera, Loader2 } from "lucide-react";
-import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
+import { ArrowLeft, Camera, Loader2, Check, Eye, PenLine, LogOut } from "lucide-react";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-import { Toast } from "@/components/ui/Toast";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
-const ORG_TYPES = [
-    { value: "community", label: "Community / DAO", description: "Open communities, DAOs, or non-profit orgs" },
-    { value: "company", label: "Company / Agency", description: "Businesses, agencies, or commercial orgs" },
-];
+const PAGE_BG = "#111111";
+const CARD_BORDER = "rgba(255,255,255,0.08)";
+const TEXT_PRIMARY = "#f9fafb";
+const TEXT_MUTED = "rgba(255,255,255,0.4)";
+const ORANGE = "rgba(253,230,138,0.6)";
+
+const inputStyle: React.CSSProperties = {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    border: `1px solid ${CARD_BORDER}`,
+    borderRadius: 16,
+    padding: 16,
+    color: TEXT_PRIMARY,
+    fontSize: 14,
+    width: "100%",
+    outline: "none",
+    boxSizing: "border-box",
+};
+
+const labelStyle: React.CSSProperties = {
+    color: TEXT_MUTED,
+    fontSize: 9,
+    fontWeight: 600,
+    letterSpacing: 1,
+    marginBottom: 10,
+    textTransform: "uppercase",
+    display: "block",
+};
+
+const groupLabelStyle: React.CSSProperties = {
+    color: "rgba(255,255,255,0.2)",
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: 2,
+    marginBottom: 25,
+    textTransform: "uppercase",
+};
 
 const COUNTRIES = [
     "Global / Remote", "Indonesia", "United States", "Singapore", "United Kingdom",
@@ -21,13 +50,24 @@ const COUNTRIES = [
     "Brazil", "Nigeria", "UAE", "Other",
 ];
 
+const ORG_TYPES = [
+    { value: "community", label: "Community / DAO" },
+    { value: "company", label: "Company / Agency" },
+];
+
+const WORK_PREFS = ["Full-time", "Contract", "Freelance", "Project-based"];
+
 export default function OrgEditProfilePage() {
     const router = useRouter();
-    const { session, orgAccount, loading, refetchOrgAccount } = useGoogleAuth();
+    const { session, orgAccount, loading, refetchOrgAccount, signOut } = useGoogleAuth();
+    const [isMobile, setIsMobile] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [cropModal, setCropModal] = useState<{ isOpen: boolean; image: string | null }>({ isOpen: false, image: null });
+
+    const isBuilder = orgAccount?.account_type === "builder";
 
     const [form, setForm] = useState({
         org_name: "",
@@ -40,25 +80,41 @@ export default function OrgEditProfilePage() {
         discord: "",
         telegram: "",
         country: "",
+        // builder-only fields
+        github: "",
+        instagram: "",
+        whatsapp: "",
+        skills: "",
+        role: "",
+        timezone: "",
+        looking_for: "",
+        work_preference: [] as string[],
     });
 
-    useEffect(() => {
-        if (!loading && !session) router.replace("/");
-    }, [loading, session, router]);
-
+    useEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
+    useEffect(() => { if (!loading && !session) router.replace("/"); }, [loading, session, router]);
     useEffect(() => {
         if (orgAccount) {
+            const a = orgAccount as any;
             setForm({
-                org_name: orgAccount.org_name ?? "",
-                org_type: orgAccount.org_type ?? "",
-                bio: orgAccount.bio ?? "",
-                website: orgAccount.website ?? "",
-                avatar_url: orgAccount.avatar_url ?? "",
-                twitter: orgAccount.twitter ?? "",
-                linkedin: orgAccount.linkedin ?? "",
-                discord: orgAccount.discord ?? "",
-                telegram: orgAccount.telegram ?? "",
-                country: orgAccount.country ?? "",
+                org_name: a.org_name ?? "",
+                org_type: a.org_type ?? "",
+                bio: a.bio ?? "",
+                website: a.website ?? "",
+                avatar_url: a.avatar_url ?? "",
+                twitter: a.twitter ?? "",
+                linkedin: a.linkedin ?? "",
+                discord: a.discord ?? "",
+                telegram: a.telegram ?? "",
+                country: a.country ?? "",
+                github: a.github ?? "",
+                instagram: a.instagram ?? "",
+                whatsapp: a.whatsapp ?? "",
+                skills: a.skills ?? "",
+                role: a.role ?? "",
+                timezone: a.timezone ?? "",
+                looking_for: a.looking_for ?? "",
+                work_preference: Array.isArray(a.work_preference) ? a.work_preference : [],
             });
         }
     }, [orgAccount]);
@@ -66,12 +122,19 @@ export default function OrgEditProfilePage() {
     const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [k]: e.target.value }));
 
+    const togglePref = (t: string) => {
+        setForm(prev => ({
+            ...prev,
+            work_preference: prev.work_preference.includes(t)
+                ? prev.work_preference.filter(x => x !== t)
+                : [...prev.work_preference, t],
+        }));
+    };
+
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
+        if (e.target.files?.[0]) {
             const reader = new FileReader();
-            reader.addEventListener("load", () => {
-                setCropModal({ isOpen: true, image: reader.result as string });
-            });
+            reader.addEventListener("load", () => setCropModal({ isOpen: true, image: reader.result as string }));
             reader.readAsDataURL(e.target.files[0]);
         }
         e.target.value = "";
@@ -79,275 +142,387 @@ export default function OrgEditProfilePage() {
 
     const handleCroppedImage = async (croppedBlob: Blob) => {
         if (!orgAccount) return;
+        setUploading(true);
+        setCropModal({ isOpen: false, image: null });
         try {
-            setUploading(true);
-            setCropModal({ isOpen: false, image: null });
-
             const { default: imageCompression } = await import("browser-image-compression");
-            const compressed = await imageCompression(croppedBlob as File, {
-                maxSizeMB: 0.5,
-                maxWidthOrHeight: 400,
-                useWebWorker: true,
-                fileType: "image/webp",
-            });
-
+            const compressed = await imageCompression(croppedBlob as File, { maxSizeMB: 0.5, maxWidthOrHeight: 400, useWebWorker: true, fileType: "image/webp" });
             const fileName = `org-${orgAccount.auth_uid}-${Date.now()}.webp`;
             const fd = new FormData();
             fd.append("file", compressed, fileName);
             fd.append("bucket", "avatars");
             fd.append("path", fileName);
-
             const res = await fetch("/api/storage/upload", { method: "POST", body: fd });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || "Upload failed");
-            }
+            if (!res.ok) throw new Error("Upload failed");
             const { url } = await res.json();
             setForm(prev => ({ ...prev, avatar_url: url }));
-        } catch (err: any) {
-            setToast({ message: "Avatar upload failed: " + err.message, type: "error" });
+        } catch {
+            // silent fail
         } finally {
             setUploading(false);
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSave = async () => {
         if (!session || !orgAccount) return;
         setSaving(true);
-
         const res = await fetch("/api/org-accounts", {
             method: "PATCH",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${session.access_token}`
-            },
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
             body: JSON.stringify({
                 auth_uid: orgAccount.auth_uid,
                 org_name: form.org_name.trim() || null,
-                org_type: form.org_type || null,
+                org_type: isBuilder ? null : (form.org_type || null),
                 bio: form.bio.trim() || null,
                 website: form.website.trim() || null,
-                avatar_url: form.avatar_url.trim() || null,
+                avatar_url: form.avatar_url || null,
                 twitter: form.twitter.trim() || null,
                 linkedin: form.linkedin.trim() || null,
                 discord: form.discord.trim() || null,
                 telegram: form.telegram.trim() || null,
                 country: form.country || null,
-                onboarding_complete: !!(form.org_name.trim() && form.org_type),
+                ...(isBuilder && {
+                    github: form.github.trim() || null,
+                    instagram: form.instagram.trim() || null,
+                    whatsapp: form.whatsapp.trim() || null,
+                    skills: form.skills.trim() || null,
+                    role: form.role.trim() || null,
+                    timezone: form.timezone.trim() || null,
+                    looking_for: form.looking_for.trim() || null,
+                    work_preference: form.work_preference.length > 0 ? form.work_preference : null,
+                }),
+                onboarding_complete: true,
             }),
         });
-
         setSaving(false);
-
-        if (!res.ok) {
-            const json = await res.json();
-            setToast({ message: json.error ?? "Failed to save. Please try again.", type: "error" });
-            return;
+        if (res.ok) {
+            await refetchOrgAccount();
+            setSaved(true);
+            setIsEditing(false);
+            setTimeout(() => {
+                setSaved(false);
+                const dest = isMobile && session?.user?.id ? `/org/${session.user.id}` : "/dashboard";
+                router.push(dest);
+            }, 1200);
         }
-
-        await refetchOrgAccount();
-        setToast({ message: "Profile saved!", type: "success" });
-        setTimeout(() => router.push("/dashboard"), 1000);
     };
 
-    if (loading) {
-        return <LoadingScreen />;
-    }
+    const handleSignOut = async () => {
+        await signOut();
+        router.push("/");
+    };
+
+    if (loading) return <LoadingScreen />;
+
+    const backHref = isMobile && session?.user?.id ? `/org/${session.user.id}` : "/dashboard";
+    const emailDisplay = session?.user?.email ?? "";
+    const nameInitial = form.org_name?.[0]?.toUpperCase() || emailDisplay[0]?.toUpperCase() || "?";
+
+    const readOnly = !isEditing;
+    const readInputStyle: React.CSSProperties = readOnly
+        ? { ...inputStyle, color: "rgba(255,255,255,0.5)", cursor: "default" }
+        : inputStyle;
 
     return (
-        <main className="min-h-screen bg-black theme-bg-page theme-aware text-white">
-            {/* Sticky header */}
-            <div className="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-4 py-4">
-                <div className="max-w-2xl mx-auto flex items-center justify-between">
-                    <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
-                        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-                    </Link>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Edit Organization Profile</span>
+        <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, paddingTop: 52, paddingBottom: 120 }}>
+
+            {/* Header */}
+            <div style={{
+                height: 100, display: "flex", flexDirection: "row",
+                alignItems: "center", justifyContent: "space-between",
+                paddingTop: 20, paddingLeft: 25, paddingRight: 25,
+            }}>
+                <div>
+                    <p style={{ color: TEXT_PRIMARY, fontSize: 22, fontWeight: 600 }}>
+                        {isEditing
+                            ? (isBuilder ? "Identity Editor" : "Organization Editor")
+                            : (isBuilder ? "Professional Identity" : "Organization Profile")
+                        }
+                    </p>
+                    <p style={{ color: TEXT_MUTED, fontSize: 11, marginTop: 2 }}>
+                        {isEditing ? "Syncing changes to trust layer" : "Your verifiable persona"}
+                    </p>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                        onClick={() => router.push(backHref)}
+                        style={{
+                            width: 44, height: 44, borderRadius: 22,
+                            backgroundColor: "rgba(255,255,255,0.06)",
+                            border: `1px solid ${CARD_BORDER}`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            cursor: "pointer",
+                        }}
+                    >
+                        <ArrowLeft size={20} color={TEXT_PRIMARY} />
+                    </button>
+                    <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        style={{
+                            width: 44, height: 44, borderRadius: 22,
+                            backgroundColor: "rgba(255,255,255,0.06)",
+                            border: `1px solid ${CARD_BORDER}`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            cursor: "pointer",
+                        }}
+                    >
+                        {isEditing
+                            ? <Eye size={20} color={TEXT_PRIMARY} />
+                            : <PenLine size={20} color={TEXT_PRIMARY} />
+                        }
+                    </button>
                 </div>
             </div>
 
-            <div className="max-w-2xl mx-auto px-4 py-10">
-                <form onSubmit={handleSubmit} className="space-y-8">
+            <div style={{ paddingLeft: 25, paddingRight: 25 }}>
 
-                    {/* Avatar upload */}
-                    <section className="flex items-center gap-6 p-5 rounded-2xl bg-slate-800/40 border border-slate-700/50">
-                        <div className="relative flex-shrink-0">
-                            <div className="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-slate-700 overflow-hidden flex items-center justify-center">
-                                {form.avatar_url ? (
-                                    <img src={form.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <Building2 className="w-8 h-8 text-slate-600" />
-                                )}
-                            </div>
-                            {uploading && (
-                                <div className="absolute inset-0 rounded-2xl bg-black/60 flex items-center justify-center">
-                                    <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
-                                </div>
+                {/* Avatar */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 10, marginBottom: 30 }}>
+                    <div style={{ position: "relative" }}>
+                        <div style={{
+                            width: 90, height: 90, borderRadius: 45,
+                            backgroundColor: "rgba(255,255,255,0.08)",
+                            border: `1.5px solid ${CARD_BORDER}`,
+                            overflow: "hidden",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                            {form.avatar_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={form.avatar_url} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                                <span style={{ color: TEXT_PRIMARY, fontSize: 32, fontWeight: 600 }}>{nameInitial}</span>
                             )}
                         </div>
-                        <div>
-                            <p className="text-sm font-bold text-white mb-1">Organization Logo</p>
-                            <p className="text-[11px] text-slate-500 mb-3">Square image recommended. Max 500 KB, auto-compressed.</p>
-                            <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold cursor-pointer transition-colors ${
-                                uploading
-                                    ? "border-slate-700 text-slate-600 cursor-not-allowed"
-                                    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            }`}>
-                                <Camera className="w-3.5 h-3.5" />
-                                {uploading ? "Uploading..." : form.avatar_url ? "Change Image" : "Upload Image"}
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageSelect}
-                                    disabled={uploading}
-                                    className="hidden"
-                                />
+                        {uploading && (
+                            <div style={{ position: "absolute", inset: 0, borderRadius: 45, backgroundColor: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Loader2 size={20} color="white" className="animate-spin" />
+                            </div>
+                        )}
+                        {isEditing && (
+                            <label style={{
+                                position: "absolute", bottom: 0, right: 0,
+                                width: 28, height: 28, borderRadius: 14,
+                                backgroundColor: "rgba(255,255,255,0.12)",
+                                border: `1px solid ${CARD_BORDER}`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                cursor: "pointer",
+                            }}>
+                                <Camera size={13} color={TEXT_PRIMARY} />
+                                <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" disabled={uploading} />
                             </label>
-                        </div>
-                    </section>
+                        )}
+                    </div>
+                    <p style={{ color: TEXT_MUTED, fontSize: 10, letterSpacing: 1, marginTop: 12 }}>
+                        {emailDisplay}
+                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 8, letterSpacing: 2, marginTop: 4, textTransform: "uppercase" }}>
+                        IDENTITY MANAGEMENT
+                    </p>
+                </div>
 
-                    {/* Identity */}
-                    <section className="space-y-4">
-                        <h2 className="text-xs font-black uppercase tracking-widest text-slate-500">Organization Identity</h2>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 mb-1.5">Organization Name <span className="text-red-400">*</span></label>
-                            <input
-                                type="text"
-                                required
-                                value={form.org_name}
-                                onChange={set("org_name")}
-                                placeholder="e.g. Solana Foundation"
-                                className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 mb-2">Organization Type</label>
-                            <div className="grid grid-cols-2 gap-3">
+                {saved && (
+                    <div style={{ backgroundColor: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 12, padding: "12px 16px", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                        <Check size={14} color="#34d399" />
+                        <p style={{ color: "#34d399", fontSize: 13, fontWeight: 600 }}>Profile updated successfully</p>
+                    </div>
+                )}
+
+                {/* Personal Information */}
+                <div style={{ marginBottom: 40 }}>
+                    <p style={groupLabelStyle}>PERSONAL INFORMATION</p>
+                    <div style={{ marginBottom: 20 }}>
+                        <label style={labelStyle}>{isBuilder ? "DISPLAY NAME" : "ORGANIZATION NAME"}</label>
+                        <input style={readInputStyle} value={form.org_name} onChange={set("org_name")} placeholder={isBuilder ? "Your name or pseudonym" : "Organization name"} readOnly={readOnly} />
+                    </div>
+                    <div style={{ marginBottom: 20 }}>
+                        <label style={labelStyle}>{isBuilder ? "PROFESSIONAL BIO" : "BIO / DESCRIPTION"}</label>
+                        <textarea
+                            style={{ ...readInputStyle, height: 100, resize: "none" } as React.CSSProperties}
+                            value={form.bio}
+                            onChange={set("bio")}
+                            placeholder={isBuilder ? "Career highlights..." : "Briefly describe your organization..."}
+                            readOnly={readOnly}
+                        />
+                    </div>
+                    <div style={{ marginBottom: 20 }}>
+                        <label style={labelStyle}>COUNTRY / REGION</label>
+                        <select value={form.country} onChange={set("country")} disabled={readOnly} style={{ ...readInputStyle, appearance: "none" } as React.CSSProperties}>
+                            <option value="" style={{ backgroundColor: "#1a1a1a" }}>Select region...</option>
+                            {COUNTRIES.map(c => <option key={c} value={c} style={{ backgroundColor: "#1a1a1a" }}>{c}</option>)}
+                        </select>
+                    </div>
+
+                    {!isBuilder && (
+                        <div style={{ marginBottom: 20 }}>
+                            <label style={labelStyle}>ORGANIZATION TYPE</label>
+                            <div style={{ display: "flex", gap: 12 }}>
                                 {ORG_TYPES.map(t => (
                                     <button
                                         key={t.value}
                                         type="button"
-                                        onClick={() => setForm(prev => ({ ...prev, org_type: t.value }))}
-                                        className={`text-left px-4 py-3.5 rounded-xl border transition-colors ${
-                                            form.org_type === t.value
-                                                ? "border-emerald-500 bg-emerald-500/10 text-white"
-                                                : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600"
-                                        }`}
+                                        onClick={() => isEditing && setForm(prev => ({ ...prev, org_type: t.value }))}
+                                        style={{
+                                            flex: 1, padding: "12px 16px", borderRadius: 16,
+                                            border: `1px solid ${form.org_type === t.value ? "rgba(255,255,255,0.25)" : CARD_BORDER}`,
+                                            backgroundColor: form.org_type === t.value ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.03)",
+                                            color: TEXT_PRIMARY, fontSize: 13, fontWeight: 600,
+                                            cursor: isEditing ? "pointer" : "default",
+                                        }}
                                     >
-                                        <div className="font-bold text-sm">{t.label}</div>
-                                        <div className="text-[11px] text-slate-400 mt-0.5">{t.description}</div>
+                                        {t.label}
                                     </button>
                                 ))}
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 mb-1.5">Bio / Description</label>
-                            <textarea
-                                value={form.bio}
-                                onChange={set("bio")}
-                                placeholder="Briefly describe your organization, mission, and what you do..."
-                                rows={4}
-                                className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors resize-none text-sm leading-relaxed"
+                    )}
+                </div>
+
+                {/* Professional Information — builder only */}
+                {isBuilder && (
+                    <div style={{ marginBottom: 40 }}>
+                        <p style={groupLabelStyle}>PROFESSIONAL INFORMATION</p>
+                        {[
+                            { key: "role", label: "CURRENT ROLE", placeholder: "Lead Dev, Designer, etc." },
+                            { key: "skills", label: "CORE SKILLS", placeholder: "Rust, Next.js, Figma..." },
+                            { key: "timezone", label: "TIMEZONE", placeholder: "UTC+7" },
+                        ].map(f => (
+                            <div key={f.key} style={{ marginBottom: 20 }}>
+                                <label style={labelStyle}>{f.label}</label>
+                                <input
+                                    style={readInputStyle}
+                                    value={(form as any)[f.key]}
+                                    onChange={set(f.key as keyof typeof form)}
+                                    placeholder={f.placeholder}
+                                    readOnly={readOnly}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Contact & Social */}
+                <div style={{ marginBottom: 40 }}>
+                    <p style={groupLabelStyle}>CONTACT &amp; SOCIAL</p>
+                    {[
+                        { key: "website", label: "WEBSITE", placeholder: "https://..." },
+                        { key: "twitter", label: "X / TWITTER", placeholder: "@handle" },
+                        { key: "linkedin", label: "LINKEDIN", placeholder: "username" },
+                        { key: "discord", label: "DISCORD", placeholder: "@handle" },
+                        { key: "telegram", label: "TELEGRAM", placeholder: "@username" },
+                        ...(isBuilder ? [
+                            { key: "github", label: "GITHUB", placeholder: "username" },
+                            { key: "instagram", label: "INSTAGRAM", placeholder: "@username" },
+                            { key: "whatsapp", label: "WHATSAPP", placeholder: "+62..." },
+                        ] : []),
+                    ].map(f => (
+                        <div key={f.key} style={{ marginBottom: 20 }}>
+                            <label style={labelStyle}>{f.label}</label>
+                            <input
+                                style={readInputStyle}
+                                value={(form as any)[f.key]}
+                                onChange={set(f.key as keyof typeof form)}
+                                placeholder={f.placeholder}
+                                readOnly={readOnly}
                             />
                         </div>
-                    </section>
-
-                    {/* Presence */}
-                    <section className="space-y-4">
-                        <h2 className="text-xs font-black uppercase tracking-widest text-slate-500">Presence</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">Country / Region</label>
-                                <div className="relative">
-                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <select value={form.country} onChange={set("country")}
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 transition-colors text-sm appearance-none">
-                                        <option value="" className="bg-slate-800 text-white">Select region...</option>
-                                        {COUNTRIES.map(c => <option key={c} value={c} className="bg-slate-800 text-white">{c}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">Website</label>
-                                <div className="relative">
-                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.website} onChange={set("website")} placeholder="https://yourorg.com"
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Contacts & Socials */}
-                    <section className="space-y-4">
-                        <h2 className="text-xs font-black uppercase tracking-widest text-slate-500">Contact &amp; Socials</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">X / Twitter</label>
-                                <div className="relative">
-                                    <XIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.twitter} onChange={set("twitter")} placeholder="@handle or URL"
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">LinkedIn</label>
-                                <div className="relative">
-                                    <LinkedInIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.linkedin} onChange={set("linkedin")} placeholder="company-name"
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">Discord</label>
-                                <div className="relative">
-                                    <DiscordIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.discord} onChange={set("discord")} placeholder="discord.gg/invite or @handle"
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">Telegram</label>
-                                <div className="relative">
-                                    <Send className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="text" value={form.telegram} onChange={set("telegram")} placeholder="t.me/group or @channel"
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors text-sm" />
-                                </div>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label className="block text-xs font-bold text-slate-400 mb-1.5">Contact Email</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                    <input type="email" value={session?.user.email ?? ""} readOnly
-                                        className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-900 border border-slate-700/50 text-slate-500 cursor-not-allowed text-sm" />
-                                </div>
-                                <p className="text-[10px] text-slate-600 mt-1 ml-1">Linked to your Google account — cannot be changed here.</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Submit */}
-                    <div className="flex items-center gap-3 pt-2">
-                        <button
-                            type="submit"
-                            disabled={saving || uploading || !form.org_name.trim()}
-                            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black text-sm transition-all"
-                        >
-                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            {saving ? "Saving..." : "Save Profile"}
-                        </button>
-                        <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors border border-slate-700">
-                            Cancel
-                        </Link>
+                    ))}
+                    <div style={{ marginBottom: 20 }}>
+                        <label style={labelStyle}>EMAIL</label>
+                        <input
+                            style={{ ...inputStyle, color: "rgba(255,255,255,0.3)", cursor: "not-allowed" } as React.CSSProperties}
+                            value={emailDisplay}
+                            readOnly
+                        />
+                        <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 9, marginTop: 6 }}>Linked to your Google account — cannot be changed here.</p>
                     </div>
-                </form>
+                </div>
+
+                {/* Career Goals — builder only */}
+                {isBuilder && (
+                    <div style={{ marginBottom: 40 }}>
+                        <p style={groupLabelStyle}>CAREER GOALS</p>
+                        <div style={{ marginBottom: 20 }}>
+                            <label style={labelStyle}>LOOKING FOR</label>
+                            <input
+                                style={readInputStyle}
+                                value={form.looking_for}
+                                onChange={e => setForm(p => ({ ...p, looking_for: e.target.value.slice(0, 160) }))}
+                                placeholder="Open to roles..."
+                                readOnly={readOnly}
+                            />
+                            <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 8, textAlign: "right", marginTop: 4 }}>{form.looking_for.length}/160</p>
+                        </div>
+                        <div>
+                            <label style={labelStyle}>AVAILABILITY</label>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                                {WORK_PREFS.map(t => {
+                                    const active = form.work_preference.includes(t);
+                                    return (
+                                        <button
+                                            key={t}
+                                            onClick={() => isEditing && togglePref(t)}
+                                            style={{
+                                                paddingLeft: 14, paddingRight: 14, paddingTop: 8, paddingBottom: 8,
+                                                borderRadius: 10, border: "none", cursor: isEditing ? "pointer" : "default",
+                                                backgroundColor: active ? "rgba(253,230,138,0.08)" : "rgba(255,255,255,0.04)",
+                                                borderWidth: 1, borderStyle: "solid",
+                                                borderColor: active ? "rgba(253,230,138,0.3)" : CARD_BORDER,
+                                                color: active ? ORANGE : TEXT_MUTED,
+                                                fontSize: 10, fontWeight: 600, textTransform: "uppercase" as const,
+                                            }}
+                                        >
+                                            {t}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Save Button — only in edit mode */}
+                {isEditing && (
+                    <button
+                        onClick={handleSave}
+                        disabled={saving || uploading}
+                        style={{
+                            width: "100%", height: 60, borderRadius: 18,
+                            background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)",
+                            color: TEXT_PRIMARY, fontSize: 16, fontWeight: 700, cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                            opacity: saving || uploading ? 0.5 : 1,
+                            marginBottom: 12,
+                        }}
+                    >
+                        {saving
+                            ? <><Loader2 size={18} className="animate-spin" /> Saving...</>
+                            : saved
+                                ? <><Check size={18} color="#34d399" /> Saved</>
+                                : "Save Changes"
+                        }
+                    </button>
+                )}
+
+                {/* Sign Out */}
+                <button
+                    onClick={handleSignOut}
+                    style={{
+                        width: "100%", height: 56, borderRadius: 16,
+                        backgroundColor: "transparent",
+                        border: `1px solid ${CARD_BORDER}`,
+                        color: TEXT_MUTED, fontSize: 13, fontWeight: 600,
+                        cursor: "pointer", display: "flex", alignItems: "center",
+                        justifyContent: "center", gap: 8, marginBottom: 20,
+                    }}
+                >
+                    <LogOut size={16} />
+                    Sign Out
+                </button>
             </div>
 
-            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             {cropModal.isOpen && cropModal.image && (
                 <ImageCropModal image={cropModal.image} onCropComplete={handleCroppedImage} onClose={() => setCropModal({ isOpen: false, image: null })} />
             )}
-        </main>
+        </div>
     );
 }

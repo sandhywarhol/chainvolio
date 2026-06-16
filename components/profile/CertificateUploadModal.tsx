@@ -6,7 +6,9 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { signChainVolioAction } from "@/lib/wallet-utils";
 
 interface CertificateUploadModalProps {
-  walletAddress: string;
+  walletAddress?: string;
+  authUid?: string;
+  accessToken?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -56,8 +58,9 @@ async function processImage(file: File): Promise<Blob> {
   });
 }
 
-export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: CertificateUploadModalProps) {
+export function CertificateUploadModal({ walletAddress, authUid, accessToken, onClose, onSuccess }: CertificateUploadModalProps) {
   const { publicKey, signMessage } = useWallet();
+  const isGoogleUser = !!authUid && !!accessToken;
   const [title, setTitle]       = useState("");
   const [issuer, setIssuer]     = useState("");
   const [dateIssued, setDate]   = useState("");
@@ -97,7 +100,6 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
     setErrorMsg("");
 
     try {
-      // Step 1: Process file
       setStatus("processing");
       setProgress(20);
 
@@ -113,36 +115,31 @@ export function CertificateUploadModal({ walletAddress, onClose, onSuccess }: Ce
       }
 
       setProgress(60);
-
-      if (!publicKey || !signMessage) {
-        throw new Error("Wallet not connected");
-      }
-
-      const signedAction = await signChainVolioAction(
-        { publicKey, signMessage } as any,
-        "update_profile"
-      );
-
-      if (!signedAction) {
-        setStatus("idle");
-        setProgress(0);
-        return; // User canceled signature
-      }
-
-      // Step 2: Upload via API
       setStatus("uploading");
+
       const form = new FormData();
-      form.append("wallet", walletAddress);
       form.append("title", title.trim());
       form.append("issuer", issuer.trim());
       form.append("dateIssued", dateIssued);
       form.append("file", new File([processedBlob], processedName, { type: processedBlob.type }));
-      form.append("signature", signedAction.signature);
-      form.append("nonce", signedAction.nonce);
-      form.append("timestamp", signedAction.timestamp.toString());
+
+      let headers: HeadersInit = {};
+
+      if (isGoogleUser) {
+        form.append("auth_uid", authUid!);
+        headers = { "Authorization": `Bearer ${accessToken}` };
+      } else {
+        if (!publicKey || !signMessage) throw new Error("Wallet not connected");
+        const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+        if (!signedAction) { setStatus("idle"); setProgress(0); return; }
+        form.append("wallet", walletAddress!);
+        form.append("signature", signedAction.signature);
+        form.append("nonce", signedAction.nonce);
+        form.append("timestamp", signedAction.timestamp.toString());
+      }
 
       setProgress(80);
-      const res = await fetch("/api/certificates", { method: "POST", body: form });
+      const res = await fetch("/api/certificates", { method: "POST", body: form, headers });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Upload failed");
