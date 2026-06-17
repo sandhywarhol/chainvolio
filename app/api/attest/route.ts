@@ -79,7 +79,20 @@ export async function POST(request: Request) {
             classification,
             isExternal,
             isPaidAttestation,   // true when user is paying per-attestation beyond quota
+            attesterAuthUid,     // Google user's auth_uid — set when attester is logged in with Google
         } = body;
+
+        // Verify attesterAuthUid if provided — must match the JWT in Authorization header
+        let verifiedAttesterAuthUid: string | null = null;
+        if (attesterAuthUid) {
+            const token = request.headers.get("Authorization")?.replace("Bearer ", "").trim();
+            if (token) {
+                const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+                if (!authErr && user && user.id === attesterAuthUid) {
+                    verifiedAttesterAuthUid = attesterAuthUid;
+                }
+            }
+        }
 
         // Paid attestation requires an on-chain tx to verify the payment
         if (isPaidAttestation && !txSignature?.trim()) {
@@ -471,6 +484,7 @@ export async function POST(request: Request) {
             id: attestationId, // Use the ID generated for the on-chain memo
             receipt_id: receiptId,
             attester_wallet: attesterWallet,
+            attester_auth_uid: verifiedAttesterAuthUid || null,
             signature: cleanSignature || cleanTxSignature, // Store the proof
             tx_signature: cleanTxSignature,
             memo_issued_at: memoIssuedAt,

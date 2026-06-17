@@ -216,6 +216,15 @@ function CreateProfileContent() {
   }
 
   if (!connected || !publicKey) {
+    // Google users have their profile at /org/[auth_uid] — redirect there
+    if (session?.user?.id) {
+      router.replace("/org/edit-profile");
+      return (
+        <div className="min-h-screen bg-[#111111] flex items-center justify-center">
+          <img src="/logo.png" alt="" className="w-16 h-16 object-contain animate-spin-slow brightness-125" />
+        </div>
+      );
+    }
     return (
       <main className="min-h-screen text-white flex flex-col bg-[#111111] md:bg-black theme-bg-page theme-aware">
         <div className="hidden md:block"><Navbar /></div>

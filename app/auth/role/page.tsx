@@ -43,11 +43,10 @@ export default function AuthRolePage() {
             body: JSON.stringify({
                 auth_uid: session.user.id,
                 email: session.user.email ?? "",
-                account_type: selectedRole,           // "builder" or "recruiter"
+                account_type: selectedRole,
                 onboarding_complete: true,
-                // Recruiter defaults — user updates these in edit profile
+                org_name: defaultOrgName,
                 ...(selectedRole === "recruiter" && {
-                    org_name: defaultOrgName,
                     org_type: "company",
                 }),
             }),

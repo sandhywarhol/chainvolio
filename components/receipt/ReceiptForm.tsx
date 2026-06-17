@@ -22,9 +22,10 @@ type Props = {
   initialData?: any;
   onSuccess?: () => void;
   onCancel?: () => void;
+  googleAccessToken?: string;
 };
 
-export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }: Props) {
+export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel, googleAccessToken }: Props) {
   const router = useRouter();
   const { publicKey, signMessage } = useWallet();
   const [loading, setLoading] = useState(false);
@@ -79,8 +80,9 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       console.log(`Compressed to ${(fullImage.size / 1024 / 1024).toFixed(2)} MB`);
 
       const timestamp = Date.now();
-      const fullFileName = `${walletAddress}/${timestamp}_full.webp`;
-      const thumbFileName = `${walletAddress}/${timestamp}_thumb.webp`;
+      const storagePrefix = walletAddress.replace(":", "-");
+      const fullFileName = `${storagePrefix}/${timestamp}_full.webp`;
+      const thumbFileName = `${storagePrefix}/${timestamp}_thumb.webp`;
 
       // Helper for uploading via API
       const uploadFile = async (blob: Blob, path: string) => {
@@ -147,32 +149,42 @@ export function ReceiptForm({ walletAddress, initialData, onSuccess, onCancel }:
       return;
     }
 
-    if (!publicKey || !signMessage) {
+    const isGoogleUser = walletAddress.startsWith("gauth:");
+
+    if (!isGoogleUser && (!publicKey || !signMessage)) {
       setToast({ message: "Please connect your wallet to sign this action.", type: "error" });
       return;
     }
     setLoading(true);
 
     try {
-      const { signChainVolioAction } = await import("@/lib/wallet-utils");
-      const actionType = isEditing ? "update_work" : "submit_work";
-      const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, actionType);
+      let signedFields: Record<string, unknown> = {};
 
-      if (!signedAction) {
-        setToast({ message: "Signing canceled. Please try again.", type: "error" });
-        setLoading(false);
-        return;
+      if (!isGoogleUser) {
+        const { signChainVolioAction } = await import("@/lib/wallet-utils");
+        const actionType = isEditing ? "update_work" : "submit_work";
+        const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, actionType);
+
+        if (!signedAction) {
+          setToast({ message: "Signing canceled. Please try again.", type: "error" });
+          setLoading(false);
+          return;
+        }
+        signedFields = signedAction;
       }
 
       const method = isEditing ? "PATCH" : "POST";
       const res = await fetch("/api/receipts", {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(isGoogleUser && googleAccessToken ? { "Authorization": `Bearer ${googleAccessToken}` } : {}),
+        },
         body: JSON.stringify({
           id: initialData?.id,
           walletAddress,
           ...form,
-          ...signedAction
+          ...signedFields,
         }),
       });
 

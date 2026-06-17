@@ -17,7 +17,7 @@ export function LoadingScreen({ message, fullScreen = true }: { message?: string
 
   if (fullScreen) {
     return (
-      <main className="min-h-screen text-white flex items-center justify-center backdrop-blur-[2px]">
+      <main className="min-h-screen text-white flex items-center justify-center bg-[#111111] md:bg-black">
         {content}
       </main>
     );

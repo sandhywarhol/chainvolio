@@ -10,7 +10,6 @@ const errorResponse = (code: string, message: string, status: number = 400) => {
     }, { status });
 };
 
-// Simple IP Hashing for privacy-preserving rate limits
 function getIpHash() {
     const forward = headers().get("x-forwarded-for");
     const ip = forward ? forward.split(",")[0] : "127.0.0.1";
@@ -31,7 +30,6 @@ export async function GET(request: Request) {
 
         const candidateWallet = wallet || `gauth:${authUid}`;
 
-        // For Google auth users, verify token
         if (authUid || candidateWallet.startsWith("gauth:")) {
             const authHeader = request.headers.get("authorization");
             if (authHeader?.startsWith("Bearer ")) {
@@ -81,16 +79,29 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { collectionSlug, walletAddress, primarySignal, roleStrength, signature, nonce, timestamp } = body;
+        const { collectionSlug, walletAddress, authUid, primarySignal, roleStrength, signature, nonce, timestamp } = body;
         const cleanSignature = signature?.replace(/\s/g, '');
 
-        if (!collectionSlug || !walletAddress) {
-            return errorResponse("ERR_INVALID_REQUEST", "slug and wallet required", 400);
+        if (!collectionSlug || (!walletAddress && !authUid)) {
+            return errorResponse("ERR_INVALID_REQUEST", "slug and wallet or authUid required", 400);
+        }
+
+        const isGoogleUser = !walletAddress && !!authUid;
+        const candidateWallet = walletAddress || `gauth:${authUid}`;
+
+        // Verify Google JWT when no wallet
+        if (isGoogleUser) {
+            const token = request.headers.get("authorization")?.replace("Bearer ", "").trim();
+            if (!token) return errorResponse("ERR_UNAUTHORIZED", "Authorization token required", 401);
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            if (error || !user || user.id !== authUid) {
+                return errorResponse("ERR_UNAUTHORIZED", "Invalid or mismatched auth token", 401);
+            }
         }
 
         const ipHash = getIpHash();
 
-        // 1. Find collection ID & Filters (Do this early for signature context)
+        // 1. Find collection
         const { data: collection, error: colError } = await supabase
             .from("hiring_collections")
             .select("id, eligibility_filters, slug, metadata")
@@ -101,41 +112,34 @@ export async function POST(request: Request) {
             return errorResponse("ERR_COLLECTION_NOT_FOUND", "The hiring collection does not exist", 404);
         }
 
-        // 1b. Enforce submission deadline
+        // 1b. Deadline check
         const deadline = collection.metadata?.deadline;
         if (deadline && new Date(deadline) < new Date()) {
             return errorResponse("ERR_DEADLINE_PASSED", "This position is no longer accepting applications.", 403);
         }
 
-        // --- 2. Advanced Rate Limiting (IP + Wallet Hybrid) ---
-        // Check for existing submissions in the last 1 minute (Wallet)
-        const { count: recentWalletSubmissions } = await supabase
+        // 2. Rate limiting
+        const { count: recentSubmissions } = await supabase
             .from("collection_submissions")
             .select("*", { count: "exact", head: true })
-            .eq("candidate_wallet", walletAddress)
+            .eq("candidate_wallet", candidateWallet)
             .gt("submitted_at", new Date(Date.now() - 60000).toISOString());
 
-        if (recentWalletSubmissions && recentWalletSubmissions > 0) {
+        if (recentSubmissions && recentSubmissions > 0) {
             return errorResponse("ERR_RATE_LIMIT", "Please wait a moment before trying again.", 429);
         }
 
-        // IP-based limit: Max 20 submissions per 24h per IP
-        // (This assumes we have logged attempts or just check total submissions if we trust the hash)
-        // For now, let's just log this attempt in the dedicated table if it exists
         try {
             await supabase.from("submission_activity_logs").insert({
                 ip_hash: ipHash,
-                wallet_address: walletAddress,
+                wallet_address: candidateWallet,
                 action: "apply_job"
             });
-
-            // Verification of IP limit
             const { count: ipCount } = await supabase
                 .from("submission_activity_logs")
                 .select("*", { count: "exact", head: true })
                 .eq("ip_hash", ipHash)
                 .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
-
             if (ipCount && ipCount > 20) {
                 return errorResponse("ERR_RATE_LIMIT_IP", "Daily submission limit reached for this connection.", 429);
             }
@@ -143,72 +147,97 @@ export async function POST(request: Request) {
             console.warn("Audit logging failed, continuing...", auditErr);
         }
 
-        // --- 3. Signature Verification (with Context) ---
-        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!cleanSignature || !nonce || !timestamp)) {
-            return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to apply.", 401);
+        // 3. Signature verification (wallet users only — Google users auth via JWT above)
+        if (!isGoogleUser) {
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!cleanSignature || !nonce || !timestamp)) {
+                return errorResponse("ERR_SIGNATURE_REQUIRED", "Signature required to apply.", 401);
+            }
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                walletAddress,
+                "apply_job",
+                nonce || "",
+                timestamp || 0,
+                cleanSignature || "",
+                collectionSlug
+            );
+            if (!isValid) {
+                return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+            }
+            await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
         }
 
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            walletAddress,
-            "apply_job",
-            nonce || "",
-            timestamp || 0,
-            cleanSignature || "",
-            collectionSlug // Hardening: Signature is now bound to THIS collection
-        );
+        // 4. Fetch candidate data for snapshot
+        let profile: any = null;
+        let receiptList: any[] = [];
+        let portfolioList: any[] = [];
+        let attestedCount = 0;
 
-        if (!isValid) {
-            return errorResponse("ERR_SIGNATURE_CONTEXT", sigError || "Signature verification failed.", 401);
+        if (isGoogleUser) {
+            const { data: orgAccount } = await supabase
+                .from("org_accounts")
+                .select("org_name, avatar_url, bio")
+                .eq("auth_uid", authUid)
+                .maybeSingle();
+            const { data: projects } = await supabase
+                .from("org_projects")
+                .select("title, description, project_type, project_url, start_date, end_date, is_ongoing")
+                .eq("owner_auth_uid", authUid)
+                .order("created_at", { ascending: false });
+            profile = orgAccount
+                ? { display_name: orgAccount.org_name, avatar_url: orgAccount.avatar_url, bio: orgAccount.bio, skills: "" }
+                : null;
+            receiptList = (projects || []).map((p: any) => ({
+                role: p.title,
+                org: p.project_type || "",
+                description: p.description || "",
+                start_date: p.start_date,
+                end_date: p.is_ongoing ? null : p.end_date,
+                status: "Active",
+            }));
+        } else {
+            const { data: walletProfile } = await supabase
+                .from("profiles")
+                .select("display_name, avatar_url, bio, skills")
+                .eq("wallet_address", walletAddress)
+                .single();
+            const { data: receipts } = await supabase
+                .from("receipts")
+                .select("role, org, description, start_date, end_date, work_type, status, evidence_links, impact")
+                .eq("wallet_address", walletAddress)
+                .order("start_date", { ascending: false });
+            const { data: portfolio } = await supabase
+                .from("portfolio_items")
+                .select("title, description, image_url, thumbnail_url")
+                .eq("wallet_address", walletAddress);
+            profile = walletProfile;
+            receiptList = receipts || [];
+            portfolioList = portfolio || [];
+            attestedCount = receiptList.filter((r: any) => r.status === "Attested").length;
         }
 
-        // Set transaction context for RLS parity
-        await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
-
-        // 4. Fetch Deep Candidate Data for Snapshot
-        const { data: profile } = await supabase
-            .from("profiles")
-            .select("display_name, avatar_url, bio, skills")
-            .eq("wallet_address", walletAddress)
-            .single();
-
-        const { data: receipts } = await supabase
-            .from("receipts")
-            .select("role, org, description, start_date, end_date, work_type, status, evidence_links, impact")
-            .eq("wallet_address", walletAddress)
-            .order("start_date", { ascending: false });
-
-        const { data: portfolio } = await supabase
-            .from("portfolio_items")
-            .select("title, description, image_url, thumbnail_url")
-            .eq("wallet_address", walletAddress);
-
-        const receiptList = receipts || [];
-        const portfolioList = portfolio || [];
-        const attestedCount = receiptList.filter((r: any) => r.status === "Attested").length;
-
-        // 5. Enforce Eligibility Filters (Server-Side)
+        // 5. Eligibility filters
         const filters = collection.eligibility_filters || {};
-
-        if (filters.activeWalletOnly && attestedCount < 1) {
+        if (filters.activeWalletOnly && (isGoogleUser || attestedCount < 1)) {
             return errorResponse("ERR_ELIGIBILITY_ACTIVE_WALLET", "This position requires an active wallet with at least 1 attested proof of work.", 403);
         }
 
-        // 6. Compute Dynamic Snapshot Tags
+        // 6. Snapshot tags
         const tags: string[] = [];
         if (receiptList.length >= 10) tags.push("Experienced Professional");
-        else if (receiptList.length >= 5) tags.push("Strong On-chain History");
+        else if (receiptList.length >= 5) tags.push("Strong History");
+        if (!isGoogleUser) {
+            if (attestedCount >= 3) tags.push("Top-Tier Verified");
+            else if (attestedCount >= 1) tags.push("Verified Contributor");
+        }
 
-        if (attestedCount >= 3) tags.push("Top-Tier Verified");
-        else if (attestedCount >= 1) tags.push("Verified Contributor");
-
-        // 7. Insert submission with Deep Snapshot
+        // 7. Insert submission
         const { error: subError } = await supabase
             .from("collection_submissions")
             .insert({
                 collection_id: collection.id,
-                candidate_wallet: walletAddress,
+                candidate_wallet: candidateWallet,
                 primary_signal: primarySignal || "Not specified",
                 role_strength: roleStrength || "Not specified",
                 snapshot_data: {
@@ -220,7 +249,7 @@ export async function POST(request: Request) {
                     },
                     experience: receiptList,
                     portfolio: portfolioList,
-                    tags: tags,
+                    tags,
                     stats: {
                         receipts: receiptList.length,
                         attested: attestedCount,
@@ -237,13 +266,14 @@ export async function POST(request: Request) {
             return errorResponse("ERR_DATABASE_ERROR", subError.message, 500);
         }
 
-        // 8. Mark source receipts as 'Submitted' (Locked for Talent)
-        // This ensures the candidate cannot edit the history they just shared.
-        await supabase
-            .from("receipts")
-            .update({ status: "Submitted" })
-            .eq("wallet_address", walletAddress)
-            .in("status", ["Draft", "Submitted", "Candidate Claim", null]);
+        // 8. Lock receipts for wallet users
+        if (!isGoogleUser) {
+            await supabase
+                .from("receipts")
+                .update({ status: "Submitted" })
+                .eq("wallet_address", walletAddress)
+                .in("status", ["Draft", "Submitted", "Candidate Claim", null]);
+        }
 
         return NextResponse.json({ ok: true, message: "Application submitted successfully" });
     } catch (err: any) {

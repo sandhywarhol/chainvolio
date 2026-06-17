@@ -192,26 +192,35 @@ export async function POST(request: Request) {
 
         const { role, org, description, evidenceLinks, impact } = sanitizeReceiptBody(body);
 
-        // --- Signature Verification ---
-        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!signature || !nonce || !timestamp)) {
-            return NextResponse.json({ error: "Signature required to save progress." }, { status: 401 });
+        // --- Auth: Google user (gauth: prefix) or wallet signature ---
+        const isGoogleUser = walletAddress.startsWith("gauth:");
+
+        if (isGoogleUser) {
+            const token = request.headers.get("Authorization")?.replace("Bearer ", "").trim();
+            if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            const authUid = walletAddress.slice("gauth:".length);
+            if (user.id !== authUid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        } else {
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!signature || !nonce || !timestamp)) {
+                return NextResponse.json({ error: "Signature required to save progress." }, { status: 401 });
+            }
+
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                walletAddress,
+                "submit_work",
+                nonce || "",
+                timestamp || 0,
+                signature || ""
+            );
+            if (!isValid) return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+
+            await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
         }
-
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            walletAddress,
-            "submit_work",
-            nonce || "",
-            timestamp || 0,
-            signature || ""
-        );
-
-        if (!isValid) return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
         // ----------------------------
-
-        // Set trans context for RLS
-        await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
 
         const { data, error } = await supabase.from("receipts").insert({
             wallet_address: walletAddress,
@@ -255,26 +264,35 @@ export async function PATCH(request: Request) {
 
         const { role, org, description, evidenceLinks, impact } = sanitizeReceiptBody(body);
 
-        // --- Signature Verification ---
-        const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
-        if (!skipVerify && (!signature || !nonce || !timestamp)) {
-            return NextResponse.json({ error: "Signature required to update progress." }, { status: 401 });
+        // --- Auth: Google user (gauth: prefix) or wallet signature ---
+        const isGoogleUser = walletAddress.startsWith("gauth:");
+
+        if (isGoogleUser) {
+            const token = request.headers.get("Authorization")?.replace("Bearer ", "").trim();
+            if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+            if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            const authUid = walletAddress.slice("gauth:".length);
+            if (user.id !== authUid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        } else {
+            const skipVerify = process.env.SKIP_SIG_VERIFY === "true" && process.env.NODE_ENV !== "production";
+            if (!skipVerify && (!signature || !nonce || !timestamp)) {
+                return NextResponse.json({ error: "Signature required to update progress." }, { status: 401 });
+            }
+
+            const { verifySignature } = await import("@/lib/crypto");
+            const { isValid, error: sigError } = await verifySignature(
+                walletAddress,
+                "update_work",
+                nonce || "",
+                timestamp || 0,
+                signature || ""
+            );
+            if (!isValid) return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
+
+            await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
         }
-
-        const { verifySignature } = await import("@/lib/crypto");
-        const { isValid, error: sigError } = await verifySignature(
-            walletAddress,
-            "update_work",
-            nonce || "",
-            timestamp || 0,
-            signature || ""
-        );
-
-        if (!isValid) return NextResponse.json({ error: sigError || "Signature verification failed." }, { status: 401 });
         // ----------------------------
-
-        // Set trans context for RLS
-        await supabase.rpc('set_app_wallet', { wallet_addr: walletAddress });
 
         const { data, error } = await supabase.from("receipts").update({
             role,

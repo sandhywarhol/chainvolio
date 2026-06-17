@@ -49,9 +49,9 @@ const mockReceipts = [
 ];
 
 const mockPortfolio = [
-    { id: "p1", label: "Nexus Block Explorer", color: "#14F195" },
-    { id: "p2", label: "Staking UI v2", color: "#60a5fa" },
-    { id: "p3", label: "Audit Dashboard", color: "#a78bfa" },
+    { id: "p1", label: "Nexus Block Explorer", color: "rgba(255,255,255,0.45)" },
+    { id: "p2", label: "Staking UI v2", color: "rgba(255,255,255,0.35)" },
+    { id: "p3", label: "Audit Dashboard", color: "rgba(255,255,255,0.3)" },
 ];
 
 // ─── BACKGROUND DASHBOARD PANELS ────────────────────────────────────────────
@@ -68,9 +68,9 @@ function DashboardPanels() {
                 </div>
                 <div className="space-y-4">
                     {[
-                        { name: "Nexus Protocol", time: "2h ago", msg: "Verified your role as Senior Protocol Engineer via on-chain signature.", color: "#34d399" },
-                        { name: "Solana Fnd", time: "1d ago", msg: "Issued a builder credential for your participation in the Grizzlython hackathon.", color: "#a78bfa" },
-                        { name: "Superteam", time: "3d ago", msg: "Endorsed your Proof of Work submission for 'Blinks Integration'.", color: "#f59e0b" },
+                        { name: "Nexus Protocol", time: "2h ago", msg: "Verified your role as Senior Protocol Engineer via on-chain signature.", color: "rgba(255,255,255,0.4)" },
+                        { name: "Solana Fnd", time: "1d ago", msg: "Issued a builder credential for your participation in the Grizzlython hackathon.", color: "rgba(255,255,255,0.35)" },
+                        { name: "Superteam", time: "3d ago", msg: "Endorsed your Proof of Work submission for 'Blinks Integration'.", color: "rgba(255,255,255,0.3)" },
                     ].map((m, i) => (
                         <div key={i} className="flex items-start gap-3">
                             <div className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" style={{ background: m.color + "25", border: `1px solid ${m.color}35` }}>
@@ -101,13 +101,13 @@ function DashboardPanels() {
                     <div className="text-[9px] text-white/20 font-bold">2024 - Present</div>
                 </div>
                 <div className="space-y-3">
-                    <div className="p-2.5 rounded-lg bg-white/[0.02] border border-emerald-500/20 w-[80%] flex items-center justify-between">
-                        <p className="text-emerald-400/80 font-bold text-[9px]">Smart Contract Dev</p>
-                        <p className="text-emerald-500/60 text-[8px] flex items-center gap-1">✓ Verified</p>
+                    <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.08] w-[80%] flex items-center justify-between">
+                        <p className="text-white/50 font-bold text-[9px]">Smart Contract Dev</p>
+                        <p className="text-white/35 text-[8px] flex items-center gap-1">✓ Verified</p>
                     </div>
                     <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] w-[90%] flex items-center justify-between">
                         <p className="text-white/60 font-bold text-[9px]">Senior Protocol Engineer</p>
-                        <p className="text-amber-500/60 text-[8px]">Pending Audit</p>
+                        <p className="text-white/30 text-[8px]">Pending Audit</p>
                     </div>
                 </div>
             </div>
@@ -122,9 +122,9 @@ function DashboardPanels() {
                 </div>
                 <div className="space-y-4">
                     {[
-                        { name: "Jump Crypto", action: "viewed your verifiable CV", time: "2h ago", color: "#60a5fa" },
-                        { name: "Paradigm", action: "requested an interview for Lead Rust Dev", time: "3h ago", color: "#a78bfa" },
-                        { name: "Chainvolio", action: "matched you with 3 open roles", time: "5h ago", color: "#f59e0b" },
+                        { name: "Jump Crypto", action: "viewed your verifiable CV", time: "2h ago", color: "rgba(255,255,255,0.4)" },
+                        { name: "Paradigm", action: "requested an interview for Lead Rust Dev", time: "3h ago", color: "rgba(255,255,255,0.35)" },
+                        { name: "Chainvolio", action: "matched you with 3 open roles", time: "5h ago", color: "rgba(255,255,255,0.3)" },
                     ].map((t, i) => (
                         <div key={i} className="flex items-start gap-3">
                             <div className="w-6 h-6 rounded-full flex-shrink-0" style={{ background: t.color + "20", border: `1px solid ${t.color}30` }}>
@@ -150,9 +150,9 @@ function DashboardPanels() {
                 </div>
                 <div className="space-y-3">
                     {[
-                        { name: "Solana Pay Integration", status: "Verified", icon: "✓", statCol: "text-emerald-500/50" },
-                        { name: "DeFi Liquidity Vault", status: "Audited", icon: "🔒", statCol: "text-blue-400/50" },
-                        { name: "Parallel Execution Engine", status: "Peer Reviewed", icon: "👁", statCol: "text-fuchsia-400/50" },
+                        { name: "Solana Pay Integration", status: "Verified", icon: "✓", statCol: "text-white/30" },
+                        { name: "DeFi Liquidity Vault", status: "Audited", icon: "🔒", statCol: "text-white/25" },
+                        { name: "Parallel Execution Engine", status: "Peer Reviewed", icon: "👁", statCol: "text-white/25" },
                         { name: "Open Source Libs", status: "Github Linked", icon: "🔗", statCol: "text-white/30" },
                     ].map((p, i) => (
                         <div key={i} className="flex items-center justify-between">
@@ -175,7 +175,7 @@ function DashboardPanels() {
                     <span className="text-white/15 text-[10px]">•••</span>
                 </div>
                 <div className="mb-4">
-                    <span className="text-emerald-500/40 text-[9px]">All systems synced ∨</span>
+                    <span className="text-white/25 text-[9px]">All systems synced ∨</span>
                 </div>
                 <div className="space-y-4">
                     {[
@@ -185,14 +185,14 @@ function DashboardPanels() {
                     ].map((n, i) => (
                         <div key={i} className="flex items-start gap-3">
                             <div className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5 border border-white/10 flex items-center justify-center">
-                                <span className="text-emerald-500/50 text-[8px]">✓</span>
+                                <span className="text-white/30 text-[8px]">✓</span>
                             </div>
                             <div className="flex-1">
                                 <p className="text-white/30 text-[9px]">{n.title}</p>
                                 <p className="text-white/50 text-[9px] font-bold">{n.sub}</p>
                                 <p className="text-white/15 text-[8px]">{n.time}</p>
                             </div>
-                            {n.dot && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 mt-1" />}
+                            {n.dot && <div className="w-1.5 h-1.5 rounded-full bg-white/25 mt-1" />}
                         </div>
                     ))}
                 </div>
@@ -208,7 +208,7 @@ function DashboardPanels() {
                     <p className="text-white/20 text-[9px] mb-1">Total Profile Views</p>
                     <div className="flex items-baseline gap-3">
                         <span className="text-white/70 text-[28px] font-black leading-none">1.2K</span>
-                        <span className="text-emerald-500/70 text-[10px] font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">+15.2%</span>
+                        <span className="text-white/40 text-[10px] font-bold bg-white/[0.05] px-1.5 py-0.5 rounded">+15.2%</span>
                     </div>
                 </div>
             </div>
@@ -220,8 +220,8 @@ function DashboardPanels() {
                     <span className="text-white/15 text-[10px]">•••</span>
                 </div>
                 <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                        <span className="text-emerald-400 text-[12px]">⭐</span>
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
+                        <span className="text-white/40 text-[12px] grayscale">⭐</span>
                     </div>
                     <div>
                         <p className="text-white/20 text-[9px]">Score increased by +15 points</p>
@@ -240,17 +240,17 @@ function DashboardPanels() {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full border border-amber-500/50"></div>
+                            <div className="w-3 h-3 rounded-full border border-white/20"></div>
                             <span className="text-white/40 text-[9px]">Previous Employer Sig</span>
                         </div>
-                        <span className="text-amber-500/50 text-[8px]">Pending</span>
+                        <span className="text-white/25 text-[8px]">Pending</span>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full border border-emerald-500/50 bg-emerald-500/20"></div>
+                            <div className="w-3 h-3 rounded-full border border-white/20 bg-white/[0.07]"></div>
                             <span className="text-white/40 text-[9px]">Wallet Snapshot</span>
                         </div>
-                        <span className="text-emerald-500/50 text-[8px]">Confirmed</span>
+                        <span className="text-white/30 text-[8px]">Confirmed</span>
                     </div>
                 </div>
             </div>
@@ -270,7 +270,7 @@ function DashboardPanels() {
                 <div className="grid grid-cols-7 gap-y-2 text-center">
                     {[...Array(4)].map((_, i) => <div key={`e${i}`} className="w-4 h-4 mx-auto rounded-sm bg-white/[0.02]" />)}
                     {Array.from({ length: 31 }, (_, i) => i + 1).map(d => {
-                        const intensity = d % 7 === 0 ? "bg-emerald-500/80" : d % 3 === 0 ? "bg-emerald-500/40" : "bg-white/[0.02]";
+                        const intensity = d % 7 === 0 ? "bg-white/25" : d % 3 === 0 ? "bg-white/10" : "bg-white/[0.02]";
                         return (
                             <div key={d} className={`w-4 h-4 mx-auto rounded-sm ${intensity} border border-white/[0.05]`} />
                         );
@@ -289,13 +289,13 @@ function DashboardPanels() {
                         <div className="flex items-center gap-2">
                             <span className="text-white/40 text-[9px]">Direct Attestations</span>
                         </div>
-                        <span className="text-emerald-500/70 text-[9px] font-mono">12</span>
+                        <span className="text-white/45 text-[9px] font-mono">12</span>
                     </div>
                     <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.03]">
                         <div className="flex items-center gap-2">
                             <span className="text-white/40 text-[9px]">Endorsed Skills</span>
                         </div>
-                        <span className="text-emerald-500/70 text-[9px] font-mono">8</span>
+                        <span className="text-white/40 text-[9px] font-mono">8</span>
                     </div>
                     <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.03]">
                         <div className="flex items-center gap-2">
@@ -314,7 +314,7 @@ function DashboardPanels() {
                 </div>
                 <div className="space-y-4 relative before:absolute before:inset-y-0 before:left-1.5 before:w-px before:bg-white/[0.05]">
                     {[
-                        { wallet: "Phantom (Primary)", pubkey: "5xAr...b9Kf", status: "Verified", color: "text-emerald-500" },
+                        { wallet: "Phantom (Primary)", pubkey: "5xAr...b9Kf", status: "Verified", color: "text-white/40" },
                         { wallet: "Backpack", pubkey: "9YxQ...m2Lp", status: "Connected", color: "text-white/50" },
                     ].map((d, i) => (
                         <div key={i} className="flex items-start gap-3 relative z-10">
@@ -340,7 +340,7 @@ function DashboardPanels() {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="text-emerald-500 text-[10px]">✓</span>
+                            <span className="text-white/30 text-[10px]">✓</span>
                             <span className="text-white/40 text-[9px]">Rust Development</span>
                         </div>
                         <div className="flex items-center gap-1">
@@ -349,11 +349,11 @@ function DashboardPanels() {
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="text-emerald-500 text-[10px]">✓</span>
+                            <span className="text-white/30 text-[10px]">✓</span>
                             <span className="text-white/40 text-[9px]">Smart Contracts</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <span className="text-amber-500/60 text-[8px]">Verified via Hackathon</span>
+                            <span className="text-white/30 text-[8px]">Verified via Hackathon</span>
                         </div>
                     </div>
                 </div>
@@ -363,10 +363,10 @@ function DashboardPanels() {
             <div className="absolute top-[62%] left-[18%] w-[180px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-white/30 font-bold tracking-wide text-[10px]">Profile Strength</span>
-                    <span className="text-emerald-500/70 text-[9px] font-bold">Expert</span>
+                    <span className="text-white/35 text-[9px] font-bold">Expert</span>
                 </div>
                 <div className="w-full h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500/50 w-[85%] rounded-full" />
+                    <div className="h-full bg-white/25 w-[85%] rounded-full" />
                 </div>
             </div>
 
@@ -374,14 +374,14 @@ function DashboardPanels() {
             <div className="absolute top-[32%] left-[28%] w-[160px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl">
                 <div className="flex flex-col items-center justify-center text-center">
                     <span className="text-white/30 font-bold tracking-wide text-[9px] mb-2">Global Rank</span>
-                    <span className="text-emerald-400 text-[24px] font-black leading-none">Top 1%</span>
+                    <span className="text-white/55 text-[24px] font-black leading-none">Top 1%</span>
                     <span className="text-white/20 text-[8px] mt-1">among Rust Devs</span>
                 </div>
             </div>
 
             {/* 15. Latest Badge (Center) */}
             <div className="absolute top-[52%] left-[40%] w-[180px] p-4 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500/20 to-blue-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center flex-shrink-0">
                     <span className="text-[14px]">🏆</span>
                 </div>
                 <div>
@@ -395,7 +395,7 @@ function DashboardPanels() {
                 <span className="text-white/30 font-bold text-[9px] mb-2 block">Score Trend</span>
                 <div className="flex items-end gap-1 h-[30px]">
                     {[40, 60, 45, 80, 65, 90, 100].map((h, i) => (
-                        <div key={i} className="flex-1 bg-emerald-500/20 rounded-t-sm" style={{ height: `${h}%` }} />
+                        <div key={i} className="flex-1 bg-white/15 rounded-t-sm" style={{ height: `${h}%` }} />
                     ))}
                 </div>
             </div>
@@ -411,7 +411,7 @@ function DashboardPanels() {
             {/* 18. Network Metrics (Top Right Center) - Adjusted up to avoid Connected Wallets */}
             <div className="absolute top-[2%] right-[28%] w-[150px] p-3 rounded-[16px] bg-[#0c0c0c] border border-white/[0.05] shadow-2xl flex justify-between items-center">
                 <span className="text-white/30 font-bold text-[9px]">Solana TPS</span>
-                <span className="text-emerald-500/70 text-[9px] font-mono">2,840</span>
+                <span className="text-white/35 text-[9px] font-mono">2,840</span>
             </div>
         </div>
     );
@@ -481,12 +481,12 @@ function PublicCVCardMockup() {
                 <div className="absolute top-10 right-10 z-50 flex flex-col gap-8 items-center">
                     {/* Verified Rosette Mock */}
                     <div className="relative group/vcheck">
-                        <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-slate-900/90 backdrop-blur-xl border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                        <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-slate-900/90 backdrop-blur-xl border border-white/[0.2]">
                             <div className="relative w-8 h-8 flex items-center justify-center">
-                                <svg viewBox="0 0 24 24" className="w-full h-full fill-none stroke-emerald-400 stroke-[1.5]">
+                                <svg viewBox="0 0 24 24" className="w-full h-full fill-none stroke-white/40 stroke-[1.5]">
                                     <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z" />
                                 </svg>
-                                <Check className="absolute w-4 h-4 text-emerald-400" strokeWidth={4} />
+                                <Check className="absolute w-4 h-4 text-white/50" strokeWidth={4} />
                             </div>
                         </div>
                     </div>
@@ -523,7 +523,7 @@ function PublicCVCardMockup() {
                             </div>
                             <div className="pt-4">
                                 <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Availability</p>
-                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-400">
+                                <span className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.12] text-[11px] font-bold text-white/50">
                                     Full-time
                                 </span>
                             </div>
@@ -533,7 +533,7 @@ function PublicCVCardMockup() {
                     {/* Info Column */}
                     <div className="flex-1 flex flex-col space-y-5">
                         {/* Looking For */}
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 w-max">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.1] text-white/50 w-max">
                             <Globe className="w-4 h-4" />
                             <span className="text-[13px] font-bold">Open to remote as Protocol Engineer</span>
                         </div>
@@ -638,7 +638,7 @@ export function Web3ResumeSection({ onCtaClick }: { onCtaClick: () => void }) {
                         { title: "Tamper-proof", icon: ShieldCheck },
                     ].map((bullet, i) => (
                         <div key={i} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors group cursor-default">
-                            <bullet.icon className="w-3.5 h-3.5 text-emerald-500/40 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
+                            <bullet.icon className="w-3.5 h-3.5 text-white/25 group-hover:text-white/50 transition-colors flex-shrink-0" />
                             <span className="text-[9px] font-bold text-white/40 group-hover:text-white/80 transition-colors uppercase tracking-[0.2em]">{bullet.title}</span>
                         </div>
                     ))}

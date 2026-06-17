@@ -354,10 +354,14 @@ export default function AttestPage() {
 
             const res = await fetch("/api/attest", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(googleSession?.access_token ? { "Authorization": `Bearer ${googleSession.access_token}` } : {}),
+                },
                 body: JSON.stringify({
                     receiptId: receipt.id,
                     attesterWallet: publicKey.toBase58(),
+                    attesterAuthUid: googleSession && googleOrg?.auth_uid ? googleOrg.auth_uid : undefined,
                     comment,
                     attesterName,
                     attesterRole,

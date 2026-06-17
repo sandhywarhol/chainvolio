@@ -58,8 +58,8 @@ export function WalletMultiButton() {
     return (
       <>
         <div className="flex items-center gap-2">
-          {/* Google session status badge */}
-          {googleSession && (
+          {googleSession ? (
+            /* Google-only: just show the org badge, no "Link Wallet" in navbar */
             <div className="relative" ref={googleMenuRef}>
               <button
                 onClick={() => setGoogleMenuOpen(!googleMenuOpen)}
@@ -91,15 +91,16 @@ export function WalletMultiButton() {
                 </div>
               )}
             </div>
+          ) : (
+            /* No session at all: show Sign In button */
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-4 py-2 bg-black hover:bg-neutral-900 text-white border border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
+            >
+              <Wallet className="w-3.5 h-3.5" />
+              Sign In
+            </button>
           )}
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-black hover:bg-neutral-900 text-white border border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
-          >
-            <Wallet className="w-3.5 h-3.5" />
-            {googleSession ? "Link Wallet" : "Sign In"}
-          </button>
         </div>
         <CustomWalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </>

@@ -12,11 +12,23 @@ async function verifyUser(req: NextRequest, uid: string) {
 
 // GET /api/org-accounts?auth_uid=<uid>
 // Returns the org_account row for the given Supabase Auth UID.
+// Pass ?public=true to get public-safe fields only (no auth required) — used for public builder/org profile pages.
 export async function GET(req: NextRequest) {
     if (!supabaseServer) return NextResponse.json({ error: "Server error" }, { status: 500 });
 
     const authUid = req.nextUrl.searchParams.get("auth_uid");
     if (!authUid) return NextResponse.json({ error: "auth_uid required" }, { status: 400 });
+
+    // Public read: returns only safe fields, no auth token required
+    if (req.nextUrl.searchParams.get("public") === "true") {
+        const { data, error } = await supabaseServer
+            .from("org_accounts")
+            .select("org_name, bio, skills, avatar_url, website, twitter, linkedin, discord, telegram, email, country, account_type")
+            .eq("auth_uid", authUid)
+            .maybeSingle();
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ orgAccount: data });
+    }
 
     const token = req.headers.get("Authorization")?.replace("Bearer ", "").trim();
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

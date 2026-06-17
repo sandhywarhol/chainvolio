@@ -252,10 +252,10 @@ function MockRecruiterDashboardUI() {
                     <p style={{ fontSize: 7.5, fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 7, paddingLeft: 8 }}>Pipeline Overview</p>
                     <div className="space-y-1">
                         {[
-                            { label: "Pipeline Depth",  value: "24",  Icon: User,        color: "rgba(96,165,250,0.7)" },
-                            { label: "Authority Rate",   value: "58%", Icon: ShieldCheck, color: "rgba(52,211,153,0.7)" },
-                            { label: "Signal Density",   value: "7.2", Icon: Briefcase,   color: "rgba(129,140,248,0.7)" },
-                            { label: "Network Breadth",  value: "11",  Icon: Building2,   color: "rgba(251,191,36,0.7)" },
+                            { label: "Pipeline Depth",  value: "24",  Icon: User,        color: "rgba(255,255,255,0.3)" },
+                            { label: "Authority Rate",   value: "58%", Icon: ShieldCheck, color: "rgba(255,255,255,0.3)" },
+                            { label: "Signal Density",   value: "7.2", Icon: Briefcase,   color: "rgba(255,255,255,0.3)" },
+                            { label: "Network Breadth",  value: "11",  Icon: Building2,   color: "rgba(255,255,255,0.3)" },
                         ].map((s, i) => (
                             <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 8px", borderRadius: 6, background: "rgba(255,255,255,0.02)" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -316,8 +316,8 @@ function MockRecruiterDashboardUI() {
                                 <div style={{
                                     display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 0.8fr",
                                     padding: "9px 16px", alignItems: "center",
-                                    background: isOpen ? "rgba(99,102,241,0.04)" : "transparent",
-                                    borderLeft: isOpen ? "2px solid rgba(99,102,241,0.4)" : "2px solid transparent",
+                                    background: isOpen ? "rgba(255,255,255,0.02)" : "transparent",
+                                    borderLeft: isOpen ? "2px solid rgba(255,255,255,0.12)" : "2px solid transparent",
                                     transition: "background 0.25s ease, border-color 0.25s ease",
                                 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
@@ -333,7 +333,7 @@ function MockRecruiterDashboardUI() {
                                         </div>
                                     </div>
                                     <div>
-                                        <span style={{ fontSize: 7.5, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.08em", padding: "2px 6px", borderRadius: 3, background: c.signal === "STRONG" ? "rgba(52,211,153,0.1)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.1)" : "rgba(239,68,68,0.08)", color: c.signal === "STRONG" ? "rgba(52,211,153,0.9)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.9)" : "rgba(239,68,68,0.7)", border: `1px solid ${c.signal === "STRONG" ? "rgba(52,211,153,0.2)" : c.signal === "CALIBRATED" ? "rgba(251,191,36,0.2)" : "rgba(239,68,68,0.15)"}` }}>
+                                        <span style={{ fontSize: 7.5, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.08em", padding: "2px 6px", borderRadius: 3, background: c.signal === "LOW SIGNAL" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.06)", color: c.signal === "LOW SIGNAL" ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.08)" }}>
                                             {c.signal}
                                         </span>
                                     </div>
@@ -348,7 +348,7 @@ function MockRecruiterDashboardUI() {
                                         </div>
                                         <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.05)" }} />
                                         <div style={{ textAlign: "center" as const }}>
-                                            <p style={{ fontSize: 13, fontWeight: 700, color: c.attested > 0 ? "rgba(52,211,153,0.85)" : "rgba(255,255,255,0.18)", lineHeight: 1 }}>{c.attested}</p>
+                                            <p style={{ fontSize: 13, fontWeight: 700, color: c.attested > 0 ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.18)", lineHeight: 1 }}>{c.attested}</p>
                                             <p style={{ fontSize: 6.5, fontWeight: 700, color: "rgba(255,255,255,0.18)", textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>attest</p>
                                         </div>
                                     </div>
@@ -365,12 +365,12 @@ function MockRecruiterDashboardUI() {
                                     overflow: "hidden",
                                     transition: "max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease",
                                     background: "rgba(0,0,0,0.4)",
-                                    borderLeft: "2px solid rgba(99,102,241,0.35)",
+                                    borderLeft: "2px solid rgba(255,255,255,0.08)",
                                 }}>
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, padding: "14px 20px 14px 18px" }}>
                                         {/* Left: Candidate intelligence */}
                                         <div>
-                                            <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(99,102,241,0.7)", textTransform: "uppercase" as const, letterSpacing: "0.2em", marginBottom: 8 }}>Candidate Intelligence</p>
+                                            <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.3)", textTransform: "uppercase" as const, letterSpacing: "0.2em", marginBottom: 8 }}>Candidate Intelligence</p>
                                             <p style={{ fontSize: 9.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.55, marginBottom: 10, fontWeight: 500 }}>{c.bio}</p>
                                             <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 4 }}>
                                                 {c.skills.map((sk) => (
@@ -379,8 +379,8 @@ function MockRecruiterDashboardUI() {
                                             </div>
                                             {c.attested > 0 && (
                                                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 5 }}>
-                                                    <ShieldCheck style={{ width: 9, height: 9, color: "rgba(52,211,153,0.7)" }} />
-                                                    <span style={{ fontSize: 8, fontWeight: 700, color: "rgba(52,211,153,0.65)" }}>Protocol Verified · {c.org}</span>
+                                                    <ShieldCheck style={{ width: 9, height: 9, color: "rgba(255,255,255,0.35)" }} />
+                                                    <span style={{ fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>Protocol Verified · {c.org}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -388,20 +388,20 @@ function MockRecruiterDashboardUI() {
                                         <div>
                                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                                                 <p style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.22)", textTransform: "uppercase" as const, letterSpacing: "0.2em" }}>Pipeline Calibration</p>
-                                                <span style={{ fontSize: 7.5, fontWeight: 800, color: c.status === "shortlisted" ? "rgba(52,211,153,0.8)" : c.status === "hired" ? "rgba(99,102,241,0.8)" : c.status === "rejected" ? "rgba(239,68,68,0.6)" : "rgba(255,255,255,0.3)", background: c.status === "shortlisted" ? "rgba(52,211,153,0.08)" : c.status === "hired" ? "rgba(99,102,241,0.08)" : c.status === "rejected" ? "rgba(239,68,68,0.06)" : "rgba(255,255,255,0.04)", border: `1px solid ${c.status === "shortlisted" ? "rgba(52,211,153,0.2)" : c.status === "hired" ? "rgba(99,102,241,0.2)" : c.status === "rejected" ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)"}`, padding: "2px 7px", borderRadius: 3, textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>
+                                                <span style={{ fontSize: 7.5, fontWeight: 800, color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "2px 7px", borderRadius: 3, textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>
                                                     {c.status === "pending" ? "Under Review" : c.status.toUpperCase()}
                                                 </span>
                                             </div>
                                             <div style={{ display: "flex", gap: 6, marginBottom: 7 }}>
-                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "shortlisted" ? "1px solid rgba(52,211,153,0.5)" : "1px solid rgba(52,211,153,0.12)", background: c.status === "shortlisted" ? "rgba(52,211,153,0.15)" : "rgba(52,211,153,0.04)", textAlign: "center" as const }}>
-                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "shortlisted" ? "rgba(52,211,153,1)" : "rgba(52,211,153,0.45)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Shortlist</span>
+                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "shortlisted" ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.06)", background: c.status === "shortlisted" ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.02)", textAlign: "center" as const }}>
+                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "shortlisted" ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.3)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Shortlist</span>
                                                 </div>
-                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "rejected" ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.06)", background: c.status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.02)", textAlign: "center" as const }}>
-                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "rejected" ? "rgba(239,68,68,0.85)" : "rgba(255,255,255,0.25)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Reject</span>
+                                                <div style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: c.status === "rejected" ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.06)", background: c.status === "rejected" ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)", textAlign: "center" as const }}>
+                                                    <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "rejected" ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>Reject</span>
                                                 </div>
                                             </div>
-                                            <div style={{ padding: "7px 0", borderRadius: 7, border: c.status === "hired" ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(99,102,241,0.14)", background: c.status === "hired" ? "rgba(99,102,241,0.18)" : "rgba(99,102,241,0.05)", textAlign: "center" as const }}>
-                                                <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "hired" ? "rgba(99,102,241,1)" : "rgba(99,102,241,0.5)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>
+                                            <div style={{ padding: "7px 0", borderRadius: 7, border: c.status === "hired" ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.07)", background: c.status === "hired" ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.02)", textAlign: "center" as const }}>
+                                                <span style={{ fontSize: 8, fontWeight: 800, color: c.status === "hired" ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.3)", textTransform: "uppercase" as const, letterSpacing: "0.15em" }}>
                                                     {c.status === "hired" ? "Hired On-Chain ✓" : "Mark as Hired"}
                                                 </span>
                                             </div>
@@ -475,10 +475,10 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 // Card 1 — Activity Feed (emerald) — like Linear's left Activity panel
 function AttestationCard() {
     const items = [
-        { initials: "DC", color: "#34d399", name: "David Chen", action: "attested your work on", subject: "Brand Identity Design", time: "2m ago" },
-        { initials: "SD", color: "#60a5fa", name: "Superteam DAO", action: "attested your contribution at", subject: "Solana Hackathon", time: "1h ago" },
-        { initials: "SA", color: "#a78bfa", name: "Smart Contract Auditor", action: "attested your audit on", subject: "Payment Protocol v2", time: "3h ago" },
-        { initials: "GH", color: "#f59e0b", name: "GitHub", action: "verified your contribution in", subject: "chainvolio/identity-core", time: "1d ago" },
+        { initials: "DC", color: "#94a3b8", name: "David Chen", action: "attested your work on", subject: "Brand Identity Design", time: "2m ago" },
+        { initials: "SD", color: "#94a3b8", name: "Superteam DAO", action: "attested your contribution at", subject: "Solana Hackathon", time: "1h ago" },
+        { initials: "SA", color: "#94a3b8", name: "Smart Contract Auditor", action: "attested your audit on", subject: "Payment Protocol v2", time: "3h ago" },
+        { initials: "GH", color: "#94a3b8", name: "GitHub", action: "verified your contribution in", subject: "chainvolio/identity-core", time: "1d ago" },
     ];
     return (
         <div style={CARD_BASE} className="theme-preserve">
@@ -547,7 +547,7 @@ function OrgIssuerCard() {
             <div className="px-4 pt-4 space-y-4">
                 {/* Org message */}
                 <div className="flex items-start gap-3">
-                    <Avatar initials="NP" color="#60a5fa" />
+                    <Avatar initials="NP" color="#94a3b8" />
                     <div className="flex-1">
                         <div className="flex items-baseline gap-2 mb-1">
                             <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>Nexus Protocol</span>
@@ -561,7 +561,7 @@ function OrgIssuerCard() {
 
                 {/* Contributor message */}
                 <div className="flex items-start gap-3">
-                    <Avatar initials="AR" color="#34d399" />
+                    <Avatar initials="AR" color="#94a3b8" />
                     <div className="flex-1">
                         <div className="flex items-baseline gap-2 mb-1">
                             <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.82)" }}>Alex Rivera</span>
@@ -576,8 +576,8 @@ function OrgIssuerCard() {
                 {/* System message */}
                 <div className="flex items-start gap-3">
                     <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)" }}>
-                        <ShieldCheck style={{ width: 12, height: 12, color: "#60a5fa" }} />
+                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <ShieldCheck style={{ width: 12, height: 12, color: "rgba(255,255,255,0.35)" }} />
                     </div>
                     <div className="flex-1">
                         <div className="flex items-baseline gap-2 mb-1">
@@ -596,8 +596,8 @@ function OrgIssuerCard() {
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                     <span style={{ fontSize: 12, color: "rgba(255,255,255,0.22)", flex: 1 }}>@Nexus Protocol sign and issue...</span>
                     <div className="flex items-center gap-1">
-                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "#5e6ad2" }}>
-                            <ArrowRight style={{ width: 11, height: 11, color: "white" }} />
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
+                            <ArrowRight style={{ width: 11, height: 11, color: "rgba(255,255,255,0.6)" }} />
                         </div>
                     </div>
                 </div>
@@ -609,10 +609,10 @@ function OrgIssuerCard() {
 // Card 3 — Updates / Notifications (purple) — like Linear's right Updates panel
 function PublicVerifyCard() {
     const updates = [
-        { icon: CheckCircle2, color: "#34d399", dot: true, title: "Attestation Received", desc: "Superteam attested your grant", time: "2h ago" },
-        { icon: ShieldCheck, color: "#60a5fa", dot: true, title: "Audit Passed", desc: "Smart contract audit passed", time: "5h ago" },
-        { icon: User, color: "#a78bfa", dot: false, title: "New Attestation", desc: "0xA34F...BCd2 attested your work", time: "1d ago" },
-        { icon: Globe, color: "#f59e0b", dot: false, title: "Identity Verified", desc: "Your wallet has been verified", time: "2d ago" },
+        { icon: CheckCircle2, color: "#94a3b8", dot: true, title: "Attestation Received", desc: "Superteam attested your grant", time: "2h ago" },
+        { icon: ShieldCheck, color: "#94a3b8", dot: true, title: "Audit Passed", desc: "Smart contract audit passed", time: "5h ago" },
+        { icon: User, color: "#94a3b8", dot: false, title: "New Attestation", desc: "0xA34F...BCd2 attested your work", time: "1d ago" },
+        { icon: Globe, color: "#94a3b8", dot: false, title: "Identity Verified", desc: "Your wallet has been verified", time: "2d ago" },
     ];
     return (
         <div style={CARD_BASE} className="theme-preserve">
@@ -650,7 +650,7 @@ function PublicVerifyCard() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
                                     <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{item.title}</span>
-                                    {item.dot && <div className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ background: "#5e6ad2" }} />}
+                                    {item.dot && <div className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ background: "rgba(255,255,255,0.25)" }} />}
                                 </div>
                                 <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 2, lineHeight: 1.4 }}>{item.desc}</p>
                                 <p style={{ fontSize: 10, color: "rgba(255,255,255,0.22)", marginTop: 3 }}>{item.time}</p>
@@ -677,8 +677,8 @@ function AttestationBlock() {
 
     const features = [
         { icon: ShieldCheck, label: "Verifiable on-chain proof", desc: "Each attestation is stored permanently on Solana.", color: "#94a3b8" },
-        { icon: Building2, label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.", color: "#60a5fa" },
-        { icon: Lock, label: "Public and tamper-resistant", desc: "Anyone can verify, the on-chain record cannot be altered.", color: "#a78bfa" },
+        { icon: Building2, label: "Issued by real organizations", desc: "Only verified orgs and collaborators can attest.", color: "#94a3b8" },
+        { icon: Lock, label: "Public and tamper-resistant", desc: "Anyone can verify, the on-chain record cannot be altered.", color: "#94a3b8" },
     ];
 
     const cards = [<AttestationCard />, <OrgIssuerCard />, <PublicVerifyCard />];
@@ -870,9 +870,9 @@ function FloatingInboxCard() {
 // --- Floating CV Score Card ---
 function FloatingVerificationCard() {
     const top3 = [
-        { initials: "SC", avatar: "https://i.pravatar.cc/40?img=47", name: "Sarah Chen",  role: "Rust Developer",    score: 94, color: "#6366f1" },
-        { initials: "YT", avatar: "https://i.pravatar.cc/40?img=44", name: "Yuki Tanaka", role: "Core Developer",    score: 91, color: "#34d399" },
-        { initials: "MW", avatar: "https://i.pravatar.cc/40?img=12", name: "Marcus Wei",  role: "Protocol Engineer", score: 87, color: "#60a5fa" },
+        { initials: "SC", avatar: "https://i.pravatar.cc/40?img=47", name: "Sarah Chen",  role: "Rust Developer",    score: 94, color: "rgba(255,255,255,0.65)" },
+        { initials: "YT", avatar: "https://i.pravatar.cc/40?img=44", name: "Yuki Tanaka", role: "Core Developer",    score: 91, color: "rgba(255,255,255,0.65)" },
+        { initials: "MW", avatar: "https://i.pravatar.cc/40?img=12", name: "Marcus Wei",  role: "Protocol Engineer", score: 87, color: "rgba(255,255,255,0.65)" },
     ];
     return (
         <div className="theme-preserve w-[280px] bg-[#060608]/95 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden flex flex-col font-sans relative"
@@ -887,12 +887,12 @@ function FloatingVerificationCard() {
             />
 
             {/* Header */}
-            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between" style={{ background: "rgba(99,102,241,0.06)" }}>
+            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <div className="flex items-center gap-2">
-                    <Star className="w-3.5 h-3.5 text-indigo-400" />
-                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">CV Score</span>
+                    <Star className="w-3.5 h-3.5 text-white/40" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">CV Score</span>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-white/25 animate-pulse" />
             </div>
 
             {/* Body */}
@@ -907,7 +907,7 @@ function FloatingVerificationCard() {
                         background: i === 0 ? "rgba(99,102,241,0.08)" : "rgba(255,255,255,0.02)",
                         border: `1px solid ${i === 0 ? "rgba(99,102,241,0.22)" : "rgba(255,255,255,0.05)"}`,
                     }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 7, overflow: "hidden", border: `1px solid ${c.color}35`, flexShrink: 0 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 7, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
                             <img src={c.avatar} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -923,7 +923,7 @@ function FloatingVerificationCard() {
             </div>
 
             {/* Bottom glow */}
-            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-30" />
+            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-30" />
         </div>
     );
 }
@@ -984,10 +984,10 @@ function RecruiterDashboardPreviewUI_V2({
                 <div className="flex-1 p-4 flex flex-col justify-center min-h-0 relative z-10">
                     {/* Profile Card */}
                     <div className="rounded-xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/5 p-3.5 relative overflow-hidden flex flex-col justify-center shadow-inner">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.03] blur-2xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-xs font-black text-white/80 shadow-lg">
+                                <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-black text-white/80 shadow-lg">
                                     AR
                                 </div>
                                 <div>
@@ -998,20 +998,20 @@ function RecruiterDashboardPreviewUI_V2({
                             
                             {/* Trust Score Badge */}
                             <div className="flex flex-col items-center justify-center relative scale-90">
-                                <span className="text-[7px] font-bold text-[#14F195]/60 uppercase tracking-widest mb-0.5">Score</span>
-                                <div className="w-9 h-9 rounded-full bg-[#14F195]/10 border border-[#14F195]/30 shadow-[0_0_15px_rgba(20,241,149,0.15)] flex items-center justify-center">
-                                    <span className="text-xs font-black text-[#14F195]">98</span>
+                                <span className="text-[7px] font-bold text-white/30 uppercase tracking-widest mb-0.5">Score</span>
+                                <div className="w-9 h-9 rounded-full bg-white/5 border border-white/15 flex items-center justify-center">
+                                    <span className="text-xs font-black text-white/70">98</span>
                                 </div>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-2 relative z-10">
                             <div className="p-2.5 rounded-lg bg-[#0d0e11] border border-white/5 shadow-md">
                                 <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1 font-bold">On-Chain Signals</p>
-                                <p className="text-sm font-black text-blue-400 leading-none">142</p>
+                                <p className="text-sm font-black text-white/65 leading-none">142</p>
                             </div>
                             <div className="p-2.5 rounded-lg bg-[#0d0e11] border border-white/5 shadow-md">
                                 <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1 font-bold">Org Attestations</p>
-                                <p className="text-sm font-black text-indigo-400 leading-none">12</p>
+                                <p className="text-sm font-black text-white/65 leading-none">12</p>
                             </div>
                         </div>
 
@@ -1019,10 +1019,10 @@ function RecruiterDashboardPreviewUI_V2({
                         <div className="mt-3.5 space-y-2 relative z-10">
                             <div className="flex items-center justify-between text-[9px]">
                                 <span className="text-white/30 font-bold uppercase tracking-wider">Role Match</span>
-                                <span className="text-[#14F195] font-black">95% (Perfect)</span>
+                                <span className="text-white/55 font-black">95% (Perfect)</span>
                             </div>
                             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-blue-505 to-[#14F195] rounded-full" style={{ width: "95%" }} />
+                                <div className="h-full bg-white/30 rounded-full" style={{ width: "95%" }} />
                             </div>
                             <div className="flex flex-wrap gap-1 mt-1.5">
                                 {["Rust", "Solana", "Anchor", "DeFi"].map(skill => (
@@ -1073,9 +1073,9 @@ function RecruiterDashboardPreviewUI_V2({
                     {/* Timeline */}
                     <div className="relative pl-4 space-y-2.5 border-l border-white/[0.08] ml-2">
                         {[
-                            { org: "Nexus Protocol", role: "Core Contributor", date: "Q3 24", color: "#94a3b8" },
-                            { org: "Superteam", role: "Grant Winner", date: "Q1 24", color: "#60a5fa" },
-                            { org: "Solana Foundation", role: "Hackathon 1st", date: "2023", color: "#14F195" },
+                            { org: "Nexus Protocol", role: "Core Contributor", date: "Q3 24", color: "rgba(255,255,255,0.3)" },
+                            { org: "Superteam", role: "Grant Winner", date: "Q1 24", color: "rgba(255,255,255,0.3)" },
+                            { org: "Solana Foundation", role: "Hackathon 1st", date: "2023", color: "rgba(255,255,255,0.3)" },
                         ].map((e, i) => (
                             <div key={i} className="relative group">
                                 <div className="absolute -left-[21px] top-1.5 w-2 h-2 rounded-full border-2 border-[#0a0b0e] transition-transform duration-300 group-hover:scale-125" style={{ background: e.color }} />
@@ -1094,10 +1094,10 @@ function RecruiterDashboardPreviewUI_V2({
                     </div>
 
                     {/* Verification Summary Card */}
-                    <div className="mt-3.5 p-2 rounded-xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 border border-white/5 flex items-center justify-between">
+                    <div className="mt-3.5 p-2 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <div className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-white/35" />
                             </div>
                             <div>
                                 <p className="text-[10px] font-bold text-white/80 leading-none">Security Attestation</p>
@@ -1105,7 +1105,7 @@ function RecruiterDashboardPreviewUI_V2({
                             </div>
                         </div>
                         <div className="text-right">
-                            <span className="text-[7.5px] font-mono text-emerald-400/70 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">Verified</span>
+                            <span className="text-[7.5px] font-mono text-white/35 uppercase tracking-widest bg-white/[0.04] border border-white/10 px-1.5 py-0.5 rounded">Verified</span>
                         </div>
                     </div>
                 </div>
@@ -1153,11 +1153,11 @@ function RecruiterDashboardPreviewUI_V2({
                         <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col gap-1.5 relative group/link hover:bg-white/[0.05] transition-all duration-500">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                                     <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Live Link</span>
                                 </div>
-                                <div className="px-1 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                                    <span className="text-[7px] font-black text-amber-500 uppercase tracking-widest">Encrypted</span>
+                                <div className="px-1 py-0.5 rounded bg-white/[0.04] border border-white/10">
+                                    <span className="text-[7px] font-black text-white/35 uppercase tracking-widest">Encrypted</span>
                                 </div>
                             </div>
                             
@@ -1214,11 +1214,11 @@ function RecruiterDashboardPreviewUI_V2({
                             </div>
                             <div className="p-1.5 rounded-lg bg-white/[0.015] border border-white/5">
                                 <p className="text-[7.5px] text-white/30 font-bold uppercase tracking-wider mb-0.5">Applicants</p>
-                                <p className="text-xs font-black text-[#14F195]">48</p>
+                                <p className="text-xs font-black text-white/70">48</p>
                             </div>
                             <div className="p-1.5 rounded-lg bg-white/[0.015] border border-white/5">
                                 <p className="text-[7.5px] text-white/30 font-bold uppercase tracking-wider mb-0.5">CTR</p>
-                                <p className="text-xs font-black text-amber-400">3.4%</p>
+                                <p className="text-xs font-black text-white/50">3.4%</p>
                             </div>
                         </div>
                     </div>
@@ -2309,7 +2309,7 @@ export function LandingPageClient() {
                                         <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                                     </Link>
                                     <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-white/[0.06] bg-white/[0.02]">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#0d9488]" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-white/25" />
                                         <span className="text-[9px] font-bold text-white/35 tracking-widest">BUILT ON SOLANA</span>
                                     </div>
                                 </div>
@@ -2345,8 +2345,8 @@ export function LandingPageClient() {
                                 <div className="flex-1 flex flex-col min-w-0 p-5" style={{ background:"linear-gradient(to bottom, #060609 0%, #0d0d11 30%)", borderRight:"1px solid rgba(255,255,255,0.06)" }}>
                                     {/* Header */}
                                     <div className="flex items-center gap-3 mb-3 flex-shrink-0">
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(94,106,210,0.12)", border:"1px solid rgba(94,106,210,0.22)" }}>
-                                            <ShieldCheck className="w-4 h-4" style={{ color:"rgba(94,106,210,0.8)" }} />
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)" }}>
+                                            <ShieldCheck className="w-4 h-4" style={{ color:"rgba(255,255,255,0.35)" }} />
                                         </div>
                                         <span className="text-[15px] font-bold text-white/85">On-Chain Attestation</span>
                                     </div>
@@ -2359,8 +2359,8 @@ export function LandingPageClient() {
                                         {/* Card header row */}
                                         <div className="px-4 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                                             <span className="text-[11px] font-bold text-white/65">Attestation</span>
-                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold" style={{ color:"#34d399" }}>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] inline-block" />
+                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.5)" }}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-white/40 inline-block" />
                                                 Verified
                                             </span>
                                         </div>
@@ -2441,8 +2441,8 @@ export function LandingPageClient() {
                                 <div className="w-[27%] flex-shrink-0 flex flex-col p-5" style={{ background:"linear-gradient(to bottom, #060609 0%, #0c0c10 30%)" }}>
                                     {/* Header */}
                                     <div className="flex items-center gap-2.5 mb-3 flex-shrink-0">
-                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(251,191,36,0.10)", border:"1px solid rgba(251,191,36,0.20)" }}>
-                                            <Briefcase className="w-3.5 h-3.5" style={{ color:"rgba(251,191,36,0.85)" }} />
+                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)" }}>
+                                            <Briefcase className="w-3.5 h-3.5" style={{ color:"rgba(255,255,255,0.35)" }} />
                                         </div>
                                         <span className="text-[13px] font-bold text-white/80">Career Timeline</span>
                                     </div>
@@ -2476,7 +2476,7 @@ export function LandingPageClient() {
                                             ))}
                                         </div>
                                         <div className="mt-3 pt-2.5 flex items-center gap-1.5" style={{ borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-                                            <TrendingUp className="w-3 h-3 flex-shrink-0" style={{ color:"rgba(251,191,36,0.5)" }} />
+                                            <TrendingUp className="w-3 h-3 flex-shrink-0" style={{ color:"rgba(255,255,255,0.2)" }} />
                                             <span className="text-[9px] text-white/30">2 years of verified growth</span>
                                         </div>
                                     </div>
@@ -2532,7 +2532,7 @@ export function LandingPageClient() {
                                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-black/60 backdrop-blur-2xl z-10 whitespace-nowrap">
                                         <div className="flex flex-col">
                                             <span className="text-[6px] font-bold text-white/20 uppercase tracking-[0.18em]">Cost</span>
-                                            <span className="text-[9px] font-bold text-[#14F195] tracking-tight">~$0.001 / attest</span>
+                                            <span className="text-[9px] font-bold text-white/55 tracking-tight">~$0.001 / attest</span>
                                         </div>
                                         <div className="w-px h-4 bg-white/10" />
                                         <div className="flex flex-col">
@@ -2596,9 +2596,9 @@ export function LandingPageClient() {
                         {/* ── 3 compact attributes — replaces the old text card ── */}
                         <div className="flex flex-wrap items-center justify-center gap-x-6 md:gap-x-10 gap-y-4 mb-6 mt-4 md:mt-6 px-6">
                             {[
-                                { icon: ShieldCheck, label: "On-Chain Proof", color: "#14F195" },
-                                { icon: CheckCircle2, label: "Instant Verification", color: "#60a5fa" },
-                                { icon: Lock, label: "Tamper-Resistant", color: "#a78bfa" },
+                                { icon: ShieldCheck, label: "On-Chain Proof", color: "rgba(255,255,255,0.45)" },
+                                { icon: CheckCircle2, label: "Instant Verification", color: "rgba(255,255,255,0.45)" },
+                                { icon: Lock, label: "Tamper-Resistant", color: "rgba(255,255,255,0.45)" },
                             ].map(({ icon: Icon, label, color }, i) => (
                                 <div key={i} className="flex items-center gap-2 md:gap-2.5 flex-shrink-0">
                                     <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color }} />

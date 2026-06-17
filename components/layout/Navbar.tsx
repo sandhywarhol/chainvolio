@@ -28,7 +28,8 @@ interface NavbarProps {
 export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, onAskClick, onScreeningClick, onAttestationClick, isVerified, verifierTier, verificationTier }: NavbarProps) {
 
     const { publicKey, connecting } = useWallet();
-    const { isGoogleSignedIn } = useGoogleAuth();
+    const { isGoogleSignedIn, session: googleSession, signOut: googleSignOut, orgAccount: googleOrgAccount } = useGoogleAuth();
+    const isGoogleBuilder = !!googleSession && googleOrgAccount?.account_type === "builder";
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeMobilePanel, setActiveMobilePanel] = useState<'main' | 'products' | 'how' | 'guides'>('main');
@@ -169,7 +170,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Link
+                    {!isGoogleBuilder && <Link
                         href="/verified-organization"
                         className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${isVerified
                             ? "bg-white/[0.04] border-white/[0.12] text-white/70"
@@ -186,7 +187,7 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                             }
                         </span>
 
-                    </Link>
+                    </Link>}
 
                     {/* Removed redundant verified badge for CV view consistency */}
 
@@ -204,12 +205,34 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                     
                     <div className="hidden md:block"><NotificationBell /></div>
 
-                    {/* Mobile: hanya tampilkan WalletButton kecil, hamburger digantikan bottom tabs */}
+                    {/* Mobile: Google avatar or WalletMultiButton */}
                     <div className="flex md:hidden items-center">
-                        <div className="scale-90">
-                            <WalletMultiButton />
-                        </div>
+                        {isGoogleSignedIn ? (
+                            <button
+                                onClick={() => googleSignOut()}
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/[0.09] transition-colors"
+                                title="Sign out"
+                            >
+                                {googleSession?.user?.user_metadata?.avatar_url ? (
+                                    <img
+                                        src={googleSession.user.user_metadata.avatar_url as string}
+                                        alt=""
+                                        className="w-5 h-5 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="w-5 h-5 rounded-full bg-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-300">
+                                        {(googleSession?.user?.email?.[0] ?? "G").toUpperCase()}
+                                    </span>
+                                )}
+                                <span className="text-[10px] font-bold text-white/50">Sign out</span>
+                            </button>
+                        ) : (
+                            <div className="scale-90">
+                                <WalletMultiButton />
+                            </div>
+                        )}
                     </div>
+
                 </div>
             </div>
 
@@ -300,14 +323,21 @@ export function Navbar({ onHowItWorksClick, onRecruitersClick, onTalentClick, on
                                                         onClick={() => setIsMobileMenuOpen(false)} 
                                                     />
                                                 )}
-                                                {publicKey && (
-                                                    <MobileNavLink 
-                                                        href={`/cv/${publicKey.toBase58()}`} 
-                                                        icon={<User className="w-5 h-5" />} 
-                                                        label="View Your CV" 
-                                                        onClick={() => setIsMobileMenuOpen(false)} 
+                                                {isGoogleSignedIn && googleSession?.user?.id ? (
+                                                    <MobileNavLink
+                                                        href={`/org/${googleSession.user.id}`}
+                                                        icon={<User className="w-5 h-5" />}
+                                                        label="View Your CV"
+                                                        onClick={() => setIsMobileMenuOpen(false)}
                                                     />
-                                                )}
+                                                ) : publicKey ? (
+                                                    <MobileNavLink
+                                                        href={`/cv/${publicKey.toBase58()}`}
+                                                        icon={<User className="w-5 h-5" />}
+                                                        label="View Your CV"
+                                                        onClick={() => setIsMobileMenuOpen(false)}
+                                                    />
+                                                ) : null}
                                                 <MobileNavLink 
                                                     href="/verified-organization" 
                                                     icon={<Briefcase className="w-5 h-5" />} 

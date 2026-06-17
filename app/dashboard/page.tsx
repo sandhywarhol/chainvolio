@@ -134,7 +134,12 @@ export default function DashboardPage() {
     }
   }, [connecting, publicKey]);
 
+  const isGoogleBuilder = !!session && orgAccount?.account_type === "builder";
+
   const getProfileUrl = () => {
+    if (isGoogleBuilder && orgAccount?.auth_uid) {
+      return `${window.location.origin}/builder/${orgAccount.auth_uid}`;
+    }
     if (!profile || !publicKey) return `${window.location.origin}/cv/${publicKey?.toBase58()}`;
     if (profile.displayName && profile.cardNumber) {
       const slug = profile.displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -187,6 +192,53 @@ export default function DashboardPage() {
 
     return () => controller.abort();
   }, [publicKey, connected, connecting]);
+
+  // For Google builders, fetch dashboard stats (profile completion, etc.) from the stats API
+  useEffect(() => {
+    if (!session || orgAccount?.account_type !== "builder" || !orgAccount?.auth_uid) return;
+    const gAuthWallet = `gauth:${orgAccount.auth_uid}`;
+    fetch(`/api/dashboard/stats?wallet=${gAuthWallet}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.profile) setProfile(data.profile);
+      })
+      .catch(() => {});
+  }, [session, orgAccount?.auth_uid]);
+
+  // For Google builders (no wallet), inject profile data from orgAccount so the builder dashboard renders
+  useEffect(() => {
+    if (!session || orgAccount?.account_type !== "builder" || profile || !orgAccount) return;
+    setProfile({
+      displayName: orgAccount.org_name ?? session.user.email?.split("@")[0] ?? "Builder",
+      bio: orgAccount.bio ?? "",
+      skills: "",
+      email: orgAccount.email || session.user.email || "",
+      avatarUrl: orgAccount.avatar_url ?? undefined,
+      website: orgAccount.website ?? undefined,
+      twitter: orgAccount.twitter ?? undefined,
+      linkedin: orgAccount.linkedin ?? undefined,
+      discord: orgAccount.discord ?? undefined,
+      telegram: orgAccount.telegram ?? undefined,
+      country: orgAccount.country ?? undefined,
+      completionPercentage: 0,
+      isProfileComplete: false,
+    });
+  }, [session, orgAccount, profile]);
+
+  // For Google builders, load receipts (PoW) using gauth: synthetic wallet key
+  useEffect(() => {
+    if (!session || orgAccount?.account_type !== "builder" || !orgAccount?.auth_uid) return;
+    const gAuthWallet = `gauth:${orgAccount.auth_uid}`;
+    fetch(`/api/receipts?wallet=${gAuthWallet}`)
+      .then(r => r.json())
+      .then(recs => {
+        const recsArr = Array.isArray(recs) ? recs : (recs.receipts || []);
+        setReceipts(recsArr.filter((r: any) =>
+          r.attestationType !== "Hiring Proof" && !r.description?.includes("Official Verified Hiring Proof")
+        ));
+      })
+      .catch(() => {});
+  }, [session, orgAccount?.auth_uid]);
 
   // Auto-switch tab when redirected with ?tab= param (e.g. from mobile Add Credential button)
   useEffect(() => {
@@ -303,7 +355,8 @@ export default function DashboardPage() {
       setEditUploading(true);
       const { default: imageCompression } = await import("browser-image-compression");
       const compressed = await imageCompression(croppedBlob as File, { maxSizeMB: 0.5, maxWidthOrHeight: 400, useWebWorker: true, fileType: "image/webp" });
-      const fileName = `${publicKey?.toBase58()}-${Date.now()}.webp`;
+      const storagePrefix = isGoogleBuilder ? `gauth-${orgAccount?.auth_uid}` : publicKey?.toBase58();
+      const fileName = `${storagePrefix}-${Date.now()}.webp`;
       const fd = new FormData();
       fd.append("file", compressed, fileName);
       fd.append("bucket", "avatars");
@@ -322,12 +375,53 @@ export default function DashboardPage() {
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!publicKey || !signMessage) return;
     if (editForm.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email.trim())) {
       setToastMessage("Please enter a valid email address.");
       return;
     }
     setEditLoading(true);
+
+    // Google builder: save to org_accounts via JWT, no wallet signing needed
+    if (isGoogleBuilder && session && orgAccount?.auth_uid) {
+      try {
+        const res = await fetch("/api/org-accounts", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            auth_uid: orgAccount.auth_uid,
+            org_name: editForm.displayName,
+            bio: editForm.bio,
+            skills: editForm.skills,
+            avatar_url: editForm.avatarUrl,
+            website: editForm.website,
+            twitter: editForm.twitter,
+            linkedin: editForm.linkedin,
+            discord: editForm.discord,
+            telegram: editForm.telegram,
+            email: editForm.email,
+            country: editForm.country,
+          }),
+        });
+        if (res.ok) {
+          setProfile(prev => prev ? { ...prev, ...editForm } : null);
+          setToastMessage("Profile updated successfully!");
+          setShowInlineEdit(false);
+        } else {
+          const data = await res.json();
+          setToastMessage(data.error || "Failed to update profile.");
+        }
+      } catch {
+        setToastMessage("Error saving profile");
+      } finally {
+        setEditLoading(false);
+      }
+      return;
+    }
+
+    if (!publicKey || !signMessage) { setEditLoading(false); return; }
     try {
       const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
       if (!signedAction) {
@@ -360,16 +454,11 @@ export default function DashboardPage() {
   }
 
   if (session) {
-    if (orgAccount?.account_type === "builder") {
-      // Google builder: if wallet is connected, fall through to wallet builder dashboard.
-      // Without a wallet, show a prompt to connect one.
-      if (!connected || !publicKey) {
-        return <GoogleBuilderNoWalletView session={session} />;
-      }
-      // fall through to wallet builder dashboard below
-    } else {
+    if (orgAccount?.account_type !== "builder") {
+      // Google recruiter → recruiter/org dashboard
       return <GoogleOrgDashboardWrapper session={session} orgAccount={orgAccount} refetchOrgAccount={refetchOrgAccount} />;
     }
+    // Google builder → fall through to builder dashboard (isGoogleBuilder flag handles null wallet)
   }
 
   // autoConnect is still running — show loading so the Sign-In screen never
@@ -378,7 +467,7 @@ export default function DashboardPage() {
     return <LoadingScreen message="Connecting wallet..." />;
   }
 
-  if (!publicKey) {
+  if (!publicKey && !isGoogleBuilder) {
     // Definitely not signed in (autoConnect finished or never started)
     return (
       <main className="min-h-screen text-white relative theme-bg-page theme-aware" style={{ background: "linear-gradient(to bottom, #000000 0%, #2c2c30 100%)" }}>
@@ -394,10 +483,12 @@ export default function DashboardPage() {
     );
   }
 
-  if (loading) {
+  if (loading || (isGoogleBuilder && !profile)) {
     return <LoadingScreen message="Aggregating professional reputation..." />;
   }
-  const walletAddress = publicKey.toBase58();
+  const walletAddress = isGoogleBuilder
+    ? `gauth:${orgAccount?.auth_uid ?? ""}`
+    : (publicKey?.toBase58() ?? "");
 
   // Special flag for Admin
   const isAdmin = publicKey?.toBase58() === "FwHtKFZY6jRqhtczE7Nkwq7pkR7fb3vWq6YqYSYtGcMv" || profile?.cardNumber === 1;
@@ -641,7 +732,7 @@ export default function DashboardPage() {
               onClick={() => {
                 setFetchError(null);
                 setLoading(true);
-                fetch(`/api/dashboard/stats?wallet=${publicKey.toBase58()}`)
+                fetch(`/api/dashboard/stats?wallet=${publicKey?.toBase58() ?? ""}`)
                   .then(r => r.json())
                   .then(data => {
                     if (data.error) throw new Error(data.error);
@@ -1171,20 +1262,22 @@ export default function DashboardPage() {
                         placeholder="Name or pseudonym" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Current Role</label>
-                        <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
-                          placeholder="CEO, Developer..." />
+                    {!isGoogleBuilder && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Current Role</label>
+                          <input value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}
+                            className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
+                            placeholder="CEO, Developer..." />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Organization</label>
+                          <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
+                            className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
+                            placeholder="Company / DAO" />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Organization</label>
-                        <input value={editForm.organization} onChange={e => setEditForm(p => ({ ...p, organization: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
-                          placeholder="Company / DAO" />
-                      </div>
-                    </div>
+                    )}
 
                     <div>
                       <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Bio</label>
@@ -1208,39 +1301,43 @@ export default function DashboardPage() {
                       <CountrySelector value={editForm.country} onChange={val => setEditForm(p => ({ ...p, country: val }))} />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Timezone</label>
-                        <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60">
-                          <option value="" className="bg-slate-900 text-white">Select</option>
-                          {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
-                            <option key={tz} value={tz} className="bg-slate-900 text-white">{tz}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Looking For</label>
-                        <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
-                          className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
-                          placeholder="Open to remote roles..." />
-                      </div>
-                    </div>
+                    {!isGoogleBuilder && (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Timezone</label>
+                            <select value={editForm.timezone} onChange={e => setEditForm(p => ({ ...p, timezone: e.target.value }))}
+                              className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60">
+                              <option value="" className="bg-slate-900 text-white">Select</option>
+                              {["GMT-12","GMT-11","GMT-10","GMT-9","GMT-8","GMT-7","GMT-6","GMT-5","GMT-4","GMT-3","GMT-2","GMT-1","GMT+0","GMT+1","GMT+2","GMT+3","GMT+4","GMT+5","GMT+6","GMT+7","GMT+8","GMT+9","GMT+10","GMT+11","GMT+12"].map(tz => (
+                                <option key={tz} value={tz} className="bg-slate-900 text-white">{tz}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-400 mb-1.5">Looking For</label>
+                            <input value={editForm.lookingFor} onChange={e => setEditForm(p => ({ ...p, lookingFor: e.target.value.slice(0, 160) }))}
+                              className="w-full px-3 py-2 rounded-lg text-sm text-white outline-none transition-colors bg-slate-800 border border-slate-700 focus:border-emerald-500/60 placeholder:text-slate-600"
+                              placeholder="Open to remote roles..." />
+                          </div>
+                        </div>
 
-                    <div>
-                      <label className="block text-[10px] font-semibold text-slate-400 mb-2">Availability</label>
-                      <div className="flex flex-wrap gap-2">
-                        {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
-                          <button key={type} type="button"
-                            onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
-                              editForm.workPreference.includes(type)
-                                ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
-                                : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600"
-                            }`}>{type}</button>
-                        ))}
-                      </div>
-                    </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-400 mb-2">Availability</label>
+                          <div className="flex flex-wrap gap-2">
+                            {["Full-time","Contract","Freelance","Project-based","Part-time"].map(type => (
+                              <button key={type} type="button"
+                                onClick={() => setEditForm(p => ({ ...p, workPreference: p.workPreference.includes(type) ? p.workPreference.filter(x => x !== type) : [...p.workPreference, type] }))}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
+                                  editForm.workPreference.includes(type)
+                                    ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
+                                    : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600"
+                                }`}>{type}</button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* ── Social Links ── */}
@@ -1249,15 +1346,15 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-2.5">
                       {[
                         { key: "twitter", label: "Twitter / X", placeholder: "@username" },
-                        { key: "github", label: "GitHub", placeholder: "username" },
+                        { key: "github", label: "GitHub", placeholder: "username", walletOnly: true },
                         { key: "linkedin", label: "LinkedIn", placeholder: "username or URL" },
                         { key: "telegram", label: "Telegram", placeholder: "@username" },
                         { key: "discord", label: "Discord", placeholder: "user#1234" },
-                        { key: "instagram", label: "Instagram", placeholder: "@username" },
+                        { key: "instagram", label: "Instagram", placeholder: "@username", walletOnly: true },
                         { key: "website", label: "Website", placeholder: "https://..." },
                         { key: "email", label: "Email", placeholder: "hello@example.com" },
-                        { key: "whatsapp", label: "WhatsApp", placeholder: "+628..." },
-                      ].map(({ key, label, placeholder }) => (
+                        { key: "whatsapp", label: "WhatsApp", placeholder: "+628...", walletOnly: true },
+                      ].filter(f => !isGoogleBuilder || !f.walletOnly).map(({ key, label, placeholder }) => (
                         <div key={key}>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">{label}</label>
                           <input
@@ -1547,6 +1644,7 @@ export default function DashboardPage() {
           <ReceiptForm
             walletAddress={walletAddress}
             initialData={editingReceipt}
+            googleAccessToken={session?.access_token}
             onSuccess={() => {
               setShowForm(false);
               setEditingReceipt(null);
@@ -1922,7 +2020,7 @@ export default function DashboardPage() {
               <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 3 }}>View Your CV</p>
               <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", lineHeight: 1.5, marginBottom: 8 }}>Preview and download your professional CV.</p>
               <Link
-                href={`/cv/${walletAddress}`}
+                href={isGoogleBuilder ? `/builder/${orgAccount?.auth_uid}` : `/cv/${walletAddress}`}
                 className="w-full flex items-center justify-center gap-2 py-2 rounded-lg transition-all hover:bg-white/[0.05]"
                 style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600, display: "flex" }}
               >
@@ -2155,67 +2253,13 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
   const [isRenewalGoogle, setIsRenewalGoogle] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [showWalletNudge, setShowWalletNudge] = useState(false);
-  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [showMembersPanel, setShowMembersPanel] = useState(false);
-  const { connected: walletConnected, publicKey: walletPublicKey } = useWallet();
-  const [walletLinkShown, setWalletLinkShown] = useState(false);
 
   // Only redirect to /auth/role if there's truly no account yet (not just missing org details)
   const noAccount = !orgAccount;
   useEffect(() => {
     if (noAccount) router.replace("/auth/role");
   }, [noAccount, router]);
-
-  // Detect wallet linked successfully — show success toast once and save to DB
-  useEffect(() => {
-    if (walletConnected && walletPublicKey && !walletLinkShown) {
-      if (orgAccount?.wallet_address === walletPublicKey.toBase58()) {
-        setWalletLinkShown(true);
-        setShowWalletNudge(false);
-        return;
-      }
-
-      setWalletLinkShown(true);
-      setShowWalletNudge(false);
-
-      fetch("/api/org-accounts", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          auth_uid: orgAccount?.auth_uid,
-          wallet_address: walletPublicKey.toBase58(),
-        }),
-      })
-      .then(async (res) => {
-        if (res.ok) {
-          setToastMessage("🎉 Wallet linked successfully! On-chain features are now unlocked.");
-          try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
-          if (refetchOrgAccount) {
-            await refetchOrgAccount();
-          }
-        } else {
-          const errData = await res.json();
-          setToastMessage(`Failed to save linked wallet: ${errData.error || "Unknown error"}`);
-          setWalletLinkShown(false);
-        }
-      })
-      .catch(() => {
-        setToastMessage("Failed to save linked wallet due to a network error.");
-        setWalletLinkShown(false);
-      });
-    }
-  }, [walletConnected, walletPublicKey, walletLinkShown, orgAccount, session, refetchOrgAccount]);
-
-  useEffect(() => {
-    try {
-      const dismissed = localStorage.getItem("cv_wallet_nudge_dismissed");
-      if (!dismissed && !orgAccount?.wallet_address) setShowWalletNudge(true);
-    } catch {}
-  }, [orgAccount?.wallet_address]);
 
   useEffect(() => {
     if (!orgAccount?.auth_uid || !session?.access_token) return;
@@ -2304,15 +2348,6 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
                   </button>
                 );
               })}
-              {!orgAccount?.wallet_address && (
-                <button
-                  onClick={() => setWalletModalOpen(true)}
-                  className="w-full flex items-center gap-2.5 px-3 py-[7px] rounded-md relative transition-colors text-left group mt-1"
-                >
-                  <Wallet style={{ width: 13, height: 13, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} className="group-hover:text-amber-400 transition-colors" />
-                  <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.42)" }} className="group-hover:text-amber-400/90 transition-colors">Link Wallet</span>
-                </button>
-              )}
             </nav>
             {/* Hiring Overview */}
             <div className="px-3 pb-3 space-y-1.5">
@@ -2381,36 +2416,6 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
               })}
             </div>
 
-            {/* Link Wallet nudge — dismissible, shown once */}
-            {showWalletNudge && (
-              <div className="mx-4 mt-3 flex items-start gap-3 px-4 py-3 rounded-xl" style={{ background: "rgba(45,212,191,0.06)", border: "1px solid rgba(45,212,191,0.18)" }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(45,212,191,0.12)" }}>
-                  <Wallet style={{ width: 14, height: 14, color: "rgb(45,212,191)" }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", lineHeight: 1.2 }}>Unlock the full platform</p>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", marginTop: 2, lineHeight: 1.5 }}>Link a Solana wallet to issue on-chain attestations, get verified, and appear as a trusted hiring source.</p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => setWalletModalOpen(true)}
-                    className="px-3 py-1.5 rounded-lg font-bold transition-all hover:opacity-90"
-                    style={{ fontSize: 11, background: "rgba(45,212,191,0.15)", border: "1px solid rgba(45,212,191,0.3)", color: "rgb(45,212,191)" }}
-                  >
-                    Link Wallet
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowWalletNudge(false);
-                      try { localStorage.setItem("cv_wallet_nudge_dismissed", "1"); } catch {}
-                    }}
-                    style={{ color: "rgba(255,255,255,0.2)", fontSize: 18, lineHeight: 1, background: "none", border: "none", cursor: "pointer" }}
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            )}
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-3 md:px-5 py-4 custom-scrollbar">
               {activeTab === "inbox" ? (
@@ -2522,7 +2527,6 @@ function GoogleOrgDashboardWrapper({ session, orgAccount, refetchOrgAccount }: {
       )}
 
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
-      <CustomWalletModal isOpen={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </main>
   );
 }

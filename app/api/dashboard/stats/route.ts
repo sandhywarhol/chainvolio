@@ -16,6 +16,58 @@ export async function GET(request: Request) {
     }
 
     try {
+        // Google builder: fetch from org_accounts instead of profiles
+        if (wallet.startsWith("gauth:")) {
+            const authUid = wallet.slice("gauth:".length);
+            const [orgRes, attestationRes] = await Promise.all([
+                supabase
+                    .from("org_accounts")
+                    .select("org_name, bio, skills, avatar_url, website, twitter, linkedin, discord, telegram, email, country")
+                    .eq("auth_uid", authUid)
+                    .maybeSingle(),
+                supabase
+                    .from("attestations")
+                    .select("*", { count: "exact", head: true })
+                    .eq("attester_auth_uid", authUid),
+            ]);
+
+            const orgAccount = orgRes.data;
+            const hasBio = !!orgAccount?.bio;
+            const hasSkills = !!orgAccount?.skills;
+            const hasContact = !!(orgAccount?.website || orgAccount?.twitter || orgAccount?.linkedin || orgAccount?.discord || orgAccount?.telegram || orgAccount?.email);
+            const completionScore = (hasBio ? 33 : 0) + (hasSkills ? 33 : 0) + (hasContact ? 34 : 0);
+
+            return NextResponse.json({
+                profile: {
+                    walletAddress: wallet,
+                    displayName: orgAccount?.org_name || null,
+                    bio: orgAccount?.bio || null,
+                    skills: orgAccount?.skills || null,
+                    avatarUrl: orgAccount?.avatar_url || null,
+                    website: orgAccount?.website || null,
+                    twitter: orgAccount?.twitter || null,
+                    linkedin: orgAccount?.linkedin || null,
+                    discord: orgAccount?.discord || null,
+                    telegram: orgAccount?.telegram || null,
+                    email: orgAccount?.email || null,
+                    country: orgAccount?.country || null,
+                    isVerified: false,
+                    verificationTier: "unverified",
+                    verificationStatus: "unverified",
+                    verificationType: null,
+                    completionPercentage: completionScore,
+                    isProfileComplete: completionScore === 100,
+                    attestationQuota: 1,
+                    attestationUsed: 0,
+                    cvScore: null,
+                    cvLevel: null,
+                },
+                collections: [],
+                attestationCount: attestationRes.count || 0,
+                certificates: [],
+            });
+        }
+
         // 1. Fetch Profile and Verification in Parallel
         const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes, scoreRes] = await Promise.all([
             supabase

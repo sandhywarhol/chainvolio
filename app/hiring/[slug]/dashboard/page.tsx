@@ -1143,7 +1143,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                         {data.collection.metadata.roleType}
                                     </span>
                                 )}
-                                <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(52,211,153,0.7)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                                     {data?.collection.metadata?.salary || "Competitive"}
                                 </span>
                             </div>
@@ -1154,10 +1154,10 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.22)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 10, paddingLeft: 12 }}>Pipeline Overview</p>
                             <div className="space-y-1.5">
                                 {[
-                                    { label: "Pipeline Depth", value: String(data?.candidates?.length || 0), Icon: Users, color: "rgba(96,165,250,0.75)", desc: "Total applications" },
-                                    { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter((c: any) => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, Icon: ShieldCheck, color: "rgba(52,211,153,0.75)", desc: "Attested portfolios" },
-                                    { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc: number, c: any) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", Icon: Briefcase, color: "rgba(129,140,248,0.75)", desc: "Avg. proof volume" },
-                                    { label: "Network Breadth", value: String(new Set(data?.candidates.flatMap((c: any) => c.attestedOrgs)).size), Icon: Building2, color: "rgba(251,191,36,0.75)", desc: "Verified partners" },
+                                    { label: "Pipeline Depth", value: String(data?.candidates?.length || 0), Icon: Users, color: "rgba(255,255,255,0.35)", desc: "Total applications" },
+                                    { label: "Authority Rate", value: `${data?.candidates?.length ? ((data.candidates.filter((c: any) => c.attestedCount > 0).length) / data.candidates.length * 100).toFixed(0) : 0}%`, Icon: ShieldCheck, color: "rgba(255,255,255,0.35)", desc: "Attested portfolios" },
+                                    { label: "Signal Density", value: data?.candidates?.length ? (data.candidates.reduce((acc: number, c: any) => acc + (c.powCount || 0), 0) / data.candidates.length).toFixed(1) : "0.0", Icon: Briefcase, color: "rgba(255,255,255,0.35)", desc: "Avg. proof volume" },
+                                    { label: "Network Breadth", value: String(new Set(data?.candidates.flatMap((c: any) => c.attestedOrgs)).size), Icon: Building2, color: "rgba(255,255,255,0.35)", desc: "Verified partners" },
                                 ].map((stat, i) => (
                                     <div key={i} className="flex items-center justify-between px-3 py-2.5 rounded-lg" style={{ background: "rgba(255,255,255,0.02)" }}>
                                         <div className="flex items-center gap-2.5">
@@ -1239,11 +1239,11 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             </div>
                         ) : (
                             <div className="px-5 pb-5 pt-4 flex items-center gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                                <div className="w-8 h-8 rounded-full bg-indigo-500/20 overflow-hidden flex items-center justify-center border border-indigo-500/30">
+                                <div className="w-8 h-8 rounded-full bg-white/[0.06] overflow-hidden flex items-center justify-center border border-white/[0.08]">
                                     {data?.profile?.avatar_url ? (
                                         <img src={data.profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                                     ) : (
-                                        <User className="w-4 h-4 text-indigo-400" />
+                                        <User className="w-4 h-4 text-white/40" />
                                     )}
                                 </div>
                                 <div className="flex flex-col flex-1 min-w-0">
@@ -1286,13 +1286,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                             <div className="rounded-xl p-4 mb-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
                                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                                     <div className="flex-1 relative group">
-                                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
+                                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-slate-400 transition-colors" />
                                         <input
                                             type="text"
                                             placeholder="Search by name, wallet address, or organization..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full bg-black/40 border border-white/[0.05] rounded-xl pl-11 pr-4 py-2 text-[13px] focus:border-indigo-400/30 transition-all text-slate-200 placeholder:text-slate-600 outline-none"
+                                            className="w-full bg-black/40 border border-white/[0.05] rounded-xl pl-11 pr-4 py-2 text-[13px] focus:border-white/[0.12] transition-all text-slate-200 placeholder:text-slate-600 outline-none"
                                         />
                                     </div>
 
@@ -1330,7 +1330,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                         <div className="h-6 w-[1px] bg-white/[0.05] mx-1" />
 
                                         <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
-                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${attestedOnly ? 'bg-emerald-500 border-emerald-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${attestedOnly ? 'bg-white/30 border-white/40' : 'border-white/[0.1] bg-black/40'}`}>
                                                 {attestedOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                                             </div>
                                             <input type="checkbox" checked={attestedOnly} onChange={(e) => setAttestedOnly(e.target.checked)} className="hidden" />
@@ -1346,7 +1346,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                         </label>
 
                                         <label className="flex items-center gap-2.5 cursor-pointer group px-2 py-1">
-                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${focusMatchOnly ? 'bg-indigo-500 border-indigo-500' : 'border-white/[0.1] bg-black/40'}`}>
+                                            <div className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center ${focusMatchOnly ? 'bg-white/30 border-white/40' : 'border-white/[0.1] bg-black/40'}`}>
                                                 {focusMatchOnly && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                                             </div>
                                             <input type="checkbox" checked={focusMatchOnly} onChange={(e) => setFocusMatchOnly(e.target.checked)} className="hidden" />
@@ -1382,7 +1382,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">No Profiles Found</p>
                                                 <p className="text-slate-600 text-[11px]">Adjust your calibration to discover more candidates.</p>
                                             </div>
-                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); setFocusMatchOnly(false); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-indigo-400 uppercase tracking-widest transition-all mt-4">Clear All Filters</button>
+                                            <button onClick={() => { setSearchTerm(""); setRoleFilter("all"); setAttestedOnly(false); setSpamFilter(false); setFocusMatchOnly(false); }} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-white/40 uppercase tracking-widest transition-all mt-4">Clear All Filters</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -1395,7 +1395,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 key={candidate.id}
                                                 onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
                                                 className={`group hover:bg-white/[0.01] transition-all cursor-pointer border-b border-white/[0.02] relative ${
-                                                    expandedId === candidate.id ? (isUnverifiedSubdued ? 'bg-black/95 border-zinc-800' : 'bg-[#121214] border-indigo-500/30') : ''
+                                                    expandedId === candidate.id ? (isUnverifiedSubdued ? 'bg-black/95 border-zinc-800' : 'bg-[#121214] border-white/[0.08]') : ''
                                                 } ${
                                                     candidate.recruiterStatus === 'rejected' ? 'opacity-40 grayscale-[0.8]' : ''
                                                 } ${
@@ -1405,15 +1405,15 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 <td className="px-4 py-5">
                                                     <div className="flex items-center gap-4">
                                                         <div className="relative flex-shrink-0">
-                                                            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm shadow-indigo-500/5 group-hover:border-indigo-500/20 transition-all duration-300 ${isUnverifiedSubdued ? 'opacity-40 grayscale' : ''}`}>
+                                                            <div className={`w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center overflow-hidden shadow-sm group-hover:border-white/[0.15] transition-all duration-300 ${isUnverifiedSubdued ? 'opacity-40 grayscale' : ''}`}>
                                                                 {candidate.avatarUrl ? (
                                                                     <img src={candidate.avatarUrl} alt="" className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
                                                                 ) : (
-                                                                    <span className={`text-[10px] font-black font-mono italic opacity-60 uppercase ${isUnverifiedSubdued ? 'text-zinc-600' : 'text-indigo-400'}`}>{candidate.wallet.slice(0, 2)}</span>
+                                                                    <span className={`text-[10px] font-black font-mono italic opacity-60 uppercase ${isUnverifiedSubdued ? 'text-zinc-600' : 'text-white/50'}`}>{candidate.wallet.slice(0, 2)}</span>
                                                                 )}
                                                             </div>
                                                             {candidate.recruiterStatus === 'shortlisted' && (
-                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#121215] shadow-lg shadow-emerald-500/20"></div>
+                                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white/50 rounded-full border-2 border-[#121215]"></div>
                                                             )}
                                                             {candidate.recruiterStatus === 'rejected' && (
                                                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#121215] shadow-lg shadow-red-500/20"></div>
@@ -1426,8 +1426,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                 </span>
                                                                 {candidate.isVerified && (
                                                                     <div className="group/verified relative">
-                                                                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-450/90" />
-                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-28 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/verified:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                                                        <BadgeCheck className="w-3.5 h-3.5 text-white/50" />
+                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-28 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-white/40 opacity-0 group-hover/verified:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                                                                             Verified Profile
                                                                         </div>
                                                                     </div>
@@ -1439,8 +1439,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                 )}
                                                                 {candidate.attestedCount > 0 && (
                                                                     <div className="group/shield relative">
-                                                                        <ShieldCheck className={`w-3.5 h-3.5 ${isUnverifiedSubdued ? 'text-zinc-650' : 'text-emerald-400/80'}`} />
-                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 opacity-0 group-hover/shield:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                                                                        <ShieldCheck className={`w-3.5 h-3.5 ${isUnverifiedSubdued ? 'text-zinc-650' : 'text-white/45'}`} />
+                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 bg-black border border-white/5 rounded px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-white/40 opacity-0 group-hover/shield:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                                                                             Attested
                                                                         </div>
                                                                     </div>
@@ -1461,13 +1461,13 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 </td>
                                                 <td className="px-4 py-5 text-center">
                                                     <div className="flex flex-col items-center gap-2">
-                                                        <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${isUnverifiedSubdued ? 'bg-black text-zinc-700 border-zinc-900' : candidate.signalStrength === 'Strong' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/10 text-amber-400 border-amber-400/20 shadow-sm shadow-amber-400/5' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
+                                                        <div className={`px-2.5 py-1 rounded-md text-[9px] font-black tracking-[0.15em] uppercase border ${isUnverifiedSubdued ? 'bg-black text-zinc-700 border-zinc-900' : candidate.signalStrength === 'Strong' ? 'bg-white/[0.06] text-white/70 border-white/[0.1]' : candidate.signalStrength === 'Medium' ? 'bg-white/[0.04] text-white/50 border-white/[0.07]' : 'bg-slate-900 text-slate-600 border-white/[0.03]'}`}>
                                                             {candidate.signalStrength === 'Strong' && "HIGH CONFIDENCE"}
                                                             {candidate.signalStrength === 'Medium' && "CALIBRATED"}
                                                             {candidate.signalStrength === 'Low' && "LOW SIGNAL"}
                                                         </div>
                                                         <div className="w-16 h-1 bg-white/[0.02] rounded-full overflow-hidden">
-                                                            <div className={`h-full rounded-full transition-all duration-700 ${isUnverifiedSubdued ? 'bg-zinc-800' : candidate.signalStrength === 'Strong' ? 'bg-emerald-500/50' : candidate.signalStrength === 'Medium' ? 'bg-amber-400/50' : 'bg-red-500/30'}`} style={{ width: `${candidate.signalScore}%` }} />
+                                                            <div className={`h-full rounded-full transition-all duration-700 ${isUnverifiedSubdued ? 'bg-zinc-800' : 'bg-white/25'}`} style={{ width: `${candidate.signalScore}%` }} />
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1477,7 +1477,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                         <div className="flex items-center gap-1.5">
                                                             <span className={`text-[10px] font-medium uppercase tracking-widest ${isUnverifiedSubdued ? 'text-zinc-700' : 'text-slate-600'}`}>{candidate.primarySignal || "Standard Contribution"}</span>
                                                             {candidate.signalMatch && !isUnverifiedSubdued && (
-                                                                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-black text-emerald-400 uppercase tracking-widest">MATCH</span>
+                                                                <span className="px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-[8px] font-black text-white/50 uppercase tracking-widest">MATCH</span>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1490,7 +1490,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                         </div>
                                                         <div className="w-[1px] h-6 bg-white/[0.04]" />
                                                         <div className="flex flex-col items-center gap-0.5">
-                                                            <span className={`text-sm font-black font-mono transition-colors ${isUnverifiedSubdued ? 'text-zinc-700' : candidate.attestedCount > 0 ? 'text-emerald-400' : 'text-slate-700'}`}>{candidate.attestedCount}</span>
+                                                            <span className={`text-sm font-black font-mono transition-colors ${isUnverifiedSubdued ? 'text-zinc-700' : candidate.attestedCount > 0 ? 'text-white/65' : 'text-slate-700'}`}>{candidate.attestedCount}</span>
                                                             <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">ATTESTED</span>
                                                         </div>
                                                     </div>
@@ -1499,7 +1499,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                 <div className="flex flex-wrap gap-2 max-w-[280px]">
                                                     {candidate.attestedOrgs.slice(0, 2).map((org: string) => (
                                                         <div key={org} className="px-2.5 py-1 bg-white/[0.03] border border-white/[0.04] rounded-md flex items-center gap-1.5 shadow-sm">
-                                                            <div className="w-1 h-1 rounded-full bg-indigo-500"></div>
+                                                            <div className="w-1 h-1 rounded-full bg-white/30"></div>
                                                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest truncate max-w-[90px]">{org}</span>
                                                         </div>
                                                     ))}
@@ -1524,7 +1524,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     <Link
                                                         href={`/cv/${candidate.wallet}`}
                                                         target="_blank"
-                                                        className="p-2 hover:bg-indigo-500/5 rounded-lg transition-all text-slate-600 hover:text-indigo-400 group/btn"
+                                                        className="p-2 hover:bg-white/[0.04] rounded-lg transition-all text-slate-600 hover:text-slate-300 group/btn"
                                                         onClick={(e) => e.stopPropagation()}
                                                         title="Strategic Review"
                                                     >
@@ -1546,9 +1546,9 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
 
                                         {expandedId === candidate.id && (
                                             <tr className="bg-black/50 backdrop-blur-sm">
-                                                <td colSpan={7} className="px-6 md:px-10 py-10 border-l-[3px] border-indigo-500/50 relative overflow-hidden">
+                                                <td colSpan={7} className="px-6 md:px-10 py-10 border-l-[3px] border-white/[0.08] relative overflow-hidden">
                                                     {/* Background Pattern */}
-                                                    <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
+                                                    <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
 
                                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10">
                                                         {/* Separator Line with soft glow */}
@@ -1558,14 +1558,14 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                         <div>
                                                             <div className="flex items-center justify-between mb-10">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] flex items-center gap-2.5">
+                                                                    <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] flex items-center gap-2.5">
                                                                         <Briefcase className="w-3.5 h-3.5 opacity-80" /> Candidate Intelligence
                                                                     </h4>
                                                                     <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest pl-6">Deep Signal Correlation</span>
                                                                 </div>
                                                                 <div className="flex flex-col items-end gap-1">
                                                                     <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Member ID</span>
-                                                                    <span className="text-[9px] font-mono text-indigo-500/50 uppercase">
+                                                                    <span className="text-[9px] font-mono text-white/25 uppercase">
                                                                         {candidate.cardNumber ? `#${String(candidate.cardNumber).padStart(5, '0')}` : `CV-${candidate.wallet.slice(0, 8)}`}
                                                                     </span>
                                                                 </div>
@@ -1593,17 +1593,17 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                     </div>
                                                                 )}
                                                                 {candidate.attestedCount > 0 ? (
-                                                                    <div className="p-5 bg-indigo-500/5 border border-indigo-500/10 rounded-xl relative overflow-hidden group/card">
-                                                                        <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-700 group-hover/card:scale-110">
-                                                                            <ShieldCheck className="w-24 h-24 text-indigo-500" />
+                                                                    <div className="p-5 bg-white/[0.02] border border-white/[0.06] rounded-xl relative overflow-hidden group/card">
+                                                                        <div className="absolute -right-4 -bottom-4 opacity-[0.02] group-hover/card:opacity-[0.05] transition-all duration-700 group-hover/card:scale-110">
+                                                                            <ShieldCheck className="w-24 h-24 text-white/50" />
                                                                         </div>
                                                                         <div className="relative z-10">
                                                                             <div className="flex items-center justify-between mb-2">
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <div className="h-[1px] w-3 bg-indigo-500/50"></div>
-                                                                                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Protocol Verified</p>
+                                                                                    <div className="h-[1px] w-3 bg-white/20"></div>
+                                                                                    <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Protocol Verified</p>
                                                                                 </div>
-                                                                                <Link href={`/cv/${candidate.wallet}`} target="_blank" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-[8px] font-black text-indigo-400 uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all shadow-xl shadow-indigo-500/5 group/btn">
+                                                                                <Link href={`/cv/${candidate.wallet}`} target="_blank" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg text-[8px] font-black text-white/50 uppercase tracking-widest hover:bg-white/[0.1] hover:text-white transition-all group/btn">
                                                                                     Dossier <ExternalLink className="w-2 h-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                                                                                 </Link>
                                                                             </div>
@@ -1638,8 +1638,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                     <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Pipeline Calibration</h4>
                                                                     <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest">Strategic Placement</span>
                                                                 </div>
-                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${candidate.recruiterStatus === 'hired' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                                                                    candidate.recruiterStatus === 'shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${candidate.recruiterStatus === 'hired' ? 'bg-white/[0.07] text-white/60 border-white/[0.12]' :
+                                                                    candidate.recruiterStatus === 'shortlisted' ? 'bg-white/[0.05] text-white/50 border-white/[0.08]' :
                                                                         candidate.recruiterStatus === 'rejected' ? 'bg-slate-800 text-slate-500 border-white/5' :
                                                                             'bg-slate-900 text-slate-600 border-white/[0.03]'
                                                                     }`}>
@@ -1660,8 +1660,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                             </button>
                                                                         </div>
                                                                         <div className="flex gap-2">
-                                                                            <div className="w-1/3 py-2 bg-indigo-600/10 border border-indigo-500/30 rounded-lg text-center flex items-center justify-center">
-                                                                                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">HIRED ON-CHAIN</span>
+                                                                            <div className="w-1/3 py-2 bg-white/[0.04] border border-white/[0.1] rounded-lg text-center flex items-center justify-center">
+                                                                                <span className="text-[9px] font-black text-white/50 uppercase tracking-widest">HIRED ON-CHAIN</span>
                                                                             </div>
                                                                             <a
                                                                                 href={`https://solscan.io/tx/${candidate.recruiterTxSignature}`}
@@ -1669,7 +1669,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                                 rel="noopener noreferrer"
                                                                                 className="flex-1 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[8px] font-black text-slate-300 uppercase tracking-widest text-center transition-all flex items-center justify-center gap-1.5"
                                                                             >
-                                                                                <ExternalLink className="w-2.5 h-2.5 text-indigo-400" /> Solscan Proof
+                                                                                <ExternalLink className="w-2.5 h-2.5 text-white/35" /> Solscan Proof
                                                                             </a>
                                                                             <button
                                                                                 onClick={() => setToast({ message: "Memo content anchored with SHA-256 fingerprint in the transaction instructions.", type: "warning" })}
@@ -1685,8 +1685,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                             disabled={processingId === candidate.id}
                                                                             onClick={() => handleUpdateStatus(candidate.id, candidate.recruiterStatus === 'shortlisted' ? 'pending' : 'shortlisted')}
                                                                             className={`py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border ${candidate.recruiterStatus === 'shortlisted'
-                                                                                ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_5px_15px_rgba(16,185,129,0.3)]"
-                                                                                : "bg-emerald-500/5 border-emerald-500/10 text-emerald-500/60 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10"
+                                                                                ? "bg-white/20 text-white border-white/30"
+                                                                                : "bg-white/[0.03] border-white/[0.07] text-white/35 hover:text-white/60 hover:border-white/[0.15] hover:bg-white/[0.07]"
                                                                                 } ${processingId === candidate.id ? "opacity-50 grayscale transition-none" : ""}`}
                                                                         >
                                                                             {processingId === candidate.id ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : (candidate.recruiterStatus === 'shortlisted' ? 'SHORTLISTED' : 'SHORTLIST')}
@@ -1705,7 +1705,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                             <button
                                                                                 disabled={processingId === candidate.id}
                                                                                 onClick={() => handleUpdateStatus(candidate.id, 'hired')}
-                                                                                className={`w-full py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border relative overflow-hidden bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 shadow-lg shadow-indigo-500/5 ${processingId === candidate.id ? "opacity-90 pointer-events-none" : ""}`}
+                                                                                className={`w-full py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border relative overflow-hidden bg-white/[0.04] border-white/[0.1] text-white/50 hover:bg-white/[0.1] hover:text-white hover:border-white/20 ${processingId === candidate.id ? "opacity-90 pointer-events-none" : ""}`}
                                                                             >
                                                                                 {processingId === candidate.id ? (
                                                                                     <div className="flex items-center justify-center gap-1.5">
@@ -1724,7 +1724,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                 )}
 
                                                                 <div className="relative flex-1 group/notes">
-                                                                    <div className="absolute top-4 left-5 text-[9px] font-black text-slate-700 uppercase tracking-widest pointer-events-none group-focus-within/notes:text-indigo-400/70 transition-colors flex items-center gap-2">
+                                                                    <div className="absolute top-4 left-5 text-[9px] font-black text-slate-700 uppercase tracking-widest pointer-events-none group-focus-within/notes:text-white/30 transition-colors flex items-center gap-2">
                                                                         <div className="w-2 h-[1px] bg-current opacity-30"></div>
                                                                         Evaluation Synthesis
                                                                     </div>
@@ -1733,17 +1733,17 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                                         onChange={(e) => setNoteDraft(e.target.value)}
                                                                         onBlur={handleSaveNote}
                                                                         placeholder="Record strategic observations, verdict rationale, or next steps..."
-                                                                        className="w-full h-full min-h-[100px] bg-black/40 border border-white/[0.04] rounded-xl p-4 pt-8 pb-12 text-[12px] outline-none focus:border-indigo-500/20 focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
+                                                                        className="w-full h-full min-h-[100px] bg-black/40 border border-white/[0.04] rounded-xl p-4 pt-8 pb-12 text-[12px] outline-none focus:border-white/[0.08] focus:bg-black/60 transition-all placeholder:text-slate-800 resize-none text-slate-300 leading-relaxed font-medium shadow-inner"
                                                                     />
                                                                     {isSavingNote ? (
                                                                         <div className="absolute bottom-4 right-4 flex items-center gap-2.5 px-3 py-1.5 bg-black/80 rounded-lg border border-white/5 shadow-2xl backdrop-blur-md">
-                                                                            <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />
-                                                                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Archiving</span>
+                                                                            <Loader2 className="w-3 h-3 animate-spin text-white/40" />
+                                                                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Archiving</span>
                                                                         </div>
                                                                     ) : (
                                                                         <button 
                                                                             onClick={handleSaveNote} 
-                                                                            className="absolute bottom-4 right-4 px-4 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-lg text-[9px] font-black text-indigo-400 uppercase tracking-widest transition-all"
+                                                                            className="absolute bottom-4 right-4 px-4 py-1.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.08] rounded-lg text-[9px] font-black text-white/40 hover:text-white/60 uppercase tracking-widest transition-all"
                                                                         >
                                                                             SAVE NOTES
                                                                         </button>
@@ -1756,22 +1756,22 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                                     {/* Member Note (admin members only) */}
                                                     {isAdminMember && (
                                                         <div className="mt-3 px-4 pb-4">
-                                                            <div className="border border-indigo-500/15 rounded-xl p-3 bg-indigo-500/5">
-                                                                <p className="text-[9px] font-black uppercase tracking-widest text-indigo-400/60 mb-2">My Member Note</p>
+                                                            <div className="border border-white/[0.06] rounded-xl p-3 bg-white/[0.02]">
+                                                                <p className="text-[9px] font-black uppercase tracking-widest text-white/25 mb-2">My Member Note</p>
                                                                 <textarea
                                                                     value={memberNoteDraft}
                                                                     onChange={(e) => setMemberNoteDraft(e.target.value)}
                                                                     placeholder="Add your note about this candidate..."
-                                                                    className="w-full bg-black/30 border border-white/[0.06] rounded-lg p-2.5 text-[11px] text-white/70 placeholder:text-white/20 outline-none focus:border-indigo-500/30 resize-none min-h-[60px]"
+                                                                    className="w-full bg-black/30 border border-white/[0.06] rounded-lg p-2.5 text-[11px] text-white/70 placeholder:text-white/20 outline-none focus:border-white/[0.12] resize-none min-h-[60px]"
                                                                 />
                                                                 <div className="flex items-center justify-end gap-2 mt-1.5">
                                                                     {memberNoteSuccess && (
-                                                                        <span className="text-[9px] text-emerald-400 font-bold">Saved!</span>
+                                                                        <span className="text-[9px] text-white/50 font-bold">Saved!</span>
                                                                     )}
                                                                     <button
                                                                         onClick={handleSaveMemberNote}
                                                                         disabled={isSavingMemberNote || !memberNoteDraft.trim()}
-                                                                        className="px-3 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest transition-all disabled:opacity-40"
+                                                                        className="px-3 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.08] text-white/40 hover:text-white/60 text-[9px] font-black uppercase tracking-widest transition-all disabled:opacity-40"
                                                                     >
                                                                         {isSavingMemberNote ? "Saving…" : "Save Note"}
                                                                     </button>
@@ -1840,8 +1840,8 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setHiringSuccess(null)} />
                     <div className="relative bg-[#0f0f11] border border-white/10 rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-6">
-                                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                            <div className="w-20 h-20 rounded-full bg-white/[0.07] border border-white/[0.12] flex items-center justify-center mb-6">
+                                <CheckCircle2 className="w-10 h-10 text-white/60" />
                             </div>
                             
                             <h2 className="text-2xl font-bold text-white mb-2">Hiring Successfully Recorded</h2>
@@ -1854,7 +1854,7 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                     href={`https://solscan.io/tx/${hiringSuccess.txSignature}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-4 bg-white/15 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-white/[0.15]"
                                 >
                                     <ExternalLink className="w-4 h-4" /> View Hiring Proof
                                 </a>
@@ -1912,12 +1912,12 @@ export default function RecruiterDashboard({ params }: { params: { slug: string 
                                 return (
                                     <div className="grid grid-cols-3 gap-3">
                                         {[
-                                            { label: "Total Applicants", val: total, icon: Users, color: "rgba(255,255,255,0.6)", bg: "rgba(255,255,255,0.05)" },
-                                            { label: "Hired", val: hired, icon: Award, color: "#4ade80", bg: "rgba(74,222,128,0.08)" },
-                                            { label: "Shortlisted", val: shortlisted, icon: TrendingUp, color: "#f59e0b", bg: "rgba(245,158,11,0.08)" },
-                                            { label: "Rejected", val: rejected, icon: XCircle, color: "#f87171", bg: "rgba(248,113,113,0.08)" },
-                                            { label: "Avg Signal Score", val: avgScore, icon: Target, color: "rgba(167,139,250,0.9)", bg: "rgba(124,58,237,0.08)" },
-                                            { label: "On-Chain Verified", val: verified, icon: ShieldCheck, color: "#60a5fa", bg: "rgba(96,165,250,0.08)" },
+                                            { label: "Total Applicants", val: total, icon: Users, color: "rgba(255,255,255,0.6)", bg: "rgba(255,255,255,0.04)" },
+                                            { label: "Hired", val: hired, icon: Award, color: "rgba(255,255,255,0.65)", bg: "rgba(255,255,255,0.04)" },
+                                            { label: "Shortlisted", val: shortlisted, icon: TrendingUp, color: "rgba(255,255,255,0.55)", bg: "rgba(255,255,255,0.03)" },
+                                            { label: "Rejected", val: rejected, icon: XCircle, color: "rgba(255,255,255,0.35)", bg: "rgba(255,255,255,0.02)" },
+                                            { label: "Avg Signal Score", val: avgScore, icon: Target, color: "rgba(255,255,255,0.55)", bg: "rgba(255,255,255,0.03)" },
+                                            { label: "On-Chain Verified", val: verified, icon: ShieldCheck, color: "rgba(255,255,255,0.55)", bg: "rgba(255,255,255,0.04)" },
                                         ].map((s, i) => (
                                             <div key={i} className="p-3 rounded-2xl" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
                                                 <s.icon style={{ width: 14, height: 14, color: s.color, marginBottom: 6 }} />

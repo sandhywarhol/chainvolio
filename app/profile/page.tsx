@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { PenLine, Eye } from "lucide-react";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 const WORK_PREFS = ["Full-time", "Contract", "Freelance", "Project-based"];
 
@@ -109,23 +110,25 @@ export default function ProfilePage() {
     };
 
     if (!publicKey) {
-        const isGoogleOnly = isGoogleSignedIn && !publicKey;
+        // Google builders have their own profile page
+        if (isGoogleSignedIn) {
+            router.replace("/org/edit-profile");
+            return <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <img src="/logo.png" alt="" className="w-16 h-16 object-contain animate-spin-slow brightness-125" />
+            </div>;
+        }
         return (
             <>
                 <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 25, textAlign: "center" }}>
-                    <p style={{ color: TEXT_PRIMARY, fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-                        {isGoogleOnly ? "Wallet Required" : "Not Connected"}
-                    </p>
+                    <p style={{ color: TEXT_PRIMARY, fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Not Connected</p>
                     <p style={{ color: TEXT_MUTED, fontSize: 13, marginBottom: 24, maxWidth: 260, lineHeight: 1.6 }}>
-                        {isGoogleOnly
-                            ? "Your profile and CV are tied to a Solana wallet address. Connect one to continue."
-                            : "Sign in to view and edit your profile."}
+                        Sign in to view and edit your profile.
                     </p>
                     <button
                         onClick={() => setShowModal(true)}
                         style={{ padding: "14px 28px", background: "rgba(253,230,138,0.1)", border: "1px solid rgba(253,230,138,0.3)", color: "rgba(253,230,138,0.85)", borderRadius: 16, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
                     >
-                        {isGoogleOnly ? "Connect a Wallet" : "Sign In"}
+                        Sign In
                     </button>
                 </div>
                 <CustomWalletModal isOpen={showModal} onClose={() => setShowModal(false)} />
@@ -133,15 +136,7 @@ export default function ProfilePage() {
         );
     }
 
-    if (loading) {
-        return (
-            <div style={{ minHeight: "100dvh", backgroundColor: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: 32, height: 32, border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "rgba(255,255,255,0.6)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                <p style={{ color: TEXT_MUTED, fontSize: 10, letterSpacing: 2, marginTop: 20, textTransform: "uppercase" }}>RESOLVING IDENTITY...</p>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
-        );
-    }
+    if (loading) return <LoadingScreen />;
 
     const inputStyle: React.CSSProperties = {
         backgroundColor: "rgba(255,255,255,0.05)",

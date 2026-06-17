@@ -33,6 +33,7 @@ import {
 import { XIcon, LinkedInIcon, DiscordIcon } from "@/components/ui/SocialIcons";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { getVerificationLabel } from "@/lib/paymentConfig";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 const SIGNAL_OPTIONS = [
     { id: "GitHub / Code", label: "GitHub / Code", desc: "Repositories, commits & PRs", icon: Github },
@@ -55,6 +56,9 @@ const ROLE_OPTIONS = [
 export default function CandidateSubmission({ params }: { params: { slug: string } }) {
     const { slug } = params;
     const { publicKey, connected, signMessage } = useWallet();
+    const { session: googleSession, orgAccount } = useGoogleAuth();
+    const googleUid = !publicKey && googleSession?.user?.id ? googleSession.user.id : null;
+    const isConnected = connected || !!googleUid;
     const [collection, setCollection] = useState<any>(null);
     const [ownerProfile, setOwnerProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -88,29 +92,59 @@ export default function CandidateSubmission({ params }: { params: { slug: string
     }, [slug]);
 
     useEffect(() => {
-        if (!publicKey) {
+        if (!publicKey && !googleUid) {
             setApplicantProfile(null);
             setExistingSubmission(null);
             setCheckingExisting(false);
             return;
         }
 
-        // 1. Fetch Profile
-        fetch(`/api/user/me?wallet=${publicKey.toBase58()}`)
+        if (googleUid) {
+            // Google user — profile comes from orgAccount hook, just check existing submission
+            if (orgAccount) {
+                setApplicantProfile({
+                    displayName: orgAccount.org_name || googleSession?.user?.email || "Builder",
+                    avatarUrl: orgAccount.avatar_url || googleSession?.user?.user_metadata?.avatar_url || null,
+                    bio: orgAccount.bio || "",
+                    isVerified: false,
+                    attestedReceiptCount: 0,
+                });
+            }
+            setCheckingExisting(true);
+            fetch(`/api/hiring/submissions/check?slug=${slug}&auth_uid=${googleUid}`)
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.submission) {
+                        setExistingSubmission(data.submission);
+                        setSubmitted(true);
+                        setTimeout(() => {
+                            const hash = window.location.hash;
+                            if (hash === '#application-status') {
+                                const el = document.getElementById('application-status');
+                                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('animate-highlight'); }
+                            }
+                        }, 1000);
+                    }
+                })
+                .catch(() => {})
+                .finally(() => setCheckingExisting(false));
+            return;
+        }
+
+        // 1. Fetch Profile (wallet user)
+        fetch(`/api/user/me?wallet=${publicKey!.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => setApplicantProfile(data))
             .catch(() => setApplicantProfile(null));
 
         // 2. Fetch Existing Submission
         setCheckingExisting(true);
-        fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey.toBase58()}`)
+        fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey!.toBase58()}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {
                 if (data?.submission) {
                     setExistingSubmission(data.submission);
                     setSubmitted(true);
-
-                    // Deep link highlight logic
                     setTimeout(() => {
                         const hash = window.location.hash;
                         if (hash === '#application-status') {
@@ -125,14 +159,40 @@ export default function CandidateSubmission({ params }: { params: { slug: string
             })
             .catch(() => {})
             .finally(() => setCheckingExisting(false));
-    }, [publicKey, slug]);
+    }, [publicKey, googleUid, orgAccount, slug]);
 
     const handleSubmit = async () => {
-        if (!publicKey || !signMessage) return;
+        if (!publicKey && !googleUid) return;
         setSubmitting(true);
         setError(null);
 
         try {
+            if (googleUid) {
+                // Google user — authenticate via JWT, no wallet signature needed
+                const token = googleSession?.access_token;
+                if (!token) { setError("Session expired. Please sign in again."); setSubmitting(false); return; }
+
+                const res = await fetch("/api/hiring/submissions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                    body: JSON.stringify({ collectionSlug: slug, authUid: googleUid, primarySignal, roleStrength }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    const subRes = await fetch(`/api/hiring/submissions/check?slug=${slug}&auth_uid=${googleUid}`);
+                    if (subRes.ok) {
+                        const subData = await subRes.json();
+                        if (subData?.submission) setExistingSubmission(subData.submission);
+                    }
+                    setSubmitted(true);
+                } else {
+                    setError(data.error?.message || data.error || "Submission failed.");
+                }
+                setSubmitting(false);
+                return;
+            }
+
+            // Wallet user
             const { signChainVolioAction } = await import("@/lib/wallet-utils");
             const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "apply_job", slug);
 
@@ -146,7 +206,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     collectionSlug: slug,
-                    walletAddress: publicKey.toBase58(),
+                    walletAddress: publicKey!.toBase58(),
                     primarySignal,
                     roleStrength,
                     ...signedAction
@@ -155,13 +215,10 @@ export default function CandidateSubmission({ params }: { params: { slug: string
 
             const data = await res.json();
             if (res.ok) {
-                // Fetch submission details to populate status snapshot
-                const subRes = await fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey.toBase58()}`);
+                const subRes = await fetch(`/api/hiring/submissions/check?slug=${slug}&wallet=${publicKey!.toBase58()}`);
                 if (subRes.ok) {
                     const subData = await subRes.json();
-                    if (subData?.submission) {
-                        setExistingSubmission(subData.submission);
-                    }
+                    if (subData?.submission) setExistingSubmission(subData.submission);
                 }
                 setSubmitted(true);
             } else {
@@ -579,13 +636,13 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                         </div>
                                     </div>
 
-                                    {!connected ? (
+                                    {!isConnected ? (
                                         <div className="text-center py-8 bg-white/[0.02] border border-white/[0.04] rounded-xl px-4">
                                             <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
                                                 <User className="w-5 h-5 text-slate-500" />
                                             </div>
-                                            <h3 className="text-sm font-bold text-white mb-2">Connect Your Wallet</h3>
-                                            <p className="text-slate-400 mb-6 text-[11px] leading-relaxed max-w-[240px] mx-auto">Connect your wallet to compile and share your verified proof of work history.</p>
+                                            <h3 className="text-sm font-bold text-white mb-2">Sign In to Apply</h3>
+                                            <p className="text-slate-400 mb-6 text-[11px] leading-relaxed max-w-[240px] mx-auto">Connect your wallet or sign in with Google to apply for this position.</p>
                                             <div className="flex justify-center scale-95">
                                                 <WalletMultiButton />
                                             </div>
@@ -630,10 +687,12 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                         </div>
                                                         <div className="min-w-0">
                                                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate">
-                                                                {applicantProfile?.displayName || "Applicant Wallet"}
+                                                                {applicantProfile?.displayName || (googleUid ? googleSession?.user?.email : "Applicant Wallet")}
                                                             </p>
                                                             <p className="text-xs font-mono font-bold text-white truncate">
-                                                                {publicKey?.toBase58().slice(0, 6)}...{publicKey?.toBase58().slice(-6)}
+                                                                {googleUid
+                                                                    ? (googleSession?.user?.email || "Google Builder")
+                                                                    : `${publicKey?.toBase58().slice(0, 6)}...${publicKey?.toBase58().slice(-6)}`}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -737,7 +796,7 @@ export default function CandidateSubmission({ params }: { params: { slug: string
                                                     <>
                                                         <button
                                                             onClick={handleSubmit}
-                                                            disabled={submitting || !primarySignal || !roleStrength || (collection.eligibility_filters?.activeWalletOnly && applicantProfile && applicantProfile.attestedReceiptCount < 1)}
+                                                            disabled={submitting || !primarySignal || !roleStrength || (collection.eligibility_filters?.activeWalletOnly && (googleUid || (applicantProfile && applicantProfile.attestedReceiptCount < 1)))}
                                                             className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 text-white font-sans"
                                                         >
                                                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Submit Verified Credentials <Send className="w-3.5 h-3.5" /></>}
