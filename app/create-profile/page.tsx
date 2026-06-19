@@ -9,9 +9,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
-import { Instagram, Github, Globe, Send, Phone, Mail } from "lucide-react";
+import { Instagram, Github, Globe, Send, Phone, Mail, FileText, Upload, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { compressPdf } from "@/lib/pdf-compress";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 function CreateProfileContent() {
@@ -49,6 +50,10 @@ function CreateProfileContent() {
 
   const [orgType, setOrgType] = useState<"company" | "community" | "">("");
   const [profileExists, setProfileExists] = useState(false);
+  const [showPdfStep, setShowPdfStep] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [savedWallet, setSavedWallet] = useState<string>("");
   const [cropModal, setCropModal] = useState<{ isOpen: boolean; image: string | null }>({
     isOpen: false,
     image: null,
@@ -190,9 +195,15 @@ function CreateProfileContent() {
       });
 
       if (res.ok) {
-        setToast({ message: isRecruiter ? "Organization profile created! Request verification from your dashboard to unlock hiring features." : "Profile saved successfully!", type: "success" });
-        const dest = isRecruiter && orgType ? `/dashboard?requestVerify=${orgType}` : "/dashboard";
-        setTimeout(() => router.push(dest), 1500);
+        if (!profileExists && !isRecruiter) {
+          // New builder: show PDF upload prompt before going to dashboard
+          setSavedWallet(publicKey.toBase58());
+          setShowPdfStep(true);
+        } else {
+          setToast({ message: isRecruiter ? "Organization profile created! Request verification from your dashboard to unlock hiring features." : "Profile saved successfully!", type: "success" });
+          const dest = isRecruiter && orgType ? `/dashboard?requestVerify=${orgType}` : "/dashboard";
+          setTimeout(() => router.push(dest), 1500);
+        }
       } else {
         const data = await res.json();
         setToast({ message: data.error?.message || data.error || "Failed to save profile.", type: "error" });
@@ -204,6 +215,33 @@ function CreateProfileContent() {
     }
   };
 
+  const handlePdfUpload = async () => {
+    if (!pdfFile || !publicKey || !signMessage) return;
+    setPdfUploading(true);
+    const result = await compressPdf(pdfFile);
+    if (!result) {
+      setToast({ message: "PDF is too large even after compression (max 5 MB).", type: "error" });
+      setPdfUploading(false);
+      return;
+    }
+    try {
+      const { signChainVolioAction } = await import("@/lib/wallet-utils");
+      const signedAction = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+      if (!signedAction) { setPdfUploading(false); return; }
+
+      const formData = new FormData();
+      formData.append("wallet", savedWallet);
+      formData.append("file", result.file);
+      formData.append("signature", signedAction.signature);
+      formData.append("nonce", signedAction.nonce);
+      formData.append("timestamp", signedAction.timestamp.toString());
+
+      await fetch("/api/cv-pdf", { method: "POST", body: formData });
+    } catch {}
+    setPdfUploading(false);
+    router.push("/dashboard");
+  };
+
   if (loading && !form.displayName) {
     return (
       <div className="min-h-screen bg-[#111111] md:bg-black theme-bg-page theme-aware flex flex-col">
@@ -212,6 +250,100 @@ function CreateProfileContent() {
           <LoadingScreen fullScreen={false} />
         </div>
       </div>
+    );
+  }
+
+  if (showPdfStep) {
+    return (
+      <main className="min-h-screen text-white flex flex-col items-center justify-center px-6 bg-[#111111] md:bg-black theme-bg-page theme-aware">
+        <div className="w-full max-w-md space-y-6">
+          {/* Success header */}
+          <div className="text-center space-y-2">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-white">Profile Created!</h1>
+            <p className="text-sm text-slate-400">
+              Do you already have a PDF resume? Upload it now so recruiters can view it, or start building your ChainVolio CV with verified work history.
+            </p>
+          </div>
+
+          {/* PDF Upload Card */}
+          <div className="p-5 rounded-2xl border border-white/[0.08] space-y-4" style={{ background: "#0a0a0c" }}>
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4 text-amber-400" />
+              <span className="text-sm font-bold text-white">Upload Existing PDF Resume</span>
+              <span className="text-[10px] text-slate-500 ml-auto">optional · max 5 MB</span>
+            </div>
+
+            <label
+              className={`flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
+                pdfFile
+                  ? "border-emerald-500/40 bg-emerald-500/5"
+                  : "border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5"
+              }`}
+            >
+              <input
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  if (f.type !== "application/pdf") return;
+                  setPdfFile(f);
+                }}
+              />
+              {pdfFile ? (
+                <>
+                  <FileText className="w-8 h-8 text-emerald-400" />
+                  <p className="text-sm font-medium text-white text-center truncate max-w-full">{pdfFile.name}</p>
+                  <p className="text-[11px] text-slate-500">{(pdfFile.size / 1024).toFixed(0)} KB</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-7 h-7 text-slate-600" />
+                  <p className="text-sm text-slate-400">Drop PDF here or click to browse</p>
+                </>
+              )}
+            </label>
+
+            <button
+              onClick={handlePdfUpload}
+              disabled={!pdfFile || pdfUploading}
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              {pdfUploading ? (
+                <><span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />Uploading...</>
+              ) : (
+                <><Upload className="w-4 h-4" />Upload & Continue</>
+              )}
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/5" />
+            <span className="text-xs text-slate-600">or</span>
+            <div className="flex-1 h-px bg-white/5" />
+          </div>
+
+          {/* Build on ChainVolio CTA */}
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="w-full py-3 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] text-white font-semibold text-sm transition-all flex items-center justify-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-indigo-400" />
+            Build CV with ChainVolio Attestation
+            <ArrowRight className="w-4 h-4 text-slate-500" />
+          </button>
+
+          <p className="text-center text-[11px] text-slate-600">
+            You can always upload or change your PDF later from your profile settings.
+          </p>
+        </div>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      </main>
     );
   }
 

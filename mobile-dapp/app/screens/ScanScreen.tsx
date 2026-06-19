@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 14,
-    backgroundcolor: '#1f2937',
+    backgroundColor: '#1f2937',
   },
   grantBtnText: {
     color: '#fff',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 28,
     height: 28,
-    bordercolor: '#1f2937',
+    borderColor: '#1f2937',
   },
   topLeft: { top: 0, left: 0, borderTopWidth: 3, borderLeftWidth: 3, borderTopLeftRadius: 6 },
   topRight: { top: 0, right: 0, borderTopWidth: 3, borderRightWidth: 3, borderTopRightRadius: 6 },

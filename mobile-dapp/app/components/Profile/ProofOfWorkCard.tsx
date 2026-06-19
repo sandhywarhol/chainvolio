@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 14 
   },
   workRole: { color: '#1f2937', fontSize: 17, fontWeight: 'bold' },
-  workOrg: { color: '#1f2937', fontSize: 15, fontWeight: '700', marginTop: 4 },
+  workOrg: { color: '#4b5563', fontSize: 15, fontWeight: '700', marginTop: 4 },
   workMeta: { color: '#6b7280', fontSize: 10, fontWeight: '700', marginTop: 6 },
   attestedTag: { 
     paddingHorizontal: 10, 
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: 'rgba(244, 63, 94, 0.2)' 
   },
-  attestedTagText: { color: '#1f2937', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
+  attestedTagText: { color: '#e11d48', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
   workDescription: { 
     color: '#4b5563', 
     fontSize: 13, 
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   attesterFooter: { marginTop: 8 },
-  footerLine: { height: 1, backgroundColor: '#f3f4f6', marginBottom: 14 },
+  footerLine: { height: 1, backgroundColor: '#e5e7eb', marginBottom: 14 },
   attesterRow: { flexDirection: 'row', alignItems: 'center' },
   attesterAvatar: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: '#e5e7eb' },
   attesterAvatarPlaceholder: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },

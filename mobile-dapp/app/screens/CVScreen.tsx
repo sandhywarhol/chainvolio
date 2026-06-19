@@ -84,7 +84,7 @@ const CVScreen = ({ navigation }: any) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1f2937" />
+        <ActivityIndicator size="large" color="#10b981" />
         <Text style={styles.loadingText}>RESOLVING PROFESSIONAL LEGACY...</Text>
       </View>
     );
@@ -119,7 +119,7 @@ const CVScreen = ({ navigation }: any) => {
 
           {/* SECTIONS */}
           <View style={styles.disclaimerBox}>
-             <Ionicons name="shield-checkmark" size={20} color="#1f2937" />
+             <Ionicons name="shield-checkmark" size={20} color="#9ca3af" />
              <View style={styles.disclaimerContent}>
                 <Text style={styles.disclaimerTitle}>RECRUITER NOTE: VERIFIED INTEGRITY</Text>
                 <Text style={styles.disclaimerSubtitle}>Attestations marked with ✓ Attested are cryptographically signed by third-party verifiers.</Text>
@@ -127,12 +127,12 @@ const CVScreen = ({ navigation }: any) => {
           </View>
 
           <TouchableOpacity style={styles.expandableSection} onPress={() => navigation.navigate('Timeline')}>
-             <View style={styles.expandableIconBox}><Ionicons name="trending-up-outline" size={18} color="#1f2937" /></View>
+             <View style={styles.expandableIconBox}><Ionicons name="trending-up-outline" size={18} color="#6b7280" /></View>
              <View style={styles.expandableText}>
                 <Text style={styles.expandableTitle}>Career Timeline</Text>
                 <Text style={styles.expandableSub}>Verified professional history.</Text>
              </View>
-             <Ionicons name="chevron-forward" size={20} color="rgba(0,0,0,0.3)" />
+             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.expandableSection} onPress={() => navigation.navigate('Add Credential')}>
@@ -141,7 +141,7 @@ const CVScreen = ({ navigation }: any) => {
                 <Text style={styles.expandableTitle}>Verified Credentials</Text>
                 <Text style={styles.expandableSub}>{certificates.length} items verified.</Text>
              </View>
-             <Ionicons name="chevron-forward" size={20} color="rgba(0,0,0,0.3)" />
+             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
           <Text style={styles.powHeader}>Proof of Work</Text>
@@ -176,16 +176,16 @@ const styles = StyleSheet.create({
   loadingText: { color: '#6b7280', fontSize: 10, letterSpacing: 2, marginTop: 20 },
   appHeader: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 25 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#1f2937' },
+  logoCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#e5e7eb' },
   brandText: { color: '#1f2937', fontSize: 18, fontWeight: '600' },
   headerIcons: { flexDirection: 'row', alignItems: 'center' },
   scrollContent: { paddingHorizontal: 15, paddingTop: 10 },
-  disclaimerBox: { flexDirection: 'row', gap: 14, padding: 16, backgroundcolor: '#1f2937', borderRadius: 12, borderWidth: 1, bordercolor: '#1f2937', marginBottom: 25 },
+  disclaimerBox: { flexDirection: 'row', gap: 14, padding: 16, backgroundColor: '#ffffff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', marginBottom: 25 },
   disclaimerContent: { flex: 1 },
-  disclaimerTitle: { color: '#1f2937', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
+  disclaimerTitle: { color: '#6b7280', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
   disclaimerSubtitle: { color: '#4b5563', fontSize: 10, fontWeight: '500', marginTop: 4, lineHeight: 15 },
-  expandableSection: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#f3f4f6', borderRadius: 14, borderWidth: 1, borderColor: '#e5e7eb', marginBottom: 12 },
-  expandableIconBox: { width: 36, height: 36, borderRadius: 10, backgroundcolor: '#1f2937', alignItems: 'center', justifyContent: 'center' },
+  expandableSection: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#ffffff', borderRadius: 14, borderWidth: 1, borderColor: '#e5e7eb', marginBottom: 12 },
+  expandableIconBox: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
   expandableText: { flex: 1, paddingLeft: 14 },
   expandableTitle: { color: '#1f2937', fontSize: 13, fontWeight: '600' },
   expandableSub: { color: '#6b7280', fontSize: 11, fontWeight: '500', marginTop: 2 },

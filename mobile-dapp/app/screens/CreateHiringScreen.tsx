@@ -88,10 +88,11 @@ const CreateHiringScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1f2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>New Collection</Text>
           <View style={{ width: 40 }} />
@@ -104,7 +105,7 @@ const CreateHiringScreen = ({ navigation }: any) => {
               <TextInput
                 style={styles.input}
                 placeholder="e.g. Frontend Engineer"
-                placeholderTextColor="rgba(255,255,255,0.2)"
+                placeholderTextColor="#9ca3af"
                 value={formData.title}
                 onChangeText={(text) => setFormData({ ...formData, title: text })}
               />
@@ -115,7 +116,7 @@ const CreateHiringScreen = ({ navigation }: any) => {
               <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder="Briefly describe the role..."
-                placeholderTextColor="rgba(255,255,255,0.2)"
+                placeholderTextColor="#9ca3af"
                 multiline
                 numberOfLines={4}
                 value={formData.description}
@@ -155,23 +156,23 @@ const CreateHiringScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
   header: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18,  },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#f3f4f6' },
+  headerTitle: { color: '#1f2937', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   formContainer: { gap: 32 },
   inputGroup: { gap: 12 },
-  label: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  letterSpacing: 2 },
+  label: { color: '#9ca3af', fontSize: 9,  letterSpacing: 2 },
   input: {
     height: 56,
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: '#e5e7eb',
     borderRadius: 16,
     paddingHorizontal: 18,
-    color: '#fff',
+    color: '#1f2937',
     fontSize: 15,
     
   },
@@ -181,21 +182,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, 
     height: 40, 
     borderRadius: 12, 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
+    backgroundColor: '#f3f4f6', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: '#e5e7eb',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  optionBtnActive: { borderColor: 'rgba(16,185,129,0.5)', backgroundColor: 'rgba(16,185,129,0.05)' },
-  optionText: { color: 'rgba(255,255,255,0.3)', fontSize: 11,  },
+  optionBtnActive: { borderColor: 'rgba(16,185,129,0.5)', backgroundColor: 'rgba(16,185,129,0.08)' },
+  optionText: { color: '#6b7280', fontSize: 11,  },
   optionTextActive: { color: '#10b981' },
   submitSection: { marginTop: 10, gap: 16 },
   submitBtn: { height: 60, borderRadius: 18, overflow: 'hidden' },
   submitBtnDisabled: { opacity: 0.5 },
   submitGradient: { flex: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 },
   submitBtnText: { color: '#fff', fontSize: 14,  letterSpacing: 1 },
-  footerNote: { textAlign: 'center', color: 'rgba(255,255,255,0.15)', fontSize: 10,  lineHeight: 16 },
+  footerNote: { textAlign: 'center', color: '#9ca3af', fontSize: 10,  lineHeight: 16 },
 });
 
 export default CreateHiringScreen;

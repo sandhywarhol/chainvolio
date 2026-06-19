@@ -63,11 +63,11 @@ const ScoreScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1f2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>CV Analysis</Text>
           <View style={{ width: 40 }} />
@@ -158,10 +158,10 @@ const ScoreScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#9ca3af', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
   header: {
     height: 70,
     flexDirection: 'row',
@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18,  },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#f3f4f6' },
+  headerTitle: { color: '#1f2937', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   scoreOrbit: { alignItems: 'center', marginBottom: 40, position: 'relative' },
   orbitGlow: { position: 'absolute', top: 0, width: 260, height: 260, borderRadius: 130 },
@@ -179,20 +179,20 @@ const styles = StyleSheet.create({
     height: 140, 
     borderRadius: 70, 
     borderWidth: 1, 
-    borderColor: 'rgba(168, 85, 247, 0.3)', 
-    backgroundColor: '#0a0a0f', 
+    borderColor: '#e5e7eb', 
+    backgroundColor: '#ffffff', 
     alignItems: 'center', 
     justifyContent: 'center',
-    shadowColor: '#a855f7',
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  scoreMainVal: { color: '#fff', fontSize: 48,  },
+  scoreMainVal: { color: '#1f2937', fontSize: 48,  },
   scoreLevelText: { color: '#a855f7', fontSize: 9,  letterSpacing: 2, marginTop: -4 },
   orbitLabels: { marginTop: 24, width: '100%', alignItems: 'center' },
-  networkTitle: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  letterSpacing: 2, marginBottom: 12 },
-  mainProgressContainer: { width: 220, height: 4, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 2, overflow: 'hidden' },
+  networkTitle: { color: '#9ca3af', fontSize: 9,  letterSpacing: 2, marginBottom: 12 },
+  mainProgressContainer: { width: 220, height: 4, backgroundColor: '#e5e7eb', borderRadius: 2, overflow: 'hidden' },
   mainProgressBar: { height: '100%', backgroundColor: '#a855f7' },
   badgeGrid: { flexDirection: 'row', gap: 12, marginBottom: 40 },
   badgeCard: { 
@@ -201,34 +201,34 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     gap: 12, 
     padding: 16, 
-    backgroundColor: 'rgba(255,255,255,0.02)', 
+    backgroundColor: '#ffffff', 
     borderRadius: 18, 
-    borderWidth: 0.5, 
-    borderColor: 'rgba(255,255,255,0.05)' 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb' 
   },
-  badgeVal: { color: '#fff', fontSize: 16,  },
-  badgeLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 8,  letterSpacing: 1 },
+  badgeVal: { color: '#1f2937', fontSize: 16,  },
+  badgeLabel: { color: '#9ca3af', fontSize: 8,  letterSpacing: 1 },
   section: { marginBottom: 40 },
-  sectionHeading: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  letterSpacing: 2, marginBottom: 16 },
+  sectionHeading: { color: '#9ca3af', fontSize: 9,  letterSpacing: 2, marginBottom: 16 },
   metricsBox: { gap: 20 },
   metricItem: { gap: 8 },
   metricHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  metricName: { color: '#fff', fontSize: 13,  },
+  metricName: { color: '#4b5563', fontSize: 13,  },
   metricStatus: { fontSize: 8,  letterSpacing: 1 },
-  progressBack: { height: 6, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 3, overflow: 'hidden' },
+  progressBack: { height: 6, backgroundColor: '#e5e7eb', borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
   expertiseBox: { 
-    backgroundColor: 'rgba(255,255,255,0.01)', 
+    backgroundColor: '#ffffff', 
     borderRadius: 20, 
     padding: 20, 
-    borderWidth: 0.5, 
-    borderColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, 
+    borderColor: '#e5e7eb',
     gap: 12
   },
   domainRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  domainDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.1)' },
-  domainName: { flex: 1, color: 'rgba(255,255,255,0.4)', fontSize: 11,  },
-  domainVal: { color: '#fff', fontSize: 12,  },
+  domainDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb' },
+  domainName: { flex: 1, color: '#6b7280', fontSize: 11,  },
+  domainVal: { color: '#1f2937', fontSize: 12,  },
 });
 
 export default ScoreScreen;

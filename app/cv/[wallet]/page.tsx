@@ -51,6 +51,7 @@ type Profile = {
   verificationTier?: string;
   role?: string;
   organization?: string;
+  cvPdfUrl?: string | null;
 };
 
 type Receipt = {
@@ -278,9 +279,12 @@ function WorkRecordCard({
   return (
     <div
       onClick={() => onSelect(r)}
-      className="p-4 md:p-5 rounded-lg hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden shadow-[0_12px_20px_-8px_rgba(0,0,0,0.8)]"
-      style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.08)" }}
+      className="p-4 md:p-5 rounded-2xl hover:border-white/20 transition-all cursor-pointer group/work relative overflow-hidden shadow-[0_20px_25px_-8px_rgba(0,0,0,0.9)] hover:shadow-[0_24px_30px_-8px_rgba(0,0,0,1)] border border-white/[0.08]"
+      style={{ background: "#0a0a0c" }}
     >
+      {/* Animated silver gradient border */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none -z-[1]" />
+
       {/* Lightning shine sweep */}
       <div className="animate-lightning-shine absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none z-10" />
       {/* Top spotlight */}
@@ -288,14 +292,14 @@ function WorkRecordCard({
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-16 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04)_0%,transparent_70%)] pointer-events-none z-10" />
 
       {/* 3D Rim Light (Inner Edge Highlight) */}
-      <div className="absolute inset-0 rounded-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_1px_0_0_0_rgba(255,255,255,0.02)] pointer-events-none z-10" />
+      <div className="absolute inset-0 rounded-2xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-2px_4px_rgba(0,0,0,0.8),inset_1.5px_0_2px_rgba(255,255,255,0.06),inset_-1.5px_0_2px_rgba(0,0,0,0.6)] pointer-events-none z-10" />
 
       {/* Specular corner highlights */}
       <div className="absolute top-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none z-10" />
       <div className="absolute top-0 right-0 w-16 h-16 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
       <div className="absolute bottom-0 left-0 w-16 h-16 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.02)_0%,transparent_70%)] pointer-events-none z-10" />
 
-      <div className="flex justify-between items-start gap-4">
+      <div className="relative z-20 flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0 max-w-full">
           {/* Primary: Role + Organization */}
           <div className="space-y-1 break-words whitespace-normal">
@@ -550,6 +554,7 @@ export default function CVPage(props: any) {
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [contactedConversationId, setContactedConversationId] = useState<string | null>(null);
   const [cvMemberships, setCvMemberships] = useState<{ id: string; company_name: string; role: "member" | "admin"; recruiter_avatar_url?: string | null }[]>([]);
   const { isGoogleSignedIn } = useGoogleAuth();
@@ -825,7 +830,7 @@ export default function CVPage(props: any) {
         ) : (
           <>
             {/* MAIN CV CARD COMPONENT */}
-            <div className="relative flex flex-col justify-between md:min-h-[360px] mb-8 p-5 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_12px_24px_-8px_rgba(0,0,0,0.9)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
+            <div className="relative flex flex-col justify-between min-h-[460px] md:min-h-[360px] mb-8 p-6 md:p-8 rounded-2xl md:rounded-3xl overflow-hidden group w-full shadow-[0_20px_25px_-8px_rgba(0,0,0,0.9)] border border-white/[0.08] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]">
               {/* Animated silver gradient border */}
               <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-400/20 via-white/30 to-slate-400/20 opacity-60 animate-pulse pointer-events-none"></div>
 
@@ -1284,6 +1289,30 @@ export default function CVPage(props: any) {
               />
             )}
 
+            {/* PDF Resume Section */}
+            {profile?.cvPdfUrl && (
+              <div className="w-full mb-3 border-t border-slate-800/50 pt-4 mt-6">
+                <button
+                  onClick={() => setIsPdfModalOpen(true)}
+                  className="w-full text-left py-2 hover:opacity-80 transition-opacity group flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 flex-shrink-0 bg-amber-500/10 text-amber-400 flex items-center justify-center rounded-lg">
+                      <FileText className="w-5 h-5" strokeWidth={2} />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors mb-0.5">PDF Resume</h2>
+                      <p className="text-xs text-slate-400 font-medium tracking-wide">Uploaded CV from candidate — click to view</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-amber-400/60 group-hover:text-amber-400 transition-colors">
+                    <span className="text-[11px] font-bold uppercase tracking-widest">View</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </div>
+                </button>
+              </div>
+            )}
+
             {/* Profile Incomplete Prompt */}
             {publicKey?.toBase58() === wallet && !isProfileComplete && (
                <div className="mt-8 mb-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-center justify-between gap-4 shadow-[0_8px_16px_-4px_rgba(0,0,0,0.7)]">
@@ -1692,6 +1721,65 @@ export default function CVPage(props: any) {
             setContactedConversationId(conversationId);
           }}
         />
+      )}
+
+      {/* PDF Resume Modal */}
+      {isPdfModalOpen && profile?.cvPdfUrl && (
+        <div
+          className="fixed inset-0 z-[200000] flex items-center justify-center p-4 md:p-8"
+          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          onClick={() => setIsPdfModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl flex flex-col"
+            style={{
+              height: "85vh",
+              background: "#111111",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.8)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              className="flex items-center justify-between px-5 py-4 flex-shrink-0"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <FileText style={{ width: 14, height: 14, color: "#fbbf24" }} />
+                </div>
+                <div>
+                  <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, fontWeight: 600 }}>{profile.displayName}&apos;s PDF Resume</p>
+                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, marginTop: 1 }}>Uploaded by candidate</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsPdfModalOpen(false)}
+                style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            {/* PDF content — scrollable inside */}
+            <div className="flex-1" style={{ overflow: "auto", position: "relative" }}>
+              <object
+                data={profile.cvPdfUrl}
+                type="application/pdf"
+                style={{ width: "100%", height: "100%", minHeight: "70vh", display: "block", border: "none" }}
+              >
+                <iframe
+                  src={profile.cvPdfUrl}
+                  style={{ width: "100%", height: "100%", minHeight: "70vh", border: "none", display: "block" }}
+                  title="PDF Resume"
+                />
+              </object>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="hidden md:block">

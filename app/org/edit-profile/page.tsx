@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Camera, Loader2, Check, Eye, PenLine, LogOut } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, Camera, Loader2, Check, Eye, PenLine, LogOut, FileText, Upload, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { compressPdf } from "@/lib/pdf-compress";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 const PAGE_BG = "#111111";
 const CARD_BORDER = "rgba(255,255,255,0.08)";
@@ -57,8 +60,9 @@ const ORG_TYPES = [
 
 const WORK_PREFS = ["Full-time", "Contract", "Freelance", "Project-based"];
 
-export default function OrgEditProfilePage() {
+function OrgEditProfilePageInner() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { session, orgAccount, loading, refetchOrgAccount, signOut } = useGoogleAuth();
     const [isMobile, setIsMobile] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -66,6 +70,10 @@ export default function OrgEditProfilePage() {
     const [uploading, setUploading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [cropModal, setCropModal] = useState<{ isOpen: boolean; image: string | null }>({ isOpen: false, image: null });
+    const [showPdfStep, setShowPdfStep] = useState(() => searchParams.get("preview") === "pdf-step");
+    const [pdfFile, setPdfFile] = useState<File | null>(null);
+    const [pdfUploading, setPdfUploading] = useState(false);
+    const [pdfError, setPdfError] = useState("");
 
     const isBuilder = orgAccount?.account_type === "builder";
 
@@ -92,7 +100,9 @@ export default function OrgEditProfilePage() {
     });
 
     useEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
-    useEffect(() => { if (!loading && !session) router.replace("/"); }, [loading, session, router]);
+    useEffect(() => {
+        if (!loading && !session && searchParams.get("preview") !== "pdf-step") router.replace("/");
+    }, [loading, session, router, searchParams]);
     useEffect(() => {
         if (orgAccount) {
             const a = orgAccount as any;
@@ -199,12 +209,42 @@ export default function OrgEditProfilePage() {
             await refetchOrgAccount();
             setSaved(true);
             setIsEditing(false);
-            setTimeout(() => {
-                setSaved(false);
-                const dest = isMobile && session?.user?.id ? `/org/${session.user.id}` : "/dashboard";
-                router.push(dest);
-            }, 1200);
+            const wasNew = !(orgAccount as any)?.onboarding_complete && isBuilder;
+            if (wasNew) {
+                setTimeout(() => { setSaved(false); setShowPdfStep(true); }, 800);
+            } else {
+                setTimeout(() => {
+                    setSaved(false);
+                    const dest = isMobile && session?.user?.id ? `/org/${session.user.id}` : "/dashboard";
+                    router.push(dest);
+                }, 1200);
+            }
         }
+    };
+
+    const handlePdfUpload = async () => {
+        if (!pdfFile || !session || !orgAccount) return;
+        setPdfUploading(true);
+        setPdfError("");
+        const result = await compressPdf(pdfFile);
+        if (!result) {
+            setPdfError("PDF is too large even after compression (max 5 MB).");
+            setPdfUploading(false);
+            return;
+        }
+        try {
+            const formData = new FormData();
+            formData.append("auth_uid", orgAccount.auth_uid);
+            formData.append("file", result.file);
+            const res = await fetch("/api/cv-pdf", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${session.access_token}` },
+                body: formData,
+            });
+            if (!res.ok) { const d = await res.json(); setPdfError(d.error || "Upload failed"); setPdfUploading(false); return; }
+        } catch { setPdfError("Upload failed. Please try again."); setPdfUploading(false); return; }
+        setPdfUploading(false);
+        router.push("/dashboard");
     };
 
     const handleSignOut = async () => {
@@ -212,7 +252,98 @@ export default function OrgEditProfilePage() {
         router.push("/");
     };
 
-    if (loading) return <LoadingScreen />;
+    const isPreview = searchParams.get("preview") === "pdf-step";
+    if (loading && !isPreview) return <LoadingScreen />;
+
+    if (showPdfStep) {
+        return (
+            <main className="min-h-screen text-white flex flex-col bg-[#111111] md:bg-black theme-bg-page theme-aware">
+                <Navbar />
+                <div className="flex-1 flex items-center justify-center px-6 py-16">
+                    <div className="w-full max-w-md space-y-6">
+                        {/* Success header */}
+                        <div className="text-center space-y-2">
+                            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-white">Profile Created!</h1>
+                            <p className="text-sm text-slate-400">
+                                Do you already have a PDF resume? Upload it now so recruiters can view it, or start building your ChainVolio CV with verified work history.
+                            </p>
+                        </div>
+
+                        {/* PDF Upload Card */}
+                        <div className="p-5 rounded-2xl border border-white/[0.08] space-y-4" style={{ background: "#0a0a0c" }}>
+                            <div className="flex items-center gap-2 mb-1">
+                                <FileText className="w-4 h-4 text-amber-400" />
+                                <span className="text-sm font-bold text-white">Upload Existing PDF Resume</span>
+                                <span className="text-[10px] text-slate-500 ml-auto">optional · max 5 MB</span>
+                            </div>
+
+                            <label className={`flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
+                                pdfFile ? "border-emerald-500/40 bg-emerald-500/5" : "border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5"
+                            }`}>
+                                <input type="file" accept=".pdf" className="hidden" onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (!f || f.type !== "application/pdf") return;
+                                    setPdfError("");
+                                    setPdfFile(f);
+                                }} />
+                                {pdfFile ? (
+                                    <>
+                                        <FileText className="w-8 h-8 text-emerald-400" />
+                                        <p className="text-sm font-medium text-white text-center truncate max-w-full">{pdfFile.name}</p>
+                                        <p className="text-[11px] text-slate-500">{(pdfFile.size / 1024).toFixed(0)} KB</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="w-7 h-7 text-slate-600" />
+                                        <p className="text-sm text-slate-400">Drop PDF here or click to browse</p>
+                                    </>
+                                )}
+                            </label>
+
+                            {pdfError && <p className="text-xs text-red-400">{pdfError}</p>}
+
+                            <button
+                                onClick={handlePdfUpload}
+                                disabled={!pdfFile || pdfUploading}
+                                className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                            >
+                                {pdfUploading ? (
+                                    <><span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />Uploading...</>
+                                ) : (
+                                    <><Upload className="w-4 h-4" />Upload & Continue</>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 h-px bg-white/5" />
+                            <span className="text-xs text-slate-600">or</span>
+                            <div className="flex-1 h-px bg-white/5" />
+                        </div>
+
+                        {/* Build on ChainVolio CTA */}
+                        <button
+                            onClick={() => router.push("/dashboard")}
+                            className="w-full py-3 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] text-white font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                        >
+                            <Sparkles className="w-4 h-4 text-indigo-400" />
+                            Build CV with ChainVolio Attestation
+                            <ArrowRight className="w-4 h-4 text-slate-500" />
+                        </button>
+
+                        <p className="text-center text-[11px] text-slate-700">
+                            You can always upload or change your PDF later from your dashboard.
+                        </p>
+                    </div>
+                </div>
+                <Footer />
+            </main>
+        );
+    }
 
     const backHref = isMobile && session?.user?.id ? `/org/${session.user.id}` : "/dashboard";
     const emailDisplay = session?.user?.email ?? "";
@@ -524,5 +655,13 @@ export default function OrgEditProfilePage() {
                 <ImageCropModal image={cropModal.image} onCropComplete={handleCroppedImage} onClose={() => setCropModal({ isOpen: false, image: null })} />
             )}
         </div>
+    );
+}
+
+export default function OrgEditProfilePage() {
+    return (
+        <Suspense>
+            <OrgEditProfilePageInner />
+        </Suspense>
     );
 }

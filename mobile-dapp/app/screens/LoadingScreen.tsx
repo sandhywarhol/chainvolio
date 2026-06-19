@@ -88,28 +88,19 @@ const LoadingScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-      <ImageBackground 
-        source={{ uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1740&auto=format&fit=crop' }} 
-        style={styles.backgroundImage}
-      >
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.9)']}
-          style={styles.gradientOverlay}
-        />
-        <SafeAreaView style={styles.contentArea}>
-          <View style={styles.content}>
-            <ExpoImage 
-              source={require('../../assets/images/logo.png')} 
-              style={{ width: 200, height: 50, marginBottom: 20 }} 
-              contentFit="contain" 
-            />
-            <ActivityIndicator size="large" color="#1f2937" />
-            <Text style={styles.text}>Synchronizing with ChainVolio...</Text>
-            <Text style={styles.subtext}>Connecting to Trust Layer</Text>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+      <View style={styles.contentArea}>
+        <View style={styles.content}>
+          <ExpoImage 
+            source={require('../../assets/images/logo.png')} 
+            style={{ width: 200, height: 50, marginBottom: 20, tintColor: '#1e232c' }} 
+            contentFit="contain" 
+          />
+          <ActivityIndicator size="large" color="#059669" />
+          <Text style={styles.text}>Synchronizing with ChainVolio...</Text>
+          <Text style={styles.subtext}>Connecting to Trust Layer</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -117,15 +108,7 @@ const LoadingScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  backgroundImage: { 
-    flex: 1, 
-    width: '100%', 
-    height: '100%',
-  },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
   },
   contentArea: {
     flex: 1,
@@ -137,16 +120,13 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   text: {
-    color: '#fff',
+    color: '#1e232c',
     fontSize: 16,
     fontWeight: '700',
     marginTop: 20,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: {width: 0, height: 2},
-    textShadowRadius: 4,
   },
   subtext: {
-    color: 'rgba(255,255,255,0.8)',
+    color: '#6b7280',
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 2,

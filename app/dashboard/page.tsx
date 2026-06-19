@@ -28,6 +28,7 @@ import { ShareProfileModal } from "@/components/dashboard/ShareProfileModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { format } from "date-fns";
 import { WorkTimeline } from "@/components/profile/WorkTimeline";
+import { compressPdf, MAX_PDF_BYTES } from "@/lib/pdf-compress";
 import { CountrySelector } from "@/components/ui/CountrySelector";
 import { SkillSelector } from "@/components/ui/SkillSelector";
 import { ImageCropModal } from "@/components/ui/ImageCropModal";
@@ -75,6 +76,7 @@ type Profile = {
   isProfileComplete: boolean;
   cvScore?: number | null;
   cvLevel?: string | null;
+  cvPdfUrl?: string | null;
 };
 
 type HiringCollection = {
@@ -104,6 +106,10 @@ export default function DashboardPage() {
   const [showMembersPanel, setShowMembersPanel] = useState(false);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [showCertModal, setShowCertModal] = useState(false);
+  const [cvPdfUrl, setCvPdfUrl] = useState<string | null>(null);
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [pdfDeleting, setPdfDeleting] = useState(false);
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
@@ -170,6 +176,7 @@ export default function DashboardPage() {
       .then(([data, recs, membershipsData, sharedData]) => {
         if (data.error) throw new Error(data.error);
         setProfile(data.profile);
+        if (data.profile?.cvPdfUrl) setCvPdfUrl(data.profile.cvPdfUrl);
         setCollections(data.collections || []);
         setAttestationCount(data.attestationCount || 0);
         if (membershipsData.ok) setMemberships(membershipsData.data);
@@ -302,6 +309,65 @@ export default function DashboardPage() {
     } catch {
       setToastMessage("Failed to delete certificate. Please try again.");
     }
+  };
+
+  const handlePdfUpload = async (file: File) => {
+    if (pdfUploading) return;
+    setPdfUploading(true);
+    try {
+      const result = await compressPdf(file);
+      if (!result) {
+        setToastMessage("PDF is too large (max 5 MB). Please compress it manually.");
+        setPdfUploading(false);
+        return;
+      }
+      const fd = new FormData();
+      fd.append("file", result.file);
+
+      let headers: HeadersInit = {};
+      if (isGoogleBuilder && orgAccount && session) {
+        fd.append("auth_uid", orgAccount.auth_uid);
+        headers = { "Authorization": `Bearer ${session.access_token}` };
+      } else if (publicKey && signMessage) {
+        const signed = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+        if (!signed) { setPdfUploading(false); return; }
+        fd.append("wallet", publicKey.toBase58());
+        fd.append("signature", signed.signature);
+        fd.append("nonce", signed.nonce);
+        fd.append("timestamp", signed.timestamp.toString());
+      } else {
+        setPdfUploading(false);
+        return;
+      }
+
+      const res = await fetch("/api/cv-pdf", { method: "POST", headers, body: fd });
+      const data = await res.json();
+      if (res.ok) setCvPdfUrl(data.cv_pdf_url);
+      else setToastMessage(data.error || "Upload failed");
+    } catch {
+      setToastMessage("Upload failed. Please try again.");
+    }
+    setPdfUploading(false);
+  };
+
+  const handlePdfDelete = async () => {
+    if (pdfDeleting) return;
+    setPdfDeleting(true);
+    try {
+      if (isGoogleBuilder && orgAccount && session) {
+        const params = new URLSearchParams({ auth_uid: orgAccount.auth_uid });
+        await fetch(`/api/cv-pdf?${params}`, { method: "DELETE", headers: { "Authorization": `Bearer ${session.access_token}` } });
+      } else if (publicKey && signMessage) {
+        const signed = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+        if (!signed) { setPdfDeleting(false); return; }
+        const params = new URLSearchParams({ wallet: publicKey.toBase58(), signature: signed.signature, nonce: signed.nonce, timestamp: signed.timestamp.toString() });
+        await fetch(`/api/cv-pdf?${params}`, { method: "DELETE" });
+      }
+      setCvPdfUrl(null);
+    } catch {
+      setToastMessage("Failed to remove PDF.");
+    }
+    setPdfDeleting(false);
   };
 
   const handleCertUploadSuccess = () => {
@@ -1611,6 +1677,79 @@ export default function DashboardPage() {
 
             {/* ── CREDENTIAL tab ── */}
             {activeTab === "credential" && <>
+
+        {/* PDF Resume card */}
+        <div className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="flex items-center gap-3 px-4 py-3" style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }}>
+              <FileText style={{ width: 13, height: 13, color: "#fbbf24" }} />
+            </div>
+            <div>
+              <p style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>PDF Resume</p>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>Visible as a secondary option on your public CV</p>
+            </div>
+          </div>
+          <div className="px-4 py-3" style={{ background: "rgba(255,255,255,0.01)" }}>
+            {cvPdfUrl ? (
+              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)" }}>
+                  <FileText style={{ width: 18, height: 18, color: "#fbbf24" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">PDF Resume uploaded</p>
+                  <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>Recruiter can view this from your public CV</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => setShowPdfViewer(true)}
+                    className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                    style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)", color: "#fbbf24" }}
+                  >
+                    View
+                  </button>
+                  <label className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+                    {pdfUploading ? "Replacing..." : "Replace"}
+                    <input type="file" accept=".pdf" className="hidden" disabled={pdfUploading} onChange={async (e) => {
+                      const f = e.target.files?.[0];
+                      if (!f || f.type !== "application/pdf") return;
+                      await handlePdfUpload(f);
+                    }} />
+                  </label>
+                  <button
+                    onClick={handlePdfDelete}
+                    disabled={pdfDeleting}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                    style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", color: "#f87171" }}
+                  >
+                    {pdfDeleting
+                      ? <span className="w-3.5 h-3.5 border-2 rounded-full animate-spin" style={{ borderColor: "rgba(248,113,113,0.3)", borderTopColor: "#f87171" }} />
+                      : <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    }
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all group ${pdfUploading ? "opacity-60 pointer-events-none" : "hover:bg-white/[0.03]"}`} style={{ border: "1.5px dashed rgba(255,255,255,0.08)" }}>
+                <input type="file" accept=".pdf" className="hidden" disabled={pdfUploading} onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f || f.type !== "application/pdf") return;
+                  await handlePdfUpload(f);
+                }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  {pdfUploading
+                    ? <span className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: "rgba(255,255,255,0.1)", borderTopColor: "rgba(251,191,36,0.7)" }} />
+                    : <Plus style={{ width: 16, height: 16, color: "rgba(255,255,255,0.25)" }} />
+                  }
+                </div>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>{pdfUploading ? "Uploading..." : "Upload PDF Resume"}</p>
+                  <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>PDF only · max 5 MB</p>
+                </div>
+              </label>
+            )}
+          </div>
+        </div>
+
         <div id="credentials" className="mb-3 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="px-4 py-3" style={{ background: "rgba(255,255,255,0.02)" }}>
             <CertificateSection
@@ -2161,6 +2300,65 @@ export default function DashboardPage() {
             }
           }}
         />
+      )}
+
+      {/* PDF Resume Viewer Modal */}
+      {showPdfViewer && cvPdfUrl && (
+        <div
+          className="fixed inset-0 z-[200000] flex items-center justify-center p-4 md:p-8"
+          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          onClick={() => setShowPdfViewer(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl flex flex-col"
+            style={{
+              height: "85vh",
+              background: "#111111",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.8)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              className="flex items-center justify-between px-5 py-4 flex-shrink-0"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <FileText style={{ width: 14, height: 14, color: "#fbbf24" }} />
+                </div>
+                <div>
+                  <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, fontWeight: 600 }}>PDF Resume</p>
+                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, marginTop: 1 }}>Your uploaded resume</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPdfViewer(false)}
+                style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            {/* PDF content — scrollable inside */}
+            <div className="flex-1" style={{ overflow: "auto", position: "relative" }}>
+              <object
+                data={cvPdfUrl}
+                type="application/pdf"
+                style={{ width: "100%", height: "100%", minHeight: "70vh", display: "block", border: "none" }}
+              >
+                <iframe
+                  src={cvPdfUrl}
+                  style={{ width: "100%", height: "100%", minHeight: "70vh", border: "none", display: "block" }}
+                  title="PDF Resume"
+                />
+              </object>
+            </div>
+          </div>
+        </div>
       )}
 
       {showCertModal && publicKey && (

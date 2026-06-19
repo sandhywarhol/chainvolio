@@ -22,7 +22,7 @@ export async function GET(request: Request) {
             const [orgRes, attestationRes] = await Promise.all([
                 supabase
                     .from("org_accounts")
-                    .select("org_name, bio, skills, avatar_url, website, twitter, linkedin, discord, telegram, email, country")
+                    .select("org_name, bio, skills, avatar_url, website, twitter, linkedin, discord, telegram, email, country, cv_pdf_url")
                     .eq("auth_uid", authUid)
                     .maybeSingle(),
                 supabase
@@ -61,6 +61,7 @@ export async function GET(request: Request) {
                     attestationUsed: 0,
                     cvScore: null,
                     cvLevel: null,
+                    cvPdfUrl: orgAccount?.cv_pdf_url || null,
                 },
                 collections: [],
                 attestationCount: attestationRes.count || 0,
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
         const [profileRes, orgRes, collectionsRes, attestationsRes, certsRes, scoreRes] = await Promise.all([
             supabase
                 .from("profiles")
-                .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test, attestation_used, attestation_reset_date")
+                .select("display_name, bio, skills, website, discord, whatsapp, email, twitter, github, linkedin, instagram, telegram, avatar_url, country, timezone, card_number, professional_role, organization, is_test, attestation_used, attestation_reset_date, cv_pdf_url")
                 .eq("wallet_address", wallet)
                 .maybeSingle(),
             supabase
@@ -165,6 +166,7 @@ export async function GET(request: Request) {
             attestationQuota: getAttestationQuota(verificationTier),
             attestationUsed: (profile?.attestation_reset_date && new Date(profile.attestation_reset_date) < new Date()) ? 0 : (profile?.attestation_used || 0),
             attestationResetDate: profile?.attestation_reset_date || null,
+            cvPdfUrl: profile?.cv_pdf_url || null,
         };
 
         // Fire-and-forget: triggers expiry notifications and auto-builder checks

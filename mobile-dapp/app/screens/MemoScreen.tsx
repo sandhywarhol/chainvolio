@@ -82,16 +82,16 @@ const MemoScreen = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={24} color="#1f2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Verification Memo</Text>
           <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="share-social-outline" size={24} color="#fff" />
+            <Ionicons name="share-social-outline" size={24} color="#1f2937" />
           </TouchableOpacity>
         </View>
 
@@ -133,7 +133,7 @@ const MemoScreen = ({ route, navigation }: any) => {
               </View>
               <View style={styles.metaItem}>
                 <Text style={styles.metaLabel}>PROTOCOL STATUS</Text>
-                <Text style={[styles.metaValue, { color: '#10b981' }]}>Verified & Active</Text>
+                <Text style={[styles.metaValue, { color: '#059669' }]}>Verified & Active</Text>
               </View>
               <View style={styles.metaItem}>
                 <Text style={styles.metaLabel}>CLASSIFICATION</Text>
@@ -296,127 +296,127 @@ const DetailItem = ({ label, value }: any) => (
 );
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   safeArea: { flex: 1 },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, letterSpacing: 2, marginTop: 20 },
-  errorContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center', padding: 30 },
-  errorTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginTop: 20 },
-  errorSub: { color: 'rgba(255,255,255,0.5)', fontSize: 14, textAlign: 'center', marginTop: 10, lineHeight: 22 },
-  backBtn: { marginTop: 30, paddingHorizontal: 30, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  backBtnText: { color: '#fff', fontWeight: 'bold' },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#6b7280', fontSize: 10, letterSpacing: 2, marginTop: 20 },
+  errorContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center', padding: 30 },
+  errorTitle: { color: '#1f2937', fontSize: 24, fontWeight: 'bold', marginTop: 20 },
+  errorSub: { color: '#6b7280', fontSize: 14, textAlign: 'center', marginTop: 10, lineHeight: 22 },
+  backBtn: { marginTop: 30, paddingHorizontal: 30, paddingVertical: 12, borderRadius: 12, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e5e7eb' },
+  backBtnText: { color: '#1f2937', fontWeight: 'bold' },
 
   header: { height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15 },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  headerTitle: { color: '#1f2937', fontSize: 16, fontWeight: 'bold' },
   iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 
   container: { flex: 1 },
   content: { padding: 25 },
 
   entryLabelBox: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 25 },
-  badgeLine: { height: 1, flex: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
+  badgeLine: { height: 1, flex: 1, backgroundColor: '#e5e7eb' },
   badgeInner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100, borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)', backgroundColor: 'rgba(16,185,129,0.05)' },
-  badgeText: { color: '#10b981', fontSize: 7, fontWeight: '900', letterSpacing: 2 },
+  badgeText: { color: '#059669', fontSize: 7, fontWeight: '900', letterSpacing: 2 },
 
-  memoHeading: { color: '#fff', fontSize: 36, fontWeight: '900', textAlign: 'center', letterSpacing: -1 },
-  memoSubheading: { color: 'rgba(255,255,255,0.4)', fontSize: 12, textAlign: 'center', marginTop: 15, lineHeight: 18, fontWeight: '500' },
+  memoHeading: { color: '#1f2937', fontSize: 36, fontWeight: '900', textAlign: 'center', letterSpacing: -1 },
+  memoSubheading: { color: '#4b5563', fontSize: 12, textAlign: 'center', marginTop: 15, lineHeight: 18, fontWeight: '500' },
 
   metaGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 40 },
   metaItem: { width: '50%', marginBottom: 25 },
-  metaLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 6 },
-  metaValue: { color: '#fff', fontSize: 12, fontWeight: '900' },
+  metaLabel: { color: '#6b7280', fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 6 },
+  metaValue: { color: '#1f2937', fontSize: 12, fontWeight: '900' },
   mono: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11 },
 
-  divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginVertical: 35 },
+  divider: { height: 1, backgroundColor: '#e5e7eb', marginVertical: 35 },
 
   summarySection: { marginBottom: 45 },
-  sectionTitle: { color: 'rgba(255,255,255,0.15)', fontSize: 9, fontWeight: '900', letterSpacing: 2, marginBottom: 15, textAlign: 'center' },
-  quoteBox: { padding: 25, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  quoteText: { color: '#fff', fontSize: 16, fontStyle: 'italic', fontWeight: '500', textAlign: 'center', lineHeight: 26 },
+  sectionTitle: { color: '#6b7280', fontSize: 9, fontWeight: '900', letterSpacing: 2, marginBottom: 15, textAlign: 'center' },
+  quoteBox: { padding: 25, borderRadius: 24, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e5e7eb' },
+  quoteText: { color: '#4b5563', fontSize: 16, fontStyle: 'italic', fontWeight: '500', textAlign: 'center', lineHeight: 26 },
 
   verificationCard: { 
     padding: 25, 
     borderRadius: 30, 
-    backgroundColor: 'rgba(15, 23, 42, 0.4)', 
+    backgroundColor: '#ffffff', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: '#e5e7eb',
     marginBottom: 50
   },
   verifHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 25 },
-  solanaLogoBox: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center' },
+  solanaLogoBox: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
   solanaLogoImg: { width: 22, height: 22 },
-  verifProvider: { color: '#fff', fontSize: 13, fontWeight: '900' },
-  verifStatus: { color: 'rgba(255,255,255,0.3)', fontSize: 8, fontWeight: '900', letterSpacing: 1.5 },
+  verifProvider: { color: '#1f2937', fontSize: 13, fontWeight: '900' },
+  verifStatus: { color: '#6b7280', fontSize: 8, fontWeight: '900', letterSpacing: 1.5 },
 
-  signatureBox: { padding: 18, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.4)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.03)' },
+  signatureBox: { padding: 18, borderRadius: 18, backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb' },
   sigHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  sigLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 7, fontWeight: '900', letterSpacing: 1 },
+  sigLabel: { color: '#6b7280', fontSize: 7, fontWeight: '900', letterSpacing: 1 },
   onChainPill: { backgroundColor: 'rgba(16,185,129,0.1)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  onChainPillText: { color: '#10b981', fontSize: 7, fontWeight: '900' },
-  sigText: { color: 'rgba(255,255,255,0.3)', fontSize: 9, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', lineHeight: 14 },
+  onChainPillText: { color: '#059669', fontSize: 7, fontWeight: '900' },
+  sigText: { color: '#4b5563', fontSize: 9, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', lineHeight: 14 },
 
-  qrRow: { flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 25, paddingBottom: 25, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
-  qrCodeBox: { width: 85, height: 85, padding: 4, backgroundColor: '#fff', borderRadius: 12 },
+  qrRow: { flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 25, paddingBottom: 25, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
+  qrCodeBox: { width: 85, height: 85, padding: 4, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb' },
   qrImg: { width: '100%', height: '100%' },
   qrTextCol: { flex: 1 },
-  qrTitle: { color: '#fff', fontSize: 10, fontWeight: '900', letterSpacing: 1 },
-  qrSub: { color: 'rgba(255,255,255,0.3)', fontSize: 9, lineHeight: 14, marginTop: 4, fontWeight: '500' },
+  qrTitle: { color: '#1f2937', fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+  qrSub: { color: '#6b7280', fontSize: 9, lineHeight: 14, marginTop: 4, fontWeight: '500' },
 
   tamperProofRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 25 },
-  tamperProofText: { color: '#10b981', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  idSubscript: { color: 'rgba(255,255,255,0.2)', fontSize: 8, lineHeight: 12, marginTop: 6, fontWeight: '500' },
+  tamperProofText: { color: '#059669', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
+  idSubscript: { color: '#9ca3af', fontSize: 8, lineHeight: 12, marginTop: 6, fontWeight: '500' },
 
   detailsGroup: { marginBottom: 45 },
   detailsGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   detailItem: { width: '50%', marginBottom: 25 },
-  detailLabel: { color: 'rgba(255,255,255,0.15)', fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 6 },
-  detailValue: { color: '#fff', fontSize: 13, fontWeight: '900' },
+  detailLabel: { color: '#6b7280', fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginBottom: 6 },
+  detailValue: { color: '#1f2937', fontSize: 13, fontWeight: '900' },
 
-  achievementsBox: { marginTop: 10, paddingTop: 30, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
+  achievementsBox: { marginTop: 10, paddingTop: 30, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
   achievementItem: { flexDirection: 'row', gap: 15, marginBottom: 15 },
-  achievementDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#10b981', marginTop: 6 },
-  achievementText: { color: 'rgba(255,255,255,0.6)', fontSize: 13, lineHeight: 22, flex: 1, fontWeight: '500' },
+  achievementDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#059669', marginTop: 6 },
+  achievementText: { color: '#4b5563', fontSize: 13, lineHeight: 22, flex: 1, fontWeight: '500' },
 
   ratingSection: { marginBottom: 45 },
-  ratingCard: { padding: 25, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.01)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  ratingCard: { padding: 25, borderRadius: 24, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e5e7eb' },
   ratingRow: { marginBottom: 18 },
   ratingHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  ratingLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: '700' },
-  ratingVal: { color: '#fff', fontSize: 11, fontWeight: '900' },
-  barBg: { height: 3, width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 2 },
-  barFill: { height: '100%', backgroundColor: '#10b981', borderRadius: 2 },
+  ratingLabel: { color: '#6b7280', fontSize: 11, fontWeight: '700' },
+  ratingVal: { color: '#1f2937', fontSize: 11, fontWeight: '900' },
+  barBg: { height: 3, width: '100%', backgroundColor: '#f3f4f6', borderRadius: 2 },
+  barFill: { height: '100%', backgroundColor: '#059669', borderRadius: 2 },
 
-  aggregateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
-  aggregateLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 9, fontWeight: '900', letterSpacing: 1.5 },
-  aggregateVal: { color: '#10b981', fontSize: 28, fontWeight: '900' },
+  aggregateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
+  aggregateLabel: { color: '#6b7280', fontSize: 9, fontWeight: '900', letterSpacing: 1.5 },
+  aggregateVal: { color: '#059669', fontSize: 28, fontWeight: '900' },
 
   footer: { marginTop: 25 },
   signatoryCard: { flexDirection: 'row', alignItems: 'center', gap: 18, marginBottom: 30 },
-  signatoryAvatar: { width: 75, height: 75, borderRadius: 40, borderWidth: 2, borderColor: '#10b981', overflow: 'hidden' },
+  signatoryAvatar: { width: 75, height: 75, borderRadius: 40, borderWidth: 2, borderColor: '#059669', overflow: 'hidden' },
   avatarImg: { width: '100%', height: '100%' },
   avatarPlaceholder: { flex: 1, backgroundColor: 'rgba(16,185,129,0.1)', alignItems: 'center', justifyContent: 'center' },
-  placeholderText: { color: '#10b981', fontSize: 26, fontWeight: 'bold' },
-  signatoryName: { color: '#fff', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
-  signatoryTitle: { color: 'rgba(255,255,255,0.4)', fontSize: 12, fontStyle: 'italic', marginTop: 4, fontWeight: '500' },
+  placeholderText: { color: '#059669', fontSize: 26, fontWeight: 'bold' },
+  signatoryName: { color: '#1f2937', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
+  signatoryTitle: { color: '#6b7280', fontSize: 12, fontStyle: 'italic', marginTop: 4, fontWeight: '500' },
   trustBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
-  trustText: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
+  trustText: { color: '#9ca3af', fontSize: 8, fontWeight: '900', letterSpacing: 0.5 },
 
   idBox: { marginTop: 30 },
-  idLabel: { color: 'rgba(255,255,255,0.15)', fontSize: 8, fontWeight: '900', letterSpacing: 1, marginBottom: 5 },
-  idValue: { color: 'rgba(255,255,255,0.15)', fontSize: 9, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  idLabel: { color: '#6b7280', fontSize: 8, fontWeight: '900', letterSpacing: 1, marginBottom: 5 },
+  idValue: { color: '#4b5563', fontSize: 9, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 
   protocolStamp: { 
     marginTop: 50,
     padding: 25,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.1)',
-    backgroundColor: 'rgba(16,185,129,0.02)',
+    borderColor: 'rgba(16,185,129,0.2)',
+    backgroundColor: 'rgba(16,185,129,0.05)',
     alignItems: 'center'
   },
   stampHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-  stampTitle: { color: '#10b981', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 },
-  stampSub: { color: 'rgba(255,255,255,0.2)', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+  stampTitle: { color: '#059669', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 },
+  stampSub: { color: '#6b7280', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
 });
 
 export default MemoScreen;

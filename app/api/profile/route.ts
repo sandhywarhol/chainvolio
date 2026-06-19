@@ -284,7 +284,7 @@ export async function GET(request: Request) {
   // 1. Fetch profile (Specific fields only)
   const { data, error } = await supabase
     .from("profiles")
-    .select("display_name, bio, skills, twitter, github, website, discord, whatsapp, email, country, avatar_url, looking_for, timezone, work_preference, lens, farcaster, tags, telegram, linkedin, instagram, card_number, wallet_address, created_at, professional_role, organization, attestation_used, attestation_reset_date")
+    .select("display_name, bio, skills, twitter, github, website, discord, whatsapp, email, country, avatar_url, looking_for, timezone, work_preference, lens, farcaster, tags, telegram, linkedin, instagram, card_number, wallet_address, created_at, professional_role, organization, attestation_used, attestation_reset_date, cv_pdf_url")
     .eq("wallet_address", wallet)
     .single();
 
@@ -360,6 +360,7 @@ export async function GET(request: Request) {
     verificationStatus: orgData?.status || null,
     pendingVerificationType: orgData?.type || null,
     rejectionReason: orgData?.rejection_reason || null,
+    cvPdfUrl: data.cv_pdf_url || null,
     // Attestation Quota (Benefit System)
     attestationQuota,
     attestationUsed: (data.attestation_reset_date && new Date(data.attestation_reset_date) < now) ? 0 : (data.attestation_used || 0),

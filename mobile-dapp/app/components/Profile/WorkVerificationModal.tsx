@@ -66,8 +66,8 @@ const WorkVerificationModal = ({ isVisible, onClose, work }: WorkVerificationMod
             {/* Status Hero */}
             <View style={[
               styles.statusHero, 
-              { backgroundColor: isAttested ? 'rgba(16,185,129,0.1)' : 'rgba(30,41,59,0.5)',
-                borderColor: isAttested ? 'rgba(16,185,129,0.3)' : 'rgba(51,65,85,1)' }
+              { backgroundColor: isAttested ? 'rgba(16,185,129,0.1)' : '#ffffff',
+                borderColor: isAttested ? 'rgba(16,185,129,0.3)' : '#e5e7eb' }
             ]}>
               <View style={styles.statusHeroContent}>
                 {work.attestationType === "Hiring Proof" ? (
@@ -249,7 +249,7 @@ const WorkVerificationModal = ({ isVisible, onClose, work }: WorkVerificationMod
                     navigation.navigate('Memo', { id: work.attestationId });
                   }}
                 >
-                  <Ionicons name="document-text-outline" size={18} color="#fff" />
+                  <Ionicons name="document-text-outline" size={18} color="#1f2937" />
                   <Text style={styles.secondaryActionText}>View Memo</Text>
                 </TouchableOpacity>
               ) : work.attestationType === "Hiring Proof" && (
@@ -269,14 +269,14 @@ const WorkVerificationModal = ({ isVisible, onClose, work }: WorkVerificationMod
 };
 
 const styles = StyleSheet.create({
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContent: { 
     height: height * 0.92, 
-    backgroundColor: '#0f172a', 
+    backgroundColor: '#fafafa', 
     borderTopLeftRadius: 30, 
     borderTopRightRadius: 30, 
     borderTopWidth: 1, 
-    borderTopColor: 'rgba(255,255,255,0.1)' 
+    borderTopColor: '#e5e7eb' 
   },
   modalHeader: { 
     flexDirection: 'row', 
@@ -284,10 +284,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
+    borderBottomColor: '#e5e7eb'
   },
   modalHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  modalTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  modalTitle: { color: '#1f2937', fontSize: 16, fontWeight: 'bold' },
   closeBtn: { padding: 4 },
   modalBody: { flex: 1, padding: 24 },
   statusHero: { 
@@ -297,9 +297,9 @@ const styles = StyleSheet.create({
     marginBottom: 30 
   },
   statusHeroContent: { alignItems: 'center', gap: 8 },
-  statusHeroTitle: { color: '#10b981', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  statusHeroTitle: { color: '#059669', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
   statusHeroSub: { 
-    color: 'rgba(148, 163, 184, 0.7)', 
+    color: '#6b7280', 
     fontSize: 11, 
     fontWeight: '500', 
     textAlign: 'center', 
@@ -308,17 +308,17 @@ const styles = StyleSheet.create({
   },
   coreInfoSection: { marginBottom: 35 },
   sectionLabel: { 
-    color: '#64748b', 
+    color: '#6b7280', 
     fontSize: 9, 
     fontWeight: '900', 
     letterSpacing: 1.5, 
     marginBottom: 8 
   },
-  mainTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold', lineHeight: 32 },
-  atText: { color: '#64748b', fontWeight: '500', fontSize: 18 },
-  orgText: { color: '#10b981' },
+  mainTitle: { color: '#1f2937', fontSize: 24, fontWeight: 'bold', lineHeight: 32 },
+  atText: { color: '#6b7280', fontWeight: '500', fontSize: 18 },
+  orgText: { color: '#059669' },
   descriptionText: { 
-    color: '#94a3b8', 
+    color: '#4b5563', 
     fontSize: 14, 
     fontWeight: '500', 
     lineHeight: 22, 
@@ -327,12 +327,12 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', gap: 20, marginTop: 25 },
   metaItem: { flex: 1 },
   metaValRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  metaValText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  metaValText: { color: '#1f2937', fontSize: 13, fontWeight: '700' },
   typeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#10b981' },
   verificationSection: { 
     paddingTop: 30, 
     borderTopWidth: 1, 
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: '#e5e7eb',
     marginBottom: 35
   },
   attesterCard: { 
@@ -340,24 +340,24 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     padding: 14, 
     borderRadius: 16, 
-    backgroundColor: 'rgba(30,41,59,0.5)', 
+    backgroundColor: '#ffffff', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.05)', 
+    borderColor: '#e5e7eb', 
     marginBottom: 20 
   },
-  attesterAvatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: '#334155' },
+  attesterAvatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: '#e5e7eb' },
   attesterAvatarPlaceholder: { 
     width: 44, 
     height: 44, 
     borderRadius: 22, 
-    backgroundColor: '#334155', 
+    backgroundColor: '#f3f4f6', 
     alignItems: 'center', 
     justifyContent: 'center' 
   },
   attesterInfo: { marginLeft: 14, flex: 1 },
   attesterHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   attesterLink: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  attesterName: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
+  attesterName: { color: '#1f2937', fontSize: 15, fontWeight: 'bold' },
   attesterVerifiedBadge: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -370,17 +370,17 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(16,185,129,0.2)' 
   },
   attesterVerifiedText: { color: '#10b981', fontSize: 8, fontWeight: '900' },
-  attesterTitle: { color: '#64748b', fontSize: 12, fontWeight: '500', marginTop: 2 },
+  attesterTitle: { color: '#6b7280', fontSize: 12, fontWeight: '500', marginTop: 2 },
   commentBox: { 
     padding: 20, 
     borderRadius: 20, 
-    backgroundColor: 'rgba(16,185,129,0.03)', 
+    backgroundColor: 'rgba(16,185,129,0.05)', 
     borderWidth: 1, 
     borderColor: 'rgba(16,185,129,0.1)', 
     marginBottom: 25,
     position: 'relative'
   },
-  commentText: { color: '#cbd5e1', fontSize: 14, fontStyle: 'italic', lineHeight: 22 },
+  commentText: { color: '#4b5563', fontSize: 14, fontStyle: 'italic', lineHeight: 22 },
   quoteMarkLeft: { 
     position: 'absolute', 
     top: -5, 
@@ -400,21 +400,21 @@ const styles = StyleSheet.create({
   detailsGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 20, columnGap: 24 },
   gridItem: { width: '46%' },
   gridLabel: { 
-    color: '#64748b', 
+    color: '#6b7280', 
     fontSize: 8, 
     fontWeight: '900', 
     letterSpacing: 1.2, 
     marginBottom: 6 
   },
-  gridValEmerald: { color: '#10b981', fontSize: 11, fontWeight: '700' },
-  gridVal: { color: '#cbd5e1', fontSize: 11, fontWeight: '700' },
-  gridValMono: { color: '#64748b', fontSize: 10, fontWeight: '500' },
+  gridValEmerald: { color: '#059669', fontSize: 11, fontWeight: '700' },
+  gridVal: { color: '#1f2937', fontSize: 11, fontWeight: '700' },
+  gridValMono: { color: '#4b5563', fontSize: 10, fontWeight: '500' },
   networkRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   networkDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#14F195' },
   evidenceSection: {
     paddingTop: 30,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderTopColor: '#e5e7eb',
     marginBottom: 35
   },
   evidenceLinkCard: {
@@ -423,25 +423,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderRadius: 14,
-    backgroundColor: 'rgba(30,41,59,0.3)',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: '#e5e7eb',
     marginBottom: 10
   },
   evidenceLinkLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  evidenceLinkLabel: { color: '#cbd5e1', fontSize: 14, fontWeight: '600' },
+  evidenceLinkLabel: { color: '#1f2937', fontSize: 14, fontWeight: '600' },
   actionBtnRow: { flexDirection: 'row', gap: 12, marginTop: 40 },
   primaryActionBtn: { 
     flex: 1, 
     height: 55, 
     borderRadius: 16, 
-    backgroundColor: '#059669', 
+    backgroundColor: '#1f2937', 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'center', 
     gap: 10,
     elevation: 4,
-    shadowColor: '#059669',
+    shadowColor: '#1f2937',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8
@@ -451,29 +451,29 @@ const styles = StyleSheet.create({
     flex: 1, 
     height: 55, 
     borderRadius: 16, 
-    backgroundColor: 'rgba(255,255,255,0.05)', 
+    backgroundColor: '#ffffff', 
     borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.1)', 
+    borderColor: '#e5e7eb', 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'center', 
     gap: 10 
   },
-  secondaryActionText: { color: '#fff', fontSize: 14, fontWeight: '900' },
+  secondaryActionText: { color: '#1f2937', fontSize: 14, fontWeight: '900' },
   syncPendingBox: { 
     flex: 1, 
     height: 55, 
     borderRadius: 16, 
     borderWidth: 1, 
     borderStyle: 'dashed', 
-    borderColor: '#334155', 
+    borderColor: '#cbd5e1', 
     alignItems: 'center', 
     justifyContent: 'center', 
-    backgroundColor: 'rgba(30,41,59,0.3)' 
+    backgroundColor: '#f8fafc' 
   },
   syncPendingText: { color: '#64748b', fontSize: 10, fontWeight: 'bold' },
   footerNote: { 
-    color: '#475569', 
+    color: '#94a3b8', 
     fontSize: 9, 
     fontWeight: '500', 
     textAlign: 'center', 

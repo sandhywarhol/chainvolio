@@ -98,11 +98,36 @@ const HomeScreen = ({ navigation }: any) => {
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           
-          {/* Greeting */}
-          <View style={styles.greetingContainer}>
-            <Text style={styles.greetingText}>
-              <Text style={{ color: '#f97316', fontWeight: 'bold' }}>GM Builders!</Text> What are we building today?
-            </Text>
+          {/* Greeting Card Banner */}
+          <View style={{ width: '100%', marginBottom: 20, height: 260, backgroundColor: '#1f2937', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 5 }}>
+            <ExpoImage
+              source={require('../../assets/images/Bahan.svg')}
+              style={StyleSheet.absoluteFillObject}
+              contentFit="cover"
+            />
+            {/* Dark gradient overlay for text readability */}
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.85)']}
+              style={StyleSheet.absoluteFillObject}
+            />
+
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#9ca3af" />
+              <Text style={styles.searchTextPlaceholder}>Search jobs, builders, or DAOs...</Text>
+              <TouchableOpacity style={styles.filterBtn}>
+                <Ionicons name="options-outline" size={18} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ flex: 1, padding: 25, justifyContent: 'flex-end', position: 'relative' }}>
+              <Text style={{ color: '#ffffff', fontSize: 28, fontWeight: '900', marginBottom: 4, textShadowColor: 'rgba(0, 0, 0, 0.75)', textShadowOffset: {width: -1, height: 1}, textShadowRadius: 10 }}>
+                GM Builders!
+              </Text>
+              <Text style={{ color: 'rgba(255,255,255,0.95)', fontSize: 14, fontWeight: '600', maxWidth: '65%' }}>
+                What are we building today?
+              </Text>
+            </View>
           </View>
 
           {/* Image Slider */}
@@ -149,9 +174,14 @@ const HomeScreen = ({ navigation }: any) => {
           {/* Work Logos Stack Grid */}
           <View style={styles.stackContainer}>
             <Text style={styles.stackTitle}>POWERING YOUR WEB3 CAREER STACK</Text>
+            <View style={[styles.stackGrid, { marginBottom: 6 }]}>
+              {WORK_LOGOS.slice(0, 8).map((logo, index) => (
+                <AnimatedGridLogo key={`top-${index}`} logo={logo} />
+              ))}
+            </View>
             <View style={styles.stackGrid}>
-              {WORK_LOGOS.map((logo, index) => (
-                <AnimatedGridLogo key={index} logo={logo} />
+              {WORK_LOGOS.slice(8, 12).map((logo, index) => (
+                <AnimatedGridLogo key={`bot-${index}`} logo={logo} />
               ))}
             </View>
             <Text style={styles.desktopHintText}>
@@ -219,6 +249,34 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     backgroundColor: '#fafafa',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    marginHorizontal: 25,
+    marginTop: 15,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  searchTextPlaceholder: {
+    flex: 1,
+    marginLeft: 8,
+    color: '#9ca3af',
+    fontSize: 12,
+  },
+  filterBtn: {
+    backgroundColor: '#1f2937',
+    padding: 6,
+    borderRadius: 8,
+  },
   greetingContainer: {
     paddingHorizontal: 25,
     marginTop: 15,
@@ -248,13 +306,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 8,
-    maxWidth: 350, // fits exactly 8 logos (8*36 + 7*8 = 344)
+    gap: 6,
+    width: '100%',
   },
   stackIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
@@ -267,8 +325,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   stackIcon: {
-    width: 18,
-    height: 18,
+    width: 14,
+    height: 14,
     opacity: 0.8,
   },
   sectionHeader: {
@@ -295,7 +353,8 @@ const styles = StyleSheet.create({
   },
   slideItemWrapper: {
     width: '100%',
-    height: (width * 0.65) * 1.4, // vertical portrait
+    height: (width * 0.65) * 1.0, // vertical portrait
+
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: '#f3f4f6',

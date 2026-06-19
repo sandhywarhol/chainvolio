@@ -63,11 +63,11 @@ const TimelineScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1f2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Career Timeline</Text>
           <View style={{ width: 40 }} />
@@ -96,10 +96,10 @@ const TimelineScreen = ({ navigation }: any) => {
                  const duration = calculateDuration(r.startDate || r.start_date, r.endDate || r.end_date);
                  
                  return (
-                    <View key={r.id || i} style={[styles.timelineItem, i === 0 && styles.firstItem]}>
-                       <View style={[styles.node, { backgroundColor: r.status === 'Attested' ? '#10b981' : '#333' }]}>
-                          {r.status === 'Attested' && <Ionicons name="shield-checkmark" size={10} color="#000" />}
-                       </View>
+                     <View key={r.id || i} style={[styles.timelineItem, i === 0 && styles.firstItem]}>
+                        <View style={[styles.node, { backgroundColor: r.status === 'Attested' ? '#10b981' : '#e5e7eb' }]}>
+                           {r.status === 'Attested' && <Ionicons name="shield-checkmark" size={10} color="#ffffff" />}
+                        </View>
                        
                        <View style={styles.contentCard}>
                           <Text style={styles.dateLabel}>{startStr} - {endStr}</Text>
@@ -137,10 +137,10 @@ const TimelineScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
-  loadingContainer: { flex: 1, backgroundColor: '#050505', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
+  loadingContainer: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#9ca3af', fontSize: 10,  letterSpacing: 2, marginTop: 20 },
   header: {
     height: 70,
     flexDirection: 'row',
@@ -148,14 +148,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18,  },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#f3f4f6' },
+  headerTitle: { color: '#1f2937', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   introSection: { marginBottom: 40 },
   tagline: { color: '#10b981', fontSize: 9,  letterSpacing: 3, marginBottom: 8 },
-  desc: { color: 'rgba(255,255,255,0.3)', fontSize: 13,  lineHeight: 20 },
-  timelineContainer: { borderLeftWidth: 1, borderLeftColor: 'rgba(255,255,255,0.05)', marginLeft: 6, paddingLeft: 24 },
-  verticalLine: { position: 'absolute', left: -1, top: 15, bottom: 0, width: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
+  desc: { color: '#6b7280', fontSize: 13,  lineHeight: 20 },
+  timelineContainer: { borderLeftWidth: 1, borderLeftColor: '#e5e7eb', marginLeft: 6, paddingLeft: 24 },
+  verticalLine: { position: 'absolute', left: -1, top: 15, bottom: 0, width: 1, backgroundColor: '#e5e7eb' },
   timelineItem: { marginBottom: 45, position: 'relative' },
   firstItem: { marginTop: 10 },
   node: { 
@@ -168,27 +168,32 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#050505'
+    borderColor: '#fafafa'
   },
   contentCard: { 
-    backgroundColor: 'rgba(255,255,255,0.01)', 
+    backgroundColor: '#ffffff', 
     borderRadius: 20, 
     padding: 18, 
-    borderWidth: 0.5, 
-    borderColor: 'rgba(255,255,255,0.05)' 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  dateLabel: { color: '#fff', fontSize: 12,  },
-  durationLabel: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  marginTop: 2 },
+  dateLabel: { color: '#1f2937', fontSize: 12,  },
+  durationLabel: { color: '#9ca3af', fontSize: 10,  marginTop: 2 },
   mainInfo: { marginVertical: 14 },
   orgName: { color: '#10b981', fontSize: 15,  },
-  roleName: { color: '#fff', fontSize: 14,  marginTop: 2 },
+  roleName: { color: '#4b5563', fontSize: 14,  marginTop: 2 },
   badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   verifiedBadge: { px: 6, py: 2, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: 4, borderWidth: 0.5, borderColor: 'rgba(16, 185, 129, 0.2)' },
   verifiedBadgeText: { color: '#10b981', fontSize: 7,  letterSpacing: 1 },
-  workType: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  textTransform: 'uppercase' },
-  description: { color: 'rgba(255,255,255,0.4)', fontSize: 12,  lineHeight: 18 },
+  workType: { color: '#9ca3af', fontSize: 9,  textTransform: 'uppercase' },
+  description: { color: '#6b7280', fontSize: 12,  lineHeight: 18 },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80, gap: 15 },
-  emptyText: { color: 'rgba(255,255,255,0.1)', fontSize: 14,  },
+  emptyText: { color: '#9ca3af', fontSize: 14,  },
   anchorBtn: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' },
   anchorBtnText: { color: '#10b981', fontSize: 11,  }
 });

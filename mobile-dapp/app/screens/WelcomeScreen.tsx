@@ -163,181 +163,120 @@ const WelcomeScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
-      {/* Background Image - Office Desk Theme */}
-      <ImageBackground 
-        source={{ uri: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1740&auto=format&fit=crop' }} 
-        style={styles.backgroundImage}
-      >
-        {/* Gradient overlay to make bottom text readable */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.9)']}
-          style={styles.gradientOverlay}
-        />
+      <ExpoImage 
+        source={require('../../assets/images/welcome-bg.svg')} 
+        style={StyleSheet.absoluteFillObject} 
+        contentFit="cover" 
+      />
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
 
-        <SafeAreaView style={styles.contentArea}>
+      <SafeAreaView style={styles.contentArea}>
+        <View style={styles.glassBox}>
+          <ExpoImage 
+            source={require('../../assets/images/logo.png')} 
+            style={styles.logo} 
+            contentFit="contain" 
+            tintColor="#ffffff"
+          />
           
-          <View style={styles.centerHero}>
-            <ExpoImage 
-              source={require('../../assets/images/logo.png')} 
-              style={styles.mainLogo} 
-              contentFit="contain" 
-            />
-            <Text style={styles.mainTitle}>Build a Verifiable Web3 Resume That Recruiters Trust.</Text>
-            <Text style={styles.subtitle}>
-              Signed by real people. Anchored on Solana. Cryptographically verified. Share anywhere with one link.
-            </Text>
+          <Text style={styles.welcomeText}>Welcome to ChainVolio</Text>
+          <Text style={styles.subtitleText}>Connect your wallet to get started</Text>
+
+          <View style={styles.walletsContainer}>
+            <TouchableOpacity 
+              style={[styles.walletBtn, styles.blackBtn]} 
+              onPress={() => connectWallet('phantom')} 
+              disabled={isConnecting}
+            >
+              {isConnecting ? <ActivityIndicator size="small" color="#fff" /> : (
+                <>
+                  <ExpoImage source={require('../../assets/images/phantom.svg')} style={styles.walletIcon} contentFit="contain" />
+                  <Text style={styles.btnText}>Continue with Phantom</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.walletBtn, styles.blackBtn]} 
+              onPress={() => connectWallet('solflare')} 
+              disabled={isConnecting}
+            >
+              <ExpoImage source={require('../../assets/images/solflare.svg')} style={styles.walletIcon} contentFit="contain" />
+              <Text style={styles.btnText}>Continue with Solflare</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.walletBtn, styles.whiteBtn]} 
+              disabled={isConnecting}
+            >
+              <ExpoImage source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg' }} style={styles.walletIcon} contentFit="contain" />
+              <Text style={[styles.btnText, { color: '#1f2937' }]}>Continue with Google</Text>
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.bottomArea}>
-            {!showWallets ? (
-              <TouchableOpacity 
-                style={styles.arrowButton} 
-                onPress={() => setShowWallets(true)}
-              >
-                <Ionicons name="chevron-forward" size={24} color="#1f2937" />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.walletsContainer}>
-                <Text style={styles.walletsTitle}>Connect Wallet</Text>
-                
-                <TouchableOpacity 
-                  style={[styles.walletBtn, styles.phantomBtn]} 
-                  onPress={() => connectWallet('phantom')} 
-                  disabled={isConnecting}
-                >
-                  {isConnecting ? <ActivityIndicator size="small" color="#fff" /> : (
-                    <>
-                      <ExpoImage source={require('../../assets/images/phantom.svg')} style={styles.walletIcon} contentFit="contain" />
-                      <Text style={styles.btnText}>Phantom</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.walletBtn, styles.solflareBtn]} 
-                  onPress={() => connectWallet('solflare')} 
-                  disabled={isConnecting}
-                >
-                  <ExpoImage source={require('../../assets/images/solflare.svg')} style={styles.walletIcon} contentFit="contain" />
-                  <Text style={styles.btnText}>Solflare</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.cancelLink} onPress={() => setShowWallets(false)}>
-                  <Text style={styles.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          
-        </SafeAreaView>
-      </ImageBackground>
+        </View>
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#000',
-  },
-  backgroundImage: { 
-    flex: 1, 
-    width: '100%', 
-    height: '100%',
-  },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  contentArea: { 
+  container: {
     flex: 1,
-    justifyContent: 'flex-end', // push wallets to bottom
-    padding: 30,
+    backgroundColor: '#1f2937',
   },
-  centerHero: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+  contentArea: {
+    flex: 1,
     justifyContent: 'center',
+    padding: 20,
+  },
+  glassBox: {
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    padding: 25,
+    borderRadius: 28,
     alignItems: 'center',
-    paddingHorizontal: 30,
-    zIndex: -1, // keeps it behind the bottom area if they overlap
-  },
-  mainLogo: {
-    width: 360,
-    height: 90,
-    marginBottom: -5,
-  },
-  mainTitle: { 
-    color: '#fff', 
-    fontSize: 28, 
-    fontWeight: '800', 
-    marginBottom: 15,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: {width: 0, height: 2},
-    textShadowRadius: 4,
-  },
-  subtitle: { 
-    color: 'rgba(255,255,255,0.9)', 
-    fontSize: 15, 
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
-  },
-  bottomArea: {
-    alignItems: 'center',
-    marginBottom: 20,
     width: '100%',
   },
-  arrowButton: {
-    width: 60,
+  logo: {
+    width: 240,
     height: 60,
-    backgroundColor: '#ffffff', // white background
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    marginBottom: 20,
+  },
+  welcomeText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: 0, height: 1},
+    textShadowRadius: 3,
+  },
+  subtitleText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 30,
   },
   walletsContainer: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    backdropFilter: 'blur(10px)',
-    borderRadius: 24,
-    padding: 25,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  walletsTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 20,
+    gap: 12,
   },
   walletBtn: { 
     width: '100%',
-    height: 54, 
-    borderRadius: 16, 
+    height: 48, 
+    borderRadius: 14, 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'center', 
-    gap: 12,
-    marginBottom: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  phantomBtn: { backgroundColor: '#ab9ff2' },
-  solflareBtn: { backgroundColor: '#fe9c1d' },
-  walletIcon: { width: 24, height: 24 },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  cancelLink: { marginTop: 10 },
-  cancelText: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: '600' },
+  blackBtn: { backgroundColor: '#000000' },
+  whiteBtn: { backgroundColor: '#ffffff', borderColor: '#e5e7eb' },
+  walletIcon: { width: 20, height: 20 },
+  btnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 });
 
 export default WelcomeScreen;

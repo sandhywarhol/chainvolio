@@ -135,10 +135,11 @@ const AddCredentialScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.background}>
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#1f2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add Credential</Text>
           <View style={{ width: 40 }} />
@@ -154,7 +155,7 @@ const AddCredentialScreen = ({ navigation }: any) => {
               <TextInput
                 style={styles.input}
                 placeholder="Certificate Title"
-                placeholderTextColor="rgba(255,255,255,0.2)"
+                placeholderTextColor="#9ca3af"
                 value={title}
                 onChangeText={setTitle}
               />
@@ -222,20 +223,20 @@ const AddCredentialScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#050505' },
+  background: { flex: 1, backgroundColor: '#fafafa' },
   container: { flex: 1 },
   header: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.03)' },
-  headerTitle: { color: '#fff', fontSize: 18,  },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#f3f4f6' },
+  headerTitle: { color: '#1f2937', fontSize: 18,  },
   scrollContent: { paddingHorizontal: 25, paddingTop: 10 },
   formContainer: { gap: 24, marginBottom: 50 },
-  sectionHeader: { color: 'rgba(255,255,255,0.2)', fontSize: 9,  letterSpacing: 2 },
+  sectionHeader: { color: '#9ca3af', fontSize: 9,  letterSpacing: 2 },
   inputGroup: { gap: 10 },
-  label: { color: 'rgba(255,255,255,0.15)', fontSize: 8,  letterSpacing: 1 },
-  input: { height: 50, backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', borderRadius: 14, px: 16, color: '#fff', fontSize: 14,  },
+  label: { color: '#6b7280', fontSize: 8,  letterSpacing: 1 },
+  input: { height: 50, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 14, paddingHorizontal: 16, color: '#1f2937', fontSize: 14,  },
   uploadArea: { height: 140, backgroundColor: 'rgba(63, 66, 241, 0.05)', borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(63, 66, 241, 0.2)', overflow: 'hidden' },
   uploadInner: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  uploadText: { color: 'rgba(255,255,255,0.4)', fontSize: 12,  },
+  uploadText: { color: '#6b7280', fontSize: 12,  },
   previewImage: { width: '100%', height: '100%' },
   submitBtn: { height: 56, borderRadius: 16, overflow: 'hidden' },
   submitBtnDisabled: { opacity: 0.5 },
@@ -243,15 +244,15 @@ const styles = StyleSheet.create({
   submitBtnText: { color: '#fff', fontSize: 13,  letterSpacing: 1 },
   listContainer: { gap: 20 },
   listHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  countBadge: { paddingHorizontal: 6, py: 2, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)' },
-  countText: { color: 'rgba(255,255,255,0.3)', fontSize: 9,  },
-  emptyText: { color: 'rgba(255,255,255,0.1)', fontSize: 12,  textAlign: 'center', marginTop: 10 },
+  countBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#f3f4f6' },
+  countText: { color: '#6b7280', fontSize: 9,  },
+  emptyText: { color: '#9ca3af', fontSize: 12,  textAlign: 'center', marginTop: 10 },
   certsGrid: { gap: 12 },
-  certItem: { flexDirection: 'row', alignItems: 'center', gap: 14, p: 12, backgroundColor: 'rgba(255,255,255,0.01)', borderRadius: 16, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.05)' },
-  certThumb: { width: 50, height: 50, borderRadius: 10, backgroundColor: '#111' },
+  certItem: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 12, backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb' },
+  certThumb: { width: 50, height: 50, borderRadius: 10, backgroundColor: '#f3f4f6' },
   certInfo: { flex: 1 },
-  certTitle: { color: '#fff', fontSize: 13,  },
-  certIssuer: { color: 'rgba(255,255,255,0.2)', fontSize: 10,  marginTop: 2 },
+  certTitle: { color: '#1f2937', fontSize: 13,  },
+  certIssuer: { color: '#9ca3af', fontSize: 10,  marginTop: 2 },
   delBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(239, 68, 68, 0.05)' },
 });
 

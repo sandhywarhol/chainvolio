@@ -51,6 +51,10 @@ const ProfileStack = () => (
 const CVStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="CVScreen" component={CVScreen} />
+      <Stack.Screen name="Memo" component={MemoScreen} />
+      <Stack.Screen name="Timeline" component={TimelineScreen} />
+      <Stack.Screen name="Add Credential" component={AddCredentialScreen} />
+      <Stack.Screen name="CV Score" component={ScoreScreen} />
     </Stack.Navigator>
 );
 
@@ -80,7 +84,7 @@ const MainTabs = () => {
           else if (route.name === 'My CV') iconName = focused ? 'document-text' : 'document-text-outline';
           else if (route.name === 'Profile') iconName = focused ? 'person-circle' : 'person-circle-outline';
 
-          const scanSize = route.name === 'Scan' ? size + 12 : size + 4;
+          const scanSize = route.name === 'Scan' ? size + 10 : size;
           return <Ionicons name={iconName} size={scanSize} color={color} />;
         },
         tabBarActiveTintColor: '#f97316',
@@ -88,7 +92,7 @@ const MainTabs = () => {
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: '700',
+          fontWeight: '500',
           marginBottom: 8,
         },
         tabBarStyle: {

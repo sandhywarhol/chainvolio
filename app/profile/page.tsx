@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { FileText, Upload, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PenLine, Eye } from "lucide-react";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { compressPdf } from "@/lib/pdf-compress";
 import { CustomWalletModal } from "@/components/wallet/CustomWalletModal";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
@@ -27,7 +29,7 @@ const TEXT_MUTED = "rgba(255,255,255,0.4)";
 const ORANGE = "rgba(253,230,138,0.6)";
 
 export default function ProfilePage() {
-    const { publicKey, disconnect } = useWallet();
+    const { publicKey, disconnect, signMessage } = useWallet();
     const { isGoogleSignedIn } = useGoogleAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -35,6 +37,10 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [savedMsg, setSavedMsg] = useState(false);
+    const [cvPdfUrl, setCvPdfUrl] = useState<string | null>(null);
+    const [pdfFile, setPdfFile] = useState<File | null>(null);
+    const [pdfUploading, setPdfUploading] = useState(false);
+    const [pdfDeleting, setPdfDeleting] = useState(false);
 
     const [form, setForm] = useState({
         displayName: "", bio: "", skills: "", role: "", organization: "",
@@ -77,6 +83,7 @@ export default function ProfilePage() {
                     workPreference: [],
                     avatarUrl: p.avatarUrl || "",
                 });
+                if (p.cvPdfUrl) setCvPdfUrl(p.cvPdfUrl);
             }
         } catch { /* ignore */ }
         setLoading(false);
@@ -98,6 +105,46 @@ export default function ProfilePage() {
             setTimeout(() => setSavedMsg(false), 3000);
         } catch { /* ignore */ }
         setSaving(false);
+    };
+
+    const handlePdfUpload = async (f: File) => {
+        if (!publicKey || !signMessage) return;
+        setPdfUploading(true);
+        const result = await compressPdf(f);
+        if (!result) { setPdfUploading(false); return; }
+        try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signed = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+            if (!signed) { setPdfUploading(false); return; }
+            const fd = new FormData();
+            fd.append("wallet", publicKey.toBase58());
+            fd.append("file", result.file);
+            fd.append("signature", signed.signature);
+            fd.append("nonce", signed.nonce);
+            fd.append("timestamp", signed.timestamp.toString());
+            const res = await fetch("/api/cv-pdf", { method: "POST", body: fd });
+            if (res.ok) { const d = await res.json(); setCvPdfUrl(d.cv_pdf_url); setPdfFile(null); }
+        } catch { /* ignore */ }
+        setPdfUploading(false);
+    };
+
+    const handlePdfDelete = async () => {
+        if (!publicKey || !signMessage) return;
+        setPdfDeleting(true);
+        try {
+            const { signChainVolioAction } = await import("@/lib/wallet-utils");
+            const signed = await signChainVolioAction({ publicKey, signMessage } as any, "update_profile");
+            if (!signed) { setPdfDeleting(false); return; }
+            const params = new URLSearchParams({
+                wallet: publicKey.toBase58(),
+                signature: signed.signature,
+                nonce: signed.nonce,
+                timestamp: signed.timestamp.toString(),
+            });
+            await fetch(`/api/cv-pdf?${params}`, { method: "DELETE" });
+            setCvPdfUrl(null);
+        } catch { /* ignore */ }
+        setPdfDeleting(false);
     };
 
     const togglePref = (t: string) => {
@@ -363,6 +410,55 @@ export default function ProfilePage() {
                             })}
                         </div>
                     </div>
+                </div>
+
+                {/* CV PDF Resume Section */}
+                <div style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${CARD_BORDER}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                        <FileText size={14} color="#fbbf24" />
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase" }}>PDF Resume</span>
+                    </div>
+
+                    {cvPdfUrl ? (
+                        <div style={{ background: CARD_BG, border: `1px solid ${CARD_BORDER}`, borderRadius: 14, padding: 16, display: "flex", alignItems: "center", gap: 12 }}>
+                            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <FileText size={16} color="#fbbf24" />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ color: TEXT_PRIMARY, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>PDF Resume uploaded</p>
+                                <p style={{ color: TEXT_MUTED, fontSize: 11 }}>Visible on your public CV</p>
+                            </div>
+                            {isEditing && (
+                                <button
+                                    onClick={handlePdfDelete}
+                                    disabled={pdfDeleting}
+                                    style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                >
+                                    {pdfDeleting ? <span style={{ width: 12, height: 12, border: "2px solid rgba(248,113,113,0.3)", borderTopColor: "#f87171", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} /> : <Trash2 size={14} />}
+                                </button>
+                            )}
+                        </div>
+                    ) : isEditing ? (
+                        <label style={{
+                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+                            padding: "20px 16px", borderRadius: 14, cursor: "pointer",
+                            border: pdfFile ? "2px dashed rgba(52,211,153,0.4)" : "2px dashed rgba(255,255,255,0.1)",
+                            background: pdfFile ? "rgba(52,211,153,0.05)" : "transparent",
+                        }}>
+                            <input type="file" accept=".pdf" style={{ display: "none" }} onChange={async (e) => {
+                                const f = e.target.files?.[0];
+                                if (!f || f.type !== "application/pdf") return;
+                                await handlePdfUpload(f);
+                            }} />
+                            {pdfUploading ? (
+                                <><span style={{ width: 20, height: 20, border: "2px solid rgba(255,255,255,0.1)", borderTopColor: "#fbbf24", borderRadius: "50%", display: "inline-block" }} /><p style={{ color: TEXT_MUTED, fontSize: 12 }}>Uploading...</p></>
+                            ) : (
+                                <><Upload size={24} color="rgba(255,255,255,0.2)" /><p style={{ color: TEXT_MUTED, fontSize: 12 }}>Tap to upload PDF resume (max 5 MB)</p></>
+                            )}
+                        </label>
+                    ) : (
+                        <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 12, fontStyle: "italic" }}>No PDF resume uploaded. Tap Edit to add one.</p>
+                    )}
                 </div>
 
                 {/* Save Button */}
