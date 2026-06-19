@@ -16,7 +16,7 @@ export async function compressPdf(file: File): Promise<{ file: File; compressed:
       const buf = await file.arrayBuffer();
       const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
       const out  = await doc.save({ useObjectStreams: true });
-      const compressedFile = new File([out], file.name, { type: "application/pdf" });
+      const compressedFile = new File([out.buffer as ArrayBuffer], file.name, { type: "application/pdf" });
       // Only use the compressed version if it's actually smaller
       if (compressedFile.size < file.size) candidate = compressedFile;
     } catch {
